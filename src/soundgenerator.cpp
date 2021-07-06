@@ -232,8 +232,7 @@ stereo_val SoundGenerator::Effector(stereo_val val)
 
 bool SoundGenerator::IsSynth()
 {
-    if (type == MINISYNTH_TYPE || type == DIGISYNTH_TYPE ||
-        type == DXSYNTH_TYPE)
+    if (type == MINISYNTH_TYPE || type == DXSYNTH_TYPE)
         return true;
 
     return false;
@@ -241,7 +240,7 @@ bool SoundGenerator::IsSynth()
 
 bool SoundGenerator::IsStepper()
 {
-    if (type == DRUMSYNTH_TYPE || type == DRUMSAMPLER_TYPE)
+    if (type == DRUMSAMPLER_TYPE)
         return true;
     return false;
 }

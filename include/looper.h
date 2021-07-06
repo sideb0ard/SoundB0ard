@@ -67,7 +67,7 @@ struct sound_grain
     float exp_mul = 0;
     float exp_now = 0;
 
-    envelope_generator eg;
+    EnvelopeGenerator eg;
 };
 
 enum
@@ -160,8 +160,8 @@ class looper : public SoundGenerator
     int grain_attack_time_pct;
     int grain_release_time_pct;
 
-    envelope_generator m_eg1; // start/stop amp
-    envelope_generator m_eg2; // unused so far
+    EnvelopeGenerator m_eg1; // start/stop amp
+    EnvelopeGenerator m_eg2; // unused so far
 
     unsigned int loop_mode_;
     double loop_len; // bars

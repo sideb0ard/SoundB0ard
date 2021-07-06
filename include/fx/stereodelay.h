@@ -63,7 +63,7 @@ class StereoDelay : Fx
     double m_tap2_left_delay_time_ms_;
     double m_tap2_right_delay_time_ms_;
 
-    lfo m_lfo1_;
+    LFO m_lfo1_;
     bool lfo1_on_;
     double m_lfo1_min_;
     double m_lfo1_max_;
@@ -71,7 +71,7 @@ class StereoDelay : Fx
     bool sync_;
     unsigned int sync_len_;
 
-    lfo m_lfo2_;
+    LFO m_lfo2_;
     bool lfo2_on_;
     double m_lfo2_min_;
     double m_lfo2_max_;

@@ -56,23 +56,25 @@ enum
     LFO_MAX_MODE
 };
 
-typedef struct oscillator oscillator;
-
-struct oscillator
+class Oscillator
 {
 
+  public:
+    Oscillator();
+    ~Oscillator() = default;
+
     // modulation matrix, owned by voice we are part of
-    modmatrix *m_v_modmatrix;
+    ModulationMatrix *modmatrix{nullptr};
+    GlobalOscillatorParams *global_oscillator_params{nullptr};
 
     // sources that we read from
     unsigned m_mod_source_fo;
     unsigned m_mod_source_pulse_width;
     unsigned m_mod_source_amp;
+
     // destinations we write to
     unsigned m_mod_dest_output1;
     unsigned m_mod_dest_output2;
-
-    global_oscillator_params *m_global_oscillator_params;
 
     bool just_wrapped; // true for one sample period. Used for hard sync
     bool m_note_on;
@@ -120,32 +122,22 @@ struct oscillator
     double m_pw_mod;     /* modulation input for PWM -1 to +1 */
     double m_amp_mod; /* output amplitude modulation for AM 0 to +1 (not dB)*/
 
-    double (*do_oscillate)(oscillator *self, double *aux_output);
-    void (*start_oscillator)(oscillator *self);
-    void (*stop_oscillator)(oscillator *self);
-    void (*reset_oscillator)(oscillator *self);
-    void (*update_oscillator)(oscillator *self);
+    virtual double DoOscillate(double *aux_output) = 0;
+    virtual void StartOscillator() = 0;
+    virtual void StopOscillator() = 0;
+
+    virtual void Reset();
+    virtual void Update();
+
+    void IncModulo();
+    bool CheckWrapModulo();
+    void ResetModulo(double d);
+    void SetAmplitudeMod(double amp_val);
+    void SetFoModExp(double fo_mod_val);
+    void SetPitchBendMod(double mod_val);
+    void SetFoModLin(double fo_mod_val);
+    void SetPhaseMod(double mod_val);
+    void SetPwMod(double mod_val);
+
+    void InitGlobalParameters(GlobalOscillatorParams *params);
 };
-
-void osc_new_settings(oscillator *self);
-
-void osc_inc_modulo(oscillator *self);
-bool osc_check_wrap_modulo(oscillator *self);
-
-void osc_reset_modulo(oscillator *self, double d);
-
-void osc_set_amplitude_mod(oscillator *self, double amp_val);
-
-void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val);
-void osc_set_pitch_bend_mod(oscillator *self, double mod_val);
-
-void osc_set_fo_mod_lin(oscillator *self, double fo_mod_val);
-void osc_set_phase_mod(oscillator *self, double mod_val);
-
-void osc_set_pw_mod(oscillator *self, double mod_val);
-
-void osc_reset(oscillator *self);
-void osc_update(oscillator *self);
-
-void osc_init_global_parameters(oscillator *self,
-                                global_oscillator_params *params);

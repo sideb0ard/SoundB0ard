@@ -24,20 +24,16 @@ StereoDelay::StereoDelay(double duration) : m_delay_time_ms_{duration}
     lfo1_on_ = false;
     m_lfo1_min_ = 50;
     m_lfo1_max_ = 80;
-    osc_new_settings((oscillator *)&m_lfo1_);
-    lfo_set_sound_generator_interface(&m_lfo1_);
-    m_lfo1_.osc.m_osc_fo = 0.01; // default LFO
-    m_lfo1_.osc.m_amplitude = 1.;
-    lfo_start_oscillator((oscillator *)&m_lfo1_);
+    m_lfo1_.m_osc_fo = 0.01; // default LFO
+    m_lfo1_.m_amplitude = 1.;
+    m_lfo1_.StartOscillator();
 
     lfo2_on_ = false;
     m_lfo2_min_ = 50;
     m_lfo2_max_ = 80;
-    osc_new_settings((oscillator *)&m_lfo2_);
-    lfo_set_sound_generator_interface(&m_lfo2_);
-    m_lfo2_.osc.m_osc_fo = 0.01; // default LFO
-    m_lfo2_.osc.m_amplitude = 1.;
-    lfo_start_oscillator((oscillator *)&m_lfo2_);
+    m_lfo2_.m_osc_fo = 0.01; // default LFO
+    m_lfo2_.m_amplitude = 1.;
+    m_lfo2_.StartOscillator();
 
     PrepareForPlay();
     Update();

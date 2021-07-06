@@ -8,9 +8,7 @@
 #include <iostream>
 
 #include <defjams.h>
-#include <digisynth.h>
 #include <drumsampler.h>
-#include <drumsynth.h>
 #include <dxsynth.h>
 #include <midi_freq_table.h>
 #include <midimaaan.h>

@@ -33,7 +33,7 @@ class Envelope : Fx
     void SetDebug(bool b);
 
   private:
-    envelope_generator eg_;
+    EnvelopeGenerator eg_;
     bool started_;
 
     unsigned int env_mode_; // trigger or sustain

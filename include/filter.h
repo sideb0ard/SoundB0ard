@@ -27,17 +27,17 @@ typedef enum
     NUM_FILTER_TYPES
 } filter_type;
 
-typedef struct filter filter;
-
-struct filter
+struct Filter
 {
-    modmatrix *m_v_modmatrix;
+    Filter();
+    ~Filter() = default;
+
+    ModulationMatrix *modmatrix{nullptr};
+    GlobalFilterParams *global_filter_params{nullptr};
 
     // sources
     unsigned m_mod_source_fc;
     unsigned m_mod_source_fc_control;
-
-    global_filter_params *m_global_filter_params;
 
     // GUI controls
     double m_fc_control;  // filter cut-off
@@ -53,20 +53,13 @@ struct filter
     double m_q;      // current q value
     double m_fc_mod; // frequency cutoff modulation input
 
-    void (*set_fc_mod)(filter *self, double d);
-    void (*set_q_control)(filter *self, double d);
-    void (*update)(filter *self);
-    void (*reset)(filter *self);
+    virtual void SetFcMod(double d);
+    virtual void SetQControl(double d);
+    virtual void SetFcControl(double val);
+    virtual void Update();
+    virtual void Reset();
+    virtual double DoFilter(double xn) = 0;
 
-    double (*gennext)(filter *self, double xn); // do_filter
+    void SetType(unsigned int type);
+    void InitGlobalParameters(GlobalFilterParams *params);
 };
-
-void filter_setup(filter *self);
-
-void filter_set_fc_control(filter *f, double val);
-void filter_set_fc_mod(filter *self, double val);
-void filter_set_q_control(filter *self, double val);
-void filter_set_type(filter *self, unsigned int type);
-void filter_update(filter *self);
-void filter_reset(filter *self);
-void filter_init_global_parameters(filter *self, global_filter_params *params);

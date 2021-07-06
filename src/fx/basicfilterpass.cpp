@@ -15,18 +15,12 @@ FilterPass ::FilterPass()
     type_ = BASICFILTER;
     enabled_ = true;
 
-    filter_moog_init(&m_filter_);
-    m_filter_.f.m_aux_control = 0.0;
+    m_filter_.m_aux_control = 0.0;
 
-    osc_new_settings((oscillator *)&m_lfo1_);
-    lfo_set_sound_generator_interface(&m_lfo1_);
-    lfo_start_oscillator((oscillator *)&m_lfo1_);
+    m_lfo1_.StartOscillator();
+    m_lfo2_.StartOscillator();
 
-    osc_new_settings((oscillator *)&m_lfo2_);
-    lfo_set_sound_generator_interface(&m_lfo2_);
-    lfo_start_oscillator((oscillator *)&m_lfo2_);
-
-    printf("LFO1 freq is %.2f\n", m_lfo1_.osc.m_osc_fo);
+    printf("LFO1 freq is %.2f\n", m_lfo1_.m_osc_fo);
 }
 
 void FilterPass::Status(char *status_string)
@@ -35,12 +29,12 @@ void FilterPass::Status(char *status_string)
     snprintf(status_string, MAX_STATIC_STRING_SZ,
              "freq:%.2f q:%.2f type:%s lfo1_active:%d lfo1_type:%d lfo1_amp:%.2f\n"
              "     lfo1_rate:%.2f lfo2_active:%d lfo2_type:%d lfo2_amp:%.2f lfo2_rate:%.2f",
-             m_filter_.f.m_fc_control, m_filter_.f.m_q_control,
-             filtertype_to_name[m_filter_.f.m_filter_type],
-             m_lfo1_active_, m_lfo1_.osc.m_waveform,
-             m_lfo1_.osc.m_amplitude, m_lfo1_.osc.m_osc_fo,
-             m_lfo2_active_, m_lfo2_.osc.m_waveform,
-             m_lfo2_.osc.m_amplitude, m_lfo2_.osc.m_osc_fo);
+             m_filter_.m_fc_control, m_filter_.m_q_control,
+             filtertype_to_name[m_filter_.m_filter_type],
+             m_lfo1_active_, m_lfo1_.m_waveform,
+             m_lfo1_.m_amplitude, m_lfo1_.m_osc_fo,
+             m_lfo2_active_, m_lfo2_.m_waveform,
+             m_lfo2_.m_amplitude, m_lfo2_.m_osc_fo);
     // clang-format on
 }
 
@@ -51,21 +45,21 @@ stereo_val FilterPass::Process(stereo_val input)
 
     if (m_lfo1_active_)
     {
-        osc_update((oscillator *)&m_lfo1_);
-        lfo1_val = lfo_do_oscillate((oscillator *)&m_lfo1_, NULL);
-        filter_set_fc_mod((filter *)&m_filter_, lfo1_val * FILTER_FC_MOD_RANGE);
+        m_lfo1_.Update();
+        lfo1_val = m_lfo1_.DoOscillate(NULL);
+        m_filter_.SetFcMod(lfo1_val * FILTER_FC_MOD_RANGE);
     }
 
     if (m_lfo2_active_)
     {
-        osc_update((oscillator *)&m_lfo2_);
-        lfo2_val = lfo_do_oscillate((oscillator *)&m_lfo2_, NULL);
-        moog_set_qcontrol((filter *)&m_filter_, bipolar_to_unipolar(lfo2_val));
+        m_lfo2_.Update();
+        lfo2_val = m_lfo2_.DoOscillate(NULL);
+        m_filter_.SetQControl(bipolar_to_unipolar(lfo2_val));
     }
 
-    moog_update((filter *)&m_filter_);
-    input.left = moog_gennext((filter *)&m_filter_, input.left);
-    input.right = moog_gennext((filter *)&m_filter_, input.right);
+    m_filter_.Update();
+    input.left = m_filter_.DoFilter(input.left);
+    input.right = m_filter_.DoFilter(input.right);
 
     return input;
 }
@@ -73,11 +67,11 @@ stereo_val FilterPass::Process(stereo_val input)
 void FilterPass::SetParam(std::string name, double val)
 {
     if (name == "freq")
-        filter_set_fc_control(&m_filter_.f, val);
+        m_filter_.SetFcControl(val);
     else if (name == "q")
-        filter_set_q_control(&m_filter_.f, val);
+        m_filter_.SetQControl(val);
     else if (name == "type")
-        filter_set_type(&m_filter_.f, val);
+        m_filter_.SetType(val);
     else if (name == "lfo1_active")
         SetLfoActive(1, val);
     else if (name == "lfo1_type")
@@ -108,10 +102,10 @@ void FilterPass::SetLfoType(int lfo_num, unsigned int type)
     switch (lfo_num)
     {
     case (1):
-        m_lfo1_.osc.m_waveform = type;
+        m_lfo1_.m_waveform = type;
         break;
     case (2):
-        m_lfo2_.osc.m_waveform = type;
+        m_lfo2_.m_waveform = type;
         break;
     default:
         printf("Only got two LFO's mate - what do you think i am?\n");
@@ -144,10 +138,10 @@ void FilterPass::SetLfoRate(int lfo_num, double val)
     switch (lfo_num)
     {
     case (1):
-        m_lfo1_.osc.m_osc_fo = val;
+        m_lfo1_.m_osc_fo = val;
         break;
     case (2):
-        m_lfo2_.osc.m_osc_fo = val;
+        m_lfo2_.m_osc_fo = val;
         break;
     default:
         printf("Only got two LFO's mate - what do you think i am?\n");
@@ -164,10 +158,10 @@ void FilterPass::SetLfoAmp(int lfo_num, double val)
     switch (lfo_num)
     {
     case (1):
-        m_lfo1_.osc.m_amplitude = val;
+        m_lfo1_.m_amplitude = val;
         break;
     case (2):
-        m_lfo2_.osc.m_amplitude = val;
+        m_lfo2_.m_amplitude = val;
         break;
     default:
         printf("Only got two LFO's mate - what do you think i am?\n");

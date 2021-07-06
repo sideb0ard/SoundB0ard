@@ -9,110 +9,92 @@
 #include <iostream>
 
 extern const char *s_dest_enum_to_name[];
-dca *new_dca()
+
+DCA::DCA()
 {
-    dca *d = (dca *)calloc(1, sizeof(dca));
-    if (!d)
-        return NULL;
+    m_amplitude_control = 1.0;
+    m_amp_mod_db = 0.0;
+    m_gain = 1.0;
+    m_amplitude_db = 0.0;
+    m_eg_mod = 1.0;
+    m_pan_control = 0.0;
+    m_pan_mod = 0.0;
+    m_midi_velocity = 127;
 
-    dca_initialize(d);
+    modmatrix = nullptr;
+    global_dca_params = nullptr;
 
-    return d;
+    m_mod_source_eg = DEST_NONE;
+    m_mod_source_amp_db = DEST_NONE;
+    m_mod_source_velocity = DEST_NONE;
+    m_mod_source_pan = DEST_NONE;
 }
 
-void dca_initialize(dca *d)
+void DCA::SetMidiVelocity(unsigned int vel) { m_midi_velocity = vel; }
+
+void DCA::SetPanControl(double pan) { m_pan_control = pan; }
+
+void DCA::Reset()
 {
-    d->m_amplitude_control = 1.0;
-    d->m_amp_mod_db = 0.0;
-    d->m_gain = 1.0;
-    d->m_amplitude_db = 0.0;
-    d->m_eg_mod = 1.0;
-    d->m_pan_control = 0.0;
-    d->m_pan_mod = 0.0;
-    d->m_midi_velocity = 127;
-
-    d->m_v_modmatrix = nullptr;
-    d->m_global_dca_params = nullptr;
-
-    d->m_mod_source_eg = DEST_NONE;
-    d->m_mod_source_amp_db = DEST_NONE;
-    d->m_mod_source_velocity = DEST_NONE;
-    d->m_mod_source_pan = DEST_NONE;
+    m_eg_mod = 1.0;
+    m_amp_mod_db = 0.0;
 }
 
-void dca_set_midi_velocity(dca *self, unsigned int vel)
+void DCA::SetAmplitudeDb(double amp)
 {
-    self->m_midi_velocity = vel;
+    m_amplitude_db = amp;
+    m_amplitude_control = pow((double)10.0, amp / (double)20.0);
 }
 
-void dca_set_pan_control(dca *self, double pan) { self->m_pan_control = pan; }
+void DCA::SetAmpModDb(double mod) { m_amp_mod_db = mod; }
 
-void dca_reset(dca *self)
+void DCA::SetEgMod(double mod) { m_eg_mod = mod; }
+
+void DCA::SetPanMod(double mod) { m_pan_mod = mod; }
+
+void DCA::Update()
 {
-    self->m_eg_mod = 1.0;
-    self->m_amp_mod_db = 0.0;
-}
-
-void dca_set_amplitude_db(dca *self, double amp)
-{
-    self->m_amplitude_db = amp;
-    self->m_amplitude_control = pow((double)10.0, amp / (double)20.0);
-}
-
-void dca_set_amp_mod_db(dca *self, double mod) { self->m_amp_mod_db = mod; }
-
-void dca_set_eg_mod(dca *self, double mod) { self->m_eg_mod = mod; }
-
-void dca_set_pan_mod(dca *self, double mod) { self->m_pan_mod = mod; }
-
-void dca_update(dca *self)
-{
-    if (self->m_global_dca_params)
+    if (global_dca_params)
     {
-        dca_set_amplitude_db(self, self->m_global_dca_params->amplitude_db);
-        self->m_pan_control = self->m_global_dca_params->pan_control;
+        SetAmplitudeDb(global_dca_params->amplitude_db);
+        m_pan_control = global_dca_params->pan_control;
     }
 
-    if (self->m_v_modmatrix)
+    if (modmatrix)
     {
         // printf("Yup yup, got modmatrix\n");
-        if (self->m_mod_source_eg != DEST_NONE)
+        if (m_mod_source_eg != DEST_NONE)
         {
-            self->m_eg_mod =
-                self->m_v_modmatrix->m_destinations[self->m_mod_source_eg];
+            m_eg_mod = modmatrix->destinations[m_mod_source_eg];
         }
-        if (self->m_mod_source_amp_db != DEST_NONE)
-            self->m_amp_mod_db =
-                self->m_v_modmatrix->m_destinations[self->m_mod_source_amp_db];
+        if (m_mod_source_amp_db != DEST_NONE)
+            m_amp_mod_db = modmatrix->destinations[m_mod_source_amp_db];
 
-        if (self->m_mod_source_velocity != DEST_NONE)
+        if (m_mod_source_velocity != DEST_NONE)
         {
-            self->m_midi_velocity =
-                self->m_v_modmatrix
-                    ->m_destinations[self->m_mod_source_velocity];
-            // std::cout << "GOT VELoCITY! " << self->m_mod_source_velocity << "
+            m_midi_velocity = modmatrix->destinations[m_mod_source_velocity];
+            // std::cout << "GOT VELoCITY! " << m_mod_source_velocity << "
             // "
-            //          << self->m_midi_velocity << std::endl;
+            //          << m_midi_velocity << std::endl;
         }
 
-        if (self->m_mod_source_pan != DEST_NONE)
-            self->m_pan_mod =
-                self->m_v_modmatrix->m_destinations[self->m_mod_source_pan];
+        if (m_mod_source_pan != DEST_NONE)
+            m_pan_mod = modmatrix->destinations[m_mod_source_pan];
     }
 
-    if (self->m_eg_mod >= 0)
-        self->m_gain = self->m_eg_mod;
+    if (m_eg_mod >= 0)
+        m_gain = m_eg_mod;
     else
-        self->m_gain = self->m_eg_mod + 1.0;
+        m_gain = m_eg_mod + 1.0;
 
-    self->m_gain *= pow(10.0, self->m_amp_mod_db / (double)20.0);
-    self->m_gain *= mma_midi_to_atten(self->m_midi_velocity);
+    m_gain *= pow(10.0, m_amp_mod_db / (double)20.0);
+    m_gain *= mma_midi_to_atten(m_midi_velocity);
 }
 
-void dca_gennext(dca *self, double left_input, double right_input,
-                 double *left_output, double *right_output)
+void DCA::DoDCA(double left_input, double right_input, double *left_output,
+                double *right_output)
 {
-    double pan_total = self->m_pan_control + self->m_pan_mod;
+    double pan_total = m_pan_control + m_pan_mod;
 
     pan_total = fmin(pan_total, 1.0);
     pan_total = fmax(pan_total, -1.0);
@@ -120,15 +102,13 @@ void dca_gennext(dca *self, double left_input, double right_input,
     double pan_right = 0.707;
     calculate_pan_values(pan_total, &pan_left, &pan_right);
 
-    *left_output =
-        pan_left * self->m_amplitude_control * left_input * self->m_gain;
-    *right_output =
-        pan_right * self->m_amplitude_control * right_input * self->m_gain;
+    *left_output = pan_left * m_amplitude_control * left_input * m_gain;
+    *right_output = pan_right * m_amplitude_control * right_input * m_gain;
 }
 
-void dca_init_global_parameters(dca *self, global_dca_params *params)
+void DCA::InitGlobalParameters(GlobalDCAParams *params)
 {
-    self->m_global_dca_params = params;
-    params->amplitude_db = self->m_amplitude_db;
-    params->pan_control = self->m_pan_control;
+    global_dca_params = params;
+    params->amplitude_db = m_amplitude_db;
+    params->pan_control = m_pan_control;
 }

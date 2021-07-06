@@ -1,230 +1,191 @@
 #include <dxsynth_voice.h>
 #include <stdlib.h>
+#include <utils.h>
+
+#include <iostream>
 
 #define IMAX 4.0
 
-dxsynth_voice *new_dxsynth_voice(void)
+DXSynthVoice::DXSynthVoice()
 {
-    dxsynth_voice *dxv = (dxsynth_voice *)calloc(1, sizeof(dxsynth_voice));
-    if (dxv == NULL)
-        return NULL;
-    dxsynth_voice_init(dxv);
-
-    return dxv;
-}
-
-void dxsynth_voice_init(dxsynth_voice *dxv)
-{
-    voice_init(&dxv->m_voice);
-
-    // initialize all oscillators
-    osc_new_settings(&dxv->m_op1.osc);
-    qb_set_sound_generator_interface(&dxv->m_op1);
-    osc_new_settings(&dxv->m_op2.osc);
-    qb_set_sound_generator_interface(&dxv->m_op2);
-    osc_new_settings(&dxv->m_op3.osc);
-    qb_set_sound_generator_interface(&dxv->m_op3);
-    osc_new_settings(&dxv->m_op4.osc);
-    qb_set_sound_generator_interface(&dxv->m_op4);
-    // or use wavetable versions
-    // wt_initialize(&dxv->m_op1);
-    // wt_initialize(&dxv->m_op2);
-    // wt_initialize(&dxv->m_op3);
-    // wt_initialize(&dxv->m_op4);
-
     // attach oscillators to base class
-    dxv->m_voice.m_osc1 = (oscillator *)&dxv->m_op1;
-    dxv->m_voice.m_osc2 = (oscillator *)&dxv->m_op2;
-    dxv->m_voice.m_osc3 = (oscillator *)&dxv->m_op3;
-    dxv->m_voice.m_osc4 = (oscillator *)&dxv->m_op4;
+    m_osc1 = &m_op1;
+    m_osc2 = &m_op2;
+    m_osc3 = &m_op3;
+    m_osc4 = &m_op4;
 
-    dxv->m_op1_feedback = 0.0;
-    dxv->m_op2_feedback = 0.0;
-    dxv->m_op3_feedback = 0.0;
-    dxv->m_op4_feedback = 0.0;
+    m_op1_feedback = 0.0;
+    m_op2_feedback = 0.0;
+    m_op3_feedback = 0.0;
+    m_op4_feedback = 0.0;
 }
 
-void dxsynth_voice_init_global_parameters(dxsynth_voice *dx,
-                                          global_synth_params *sp)
+void DXSynthVoice::InitGlobalParameters(GlobalSynthParams *sp)
 {
-    voice_init_global_parameters(&dx->m_voice, sp);
-    dx->m_voice.m_global_voice_params->op1_feedback = 1.0;
-    dx->m_voice.m_global_voice_params->op2_feedback = 1.0;
-    dx->m_voice.m_global_voice_params->op3_feedback = 1.0;
-    dx->m_voice.m_global_voice_params->op4_feedback = 1.0;
-    dx->m_voice.m_global_voice_params->lfo1_osc_mod_intensity = 1.0;
+    Voice::InitGlobalParameters(sp);
+    m_global_voice_params->op1_feedback = 1.0;
+    m_global_voice_params->op2_feedback = 1.0;
+    m_global_voice_params->op3_feedback = 1.0;
+    m_global_voice_params->op4_feedback = 1.0;
+    m_global_voice_params->lfo1_osc_mod_intensity = 1.0;
 }
 
-void dxsynth_voice_initialize_modmatrix(dxsynth_voice *dxv, modmatrix *matrix)
+void DXSynthVoice::InitializeModMatrix(ModulationMatrix *matrix)
 {
-    voice_initialize_modmatrix(&dxv->m_voice, matrix);
+    Voice::InitializeModMatrix(matrix);
 
-    if (!get_matrix_core(matrix))
-        return;
-
-    matrixrow *row = NULL;
+    std::shared_ptr<ModMatrixRow> row;
 
     // LFO1 -> DEST_OSC1_OUTPUT_AMP
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_OSC1_OUTPUT_AMP,
-        &dxv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &dxv->m_voice.m_default_mod_range, TRANSFORM_BIPOLAR_TO_UNIPOLAR,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_OSC1_OUTPUT_AMP,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_default_mod_range, TRANSFORM_BIPOLAR_TO_UNIPOLAR,
+                          false);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> DEST_OSC1_FO (VIBRATO)
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_OSC1_FO,
-        &dxv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &dxv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_OSC1_FO,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_global_voice_params->osc_fo_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> DEST_OSC2_OUTPUT_AMP
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_OSC2_OUTPUT_AMP,
-        &dxv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &dxv->m_voice.m_default_mod_range, TRANSFORM_BIPOLAR_TO_UNIPOLAR,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_OSC2_OUTPUT_AMP,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_default_mod_range, TRANSFORM_BIPOLAR_TO_UNIPOLAR,
+                          false);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> DEST_OSC2_FO (VIBRATO)
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_OSC2_FO,
-        &dxv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &dxv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_OSC2_FO,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_global_voice_params->osc_fo_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> DEST_OSC3_OUTPUT_AMP
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_OSC3_OUTPUT_AMP,
-        &dxv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &dxv->m_voice.m_default_mod_range, TRANSFORM_BIPOLAR_TO_UNIPOLAR,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_OSC3_OUTPUT_AMP,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_default_mod_range, TRANSFORM_BIPOLAR_TO_UNIPOLAR,
+                          false);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> DEST_OSC3_FO (VIBRATO)
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_OSC3_FO,
-        &dxv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &dxv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_OSC3_FO,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_global_voice_params->osc_fo_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> DEST_OSC4_OUTPUT_AMP
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_OSC4_OUTPUT_AMP,
-        &dxv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &dxv->m_voice.m_default_mod_range, TRANSFORM_BIPOLAR_TO_UNIPOLAR,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_OSC4_OUTPUT_AMP,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_default_mod_range, TRANSFORM_BIPOLAR_TO_UNIPOLAR,
+                          false);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> DEST_OSC4_FO (VIBRATO)
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_OSC4_FO,
-        &dxv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &dxv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_OSC4_FO,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_global_voice_params->osc_fo_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
 }
 
-void dxsynth_voice_set_lfo1_destination(dxsynth_voice *dx, unsigned int op,
-                                        unsigned int dest);
-void dxsynth_voice_set_lfo1_destination(dxsynth_voice *dx, unsigned int op,
-                                        unsigned int dest)
+void DXSynthVoice::SetLFO1Destination(unsigned int op, unsigned int dest)
 {
     switch (op)
     {
     case (0):
     {
         if (dest == DX_LFO_DEST_AMP_MOD &&
-            dx->m_op1.osc.m_mod_source_amp != DEST_OSC1_OUTPUT_AMP)
+            m_op1.m_mod_source_amp != DEST_OSC1_OUTPUT_AMP)
         {
-            dx->m_op1.osc.m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
-            dx->m_op1.osc.m_mod_source_fo = DEST_NONE;
+            m_op1.m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
+            m_op1.m_mod_source_fo = DEST_NONE;
         }
         else if (dest == DX_LFO_DEST_VIBRATO &&
-                 dx->m_op1.osc.m_mod_source_fo != DEST_OSC1_FO)
+                 m_op1.m_mod_source_fo != DEST_OSC1_FO)
         {
-            dx->m_op1.osc.m_mod_source_fo = DEST_OSC1_FO;
-            dx->m_op1.osc.m_mod_source_amp = DEST_NONE;
+            m_op1.m_mod_source_fo = DEST_OSC1_FO;
+            m_op1.m_mod_source_amp = DEST_NONE;
         }
         else if (dest == DX_LFO_DEST_NONE &&
-                 (dx->m_op1.osc.m_mod_source_amp != DEST_NONE ||
-                  dx->m_op1.osc.m_mod_source_fo != DEST_NONE))
+                 (m_op1.m_mod_source_amp != DEST_NONE ||
+                  m_op1.m_mod_source_fo != DEST_NONE))
         {
-            dx->m_op1.osc.m_mod_source_amp = DEST_NONE;
-            dx->m_op1.osc.m_mod_source_fo = DEST_NONE;
+            m_op1.m_mod_source_amp = DEST_NONE;
+            m_op1.m_mod_source_fo = DEST_NONE;
         }
         break;
     }
     case (1):
     {
         if (dest == DX_LFO_DEST_AMP_MOD &&
-            dx->m_op2.osc.m_mod_source_amp != DEST_OSC2_OUTPUT_AMP)
+            m_op2.m_mod_source_amp != DEST_OSC2_OUTPUT_AMP)
         {
-            dx->m_op2.osc.m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
-            dx->m_op2.osc.m_mod_source_fo = DEST_NONE;
+            m_op2.m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
+            m_op2.m_mod_source_fo = DEST_NONE;
         }
         else if (dest == DX_LFO_DEST_VIBRATO &&
-                 dx->m_op2.osc.m_mod_source_fo != DEST_OSC2_FO)
+                 m_op2.m_mod_source_fo != DEST_OSC2_FO)
         {
-            dx->m_op2.osc.m_mod_source_fo = DEST_OSC2_FO;
-            dx->m_op2.osc.m_mod_source_amp = DEST_NONE;
+            m_op2.m_mod_source_fo = DEST_OSC2_FO;
+            m_op2.m_mod_source_amp = DEST_NONE;
         }
         else if (dest == DX_LFO_DEST_NONE &&
-                 (dx->m_op2.osc.m_mod_source_amp != DEST_NONE ||
-                  dx->m_op2.osc.m_mod_source_fo != DEST_NONE))
+                 (m_op2.m_mod_source_amp != DEST_NONE ||
+                  m_op2.m_mod_source_fo != DEST_NONE))
         {
-            dx->m_op2.osc.m_mod_source_amp = DEST_NONE;
-            dx->m_op2.osc.m_mod_source_fo = DEST_NONE;
+            m_op2.m_mod_source_amp = DEST_NONE;
+            m_op2.m_mod_source_fo = DEST_NONE;
         }
         break;
     }
     case (2):
     {
         if (dest == DX_LFO_DEST_AMP_MOD &&
-            dx->m_op3.osc.m_mod_source_amp != DEST_OSC3_OUTPUT_AMP)
+            m_op3.m_mod_source_amp != DEST_OSC3_OUTPUT_AMP)
         {
-            dx->m_op3.osc.m_mod_source_amp = DEST_OSC3_OUTPUT_AMP;
-            dx->m_op3.osc.m_mod_source_fo = DEST_NONE;
+            m_op3.m_mod_source_amp = DEST_OSC3_OUTPUT_AMP;
+            m_op3.m_mod_source_fo = DEST_NONE;
         }
         else if (dest == DX_LFO_DEST_VIBRATO &&
-                 dx->m_op3.osc.m_mod_source_fo != DEST_OSC3_FO)
+                 m_op3.m_mod_source_fo != DEST_OSC3_FO)
         {
-            dx->m_op3.osc.m_mod_source_fo = DEST_OSC3_FO;
-            dx->m_op3.osc.m_mod_source_amp = DEST_NONE;
+            m_op3.m_mod_source_fo = DEST_OSC3_FO;
+            m_op3.m_mod_source_amp = DEST_NONE;
         }
         else if (dest == DX_LFO_DEST_NONE &&
-                 (dx->m_op3.osc.m_mod_source_amp != DEST_NONE ||
-                  dx->m_op3.osc.m_mod_source_fo != DEST_NONE))
+                 (m_op3.m_mod_source_amp != DEST_NONE ||
+                  m_op3.m_mod_source_fo != DEST_NONE))
         {
-            dx->m_op3.osc.m_mod_source_amp = DEST_NONE;
-            dx->m_op3.osc.m_mod_source_fo = DEST_NONE;
+            m_op3.m_mod_source_amp = DEST_NONE;
+            m_op3.m_mod_source_fo = DEST_NONE;
         }
         break;
     }
     case (3):
     {
         if (dest == DX_LFO_DEST_AMP_MOD &&
-            dx->m_op4.osc.m_mod_source_amp != DEST_OSC4_OUTPUT_AMP)
+            m_op4.m_mod_source_amp != DEST_OSC4_OUTPUT_AMP)
         {
-            dx->m_op4.osc.m_mod_source_amp = DEST_OSC4_OUTPUT_AMP;
-            dx->m_op4.osc.m_mod_source_fo = DEST_NONE;
+            m_op4.m_mod_source_amp = DEST_OSC4_OUTPUT_AMP;
+            m_op4.m_mod_source_fo = DEST_NONE;
         }
         else if (dest == DX_LFO_DEST_VIBRATO &&
-                 dx->m_op4.osc.m_mod_source_fo != DEST_OSC4_FO)
+                 m_op4.m_mod_source_fo != DEST_OSC4_FO)
         {
-            dx->m_op4.osc.m_mod_source_fo = DEST_OSC4_FO;
-            dx->m_op4.osc.m_mod_source_amp = DEST_NONE;
+            m_op4.m_mod_source_fo = DEST_OSC4_FO;
+            m_op4.m_mod_source_amp = DEST_NONE;
         }
         else if (dest == DX_LFO_DEST_NONE &&
-                 (dx->m_op4.osc.m_mod_source_amp != DEST_NONE ||
-                  dx->m_op4.osc.m_mod_source_fo != DEST_NONE))
+                 (m_op4.m_mod_source_amp != DEST_NONE ||
+                  m_op4.m_mod_source_fo != DEST_NONE))
         {
-            dx->m_op4.osc.m_mod_source_amp = DEST_NONE;
-            dx->m_op4.osc.m_mod_source_fo = DEST_NONE;
+            m_op4.m_mod_source_amp = DEST_NONE;
+            m_op4.m_mod_source_fo = DEST_NONE;
         }
         break;
     }
@@ -233,71 +194,66 @@ void dxsynth_voice_set_lfo1_destination(dxsynth_voice *dx, unsigned int op,
     }
 }
 
-void dxsynth_voice_prepare_for_play(dxsynth_voice *dxv)
+void DXSynthVoice::PrepareForPlay()
 {
-    voice_prepare_for_play(&dxv->m_voice);
-    dxsynth_voice_reset(dxv);
+    Voice::PrepareForPlay();
+    Reset();
 }
 
-void dxsynth_voice_update(dxsynth_voice *dxv)
+void DXSynthVoice::Update()
 {
-    if (!dxv->m_voice.m_global_voice_params)
+    if (!m_global_voice_params)
         return;
 
-    voice_update(&dxv->m_voice);
+    Voice::Update();
 
-    dxv->m_op1_feedback = dxv->m_voice.m_global_voice_params->op1_feedback;
-    dxv->m_op2_feedback = dxv->m_voice.m_global_voice_params->op2_feedback;
-    dxv->m_op3_feedback = dxv->m_voice.m_global_voice_params->op3_feedback;
-    dxv->m_op4_feedback = dxv->m_voice.m_global_voice_params->op4_feedback;
+    m_op1_feedback = m_global_voice_params->op1_feedback;
+    m_op2_feedback = m_global_voice_params->op2_feedback;
+    m_op3_feedback = m_global_voice_params->op3_feedback;
+    m_op4_feedback = m_global_voice_params->op4_feedback;
 }
 
-void dxsynth_voice_reset(dxsynth_voice *dxv)
+void DXSynthVoice::Reset()
 {
-    voice_reset(&dxv->m_voice);
-    dxv->m_voice.m_portamento_inc = 0.0;
+    Voice::Reset();
+    m_portamento_inc = 0.0;
 }
 
-inline bool dxsynth_voice_can_note_off(dxsynth_voice *dxv)
+bool DXSynthVoice::CanNoteOff()
 {
     bool ret = false;
-    if (!dxv->m_voice.m_note_on)
+    if (!m_note_on)
         return ret;
     else
     {
-        switch (dxv->m_voice.m_voice_mode + 1)
+        switch (m_voice_mode + 1)
         {
         case 1:
         case 2:
         case 3:
         case 4:
         {
-            if (eg_can_note_off(&dxv->m_voice.m_eg1))
+            if (m_eg1.CanNoteOff())
                 ret = true;
             break;
         }
         case 5:
         {
-            if (eg_can_note_off(&dxv->m_voice.m_eg1) &&
-                eg_can_note_off(&dxv->m_voice.m_eg2))
+            if (m_eg1.CanNoteOff() && m_eg2.CanNoteOff())
                 ret = true;
             break;
         }
         case 6:
         case 7:
         {
-            if (eg_can_note_off(&dxv->m_voice.m_eg1) &&
-                eg_can_note_off(&dxv->m_voice.m_eg2) &&
-                eg_can_note_off(&dxv->m_voice.m_eg3))
+            if (m_eg1.CanNoteOff() && m_eg2.CanNoteOff() && m_eg3.CanNoteOff())
                 ret = true;
             break;
         }
         case 8:
         {
-            if (eg_can_note_off(&dxv->m_voice.m_eg1) &&
-                eg_can_note_off(&dxv->m_voice.m_eg2) &&
-                eg_can_note_off(&dxv->m_voice.m_eg3) &&
-                eg_can_note_off(&dxv->m_voice.m_eg4))
+            if (m_eg1.CanNoteOff() && m_eg2.CanNoteOff() &&
+                m_eg3.CanNoteOff() && m_eg4.CanNoteOff())
                 ret = true;
             break;
         }
@@ -306,42 +262,38 @@ inline bool dxsynth_voice_can_note_off(dxsynth_voice *dxv)
     return ret;
 }
 
-bool dxsynth_voice_is_voice_done(dxsynth_voice *dxv)
+bool DXSynthVoice::IsVoiceDone()
 {
     bool ret = false;
-    switch (dxv->m_voice.m_voice_mode + 1)
+    switch (m_voice_mode + 1)
     {
     case 1:
     case 2:
     case 3:
     case 4:
     {
-        if (eg_get_state(&dxv->m_voice.m_eg1) == OFFF)
+        if (m_eg1.GetState() == OFFF)
             ret = true;
         break;
     }
     case 5:
     {
-        if (eg_get_state(&dxv->m_voice.m_eg1) == OFFF &&
-            eg_get_state(&dxv->m_voice.m_eg2) == OFFF)
+        if (m_eg1.GetState() == OFFF && m_eg2.GetState() == OFFF)
             ret = true;
         break;
     }
     case 6:
     case 7:
     {
-        if (eg_get_state(&dxv->m_voice.m_eg1) == OFFF &&
-            eg_get_state(&dxv->m_voice.m_eg2) == OFFF &&
-            eg_get_state(&dxv->m_voice.m_eg3) == OFFF)
+        if (m_eg1.GetState() == OFFF && m_eg2.GetState() == OFFF &&
+            m_eg3.GetState() == OFFF)
             ret = true;
         break;
     }
     case 8:
     {
-        if (eg_get_state(&dxv->m_voice.m_eg1) == OFFF &&
-            eg_get_state(&dxv->m_voice.m_eg2) == OFFF &&
-            eg_get_state(&dxv->m_voice.m_eg3) == OFFF &&
-            eg_get_state(&dxv->m_voice.m_eg4) == OFFF)
+        if (m_eg1.GetState() == OFFF && m_eg2.GetState() == OFFF &&
+            m_eg3.GetState() == OFFF && m_eg4.GetState() == OFFF)
             ret = true;
         break;
     }
@@ -349,112 +301,144 @@ bool dxsynth_voice_is_voice_done(dxsynth_voice *dxv)
     return ret;
 }
 
-void dxsynth_voice_set_output_egs(dxsynth_voice *dxv)
+void DXSynthVoice::SetOutputEGs()
 {
-    dxv->m_voice.m_eg1.m_output_eg = false;
-    dxv->m_voice.m_eg2.m_output_eg = false;
-    dxv->m_voice.m_eg3.m_output_eg = false;
-    dxv->m_voice.m_eg4.m_output_eg = false;
+    m_eg1.m_output_eg = false;
+    m_eg2.m_output_eg = false;
+    m_eg3.m_output_eg = false;
+    m_eg4.m_output_eg = false;
 
-    switch (dxv->m_voice.m_voice_mode + 1)
+    switch (m_voice_mode + 1)
     {
     case 1:
     case 2:
     case 3:
     case 4:
     {
-        dxv->m_voice.m_eg1.m_output_eg = true;
+        m_eg1.m_output_eg = true;
         break;
     }
     case 5:
     {
-        dxv->m_voice.m_eg1.m_output_eg = true;
-        dxv->m_voice.m_eg2.m_output_eg = true;
+        m_eg1.m_output_eg = true;
+        m_eg2.m_output_eg = true;
         break;
     }
     case 6:
     case 7:
     {
-        dxv->m_voice.m_eg1.m_output_eg = true;
-        dxv->m_voice.m_eg2.m_output_eg = true;
-        dxv->m_voice.m_eg3.m_output_eg = true;
+        m_eg1.m_output_eg = true;
+        m_eg2.m_output_eg = true;
+        m_eg3.m_output_eg = true;
         break;
     }
     case 8:
     {
-        dxv->m_voice.m_eg1.m_output_eg = true;
-        dxv->m_voice.m_eg2.m_output_eg = true;
-        dxv->m_voice.m_eg3.m_output_eg = true;
-        dxv->m_voice.m_eg4.m_output_eg = true;
+        m_eg1.m_output_eg = true;
+        m_eg2.m_output_eg = true;
+        m_eg3.m_output_eg = true;
+        m_eg4.m_output_eg = true;
         break;
     }
     }
 }
 
-bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
-                           double *right_output)
+bool DXSynthVoice::DoVoice(double *left_output, double *right_output)
 {
-    if (!voice_gennext(&dxv->m_voice, left_output, right_output))
+    if (!Voice::DoVoice(left_output, right_output))
     {
         return false;
+    }
+
+    if (m_portamento_inc > 0.0 && m_op1.m_osc_fo != m_osc_pitch)
+    {
+        // target pitch has now been hit
+        if (m_modulo_portamento >= 1.0)
+        {
+            m_modulo_portamento = 0.0;
+            m_op1.m_osc_fo = m_osc_pitch;
+            m_op2.m_osc_fo = m_osc_pitch;
+            m_op3.m_osc_fo = m_osc_pitch;
+            m_op4.m_osc_fo = m_osc_pitch;
+        }
+        else
+        {
+            // calculate the pitch multiplier for this sample interval
+            double portamento_pitch_mult = pitch_shift_multiplier(
+                m_modulo_portamento * m_portamento_semitones);
+
+            // set it on our one and only one oscillator
+            m_op1.m_osc_fo = m_portamento_start * portamento_pitch_mult;
+            m_op2.m_osc_fo = m_portamento_start * portamento_pitch_mult;
+            m_op3.m_osc_fo = m_portamento_start * portamento_pitch_mult;
+            m_op4.m_osc_fo = m_portamento_start * portamento_pitch_mult;
+
+            // inc the modulo
+            m_modulo_portamento += m_portamento_inc;
+        }
+
+        // oscillator is still running, so just update
+        m_op1.Update();
+        m_op2.Update();
+        m_op3.Update();
+        m_op4.Update();
     }
 
     double out = 0.0;
     double out1, out2, out3, out4 = 0.0;
     double eg1, eg2, eg3, eg4 = 0.0;
 
-    dxsynth_voice_set_output_egs(dxv);
+    SetOutputEGs();
 
-    do_modulation_matrix(&dxv->m_voice.m_v_modmatrix, 0);
+    modmatrix.DoModMatrix(0);
 
-    eg_update(&dxv->m_voice.m_eg1);
-    eg_update(&dxv->m_voice.m_eg2);
-    eg_update(&dxv->m_voice.m_eg3);
-    eg_update(&dxv->m_voice.m_eg4);
+    m_eg1.Update();
+    m_eg2.Update();
+    m_eg3.Update();
+    m_eg4.Update();
 
-    eg1 = eg_do_envelope(&dxv->m_voice.m_eg1, NULL);
-    eg2 = eg_do_envelope(&dxv->m_voice.m_eg2, NULL);
-    eg3 = eg_do_envelope(&dxv->m_voice.m_eg3, NULL);
-    eg4 = eg_do_envelope(&dxv->m_voice.m_eg4, NULL);
+    eg1 = m_eg1.DoEnvelope(NULL);
+    eg2 = m_eg2.DoEnvelope(NULL);
+    eg3 = m_eg3.DoEnvelope(NULL);
+    eg4 = m_eg4.DoEnvelope(NULL);
 
-    osc_update((oscillator *)&dxv->m_voice.m_lfo1);
-    lfo_do_oscillate((oscillator *)&dxv->m_voice.m_lfo1, NULL);
+    m_lfo1.Update();
+    m_lfo1.DoOscillate(NULL);
 
     ////// layer 1 //////////////////////////////
-    do_modulation_matrix(&dxv->m_voice.m_v_modmatrix, 1);
+    modmatrix.DoModMatrix(1);
 
-    dxsynth_voice_update(dxv);
-    osc_update((oscillator *)&dxv->m_op1);
-    osc_update((oscillator *)&dxv->m_op2);
-    osc_update((oscillator *)&dxv->m_op3);
-    osc_update((oscillator *)&dxv->m_op4);
+    Update();
+    m_op1.Update();
+    m_op2.Update();
+    m_op3.Update();
+    m_op4.Update();
 
-    dca_update(&dxv->m_voice.m_dca);
+    m_dca.Update();
 
-    switch (dxv->m_voice.m_voice_mode + 1)
+    switch (m_voice_mode + 1)
     {
     case (1):
     {
-        out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
+        out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op4,
-                          out4 * dxv->m_op4_feedback);
-        osc_update((oscillator *)&dxv->m_op4);
+        m_op4.SetPhaseMod(out4 * m_op4_feedback);
+        m_op4.Update();
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op3, out4);
-        osc_update((oscillator *)&dxv->m_op3);
+        m_op3.SetPhaseMod(out4);
+        m_op3.Update();
 
-        out3 = IMAX * eg3 * qb_do_oscillate((oscillator *)&dxv->m_op3, NULL);
+        out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op2, out3);
-        osc_update((oscillator *)&dxv->m_op2);
+        m_op2.SetPhaseMod(out3);
+        m_op2.Update();
 
-        out2 = IMAX * eg2 * qb_do_oscillate((oscillator *)&dxv->m_op2, NULL);
+        out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op1, out2);
-        osc_update((oscillator *)&dxv->m_op1);
+        m_op1.SetPhaseMod(out2);
+        m_op1.Update();
 
-        out1 = IMAX * eg1 * qb_do_oscillate((oscillator *)&dxv->m_op1, NULL);
+        out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
         out = out1;
 
@@ -462,22 +446,21 @@ bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     }
     case (2):
     {
-        out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
-        osc_set_phase_mod((oscillator *)&dxv->m_op4,
-                          out4 * dxv->m_op4_feedback);
-        osc_update((oscillator *)&dxv->m_op4);
+        out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
+        m_op4.SetPhaseMod(out4 * m_op4_feedback);
+        m_op4.Update();
 
-        out3 = IMAX * eg3 * qb_do_oscillate((oscillator *)&dxv->m_op3, NULL);
+        out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op2, out3 + out4);
-        osc_update((oscillator *)&dxv->m_op2);
+        m_op2.SetPhaseMod(out3 + out4);
+        m_op2.Update();
 
-        out2 = IMAX * eg2 * qb_do_oscillate((oscillator *)&dxv->m_op2, NULL);
+        out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op1, out2);
-        osc_update((oscillator *)&dxv->m_op1);
+        m_op1.SetPhaseMod(out2);
+        m_op1.Update();
 
-        out1 = IMAX * eg1 * qb_do_oscillate((oscillator *)&dxv->m_op1, NULL);
+        out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
         out = out1;
 
@@ -485,22 +468,21 @@ bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     }
     case (3):
     {
-        out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
-        osc_set_phase_mod((oscillator *)&dxv->m_op4,
-                          out4 * dxv->m_op4_feedback);
-        osc_update((oscillator *)&dxv->m_op4);
+        out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
+        m_op4.SetPhaseMod(out4 * m_op4_feedback);
+        m_op4.Update();
 
-        out3 = IMAX * eg3 * qb_do_oscillate((oscillator *)&dxv->m_op3, NULL);
+        out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op2, out3);
-        osc_update((oscillator *)&dxv->m_op2);
+        m_op2.SetPhaseMod(out3);
+        m_op2.Update();
 
-        out2 = IMAX * eg2 * qb_do_oscillate((oscillator *)&dxv->m_op2, NULL);
+        out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op1, out2 + out4);
-        osc_update((oscillator *)&dxv->m_op1);
+        m_op1.SetPhaseMod(out2 + out4);
+        m_op1.Update();
 
-        out1 = IMAX * eg1 * qb_do_oscillate((oscillator *)&dxv->m_op1, NULL);
+        out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
         out = out1;
 
@@ -508,22 +490,22 @@ bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     }
     case (4):
     {
-        out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
-        osc_set_phase_mod((oscillator *)&dxv->m_op4,
-                          out4 * dxv->m_op4_feedback);
-        osc_update((oscillator *)&dxv->m_op4);
+        out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op3, out4);
-        osc_update((oscillator *)&dxv->m_op2);
+        m_op4.SetPhaseMod(out4 * m_op4_feedback);
+        m_op4.Update();
 
-        out3 = IMAX * eg3 * qb_do_oscillate((oscillator *)&dxv->m_op3, NULL);
+        m_op3.SetPhaseMod(out4);
+        m_op3.Update();
 
-        out2 = IMAX * eg2 * qb_do_oscillate((oscillator *)&dxv->m_op2, NULL);
+        out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op1, out2 + out3);
-        osc_update((oscillator *)&dxv->m_op1);
+        out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
 
-        out1 = IMAX * eg1 * qb_do_oscillate((oscillator *)&dxv->m_op1, NULL);
+        m_op1.SetPhaseMod(out2 + out3);
+        m_op1.Update();
+
+        out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
         out = out1;
 
@@ -531,22 +513,22 @@ bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     }
     case (5):
     {
-        out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
-        osc_set_phase_mod((oscillator *)&dxv->m_op4,
-                          out4 * dxv->m_op4_feedback);
-        osc_update((oscillator *)&dxv->m_op4);
+        out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
-        out3 = IMAX * eg3 * qb_do_oscillate((oscillator *)&dxv->m_op3, NULL);
+        m_op4.SetPhaseMod(out4 * m_op4_feedback);
+        m_op4.Update();
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op2, out4);
-        osc_update((oscillator *)&dxv->m_op2);
+        out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
 
-        out2 = IMAX * eg2 * qb_do_oscillate((oscillator *)&dxv->m_op2, NULL);
+        m_op2.SetPhaseMod(out4);
+        m_op2.Update();
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op1, out3);
-        osc_update((oscillator *)&dxv->m_op1);
+        out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
 
-        out1 = IMAX * eg1 * qb_do_oscillate((oscillator *)&dxv->m_op1, NULL);
+        m_op1.SetPhaseMod(out3);
+        m_op1.Update();
+
+        out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
         out = out1;
 
@@ -554,25 +536,25 @@ bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     }
     case (6):
     {
-        out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
-        osc_set_phase_mod((oscillator *)&dxv->m_op4,
-                          out4 * dxv->m_op4_feedback);
-        osc_update((oscillator *)&dxv->m_op4);
+        out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op3, out4);
-        osc_update((oscillator *)&dxv->m_op2);
+        m_op4.SetPhaseMod(out4 * m_op4_feedback);
+        m_op4.Update();
 
-        out3 = IMAX * eg3 * qb_do_oscillate((oscillator *)&dxv->m_op3, NULL);
+        m_op3.SetPhaseMod(out4);
+        m_op3.Update();
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op2, out4);
-        osc_update((oscillator *)&dxv->m_op2);
+        out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
 
-        out2 = IMAX * eg2 * qb_do_oscillate((oscillator *)&dxv->m_op2, NULL);
+        m_op2.SetPhaseMod(out4);
+        m_op2.Update();
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op1, out4);
-        osc_update((oscillator *)&dxv->m_op1);
+        out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
 
-        out1 = IMAX * eg1 * qb_do_oscillate((oscillator *)&dxv->m_op1, NULL);
+        m_op1.SetPhaseMod(out4);
+        m_op1.Update();
+
+        out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
         out = 0.33 * out1 + 0.33 * out2 + 0.33 * out3;
 
@@ -580,19 +562,18 @@ bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     }
     case (7):
     {
-        out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
-        osc_set_phase_mod((oscillator *)&dxv->m_op4,
-                          out4 * dxv->m_op4_feedback);
-        osc_update((oscillator *)&dxv->m_op4);
+        out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
+        m_op4.SetPhaseMod(out4 * m_op4_feedback);
+        m_op4.Update();
 
-        osc_set_phase_mod((oscillator *)&dxv->m_op3, out4);
-        osc_update((oscillator *)&dxv->m_op2);
+        m_op3.SetPhaseMod(out4);
+        m_op3.Update();
 
-        out3 = IMAX * eg3 * qb_do_oscillate((oscillator *)&dxv->m_op3, NULL);
+        out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
 
-        out2 = IMAX * eg2 * qb_do_oscillate((oscillator *)&dxv->m_op2, NULL);
+        out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
 
-        out1 = IMAX * eg1 * qb_do_oscillate((oscillator *)&dxv->m_op1, NULL);
+        out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
         out = 0.33 * out1 + 0.33 * out2 + 0.33 * out3;
 
@@ -600,14 +581,14 @@ bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     }
     case (8):
     {
-        out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
-        osc_set_phase_mod((oscillator *)&dxv->m_op4,
-                          out4 * dxv->m_op4_feedback);
-        osc_update((oscillator *)&dxv->m_op4);
+        out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
-        out3 = IMAX * eg3 * qb_do_oscillate((oscillator *)&dxv->m_op3, NULL);
-        out2 = IMAX * eg2 * qb_do_oscillate((oscillator *)&dxv->m_op2, NULL);
-        out1 = IMAX * eg1 * qb_do_oscillate((oscillator *)&dxv->m_op1, NULL);
+        m_op4.SetPhaseMod(out4 * m_op4_feedback);
+        m_op4.Update();
+
+        out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
+        out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
+        out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
         out = 0.25 * out1 + 0.25 * out2 + 0.25 * out3 + 0.25 * out4;
 
@@ -617,9 +598,7 @@ bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
         break;
     }
 
-    dca_gennext(&dxv->m_voice.m_dca, out, out, left_output, right_output);
+    m_dca.DoDCA(out, out, left_output, right_output);
 
     return true;
 }
-
-void dxsynth_voice_free_self(dxsynth_voice *dxv) { free(dxv); }

@@ -6,47 +6,117 @@
 #include "qblimited_oscillator.h"
 #include "utils.h"
 
-qb_osc *qb_osc_new()
+double QBLimitedOscillator::DoOscillate(double *aux_output)
 {
-    qb_osc *qb = (qb_osc *)calloc(1, sizeof(qb_osc));
-    if (qb == NULL)
+    if (!m_note_on)
+        return 0.0;
+
+    double out = 0.0;
+
+    just_wrapped = false;
+    bool wrap = CheckWrapModulo();
+    if (wrap)
+        just_wrapped = true;
+
+    double calc_modulo = m_modulo + m_phase_mod;
+    CheckWrapIndex(&calc_modulo);
+
+    switch (m_waveform)
     {
-        printf("Dinghie, mate\n");
-        return NULL;
+    case SINE:
+    {
+        double angle = calc_modulo * 2.0 * (double)M_PI - (double)M_PI;
+        out = parabolic_sine(-1.0 * angle, true);
+        break;
     }
 
-    osc_new_settings(&qb->osc);
-    qb_set_sound_generator_interface(qb);
+    case SAW1:
+    case SAW2:
+    case SAW3:
+    {
+        out = DoSawtooth(calc_modulo, m_inc);
+        break;
+    }
 
-    return qb;
+    case SQUARE:
+    {
+        out = DoSquare(calc_modulo, m_inc);
+        break;
+    }
+
+    case TRI:
+    {
+        if (wrap)
+            m_dpw_square_modulator *= -1.0;
+
+        out = DoTriangle(calc_modulo, m_inc, m_fo, m_dpw_square_modulator,
+                         &m_dpw_z1);
+        break;
+    }
+
+    case NOISE:
+    {
+        out = do_white_noise();
+        break;
+    }
+
+    case PNOISE:
+    {
+        out = do_pn_sequence(&m_pn_register);
+        break;
+    }
+    default:
+        break;
+    }
+
+    IncModulo();
+    if (m_waveform == TRI)
+        IncModulo();
+
+    if (modmatrix)
+    {
+        modmatrix->sources[m_mod_dest_output1] = out * m_amplitude * m_amp_mod;
+        modmatrix->sources[m_mod_dest_output2] = out * m_amplitude * m_amp_mod;
+    }
+
+    if (aux_output)
+        *aux_output = out * m_amplitude * m_amp_mod;
+
+    return out * m_amplitude * m_amp_mod;
 }
 
-void qb_set_sound_generator_interface(qb_osc *qb)
+inline void QBLimitedOscillator::Reset()
 {
-    qb->osc.do_oscillate = &qb_do_oscillate;
-    qb->osc.start_oscillator = &qb_start_oscillator;
-    qb->osc.stop_oscillator = &qb_stop_oscillator;
-    qb->osc.reset_oscillator = &qb_reset_oscillator;
-    qb->osc.update_oscillator = &osc_update; // from base class
+    Oscillator::Reset();
+    if (m_waveform == SAW1 || m_waveform == SAW2 || m_waveform == SAW3 ||
+        m_waveform == TRI)
+        m_modulo = 0.5;
+}
+void QBLimitedOscillator::StartOscillator()
+{
+    Oscillator::Reset();
+    m_note_on = true;
 }
 
-inline double qb_do_sawtooth(oscillator *self, double modulo, double inc)
+void QBLimitedOscillator::StopOscillator() { m_note_on = false; }
+
+double QBLimitedOscillator::DoSawtooth(double modulo, double inc)
 {
     double trivial_saw = 0.0;
     double out = 0.0;
 
-    if (self->m_waveform == SAW1)
+    if (m_waveform == SAW1)
         trivial_saw = unipolar_to_bipolar(modulo);
-    else if (self->m_waveform == SAW2)
+    else if (m_waveform == SAW2)
         trivial_saw = 2.0 * (tanh(1.5 * modulo) / tanh(1.5)) - 1.0;
-    else if (self->m_waveform == SAW3)
+    else if (m_waveform == SAW3)
     {
         trivial_saw = unipolar_to_bipolar(modulo);
         trivial_saw = tanh(1.5 * trivial_saw) / tanh(1.5);
     }
 
     // --- NOTE: Fs/8 = Nyquist/4
-    if (self->m_fo <= SAMPLE_RATE / 8.0)
+    if (m_fo <= SAMPLE_RATE / 8.0)
     {
         out = trivial_saw + do_blep_n(&blep_table_8_blkhar[0], blep_table_size,
                                       modulo,    /* current phase value */
@@ -75,14 +145,14 @@ inline double qb_do_sawtooth(oscillator *self, double modulo, double inc)
     return out;
 }
 
-inline double qb_do_square(oscillator *self, double modulo, double inc)
+inline double QBLimitedOscillator::DoSquare(double modulo, double inc)
 {
-    self->m_waveform = SAW1;
-    double dSaw1 = qb_do_sawtooth(self, modulo, inc);
+    m_waveform = SAW1;
+    double dSaw1 = DoSawtooth(modulo, inc);
     if (inc > 0)
-        modulo += self->m_pulse_width / 100.0;
+        modulo += m_pulse_width / 100.0;
     else
-        modulo -= self->m_pulse_width / 100.0;
+        modulo -= m_pulse_width / 100.0;
 
     if (inc > 0 && modulo >= 1.0)
         modulo -= 1.0;
@@ -90,21 +160,22 @@ inline double qb_do_square(oscillator *self, double modulo, double inc)
     if (inc < 0 && modulo <= 0.0)
         modulo += 1.0;
 
-    double dSaw2 = qb_do_sawtooth(self, modulo, inc);
+    double dSaw2 = DoSawtooth(modulo, inc);
     double out = 0.5 * dSaw1 - 0.5 * dSaw2;
-    double dCorr = 1.0 / (self->m_pulse_width / 100.0);
+    double dCorr = 1.0 / (m_pulse_width / 100.0);
 
-    if ((self->m_pulse_width / 100.0) < 0.5)
-        dCorr = 1.0 / (1.0 - (self->m_pulse_width / 100.0));
+    if ((m_pulse_width / 100.0) < 0.5)
+        dCorr = 1.0 / (1.0 - (m_pulse_width / 100.0));
 
     out *= dCorr;
-    self->m_waveform = SQUARE;
+    m_waveform = SQUARE;
 
     return out;
 }
 
-inline double qb_do_triangle(double modulo, double inc, double fo,
-                             double square_modulator, double *z_register)
+double QBLimitedOscillator::DoTriangle(double modulo, double inc, double fo,
+                                       double square_modulator,
+                                       double *z_register)
 {
 
     double bipolar = unipolar_to_bipolar(modulo);
@@ -117,99 +188,3 @@ inline double qb_do_triangle(double modulo, double inc, double fo,
 
     return differentiated_sq_mod * c;
 }
-
-inline double qb_do_oscillate(oscillator *self, double *aux_output)
-{
-    if (!self->m_note_on)
-        return 0.0;
-
-    double out = 0.0;
-
-    self->just_wrapped = false;
-    bool wrap = osc_check_wrap_modulo(self);
-    if (wrap)
-        self->just_wrapped = true;
-
-    double calc_modulo = self->m_modulo + self->m_phase_mod;
-    check_wrap_index(&calc_modulo);
-
-    switch (self->m_waveform)
-    {
-    case SINE:
-    {
-        double angle = calc_modulo * 2.0 * (double)M_PI - (double)M_PI;
-        out = parabolic_sine(-1.0 * angle, true);
-        break;
-    }
-
-    case SAW1:
-    case SAW2:
-    case SAW3:
-    {
-        out = qb_do_sawtooth(self, calc_modulo, self->m_inc);
-        break;
-    }
-
-    case SQUARE:
-    {
-        out = qb_do_square(self, calc_modulo, self->m_inc);
-        break;
-    }
-
-    case TRI:
-    {
-        if (wrap)
-            self->m_dpw_square_modulator *= -1.0;
-
-        out = qb_do_triangle(calc_modulo, self->m_inc, self->m_fo,
-                             self->m_dpw_square_modulator, &self->m_dpw_z1);
-        break;
-    }
-
-    case NOISE:
-    {
-        out = do_white_noise();
-        break;
-    }
-
-    case PNOISE:
-    {
-        out = do_pn_sequence(&self->m_pn_register);
-        break;
-    }
-    default:
-        break;
-    }
-
-    osc_inc_modulo(self);
-    if (self->m_waveform == TRI)
-        osc_inc_modulo(self);
-
-    if (self->m_v_modmatrix)
-    {
-        self->m_v_modmatrix->m_sources[self->m_mod_dest_output1] =
-            out * self->m_amplitude * self->m_amp_mod;
-        self->m_v_modmatrix->m_sources[self->m_mod_dest_output2] =
-            out * self->m_amplitude * self->m_amp_mod;
-    }
-
-    if (aux_output)
-        *aux_output = out * self->m_amplitude * self->m_amp_mod;
-
-    return out * self->m_amplitude * self->m_amp_mod;
-}
-
-inline void qb_reset_oscillator(oscillator *self)
-{
-    osc_reset(self);
-    if (self->m_waveform == SAW1 || self->m_waveform == SAW2 ||
-        self->m_waveform == SAW3 || self->m_waveform == TRI)
-        self->m_modulo = 0.5;
-}
-inline void qb_start_oscillator(oscillator *self)
-{
-    osc_reset(self);
-    self->m_note_on = true;
-}
-
-inline void qb_stop_oscillator(oscillator *self) { self->m_note_on = false; }

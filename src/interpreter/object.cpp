@@ -111,18 +111,6 @@ MoogSynth::MoogSynth() { soundgen_id_ = AddSoundGenerator(MINISYNTH_TYPE); }
 std::string MoogSynth::Inspect() { return "Moog synth."; }
 ObjectType MoogSynth::Type() { return SYNTH_OBJ; }
 
-DrumSynth::DrumSynth() { soundgen_id_ = AddSoundGenerator(DRUMSYNTH_TYPE); }
-std::string DrumSynth::Inspect() { return "Drum synth."; }
-ObjectType DrumSynth::Type() { return SYNTH_OBJ; }
-
-DigiSynth::DigiSynth(std::string sample_path)
-{
-    std::cout << "SKELP ME - PATH:" << sample_path << std::endl;
-    soundgen_id_ = AddSoundGenerator(DIGISYNTH_TYPE, sample_path);
-}
-std::string DigiSynth::Inspect() { return "Digi synth."; }
-ObjectType DigiSynth::Type() { return SYNTH_OBJ; }
-
 Sample::Sample(std::string sample_path)
 {
     sample_path_ = sample_path;

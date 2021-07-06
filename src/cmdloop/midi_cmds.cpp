@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <drumsynth.h>
 #include <midi_cmds.h>
 #include <midimaaan.h>
 
@@ -27,11 +26,6 @@ void midi_set_destination(Mixer *mixr, int soundgen_num)
         if (mixr->sound_generators_[soundgen_num]->IsSynth())
         {
             mixr->midi_control_destination = MIDI_CONTROL_SYNTH_TYPE;
-            mixr->active_midi_soundgen_num = soundgen_num;
-        }
-        else if (mixr->sound_generators_[soundgen_num]->type == DRUMSYNTH_TYPE)
-        {
-            mixr->midi_control_destination = MIDI_CONTROL_DRUMSYNTH_TYPE;
             mixr->active_midi_soundgen_num = soundgen_num;
         }
     }

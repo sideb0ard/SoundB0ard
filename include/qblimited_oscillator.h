@@ -2,25 +2,20 @@
 
 #include "oscillator.h"
 
-typedef struct qblimited_oscillator qb_osc;
-
-typedef struct qblimited_oscillator
+struct QBLimitedOscillator : public Oscillator
 {
-    oscillator osc;
-} qblimited_oscillator;
+    QBLimitedOscillator() = default;
+    ~QBLimitedOscillator() = default;
 
-qb_osc *qb_osc_new(void);
+    double DoOscillate(double *quad_phase_output) override;
 
-void qb_set_sound_generator_interface(qb_osc *self);
+    void StartOscillator() override;
+    void StopOscillator() override;
 
-double qb_do_oscillate(oscillator *self, double *quad_phase_output);
+    void Reset() override;
 
-void qb_start_oscillator(oscillator *self);
-void qb_stop_oscillator(oscillator *self);
-
-void qb_reset_oscillator(oscillator *self);
-
-double qb_do_sawtooth(oscillator *self, double modulo, double dInc);
-double qb_do_square(oscillator *self, double modulo, double dInc);
-double qb_do_triangle(double modulo, double dInc, double dFo,
+    double DoSawtooth(double modulo, double dInc);
+    double DoSquare(double modulo, double dInc);
+    double DoTriangle(double modulo, double dInc, double dFo,
                       double dSquareModulator, double *pZ_register);
+};

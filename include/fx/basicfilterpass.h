@@ -31,11 +31,11 @@ class FilterPass : Fx
     void SetLfoType(int lfo_num, unsigned int type);
 
   private:
-    filter_moogladder m_filter_;
+    MoogLadder m_filter_;
 
-    lfo m_lfo1_; // route to freq
+    LFO m_lfo1_; // route to freq
     bool m_lfo1_active_{true};
 
-    lfo m_lfo2_; // route to qv
+    LFO m_lfo2_; // route to qv
     bool m_lfo2_active_{false};
 };

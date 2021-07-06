@@ -7,69 +7,44 @@
 #include "utils.h"
 #include "wt_oscillator.h"
 
-wt_osc *wt_osc_new()
+WTOscillator::WTOscillator()
 {
-    wt_osc *wt = (wt_osc *)calloc(1, sizeof(wt_osc));
-    if (wt == NULL)
-    {
-        printf("Nae mem\n");
-        return NULL;
-    }
+    memset(m_saw_tables, 0, NUM_TABLES * sizeof(double));
+    memset(m_tri_tables, 0, NUM_TABLES * sizeof(double));
 
-    wt_initialize(wt);
+    m_read_idx = 0;
+    m_wt_inc = 0;
+    m_read_idx2 = 0;
+    m_wt_inc2 = 0;
+    m_current_table_idx = 0;
 
-    return wt;
+    m_current_table = &m_sine_table[0];
+
+    m_square_corr_factor[0] = 0.5;
+    m_square_corr_factor[1] = 0.5;
+    m_square_corr_factor[2] = 0.5;
+    m_square_corr_factor[3] = 0.49;
+    m_square_corr_factor[4] = 0.48;
+    m_square_corr_factor[5] = 0.468;
+    m_square_corr_factor[6] = 0.43;
+    m_square_corr_factor[7] = 0.34;
+    m_square_corr_factor[8] = 0.25;
+
+    CreateWaveTables();
 }
 
-void wt_initialize(wt_osc *wt)
+void WTOscillator::Reset()
 {
-    osc_new_settings(&wt->osc);
+    Oscillator::Reset();
+    m_read_idx = 0;
+    m_read_idx2 = 0;
 
-    memset(wt->m_saw_tables, 0, NUM_TABLES * sizeof(double));
-    memset(wt->m_tri_tables, 0, NUM_TABLES * sizeof(double));
-
-    wt->m_read_idx = 0;
-    wt->m_wt_inc = 0;
-    wt->m_read_idx2 = 0;
-    wt->m_wt_inc2 = 0;
-    wt->m_current_table_idx = 0;
-
-    wt->m_current_table = &wt->m_sine_table[0];
-
-    wt->m_square_corr_factor[0] = 0.5;
-    wt->m_square_corr_factor[1] = 0.5;
-    wt->m_square_corr_factor[2] = 0.5;
-    wt->m_square_corr_factor[3] = 0.49;
-    wt->m_square_corr_factor[4] = 0.48;
-    wt->m_square_corr_factor[5] = 0.468;
-    wt->m_square_corr_factor[6] = 0.43;
-    wt->m_square_corr_factor[7] = 0.34;
-    wt->m_square_corr_factor[8] = 0.25;
-
-    wt_create_wave_tables(wt);
-    wt->osc.do_oscillate = &wt_do_oscillate;
-    wt->osc.start_oscillator = &wt_start;
-    wt->osc.stop_oscillator = &wt_stop;
-    wt->osc.reset_oscillator = &wt_reset;
-    wt->osc.update_oscillator = &wt_update; // from base class
+    Update();
 }
 
-void wt_reset(oscillator *self)
+double WTOscillator::DoOscillate(double *quad_outval)
 {
-    wt_osc *wt = (wt_osc *)self;
-
-    osc_reset(&wt->osc);
-    wt->m_read_idx = 0;
-    wt->m_read_idx2 = 0;
-
-    wt_update(self);
-}
-
-double wt_do_oscillate(oscillator *self, double *quad_outval)
-{
-    wt_osc *wt = (wt_osc *)self;
-
-    if (!wt->osc.m_note_on)
+    if (!m_note_on)
     {
         if (quad_outval)
             *quad_outval = 0.0;
@@ -77,57 +52,57 @@ double wt_do_oscillate(oscillator *self, double *quad_outval)
         return 0.0;
     }
 
-    if (wt->osc.m_waveform == SQUARE && wt->m_current_table_idx >= 0)
+    if (m_waveform == SQUARE && m_current_table_idx >= 0)
     {
-        double out = wt_do_square_wave(wt);
+        double out = DoSquareWave();
         if (quad_outval)
             *quad_outval = out;
         return out;
     }
 
-    double outval = wt_do_wave_table(wt, &wt->m_read_idx, wt->m_wt_inc);
-    if (wt->osc.m_v_modmatrix)
+    double outval = DoWaveTable(&m_read_idx, m_wt_inc);
+    if (modmatrix)
     {
-        wt->osc.m_v_modmatrix->m_sources[wt->osc.m_mod_dest_output1] =
-            outval * wt->osc.m_amplitude * wt->osc.m_amp_mod;
-        wt->osc.m_v_modmatrix->m_sources[wt->osc.m_mod_dest_output2] =
-            outval * wt->osc.m_amplitude * wt->osc.m_amp_mod;
+        modmatrix->sources[m_mod_dest_output1] =
+            outval * m_amplitude * m_amp_mod;
+        modmatrix->sources[m_mod_dest_output2] =
+            outval * m_amplitude * m_amp_mod;
     }
 
     if (quad_outval)
-        *quad_outval = outval * wt->osc.m_amplitude * wt->osc.m_amp_mod;
+        *quad_outval = outval * m_amplitude * m_amp_mod;
 
-    return outval * wt->osc.m_amplitude * wt->osc.m_amp_mod;
+    return outval * m_amplitude * m_amp_mod;
 }
 
-double wt_do_wave_table(wt_osc *wt, double *read_idx, double wt_inc)
+double WTOscillator::DoWaveTable(double *read_idx, double wt_inc)
 {
     double out = 0.;
-    double mod_read_idx = *read_idx + wt->osc.m_phase_mod * WT_LENGTH;
-    wt_check_wrap_index(&mod_read_idx);
+    double mod_read_idx = *read_idx + m_phase_mod * WT_LENGTH;
+    CheckWrapIndex(&mod_read_idx);
 
     int i_read_idx = abs((int)mod_read_idx);
     float frac = mod_read_idx - i_read_idx;
     int read_idx_next = i_read_idx + 1 > WT_LENGTH - 1 ? 0 : i_read_idx + 1;
-    out = lin_terp(0, 1, wt->m_current_table[i_read_idx],
-                   wt->m_current_table[read_idx_next], frac);
+    out = lin_terp(0, 1, m_current_table[i_read_idx],
+                   m_current_table[read_idx_next], frac);
     *read_idx += wt_inc;
 
-    wt_check_wrap_index(read_idx);
+    CheckWrapIndex(read_idx);
     return out;
 }
 
-double wt_do_square_wave(wt_osc *wt)
+double WTOscillator::DoSquareWave()
 {
-    return wt_do_square_wave_core(wt, &wt->m_read_idx, wt->m_wt_inc);
+    return DoSquareWaveCore(&m_read_idx, m_wt_inc);
 }
 
-double wt_do_square_wave_core(wt_osc *wt, double *read_idx, double wt_inc)
+double WTOscillator::DoSquareWaveCore(double *read_idx, double wt_inc)
 {
-    double pw = wt->osc.m_pulse_width / 100;
+    double pw = m_pulse_width / 100;
     double pwidx = *read_idx + pw * WT_LENGTH;
 
-    double saw1 = wt_do_wave_table(wt, read_idx, wt_inc);
+    double saw1 = DoWaveTable(read_idx, wt_inc);
 
     if (wt_inc >= 0)
     {
@@ -140,9 +115,9 @@ double wt_do_square_wave_core(wt_osc *wt, double *read_idx, double wt_inc)
             pwidx = pwidx + WT_LENGTH;
     }
 
-    double saw2 = wt_do_wave_table(wt, &pwidx, wt_inc);
+    double saw2 = DoWaveTable(&pwidx, wt_inc);
 
-    double sqamp = wt->m_square_corr_factor[wt->m_current_table_idx];
+    double sqamp = m_square_corr_factor[m_current_table_idx];
     double out = sqamp * saw1 - sqamp * saw2;
 
     double corr = 1.0 / pw;
@@ -153,51 +128,42 @@ double wt_do_square_wave_core(wt_osc *wt, double *read_idx, double wt_inc)
     return out;
 }
 
-void wt_start(oscillator *self)
+void WTOscillator::StartOscillator() { m_note_on = true; }
+
+void WTOscillator::StopOscillator() { m_note_on = false; }
+
+void WTOscillator::Update()
 {
-    wt_osc *wt = (wt_osc *)self;
-    wt->osc.m_note_on = true;
+    Oscillator::Update();
+    m_wt_inc = (double)WT_LENGTH * m_inc;
+    SelectTable();
 }
 
-void wt_stop(oscillator *self)
+void WTOscillator::SelectTable()
 {
-    wt_osc *wt = (wt_osc *)self;
-    wt->osc.m_note_on = false;
-}
-
-void wt_update(oscillator *self)
-{
-    wt_osc *wt = (wt_osc *)self;
-    osc_update(&wt->osc);
-    wt->m_wt_inc = (double)WT_LENGTH * wt->osc.m_inc;
-    wt_select_table(wt);
-}
-
-void wt_select_table(wt_osc *wt)
-{
-    wt->m_current_table_idx = wt_get_table_index(wt);
-    if (wt->m_current_table_idx < 0)
+    m_current_table_idx = GetTableIndex();
+    if (m_current_table_idx < 0)
     {
-        wt->m_current_table = &wt->m_sine_table[0];
+        m_current_table = &m_sine_table[0];
         return;
     }
 
-    if (wt->osc.m_waveform == SAW1 || wt->osc.m_waveform == SAW2 ||
-        wt->osc.m_waveform == SAW3 || wt->osc.m_waveform == SQUARE)
-        wt->m_current_table = wt->m_saw_tables[wt->m_current_table_idx];
-    else if (wt->osc.m_waveform == TRI)
-        wt->m_current_table = wt->m_tri_tables[wt->m_current_table_idx];
+    if (m_waveform == SAW1 || m_waveform == SAW2 || m_waveform == SAW3 ||
+        m_waveform == SQUARE)
+        m_current_table = m_saw_tables[m_current_table_idx];
+    else if (m_waveform == TRI)
+        m_current_table = m_tri_tables[m_current_table_idx];
 }
 
-int wt_get_table_index(wt_osc *wt)
+int WTOscillator::GetTableIndex()
 {
-    if (wt->osc.m_waveform == SINE)
+    if (m_waveform == SINE)
         return -1;
 
     double seed_freq = 27.5; // A0
     for (int i = 0; i < NUM_TABLES; ++i)
     {
-        if (wt->osc.m_fo <= seed_freq)
+        if (m_fo <= seed_freq)
             return i;
 
         seed_freq *= 2.0;
@@ -205,17 +171,17 @@ int wt_get_table_index(wt_osc *wt)
     return -1;
 }
 
-void wt_create_wave_tables(wt_osc *wt)
+void WTOscillator::CreateWaveTables()
 {
     for (int i = 0; i < WT_LENGTH; i++)
     {
-        wt->m_sine_table[i] = sin((double)i / WT_LENGTH) * (TWO_PI);
+        m_sine_table[i] = sin((double)i / WT_LENGTH) * (TWO_PI);
     }
     double seed_freq = 27.5; // A0
     for (int i = 0; i < NUM_TABLES; ++i)
     {
-        double *saw_table = (double*) calloc(WT_LENGTH, sizeof(double));
-        double *tri_table = (double*) calloc(WT_LENGTH, sizeof(double));
+        double *saw_table = (double *)calloc(WT_LENGTH, sizeof(double));
+        double *tri_table = (double *)calloc(WT_LENGTH, sizeof(double));
         int harms = (int)((SAMPLE_RATE / 2.0 / seed_freq) - 1.0);
         int half_harms = (int)((float)harms / 2.0);
         double max_saw = 0;
@@ -262,28 +228,28 @@ void wt_create_wave_tables(wt_osc *wt)
         }
 
         // store
-        wt->m_saw_tables[i] = saw_table;
-        wt->m_tri_tables[i] = tri_table;
+        m_saw_tables[i] = saw_table;
+        m_tri_tables[i] = tri_table;
 
         seed_freq *= 2.0;
     }
 }
 
-void wt_destroy_wave_tables(wt_osc *wt)
+void WTOscillator::DestroyWaveTables()
 {
     for (int i = 0; i < NUM_TABLES; ++i)
     {
-        double *p = wt->m_saw_tables[i];
+        double *p = m_saw_tables[i];
         if (p)
         {
             free(p);
-            wt->m_saw_tables[i] = NULL;
+            m_saw_tables[i] = NULL;
         }
-        p = wt->m_tri_tables[i];
+        p = m_tri_tables[i];
         if (p)
         {
             free(p);
-            wt->m_tri_tables[i] = NULL;
+            m_tri_tables[i] = NULL;
         }
     }
 }

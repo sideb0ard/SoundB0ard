@@ -23,11 +23,10 @@ Envelope::Envelope()
 
 void Envelope::Reset()
 {
-    envelope_generator_init(&eg_);
     eg_.m_state = SUSTAIN;
-    eg_set_attack_time_msec(&eg_, 300);
-    eg_set_decay_time_msec(&eg_, 300);
-    eg_set_release_time_msec(&eg_, 300);
+    eg_.SetAttackTimeMsec(300);
+    eg_.SetDecayTimeMsec(300);
+    eg_.SetReleaseTimeMsec(300);
     SetLengthBars(1);
     debug_ = false;
 }
@@ -47,7 +46,7 @@ void Envelope::Status(char *status_string)
 
 stereo_val Envelope::Process(stereo_val input)
 {
-    double env_out = eg_do_envelope(&eg_, NULL);
+    double env_out = eg_.DoEnvelope(NULL);
     input.left *= env_out;
     input.right *= env_out;
     return input;
@@ -102,13 +101,13 @@ void Envelope::EventNotify(broadcast_event event)
 
         if (env_length_ticks_counter_ >= env_length_ticks_)
         {
-            eg_start_eg(&eg_);
+            eg_.StartEg();
             env_length_ticks_counter_ = 0;
         }
         else if (eg_.m_state == SUSTAIN &&
                  env_length_ticks_counter_ >= release_tick_)
         {
-            eg_note_off(&eg_);
+            eg_.NoteOff();
         }
 
         if (eg_.m_state != eg_state_)
@@ -123,7 +122,7 @@ void Envelope::EventNotify(broadcast_event event)
     }
 }
 
-void Envelope::SetType(unsigned int type) { eg_set_eg_mode(&eg_, type); }
+void Envelope::SetType(unsigned int type) { eg_.SetEgMode(type); }
 
 void Envelope::SetMode(unsigned int mode)
 {
@@ -133,21 +132,21 @@ void Envelope::SetMode(unsigned int mode)
 
 void Envelope::SetAttackMs(double val)
 {
-    eg_set_attack_time_msec(&eg_, val);
+    eg_.SetAttackTimeMsec(val);
     CalculateTimings();
 }
 
 void Envelope::SetDecayMs(double val)
 {
-    eg_set_decay_time_msec(&eg_, val);
+    eg_.SetDecayTimeMsec(val);
     CalculateTimings();
 }
 
-void Envelope::SetSustainLvl(double val) { eg_set_sustain_level(&eg_, val); }
+void Envelope::SetSustainLvl(double val) { eg_.SetSustainLevel(val); }
 
 void Envelope::SetReleaseMs(double val)
 {
-    eg_set_release_time_msec(&eg_, val);
+    eg_.SetReleaseTimeMsec(val);
     CalculateTimings();
 }
 

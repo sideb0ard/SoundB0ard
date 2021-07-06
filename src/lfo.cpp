@@ -6,37 +6,11 @@
 #include "oscillator.h"
 #include "utils.h"
 
-lfo *lfo_new()
+LFO::LFO() { m_lfo_mode = LFOSYNC; }
+
+double LFO::DoOscillate(double *quad_phase_output)
 {
-    lfo *l = (lfo *)calloc(1, sizeof(lfo));
-    if (l == NULL)
-    {
-        printf("Nae mems for LFO, mate. Sort it oot\n");
-        return NULL;
-    }
-
-    osc_new_settings(&l->osc);
-    lfo_set_sound_generator_interface(l);
-
-    return l;
-}
-
-void lfo_set_sound_generator_interface(lfo *l)
-{
-    l->osc.do_oscillate = &lfo_do_oscillate;
-    l->osc.start_oscillator = &lfo_start_oscillator;
-    l->osc.stop_oscillator = &lfo_stop_oscillator;
-    l->osc.reset_oscillator = &lfo_reset_oscillator;
-    l->osc.update_oscillator = &osc_update; // base clase impl
-
-    l->osc.m_lfo_mode = LFOSYNC;
-    l->osc.m_fo = DEFAULT_LFO_RATE;
-    l->osc.m_osc_fo = DEFAULT_LFO_RATE;
-}
-
-double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
-{
-    if (!self->m_note_on)
+    if (!m_note_on)
     {
         if (quad_phase_output)
         {
@@ -50,12 +24,12 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     double qp_out = 0.0;
 
     // always first
-    bool wrap = osc_check_wrap_modulo(self);
+    bool wrap = CheckWrapModulo();
 
     // one shot LFO?
-    if (self->m_lfo_mode == LFOSHOT && wrap)
+    if (m_lfo_mode == LFOSHOT && wrap)
     {
-        self->m_note_on = false;
+        m_note_on = false;
 
         if (quad_phase_output)
         {
@@ -67,7 +41,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
 
     // for Quad Phase output
     // advance modulo by 0.25 = 90 degrees
-    double quad_modulo = self->m_modulo + 0.25;
+    double quad_modulo = m_modulo + 0.25;
 
     //// check and wrap
     if (quad_modulo >= 1.0)
@@ -75,11 +49,11 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
         quad_modulo -= 1.0;
     }
 
-    switch (self->m_waveform)
+    switch (m_waveform)
     {
     case sine:
     {
-        double angle = self->m_modulo * 2.0 * M_PI - M_PI;
+        double angle = m_modulo * 2.0 * M_PI - M_PI;
         out = parabolic_sine(-angle, true);
         angle = quad_modulo * 2.0 * M_PI - M_PI;
         qp_out = parabolic_sine(-angle, true);
@@ -90,20 +64,20 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     case dsaw:
     {
         // --- one shot is unipolar for saw
-        if (self->m_lfo_mode != LFOSHOT)
+        if (m_lfo_mode != LFOSHOT)
         {
             // unipolar to bipolar
-            out = unipolar_to_bipolar(self->m_modulo);
+            out = unipolar_to_bipolar(m_modulo);
             qp_out = unipolar_to_bipolar(quad_modulo);
         }
         else
         {
-            out = self->m_modulo - 1.0;
+            out = m_modulo - 1.0;
             qp_out = quad_modulo - 1.0;
         }
 
         // invert for downsaw
-        if (self->m_waveform == dsaw)
+        if (m_waveform == dsaw)
         {
             out *= -1.0;
             qp_out *= -1.0;
@@ -115,20 +89,20 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     case square:
     {
         // check pulse width and output either +1 or -1
-        out = self->m_modulo > self->m_pulse_width / 100.0 ? -1.0 : +1.0;
-        qp_out = quad_modulo > self->m_pulse_width / 100.0 ? -1.0 : +1.0;
+        out = m_modulo > m_pulse_width / 100.0 ? -1.0 : +1.0;
+        qp_out = quad_modulo > m_pulse_width / 100.0 ? -1.0 : +1.0;
 
         break;
     }
 
     case tri:
     {
-        if (self->m_modulo < 0.5) // out  = 0 -> +1
-            out = 2.0 * self->m_modulo;
+        if (m_modulo < 0.5) // out  = 0 -> +1
+            out = 2.0 * m_modulo;
         else // out = +1 -> 0
-            out = 1.0 - 2.0 * (self->m_modulo - 0.5);
+            out = 1.0 - 2.0 * (m_modulo - 0.5);
 
-        if (self->m_lfo_mode != LFOSHOT)
+        if (m_lfo_mode != LFOSHOT)
             // unipolar to bipolar
             out = unipolar_to_bipolar(out);
 
@@ -147,7 +121,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     case expo:
     {
         // calculate the output directly
-        out = concave_inverted_transform(self->m_modulo);
+        out = concave_inverted_transform(m_modulo);
         qp_out = concave_inverted_transform(quad_modulo);
 
         break;
@@ -157,34 +131,34 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     case qrsh:
     {
         // this is the very first run
-        if (self->m_rsh_counter < 0)
+        if (m_rsh_counter < 0)
         {
-            if (self->m_waveform == rsh)
-                self->m_rsh_value = do_white_noise();
+            if (m_waveform == rsh)
+                m_rsh_value = do_white_noise();
             else
-                self->m_rsh_value = do_pn_sequence(&self->m_pn_register);
+                m_rsh_value = do_pn_sequence(&m_pn_register);
 
-            self->m_rsh_counter = 1.0;
+            m_rsh_counter = 1.0;
         }
         // hold time exceeded?
-        else if (self->m_rsh_counter > SAMPLE_RATE / self->m_fo)
+        else if (m_rsh_counter > SAMPLE_RATE / m_fo)
         {
-            self->m_rsh_counter -= SAMPLE_RATE / self->m_fo;
+            m_rsh_counter -= SAMPLE_RATE / m_fo;
 
-            if (self->m_waveform == rsh)
-                self->m_rsh_value = do_white_noise();
+            if (m_waveform == rsh)
+                m_rsh_value = do_white_noise();
             else
-                self->m_rsh_value = do_pn_sequence(&self->m_pn_register);
+                m_rsh_value = do_pn_sequence(&m_pn_register);
         }
 
         // inc the counter
-        self->m_rsh_counter += 1.0;
+        m_rsh_counter += 1.0;
 
         // output held value
-        out = self->m_rsh_value;
+        out = m_rsh_value;
 
         // not meaningful for this output
-        qp_out = self->m_rsh_value;
+        qp_out = m_rsh_value;
         break;
     }
 
@@ -193,42 +167,30 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     }
 
     // ok to inc modulo now
-    osc_inc_modulo(self);
+    IncModulo();
 
-    //// self->m_amplitude & self->m_amp_mod is calculated in update() on base
-    //// class
-    if (self->m_v_modmatrix)
+    if (modmatrix)
     {
         // write our outputs into their destinations
-        // printf("LFO WRITING TO m_mod_dest_output1 OUT:%f m_AMP: %f
-        // m_AMP_MOD:
-        // %f FINALVAL: %f\n", out, self->m_amplitude, self->m_amp_mod, out
-        // *
-        // self->m_amplitude * self->m_amp_mod);
-        self->m_v_modmatrix->m_sources[self->m_mod_dest_output1] =
-            out * self->m_amplitude * self->m_amp_mod;
+        modmatrix->sources[m_mod_dest_output1] = out * m_amplitude * m_amp_mod;
 
         // add quad phase/stereo output
-        self->m_v_modmatrix->m_sources[self->m_mod_dest_output2] =
-            qp_out * self->m_amplitude * self->m_amp_mod;
+        modmatrix->sources[m_mod_dest_output2] =
+            qp_out * m_amplitude * m_amp_mod;
     }
 
     if (quad_phase_output)
-        *quad_phase_output = qp_out * self->m_amplitude * self->m_amp_mod;
+        *quad_phase_output = qp_out * m_amplitude * m_amp_mod;
 
-    // self->m_amplitude & self->m_amp_mod is calculated in update() on base
-    // class
-    return out * self->m_amplitude * self->m_amp_mod;
+    return out * m_amplitude * m_amp_mod;
 }
 
-void lfo_start_oscillator(oscillator *self)
+void LFO::StartOscillator()
 {
-    if (self->m_lfo_mode == LFOSYNC || self->m_lfo_mode == LFOSHOT)
-        osc_reset(self);
+    if (m_lfo_mode == LFOSYNC || m_lfo_mode == LFOSHOT)
+        Reset();
 
-    self->m_note_on = true;
+    m_note_on = true;
 }
 
-void lfo_stop_oscillator(oscillator *self) { self->m_note_on = false; }
-
-void lfo_reset_oscillator(oscillator *self) { osc_reset(self); }
+void LFO::StopOscillator() { m_note_on = false; }

@@ -4,202 +4,178 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "soundgenerator.h"
+#include <iostream>
+
 #include "modmatrix.h"
 #include "oscillator.h"
+#include "soundgenerator.h"
 #include "utils.h"
 
-void osc_new_settings(oscillator *osc)
+Oscillator::Oscillator()
 {
-    osc->m_note_on = false;
-    osc->m_midi_note_number = 0;
-    osc->m_modulo = 0.0;
-    osc->m_inc = 0.0;
-    osc->m_osc_fo = OSC_FO_DEFAULT; // GUI
-    osc->m_amplitude = 1.0;         // default ON
-    osc->m_pulse_width = OSC_PULSEWIDTH_DEFAULT;
-    osc->m_pulse_width_control = OSC_PULSEWIDTH_DEFAULT; // GUI
-    osc->m_fo = OSC_FO_DEFAULT;
+    m_note_on = false;
+    m_midi_note_number = 0;
+    m_modulo = 0.0;
+    m_inc = 0.0;
+    m_osc_fo = OSC_FO_DEFAULT; // GUI
+    m_amplitude = 1.0;         // default ON
+    m_pulse_width = OSC_PULSEWIDTH_DEFAULT;
+    m_pulse_width_control = OSC_PULSEWIDTH_DEFAULT; // GUI
+    m_fo = OSC_FO_DEFAULT;
 
-    osc->m_pn_register = rand();
+    m_pn_register = rand();
 
     // --- continue inits
-    osc->m_rsh_counter = -1; // flag for reset condition
-    osc->m_rsh_value = 0.0;
-    osc->m_amp_mod = 1.0; // note default to 1 to avoid silent osc
-    osc->m_fo_mod_lin = 0.0;
-    osc->m_phase_mod = 0.0;
-    osc->m_fo_mod = 0.0;
-    osc->m_pitch_bend_mod = 0.0;
-    osc->m_pw_mod = 0.0;
-    osc->m_octave = 0.0;
-    osc->m_semitones = 0.0;
-    osc->m_cents = 0.0;
-    osc->m_fo_ratio = 1.0;
-    osc->m_lfo_mode = 0; // LFOSYNC
+    m_rsh_counter = -1; // flag for reset condition
+    m_rsh_value = 0.0;
+    m_amp_mod = 1.0; // note default to 1 to avoid silent osc
+    m_fo_mod_lin = 0.0;
+    m_phase_mod = 0.0;
+    m_fo_mod = 0.0;
+    m_pitch_bend_mod = 0.0;
+    m_pw_mod = 0.0;
+    m_octave = 0.0;
+    m_semitones = 0.0;
+    m_cents = 0.0;
+    m_fo_ratio = 1.0;
+    m_lfo_mode = 0; // LFOSYNC
 
     // --- pitched
-    osc->m_waveform = SINE;
+    m_waveform = SINE;
 
     // --- default modulation matrix inits
-    osc->m_v_modmatrix = NULL;
+    modmatrix = NULL;
 
     // --- everything is disconnected unless you use mod matrix
-    osc->m_mod_source_fo = DEST_NONE;
-    osc->m_mod_source_pulse_width = DEST_NONE;
-    osc->m_mod_source_amp = DEST_NONE;
-    osc->m_mod_dest_output1 = SOURCE_NONE;
-    osc->m_mod_dest_output2 = SOURCE_NONE;
+    m_mod_source_fo = DEST_NONE;
+    m_mod_source_pulse_width = DEST_NONE;
+    m_mod_source_amp = DEST_NONE;
+    m_mod_dest_output1 = SOURCE_NONE;
+    m_mod_dest_output2 = SOURCE_NONE;
 
-    osc->m_global_oscillator_params = NULL;
+    global_oscillator_params = NULL;
 }
 
-void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }
+void Oscillator::IncModulo() { m_modulo += m_inc; }
 
-bool osc_check_wrap_modulo(oscillator *self)
+bool Oscillator::CheckWrapModulo()
 {
-    if (self->m_inc > 0 && self->m_modulo >= 1.0)
+    if (m_inc > 0 && m_modulo >= 1.0)
     {
-        self->m_modulo -= 1.0;
+        m_modulo -= 1.0;
         return true;
     }
-    if (self->m_inc < 0 && self->m_modulo <= 0.0)
+    if (m_inc < 0 && m_modulo <= 0.0)
     {
-        self->m_modulo += 1.0;
+        m_modulo += 1.0;
         return true;
     }
     return false;
 }
 
-void osc_reset_modulo(oscillator *self, double d) { self->m_modulo = d; }
+void Oscillator::ResetModulo(double d) { m_modulo = d; }
 
-void osc_set_amplitude_mod(oscillator *self, double amp_val)
+void Oscillator::SetAmplitudeMod(double amp_val) { m_amp_mod = amp_val; }
+
+void Oscillator::SetFoModExp(double fo_mod_val) { m_fo_mod = fo_mod_val; }
+
+void Oscillator::SetPitchBendMod(double mod_val) { m_pitch_bend_mod = mod_val; }
+void Oscillator::SetFoModLin(double fo_mod_val) { m_fo_mod_lin = fo_mod_val; }
+
+void Oscillator::SetPhaseMod(double mod_val) { m_phase_mod = mod_val; }
+
+void Oscillator::SetPwMod(double mod_val) { m_pw_mod = mod_val; }
+
+void Oscillator::Reset()
 {
-    self->m_amp_mod = amp_val;
+    m_modulo = 0.0;
+    m_dpw_square_modulator = -1.0;
+    m_dpw_z1 = 0.0;
+
+    m_pn_register = rand();
+    m_rsh_counter = -1; // flag for reset condition
+    m_rsh_value = 0.0;
+
+    m_amp_mod = 1.0; // note default to 1 to avoid silent osc
+    m_pw_mod = 0.0;
+    m_pitch_bend_mod = 0.0;
+    m_fo_mod = 0.0;
+    m_fo_mod_lin = 0.0;
+    m_phase_mod = 0.0;
 }
 
-void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val)
+void Oscillator::Update()
 {
-    self->m_fo_mod = fo_mod_val;
-}
-
-void osc_set_pitch_bend_mod(oscillator *self, double mod_val)
-{
-    self->m_pitch_bend_mod = mod_val;
-}
-void osc_set_fo_mod_lin(oscillator *self, double fo_mod_val)
-{
-    self->m_fo_mod_lin = fo_mod_val;
-}
-
-void osc_set_phase_mod(oscillator *self, double mod_val)
-{
-    self->m_phase_mod = mod_val;
-}
-
-void osc_set_pw_mod(oscillator *self, double mod_val)
-{
-    self->m_pw_mod = mod_val;
-}
-
-void osc_reset(oscillator *self)
-{
-    self->m_modulo = 0.0;
-    self->m_dpw_square_modulator = -1.0;
-    self->m_dpw_z1 = 0.0;
-
-    self->m_pn_register = rand();
-    self->m_rsh_counter = -1; // flag for reset condition
-    self->m_rsh_value = 0.0;
-
-    self->m_amp_mod = 1.0; // note default to 1 to avoid silent osc
-    self->m_pw_mod = 0.0;
-    self->m_pitch_bend_mod = 0.0;
-    self->m_fo_mod = 0.0;
-    self->m_fo_mod_lin = 0.0;
-    self->m_phase_mod = 0.0;
-}
-
-void osc_update(oscillator *self)
-{
-    if (self->m_global_oscillator_params)
+    if (global_oscillator_params)
     {
-        if (self->m_global_oscillator_params->osc_fo >= 0)
-            self->m_osc_fo = self->m_global_oscillator_params->osc_fo;
+        if (global_oscillator_params->osc_fo >= 0)
+            m_osc_fo = global_oscillator_params->osc_fo;
 
-        self->m_fo_ratio = self->m_global_oscillator_params->fo_ratio;
-        self->m_amplitude = self->m_global_oscillator_params->amplitude;
-        self->m_pulse_width_control =
-            self->m_global_oscillator_params->pulse_width_control;
-        self->m_octave = self->m_global_oscillator_params->octave;
-        self->m_semitones = self->m_global_oscillator_params->semitones;
-        self->m_cents = self->m_global_oscillator_params->cents;
-        self->m_waveform = self->m_global_oscillator_params->waveform;
-        self->m_lfo_mode = self->m_global_oscillator_params->lfo_mode;
+        m_fo_ratio = global_oscillator_params->fo_ratio;
+        m_amplitude = global_oscillator_params->amplitude;
+        m_pulse_width_control = global_oscillator_params->pulse_width_control;
+        m_octave = global_oscillator_params->octave;
+        m_semitones = global_oscillator_params->semitones;
+        m_cents = global_oscillator_params->cents;
+        m_waveform = global_oscillator_params->waveform;
+        m_lfo_mode = global_oscillator_params->lfo_mode;
     }
 
     // --- ignore LFO mode for noise sources
-    if (self->m_waveform == rsh || self->m_waveform == qrsh)
-        self->m_lfo_mode = LFORFREE;
+    if (m_waveform == rsh || m_waveform == qrsh)
+        m_lfo_mode = LFORFREE;
 
     // --- get from matrix Sources
-    if (self->m_v_modmatrix)
+    if (modmatrix)
     {
         // --- zero is norm for these
-        self->m_fo_mod =
-            self->m_v_modmatrix->m_destinations[self->m_mod_source_fo];
+        m_fo_mod = modmatrix->destinations[m_mod_source_fo];
 
-        self->m_pw_mod =
-            self->m_v_modmatrix->m_destinations[self->m_mod_source_pulse_width];
+        m_pw_mod = modmatrix->destinations[m_mod_source_pulse_width];
 
         // --- amp mod is 0->1
         // --- invert for oscillator output mod
-        self->m_amp_mod =
-            self->m_v_modmatrix->m_destinations[self->m_mod_source_amp];
-        self->m_amp_mod = 1.0 - self->m_amp_mod;
+        m_amp_mod = modmatrix->destinations[m_mod_source_amp];
+        m_amp_mod = 1.0 - m_amp_mod;
     }
 
     // --- do the  complete frequency mod
-    self->m_fo =
-        self->m_osc_fo * self->m_fo_ratio *
-        pitch_shift_multiplier(self->m_fo_mod + self->m_pitch_bend_mod +
-                               self->m_octave * 12.0 + self->m_semitones +
-                               self->m_cents / 100.0);
+    m_fo =
+        m_osc_fo * m_fo_ratio *
+        pitch_shift_multiplier(m_fo_mod + m_pitch_bend_mod + m_octave * 12.0 +
+                               m_semitones + m_cents / 100.0);
     // --- apply linear FM (not used in book projects)
-    self->m_fo += self->m_fo_mod_lin;
+    m_fo += m_fo_mod_lin;
 
     // --- bound Fo (can go outside for FM/PM mod)
     //     +/- 20480 for FM/PM
-    if (self->m_fo > OSC_FO_MAX)
-        self->m_fo = OSC_FO_MAX;
-    if (self->m_fo < -OSC_FO_MAX)
-        self->m_fo = -OSC_FO_MAX;
+    if (m_fo > OSC_FO_MAX)
+        m_fo = OSC_FO_MAX;
+    if (m_fo < -OSC_FO_MAX)
+        m_fo = -OSC_FO_MAX;
 
-    self->m_inc = self->m_fo / SAMPLE_RATE;
+    m_inc = m_fo / SAMPLE_RATE;
 
     // --- limits are 2% and 98%
-    self->m_pulse_width = self->m_pulse_width_control +
-                          self->m_pw_mod *
-                              (OSC_PULSEWIDTH_MAX - OSC_PULSEWIDTH_MIN) /
-                              OSC_PULSEWIDTH_MIN;
+    m_pulse_width = m_pulse_width_control +
+                    m_pw_mod * (OSC_PULSEWIDTH_MAX - OSC_PULSEWIDTH_MIN) /
+                        OSC_PULSEWIDTH_MIN;
 
     // --- bound the PWM to the range
-    self->m_pulse_width = fmin(self->m_pulse_width, OSC_PULSEWIDTH_MAX);
-    self->m_pulse_width = fmax(self->m_pulse_width, OSC_PULSEWIDTH_MIN);
+    m_pulse_width = fmin(m_pulse_width, OSC_PULSEWIDTH_MAX);
+    m_pulse_width = fmax(m_pulse_width, OSC_PULSEWIDTH_MIN);
 }
 
-void osc_init_global_parameters(oscillator *self,
-                                global_oscillator_params *params)
+void Oscillator::InitGlobalParameters(GlobalOscillatorParams *params)
 {
-    self->m_global_oscillator_params = params;
-    self->m_global_oscillator_params->osc_fo = -1.0;
-    self->m_global_oscillator_params->fo_ratio = self->m_fo_ratio;
-    self->m_global_oscillator_params->amplitude = self->m_amplitude;
-    self->m_global_oscillator_params->pulse_width_control =
-        self->m_pulse_width_control;
-    self->m_global_oscillator_params->octave = self->m_octave;
-    self->m_global_oscillator_params->semitones = self->m_semitones;
-    self->m_global_oscillator_params->cents = self->m_cents;
-    self->m_global_oscillator_params->waveform = self->m_waveform;
-    self->m_global_oscillator_params->lfo_mode = self->m_lfo_mode;
+    global_oscillator_params = params;
+    global_oscillator_params->osc_fo = -1.0;
+    global_oscillator_params->fo_ratio = m_fo_ratio;
+    global_oscillator_params->amplitude = m_amplitude;
+    global_oscillator_params->pulse_width_control = m_pulse_width_control;
+    global_oscillator_params->octave = m_octave;
+    global_oscillator_params->semitones = m_semitones;
+    global_oscillator_params->cents = m_cents;
+    global_oscillator_params->waveform = m_waveform;
+    global_oscillator_params->lfo_mode = m_lfo_mode;
 }

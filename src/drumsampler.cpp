@@ -27,7 +27,6 @@ DrumSampler::DrumSampler(char *filename)
 
     type = DRUMSAMPLER_TYPE;
 
-    envelope_generator_init(&eg);
     eg.m_sustain_level = 0;
 
     active = true;
@@ -84,9 +83,9 @@ stereo_val DrumSampler::genNext()
         }
     }
 
-    double amp_env = eg_do_envelope(&eg, NULL);
+    double amp_env = eg.DoEnvelope(NULL);
     if (eg.m_state == SUSTAIN)
-        eg_note_off(&eg);
+        eg.NoteOff();
 
     double amp = volume;
     if (envelope_enabled)
@@ -151,7 +150,7 @@ void DrumSampler::noteOn(midi_event ev)
         samples_now_playing[seq_position] = idx;
         velocity_now_playing[seq_position] = ev.data2;
     }
-    eg_start_eg(&eg);
+    eg.StartEg();
 }
 
 void DrumSampler::pitchBend(midi_event ev)
@@ -219,19 +218,19 @@ void drumsampler_enable_envelope_generator(DrumSampler *ds, bool b)
 }
 void drumsampler_set_attack_time(DrumSampler *ds, double val)
 {
-    eg_set_attack_time_msec(&ds->eg, val);
+    ds->eg.SetAttackTimeMsec(val);
 }
 void drumsampler_set_decay_time(DrumSampler *ds, double val)
 {
-    eg_set_decay_time_msec(&ds->eg, val);
+    ds->eg.SetDecayTimeMsec(val);
 }
 void drumsampler_set_sustain_lvl(DrumSampler *ds, double val)
 {
-    eg_set_sustain_level(&ds->eg, val);
+    ds->eg.SetSustainLevel(val);
 }
 void drumsampler_set_release_time(DrumSampler *ds, double val)
 {
-    eg_set_release_time_msec(&ds->eg, val);
+    ds->eg.SetReleaseTimeMsec(val);
 }
 
 void drumsampler_set_glitch_mode(DrumSampler *ds, bool b)

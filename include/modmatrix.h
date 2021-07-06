@@ -3,7 +3,11 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-typedef enum
+#include <array>
+#include <memory>
+#include <vector>
+
+enum MatrixSources
 {
     SOURCE_NONE,
     SOURCE_LFO1,
@@ -29,9 +33,9 @@ typedef enum
     SOURCE_MIDI_JS_X,
     SOURCE_MIDI_JS_Y,
     MAX_SOURCES
-} matrix_sources;
+};
 
-typedef enum
+enum MatrixDestinations
 {
     DEST_NONE,
 
@@ -99,9 +103,9 @@ typedef enum
     // --- END OF LAYER 1 DESTINATIONS
 
     MAX_DESTINATIONS
-} matrix_destinations;
+};
 
-typedef enum
+enum MatrixTransformations
 {
     TRANSFORM_NONE,
     TRANSFORM_UNIPOLAR_TO_BIPOLAR,
@@ -114,52 +118,48 @@ typedef enum
     TRANSFORM_MIDI_TO_ATTENUATION,
     TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,
     MAX_TRANSFORMS /* not needed? */
-} matrix_transformations;
+};
 
-typedef struct matrixrow
+struct ModMatrixRow
 {
-    unsigned m_source_index;
-    unsigned m_destination_index;
-    double *m_mod_intensity{nullptr};
-    double *m_mod_range{nullptr};
-    unsigned m_source_transform;
-    bool m_enable;
-} matrixrow;
+    unsigned source_index{0};
+    unsigned destination_index{0};
+    double *mod_intensity{nullptr};
+    double *mod_range{nullptr};
+    unsigned source_transform{0};
+    bool enable{false};
+};
 
-typedef struct modmatrix
+struct ModulationMatrix
 {
-    matrixrow **m_matrix_core;
-    int m_num_rows_in_matrix_core;
-    double m_sources[MAX_SOURCES];
-    double m_destinations[MAX_DESTINATIONS];
-} modmatrix;
+    ModulationMatrix() = default;
+    ~ModulationMatrix() = default;
 
-modmatrix *new_modmatrix(void);
+    std::vector<std::shared_ptr<ModMatrixRow>> &GetModMatrixCore();
+    void SetModMatrixCore(std::vector<std::shared_ptr<ModMatrixRow>> &matrix);
 
-int get_matrix_size(modmatrix *self);
+    int GetMatrixSize();
 
-void matrix_clear_sources(modmatrix *self);
-void matrix_clear_destinations(modmatrix *self);
+    void ClearMatrix();
+    void ClearSources();
+    void ClearDestinations();
 
-void create_matrix_core(modmatrix *self);
-void clear_matrix_core(modmatrix *self);
-void delete_matrix_core(modmatrix *self);
+    void AddMatrixRow(std::shared_ptr<ModMatrixRow> row);
+    bool MatrixRowExists(unsigned sourceidx, unsigned destidx);
 
-matrixrow **get_matrix_core(modmatrix *self);
-void set_matrix_core(modmatrix *self, matrixrow **matrix);
+    bool EnableMatrixRow(unsigned sourceidx, unsigned destidx, bool enable);
 
-void add_matrix_row(modmatrix *self, matrixrow *row);
-bool matrix_row_exists(modmatrix *self, unsigned sourceidx, unsigned destidx);
-bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,
-                       bool enable);
+    bool CheckDestinationLayer(unsigned layer,
+                               std::shared_ptr<ModMatrixRow> row);
 
-bool check_destination_layer(unsigned layer, matrixrow *row);
-void do_modulation_matrix(modmatrix *self, unsigned layer);
+    void DoModMatrix(unsigned layer);
 
-void print_modulation_matrix(modmatrix *self);
-void print_modulation_matrix_info_lfo1(modmatrix *self, wchar_t *status_string);
-void print_modulation_matrix_info_eg1(modmatrix *self, wchar_t *status_string);
+    std::vector<std::shared_ptr<ModMatrixRow>> matrix_core;
+    std::array<double, MAX_SOURCES> sources{};
+    std::array<double, MAX_DESTINATIONS> destinations{};
+};
 
-matrixrow *create_matrix_row(unsigned src, unsigned dest, double *intensity,
-                             double *range, unsigned transformation,
-                             bool enable);
+std::shared_ptr<ModMatrixRow> CreateMatrixRow(unsigned src, unsigned dest,
+                                              double *intensity, double *range,
+                                              unsigned transformation,
+                                              bool enable);

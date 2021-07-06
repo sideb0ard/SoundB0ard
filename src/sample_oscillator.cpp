@@ -7,151 +7,132 @@
 #include <sample_oscillator.h>
 #include <utils.h>
 
-void sampleosc_init(sampleosc *sosc, std::string filename)
+SampleOscillator::SampleOscillator(std::string filename)
 {
-    audiofile_data_import_file_contents(&sosc->afd, filename);
-    sampleosc_set_oscillator_interface(sosc);
-    sosc->is_single_cycle = false;
-    sosc->is_pitchless = false;
-    sosc->loop_mode = SAMPLE_ONESHOT;
+    Oscillator::Reset();
+
+    audiofile_data_import_file_contents(&afd, filename);
+    is_single_cycle = false;
+    is_pitchless = false;
+    loop_mode = SAMPLE_ONESHOT;
     // TODO - this duplicates the reading of the file data
-    sosc->orig_pitch_midi_ = DetectMidiPitch(filename);
-
-    osc_new_settings(&sosc->osc);
-    sampleosc_reset_oscillator(&sosc->osc);
+    orig_pitch_midi_ = DetectMidiPitch(filename);
 }
 
-void sampleosc_set_oscillator_interface(sampleosc *sosc)
+void SampleOscillator::StartOscillator()
 {
-    sosc->osc.do_oscillate = &sampleosc_do_oscillate;
-    sosc->osc.start_oscillator = &sampleosc_start_oscillator;
-    sosc->osc.stop_oscillator = &sampleosc_stop_oscillator;
-    sosc->osc.reset_oscillator = &sampleosc_reset_oscillator;
-    sosc->osc.update_oscillator = &sampleosc_update;
+    Reset();
+    m_note_on = true;
 }
+void SampleOscillator::StopOscillator() { m_note_on = false; }
 
-void sampleosc_start_oscillator(oscillator *self)
+void SampleOscillator::Reset()
 {
-    sampleosc_reset_oscillator(self);
-    self->m_note_on = true;
-}
-void sampleosc_stop_oscillator(oscillator *self) { self->m_note_on = false; }
-
-void sampleosc_reset_oscillator(oscillator *self)
-{
-    sampleosc *sosc = (sampleosc *)self;
-    osc_reset(&sosc->osc);
-    sosc->m_read_idx = 0;
-    sampleosc_update((oscillator *)sosc);
+    Oscillator::Reset();
+    m_read_idx = 0;
+    Update();
 }
 
-double sampleosc_read_sample_buffer(sampleosc *sosc)
+double SampleOscillator::ReadSampleBuffer()
 {
     double return_val = 0;
 
-    int read_idx = sosc->m_read_idx;
-    double frac = sosc->m_read_idx - read_idx;
+    int read_idx = m_read_idx;
+    double frac = m_read_idx - read_idx;
 
-    if (sosc->m_read_idx > sosc->afd.samplecount)
-        printf("OSC IDX TOO BIG %f\n", sosc->m_read_idx);
+    if (m_read_idx > afd.samplecount)
+        printf("OSC IDX TOO BIG %f\n", m_read_idx);
 
-    if (sosc->afd.channels == 1)
+    if (afd.channels == 1)
     {
         int next_read_idx =
-            read_idx + 1 > sosc->afd.samplecount - 1 ? 0 : read_idx + 1;
+            read_idx + 1 > afd.samplecount - 1 ? 0 : read_idx + 1;
 
-        return_val = lin_terp(0, 1, sosc->afd.filecontents[read_idx],
-                              sosc->afd.filecontents[next_read_idx], frac);
+        return_val = lin_terp(0, 1, afd.filecontents[read_idx],
+                              afd.filecontents[next_read_idx], frac);
 
-        sosc->m_read_idx += sosc->osc.m_inc;
+        m_read_idx += m_inc;
     }
 
-    else if (sosc->afd.channels == 2)
+    else if (afd.channels == 2)
     {
-        int read_idx_left = (int)sosc->m_read_idx * 2;
-        int next_read_idx_left = read_idx_left + 2 > sosc->afd.samplecount - 1
-                                     ? 0
-                                     : read_idx_left + 2;
+        int read_idx_left = (int)m_read_idx * 2;
+        int next_read_idx_left =
+            read_idx_left + 2 > afd.samplecount - 1 ? 0 : read_idx_left + 2;
         double left_sample =
-            lin_terp(0, 1, sosc->afd.filecontents[read_idx_left],
-                     sosc->afd.filecontents[next_read_idx_left], frac);
+            lin_terp(0, 1, afd.filecontents[read_idx_left],
+                     afd.filecontents[next_read_idx_left], frac);
 
         int read_idx_right = read_idx_left + 1;
-        int next_read_idx_right = read_idx_right + 2 > sosc->afd.samplecount - 1
-                                      ? 1
-                                      : read_idx_right + 2;
+        int next_read_idx_right =
+            read_idx_right + 2 > afd.samplecount - 1 ? 1 : read_idx_right + 2;
         double right_sample =
-            lin_terp(0, 1, sosc->afd.filecontents[read_idx_right],
-                     sosc->afd.filecontents[next_read_idx_right], frac);
+            lin_terp(0, 1, afd.filecontents[read_idx_right],
+                     afd.filecontents[next_read_idx_right], frac);
 
         return_val = (left_sample + right_sample) / 2;
-        sosc->m_read_idx += sosc->osc.m_inc;
+        m_read_idx += m_inc;
     }
 
     return return_val;
 }
 
-void sampleosc_update(oscillator *self)
+void SampleOscillator::Update()
 {
-    sample_oscillator *sosc = (sample_oscillator *)self;
-    osc_update(&sosc->osc);
+    Oscillator::Update();
 
-    if (sosc->is_pitchless)
+    if (is_pitchless)
     {
-        sosc->osc.m_inc = 1;
+        m_inc = 1;
         return;
     }
 
-    double unity_freq = sosc->is_single_cycle
-                            ? (SAMPLE_RATE / ((float)sosc->afd.samplecount /
-                                              (float)sosc->afd.channels))
-                            : get_midi_freq(sosc->orig_pitch_midi_);
+    double unity_freq =
+        is_single_cycle
+            ? (SAMPLE_RATE / ((float)afd.samplecount / (float)afd.channels))
+            : get_midi_freq(orig_pitch_midi_);
 
     double length = SAMPLE_RATE / unity_freq;
 
-    sosc->osc.m_inc *= length;
+    m_inc *= length;
 
-    // if (sosc->m_read_idx >= sosc->afd.samplecount)
+    // if (m_read_idx >= afd.samplecount)
     //{
-    //    sosc->m_read_idx -= sosc->afd.samplecount;
+    //    m_read_idx -= afd.samplecount;
     //}
 }
 
-double sampleosc_do_oscillate(oscillator *self, double *quad_phase_output)
+double SampleOscillator::DoOscillate(double *quad_phase_output)
 {
 
     if (quad_phase_output)
         *quad_phase_output = 0.0;
 
-    if (!self->m_note_on)
+    if (!m_note_on)
         return 0.0;
 
-    sampleosc *sosc = (sampleosc *)self;
-
-    if (sosc->m_read_idx < 0)
+    if (m_read_idx < 0)
         return 0.0;
 
-    double left_output = sampleosc_read_sample_buffer(sosc);
+    double left_output = ReadSampleBuffer();
     // double right_output;
 
     // check for wrap
-    if (sosc->loop_mode == SAMPLE_ONESHOT)
+    if (loop_mode == SAMPLE_ONESHOT)
     {
-        if (sosc->m_read_idx >
-            (double)(sosc->afd.samplecount - sosc->afd.channels - 1) /
-                sosc->afd.channels)
+        if (m_read_idx >
+            (double)(afd.samplecount - afd.channels - 1) / afd.channels)
         {
-            sosc->m_read_idx = -1;
+            m_read_idx = -1;
         }
     }
     else
     {
-        if (sosc->m_read_idx >
-            (double)(sosc->afd.samplecount - sosc->afd.channels - 1) /
-                sosc->afd.channels)
+        if (m_read_idx >
+            (double)(afd.samplecount - afd.channels - 1) / afd.channels)
         {
-            printf("BEYOND! %f\n", sosc->m_read_idx);
-            sosc->m_read_idx = 0;
+            printf("BEYOND! %f\n", m_read_idx);
+            m_read_idx = 0;
         }
     }
 

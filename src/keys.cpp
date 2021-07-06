@@ -8,7 +8,6 @@
 #include <unistd.h>
 
 #include "defjams.h"
-#include "digisynth.h"
 #include "dxsynth.h"
 #include "keys.h"
 #include "midimaaan.h"

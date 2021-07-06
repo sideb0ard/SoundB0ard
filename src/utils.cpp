@@ -707,7 +707,7 @@ double do_pn_sequence(unsigned *pn_register)
     return out;
 }
 
-void check_wrap_index(double *index)
+void CheckWrapIndex(double *index)
 {
     while (*index < 0.0)
         *index += 1.0;

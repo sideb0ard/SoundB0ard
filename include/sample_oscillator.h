@@ -9,10 +9,10 @@ enum
     SAMPLE_ONESHOT
 };
 
-typedef struct sample_oscillator sampleosc;
-typedef struct sample_oscillator
+struct SampleOscillator : public Oscillator
 {
-    oscillator osc;
+    SampleOscillator(std::string filename);
+    ~SampleOscillator() = default;
     audiofile_data afd;
     int orig_pitch_midi_{36}; // default is C2
 
@@ -23,16 +23,11 @@ typedef struct sample_oscillator
 
     double m_read_idx;
 
-} sample_oscillator;
+    void StartOscillator() override;
+    void StopOscillator() override;
+    void Reset() override;
+    void Update() override;
+    double DoOscillate(double *quad_phase_output) override;
 
-void sampleosc_init(sampleosc *sosc, std::string filename);
-
-void sampleosc_set_oscillator_interface(sampleosc *self);
-
-void sampleosc_start_oscillator(oscillator *self);
-void sampleosc_stop_oscillator(oscillator *self);
-void sampleosc_reset_oscillator(oscillator *self);
-void sampleosc_update(oscillator *self);
-
-double sampleosc_read_sample_buffer(sampleosc *sosc);
-double sampleosc_do_oscillate(oscillator *self, double *quad_phase_output);
+    double ReadSampleBuffer();
+};

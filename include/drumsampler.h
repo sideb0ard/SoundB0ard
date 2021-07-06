@@ -53,7 +53,7 @@ class DrumSampler : public SoundGenerator
     int samplerate;
     int channels;
 
-    envelope_generator eg;
+    EnvelopeGenerator eg;
     bool envelope_enabled;
 
     double *buffer{nullptr};

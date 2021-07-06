@@ -40,7 +40,7 @@ class ModDelay : Fx
     void SetLfoType(unsigned int val);
 
   private:
-    wt_oscillator m_lfo_;
+    WTOscillator m_lfo_;
     ddlmodule m_ddl_;
 
     double m_min_delay_msec_;

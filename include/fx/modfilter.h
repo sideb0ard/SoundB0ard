@@ -31,8 +31,8 @@ class ModFilter : Fx
     biquad m_left_lpf_;
     biquad m_right_lpf_;
 
-    wt_oscillator m_fc_lfo_;
-    wt_oscillator m_q_lfo_;
+    WTOscillator m_fc_lfo_;
+    WTOscillator m_q_lfo_;
 
     double m_min_cutoff_freq_;
     double m_max_cutoff_freq_;

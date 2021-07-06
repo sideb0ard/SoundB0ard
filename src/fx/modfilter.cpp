@@ -18,9 +18,6 @@ void ModFilter::Init()
     biquad_flush_delays(&m_left_lpf_);
     biquad_flush_delays(&m_right_lpf_);
 
-    wt_initialize(&m_fc_lfo_);
-    wt_initialize(&m_q_lfo_);
-
     m_min_cutoff_freq_ = 100.;
     m_max_cutoff_freq_ = 5000.;
     m_min_q_ = 0.577;
@@ -41,18 +38,18 @@ void ModFilter::Init()
 
     Update();
 
-    wt_start((oscillator *)&m_fc_lfo_);
-    wt_start((oscillator *)&m_q_lfo_);
+    m_fc_lfo_.StartOscillator();
+    m_q_lfo_.StartOscillator();
 }
 
 void ModFilter::Update()
 {
-    m_fc_lfo_.osc.m_osc_fo = m_mod_rate_fc_;
-    m_q_lfo_.osc.m_osc_fo = m_mod_rate_q_;
-    m_fc_lfo_.osc.m_waveform = m_lfo_waveform_;
-    m_q_lfo_.osc.m_waveform = m_lfo_waveform_;
-    wt_update((oscillator *)&m_fc_lfo_);
-    wt_update((oscillator *)&m_q_lfo_);
+    m_fc_lfo_.m_osc_fo = m_mod_rate_fc_;
+    m_q_lfo_.m_osc_fo = m_mod_rate_q_;
+    m_fc_lfo_.m_waveform = m_lfo_waveform_;
+    m_q_lfo_.m_waveform = m_lfo_waveform_;
+    m_fc_lfo_.Update();
+    m_q_lfo_.Update();
 }
 
 double ModFilter::CalculateCutoffFreq(double lfo_sample)
@@ -121,12 +118,12 @@ stereo_val ModFilter::Process(stereo_val in)
     double yn = 0.0;
     double yqn = 0; // quad phase
 
-    yn = wt_do_oscillate((oscillator *)&m_fc_lfo_, &yqn);
+    yn = m_fc_lfo_.DoOscillate(&yqn);
     double fc = CalculateCutoffFreq(yn);
     double fcq = CalculateCutoffFreq(yqn);
     // printf("LFO FC: %f FC: %f\n", yn, fc);
 
-    yn = wt_do_oscillate((oscillator *)&m_q_lfo_, &yqn);
+    yn = m_q_lfo_.DoOscillate(&yqn);
     double q = CalculateQ(yn);
     double qq = CalculateQ(yqn);
     // printf("LFO Q: %f Q: %f\n", yn, q);

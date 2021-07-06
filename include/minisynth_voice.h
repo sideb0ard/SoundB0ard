@@ -17,36 +17,28 @@ typedef enum
     MAX_VOICE_CHOICE
 } minisynth_voice_choice;
 
-typedef struct
+struct MiniSynthVoice : Voice
 {
-    voice m_voice;
+    MiniSynthVoice();
+    ~MiniSynthVoice() = default;
 
-    qblimited_oscillator m_osc1;
-    qblimited_oscillator m_osc2;
-    qblimited_oscillator m_osc3;
-    qblimited_oscillator m_osc4;
-    // wt_oscillator m_osc1;
-    // wt_oscillator m_osc2;
-    // wt_oscillator m_osc3;
-    // wt_oscillator m_osc4;
+    QBLimitedOscillator m_op1;
+    QBLimitedOscillator m_op2;
+    QBLimitedOscillator m_op3;
+    QBLimitedOscillator m_op4;
+    // WTOscillator m_op1;
+    // WTOscillator m_op2;
+    // WTOscillator m_op3;
+    // WTOscillator m_op4;
 
-    filter_moogladder m_filter;
-    // filter_ckthreefive m_filter;
+    MoogLadder m_filter;
 
-} minisynth_voice;
+    void InitGlobalParameters(GlobalSynthParams *sp) override;
+    void InitializeModMatrix(ModulationMatrix *matrix) override;
+    void PrepareForPlay() override;
+    void Update() override;
+    void Reset() override;
 
-minisynth_voice *new_minisynth_voice(void);
-void minisynth_voice_init(minisynth_voice *ms);
-void minisynth_voice_free_self(minisynth_voice *msv);
-
-void minisynth_voice_init_global_parameters(minisynth_voice *ms,
-                                            global_synth_params *sp);
-void minisynth_voice_initialize_modmatrix(minisynth_voice *ms,
-                                          modmatrix *matrix);
-void minisynth_voice_prepare_for_play(minisynth_voice *ms);
-void minisynth_voice_update(minisynth_voice *ms);
-void minisynth_voice_reset(minisynth_voice *ms);
-
-bool minisynth_voice_gennext(minisynth_voice *ms, double *left_output,
-                             double *right_output);
-void minisynth_voice_set_filter_mod(minisynth_voice *ms, double mod);
+    bool DoVoice(double *left_output, double *right_output) override;
+    void SetFilterMod(double mod);
+};

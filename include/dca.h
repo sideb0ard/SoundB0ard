@@ -6,11 +6,14 @@
 
 #define AMP_MOD_RANGE -96 // -96dB
 
-typedef struct dca
+struct DCA
 {
 
-    modmatrix *m_v_modmatrix = {nullptr};
-    global_dca_params *m_global_dca_params = {nullptr};
+    DCA();
+    ~DCA() = default;
+
+    ModulationMatrix *modmatrix{nullptr};
+    GlobalDCAParams *global_dca_params{nullptr};
 
     unsigned m_mod_source_eg;
     unsigned m_mod_source_amp_db;
@@ -29,18 +32,15 @@ typedef struct dca
     double m_eg_mod;
     double m_pan_mod;
 
-} dca;
-
-dca *new_dca(void);
-void dca_initialize(dca *d);
-void dca_set_midi_velocity(dca *self, unsigned int vel);
-void dca_set_pan_control(dca *self, double pan);
-void dca_reset(dca *self);
-void dca_set_amplitude_db(dca *self, double amp);
-void dca_set_amp_mod_db(dca *self, double mod);
-void dca_set_eg_mod(dca *self, double mod);
-void dca_set_pan_mod(dca *self, double mod);
-void dca_update(dca *self);
-void dca_gennext(dca *self, double left_input, double right_input,
-                 double *left_output, double *right_output);
-void dca_init_global_parameters(dca *self, global_dca_params *params);
+    void SetPanControl(double pan);
+    void Reset();
+    void SetAmplitudeDb(double amp);
+    void SetAmpModDb(double mod);
+    void SetMidiVelocity(unsigned int vel);
+    void SetEgMod(double mod);
+    void SetPanMod(double mod);
+    void Update();
+    void DoDCA(double left_input, double right_input, double *left_output,
+               double *right_output);
+    void InitGlobalParameters(GlobalDCAParams *params);
+};

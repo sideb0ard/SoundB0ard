@@ -8,7 +8,6 @@ constexpr char const *mod_type_as_string[] = {"FLANGER", "VIBRATO", "CHORUS"};
 
 ModDelay::ModDelay()
 {
-    wt_initialize(&m_lfo_);
     ddl_initialize(&m_ddl_);
 
     type_ = MODDELAY;
@@ -32,7 +31,7 @@ ModDelay::ModDelay()
     m_lfo_type_ = 0;         // TRI or SINE // these don't match other OSC enums
 
     Update();
-    wt_start((oscillator *)&m_lfo_);
+    m_lfo_.StartOscillator();
 }
 
 bool ModDelay::Update()
@@ -77,10 +76,10 @@ void ModDelay::CookModType()
 
 void ModDelay::UpdateLfo()
 {
-    m_lfo_.osc.m_osc_fo = m_mod_freq_;
-    m_lfo_.osc.m_waveform =
+    m_lfo_.m_osc_fo = m_mod_freq_;
+    m_lfo_.m_waveform =
         m_lfo_type_ == 0 ? 3 : 0; // tri or sine // dumb and mixed up
-    wt_update((oscillator *)&m_lfo_);
+    m_lfo_.Update();
 }
 
 void ModDelay::UpdateDdl()
@@ -116,7 +115,7 @@ bool ModDelay::ProcessAudio(double *input_left, double *input_right,
 
     double yn = 0;
     double yqn = 0;
-    yn = wt_do_oscillate((oscillator *)&m_lfo_, &yqn);
+    yn = m_lfo_.DoOscillate(&yqn);
     // yn = scaleybum(-1.0, 1.0, 0, 1.0, yn);
 
     double delay = 0.0;

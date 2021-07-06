@@ -26,66 +26,46 @@ let rescale = fn(vals, rescaler) {
   }
 
   for (i = 0; i < len(vals); ++i) {
-    rescaled_vals[i*rescaler] = vals[i];
+    if (vals[i] > 0) {
+      rescaled_vals[i*rescaler] = vals[i];
+    }
   }
 
   return rescaled_vals;
 }
 
-let melod = gen()
+
+let scaled_play = gen()
 {
   setup()
   {
-    let notes = [5, 7, 0, 2];
-    let nidx = 0;
-    let durz = [3840/2, 3840/3, 3840/4];
-    let dix = 0;
-    let velz = [128, 120, 110, 80, 50];
-    let vix = 0;
-    let rf = riff();
-    let rescaler = 2;
+    let sclrz = [0.5, 1, 2, 3, 0.75];
+    let six = 0;
   }
   run()
   {
-
-    for (i = 0; i < 16; ++i) {
-      if (rf[i] > 0) {
-        note_on_at(mo, notes_in_chord(mut(rf[i], 3), 0, true), pp*i, dur = durz[dix], vel=velz[vix] );
-        dix = incr(dix, 0, len(durz));
-        vix = incr(vix, 0, len(velz));
-        note_on_at(dx100, notes_in_chord(mut(rf[i], 2), 0, true), pp*i, dur = durz[dix], vel=velz[vix] );
-      }
-    }
-    if (count % 8 == 0) {
-      rf = riff();
-    }
-    if (count % rescaler == 0) {
-      let myr = rescale(rf, rescaler);
-      #print("SCLAED:", myr);
-      #play_array(dx100, myr);
-      for (i = 0; i < 16 * rescaler; ++i) {
-        if (myr[i] > 0) {
-          #note_on_at(dx100, notes_in_chord(mut(myr[i]), 0, true), pp*i*rescaler );
-          #note_on_at(mo, rf[i], i * pp * rescaler);
+    if (count % sclrz[six] == 0) {
+      let scld = rescale(rf, sclrz[six]);
+      let per = 3840 / len(scld);
+      for (i = 0; i < len(scld); ++i) {
+        if (scld[i] > 0) {
+          if (rand(100) > 20) {
+            note_on_at(mo, scld[i], per * i);
+          } else {
+            if (rand(100) > 30) {
+              note_on_at(mo, notes_in_chord(scld[i], 0, true), per * i);
+            } else {
+              print("IT ME!");
+              note_on_at(mo, inv_fn(notes_in_chord(scld[i])), 0, true), per * i);
+            }
+          }
         }
       }
     }
-
-    # if (count % 7 == 0) {
-      #   let rf = rescale(rf, rescaler);
-      #   for (i = 0; i < 16 * rescaler; ++i) {
-        #     if (rf[i] > 0) {
-          #       note_on_at(mo, notes_in_chord(mut(rf[i]), 0, true), pp*i );
-          #       #note_on_at(mo, rf[i], i * pp * rescaler);
-          #     }
-        #   }
-      # }
-    # else {
-      #   note_on(mo, notes_in_chord(mut(notes[nidx]), 0, true), dur=durz[dix] );
-      #   #note_on(mo, notes_in_chord(mut(notes[nidx]), 0));
-      #   nidx = incr(nidx, 0, len(notes));
-      #   dix = incr(dix, 0, len(durz));
-      # }
+    six = incr(six, 0, len(sclrz));
+    if (count % 6 == 0) {
+      rf = riff();
+    }
   }
 }
 

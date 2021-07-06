@@ -305,24 +305,6 @@ class MoogSynth : public SoundGenerator
     std::string Inspect() override;
 };
 
-class DrumSynth : public SoundGenerator
-{
-  public:
-    DrumSynth();
-    ~DrumSynth() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
-};
-
-class DigiSynth : public SoundGenerator
-{
-  public:
-    DigiSynth(std::string sample_name);
-    ~DigiSynth() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
-};
-
 class Sample : public SoundGenerator
 {
   public:

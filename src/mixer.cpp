@@ -13,9 +13,7 @@
 #include <ableton_link_wrapper.h>
 #include <audio_action_queue.h>
 #include <defjams.h>
-#include <digisynth.h>
 #include <drumsampler.h>
-#include <drumsynth.h>
 #include <dxsynth.h>
 #include <event_queue.h>
 #include <filereader.hpp>
@@ -461,12 +459,6 @@ void Mixer::AddSoundGenerator(std::shared_ptr<SoundGenerator> sg)
     }
 }
 
-void Mixer::AddDrumsynth()
-{
-    auto ds = std::make_shared<DrumSynth>();
-    AddSoundGenerator(ds);
-}
-
 void Mixer::AddMinisynth()
 {
     auto ms = std::make_shared<MiniSynth>();
@@ -479,15 +471,9 @@ void Mixer::AddSample(std::string sample_path)
     AddSoundGenerator(ds);
 }
 
-void Mixer::AddDigisynth(std::string sample_path)
-{
-    auto ds = std::make_shared<DigiSynth>(sample_path);
-    AddSoundGenerator(ds);
-}
-
 void Mixer::AddDxsynth()
 {
-    auto dx = std::make_shared<dxsynth>();
+    auto dx = std::make_shared<DXSynth>();
     AddSoundGenerator(dx);
 }
 
@@ -953,17 +939,11 @@ void Mixer::CheckForAudioActionQueueMessages()
                 case (DXSYNTH_TYPE):
                     AddDxsynth();
                     break;
-                case (DIGISYNTH_TYPE):
-                    AddDigisynth(action->filepath);
-                    break;
                 case (LOOPER_TYPE):
                     AddLooper(action->filepath, action->loop_mode);
                     break;
                 case (DRUMSAMPLER_TYPE):
                     AddSample(action->filepath);
-                    break;
-                case (DRUMSYNTH_TYPE):
-                    AddDrumsynth();
                     break;
                 }
             }

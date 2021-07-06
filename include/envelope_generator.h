@@ -25,10 +25,15 @@ enum
     SHUTDOWN
 };
 
-typedef struct envelope_generator
+class EnvelopeGenerator
 {
 
-    modmatrix *m_v_modmatrix;
+  public:
+    EnvelopeGenerator();
+    ~EnvelopeGenerator() = default;
+
+    ModulationMatrix *modmatrix{nullptr};
+    GlobalEgParams *global_eg_params{nullptr};
 
     unsigned m_mod_source_eg_attack_scaling;
     unsigned m_mod_source_eg_decay_scaling;
@@ -36,8 +41,6 @@ typedef struct envelope_generator
 
     unsigned m_mod_dest_eg_output;
     unsigned m_mod_dest_eg_biased_output;
-
-    global_eg_params *m_global_eg_params;
 
     /////////////////////////////////////////
 
@@ -83,47 +86,42 @@ typedef struct envelope_generator
     // enum above
     unsigned int m_state;
 
-} envelope_generator;
+  public:
+    unsigned int GetState();
+    bool IsActive();
 
-envelope_generator *new_envelope_generator(void);
+    bool CanNoteOff();
 
-void envelope_generator_init(envelope_generator *eg);
+    void Reset();
 
-unsigned int eg_get_state(envelope_generator *self);
-bool eg_is_active(envelope_generator *self);
+    void SetEgMode(unsigned int mode);
 
-bool eg_can_note_off(envelope_generator *self);
+    void CalculateAttackTime();
+    void CalculateDecayTime();
+    void CalculateReleaseTime();
 
-void eg_reset(envelope_generator *self);
+    void NoteOff();
 
-void eg_set_eg_mode(envelope_generator *self, unsigned int mode);
+    void Shutdown();
 
-void eg_calculate_attack_time(envelope_generator *self);
-void eg_calculate_decay_time(envelope_generator *self);
-void eg_calculate_release_time(envelope_generator *self);
+    void SetState(unsigned int state);
 
-void eg_note_off(envelope_generator *self);
+    void SetAttackTimeMsec(double time);
+    void SetDecayTimeMsec(double time);
+    void SetReleaseTimeMsec(double time);
+    void SetShutdownTimeMsec(double time_msec);
 
-void eg_shutdown(envelope_generator *self);
+    void SetSustainLevel(double level);
+    void SetSustainOverride(bool b);
 
-void eg_set_state(envelope_generator *self, unsigned int state);
+    void StartEg();
+    void StopEg();
 
-void eg_set_attack_time_msec(envelope_generator *self, double time);
-void eg_set_decay_time_msec(envelope_generator *self, double time);
-void eg_set_release_time_msec(envelope_generator *self, double time);
-void eg_set_shutdown_time_msec(envelope_generator *self, double time_msec);
+    void InitGlobalParameters(GlobalEgParams *params);
 
-void eg_set_sustain_level(envelope_generator *self, double level);
-void eg_set_sustain_override(envelope_generator *self, bool b);
+    void Update();
+    double DoEnvelope(double *p_biased_output);
 
-void eg_start_eg(envelope_generator *self);
-void eg_stop_eg(envelope_generator *self);
-
-void eg_init_global_parameters(envelope_generator *self,
-                               global_eg_params *params);
-
-void eg_update(envelope_generator *self);
-double eg_do_envelope(envelope_generator *self, double *p_biased_output);
-
-void eg_release(envelope_generator *self);
-void eg_set_drum_mode(envelope_generator *self, bool b);
+    void Release();
+    void SetDrumMode(bool b);
+};

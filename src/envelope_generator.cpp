@@ -6,417 +6,379 @@
 #include "defjams.h"
 #include "envelope_generator.h"
 
-envelope_generator *new_envelope_generator()
+EnvelopeGenerator::EnvelopeGenerator()
 {
-    envelope_generator *eg =
-        (envelope_generator *)calloc(1, sizeof(envelope_generator));
+    m_attack_time_msec = EG_DEFAULT_STATE_TIME;
+    m_decay_time_msec = EG_DEFAULT_STATE_TIME;
+    m_release_time_msec = EG_DEFAULT_STATE_TIME;
 
-    if (eg == NULL)
-        return NULL;
+    m_attack_time_scalar = 1.0;
+    m_decay_time_scalar = 1.0;
 
-    envelope_generator_init(eg);
+    m_sustain_level = 1;
+    m_envelope_output = 0.0;
 
-    return eg;
+    m_inc_shutdown = 0.0;
+
+    m_shutdown_time_msec = 10.0;
+
+    m_state = OFFF;
+    m_sustain_override = false;
+    m_release_pending = false;
+    m_output_eg = false;
+
+    SetEgMode(ANALOG);
+
+    m_reset_to_zero = false;
+    m_legato_mode = false;
+
+    modmatrix = NULL;
+
+    m_mod_dest_eg_output = SOURCE_NONE;
+    m_mod_dest_eg_biased_output = SOURCE_NONE;
+
+    m_mod_source_eg_attack_scaling = DEST_NONE;
+    m_mod_source_eg_decay_scaling = DEST_NONE;
+    m_mod_source_sustain_override = DEST_NONE;
+
+    global_eg_params = NULL;
 }
 
-void envelope_generator_init(envelope_generator *eg)
+unsigned int EnvelopeGenerator::GetState() { return m_state; }
+
+bool EnvelopeGenerator::IsActive()
 {
-    eg->m_attack_time_msec = EG_DEFAULT_STATE_TIME;
-    eg->m_decay_time_msec = EG_DEFAULT_STATE_TIME;
-    eg->m_release_time_msec = EG_DEFAULT_STATE_TIME;
-
-    eg->m_attack_time_scalar = 1.0;
-    eg->m_decay_time_scalar = 1.0;
-
-    eg->m_sustain_level = 1;
-    eg->m_envelope_output = 0.0;
-
-    eg->m_inc_shutdown = 0.0;
-
-    eg->m_shutdown_time_msec = 10.0;
-
-    eg->m_state = OFFF;
-    eg->m_sustain_override = false;
-    eg->m_release_pending = false;
-    eg->m_output_eg = false;
-    eg_set_eg_mode(eg, ANALOG);
-    eg->m_reset_to_zero = false;
-    eg->m_legato_mode = false;
-
-    eg->m_v_modmatrix = NULL;
-
-    eg->m_mod_dest_eg_output = SOURCE_NONE;
-    eg->m_mod_dest_eg_biased_output = SOURCE_NONE;
-
-    eg->m_mod_source_eg_attack_scaling = DEST_NONE;
-    eg->m_mod_source_eg_decay_scaling = DEST_NONE;
-    eg->m_mod_source_sustain_override = DEST_NONE;
-
-    eg->m_global_eg_params = NULL;
-}
-
-unsigned int eg_get_state(envelope_generator *self) { return self->m_state; }
-
-bool eg_is_active(envelope_generator *self)
-{
-    if (self->m_state != RELEASE && self->m_state != OFFF &&
-        !self->m_release_pending)
+    if (m_state != RELEASE && m_state != OFFF && !m_release_pending)
         return true;
     return false;
 }
 
-bool eg_can_note_off(envelope_generator *self)
+bool EnvelopeGenerator::CanNoteOff()
 {
-    if (self->m_state != RELEASE && self->m_state != SHUTDOWN &&
-        self->m_state != OFFF && !self->m_release_pending)
+    if (m_state != RELEASE && m_state != SHUTDOWN && m_state != OFFF &&
+        !m_release_pending)
         return true;
     return false;
 }
 
-void eg_reset(envelope_generator *self)
+void EnvelopeGenerator::Reset()
 {
-    self->m_attack_time_scalar = 1.0;
-    self->m_decay_time_scalar = 1.0;
-    self->m_state = OFFF;
-    self->m_release_pending = false;
-    eg_set_eg_mode(self, self->m_eg_mode);
+    m_attack_time_scalar = 1.0;
+    m_decay_time_scalar = 1.0;
+    m_state = OFFF;
+    m_release_pending = false;
+    SetEgMode(m_eg_mode);
 
-    eg_calculate_release_time(self);
+    CalculateReleaseTime();
 
-    if (self->m_reset_to_zero)
+    if (m_reset_to_zero)
     {
-        self->m_envelope_output = 0.0;
+        m_envelope_output = 0.0;
     }
 }
 
-void eg_set_eg_mode(envelope_generator *self, unsigned int mode)
+void EnvelopeGenerator::SetEgMode(unsigned int mode)
 {
-    self->m_eg_mode = mode;
-    if (self->m_eg_mode == ANALOG)
+    m_eg_mode = mode;
+    if (m_eg_mode == ANALOG)
     {
-        self->m_attack_tco = exp(-1.5); // fast attack
-        self->m_decay_tco = exp(-4.95);
-        self->m_release_tco = self->m_decay_tco;
+        m_attack_tco = exp(-1.5); // fast attack
+        m_decay_tco = exp(-4.95);
+        m_release_tco = m_decay_tco;
     }
     else
     {
-        self->m_attack_tco = pow(10.0, -96.0 / 20.0);
-        self->m_decay_tco = self->m_attack_tco;
-        self->m_release_tco = self->m_decay_tco;
+        m_attack_tco = pow(10.0, -96.0 / 20.0);
+        m_decay_tco = m_attack_tco;
+        m_release_tco = m_decay_tco;
     }
 
-    eg_calculate_attack_time(self);
-    eg_calculate_decay_time(self);
-    eg_calculate_release_time(self);
+    CalculateAttackTime();
+    CalculateDecayTime();
+    CalculateReleaseTime();
 }
 
-void eg_calculate_attack_time(envelope_generator *self)
+void EnvelopeGenerator::CalculateAttackTime()
 {
     double d_samples =
-        SAMPLE_RATE *
-        ((self->m_attack_time_scalar * self->m_attack_time_msec) / 1000.0);
-    self->m_attack_coeff =
-        exp(-log((1.0 + self->m_attack_tco) / self->m_attack_tco) / d_samples);
-    self->m_attack_offset =
-        (1.0 + self->m_attack_tco) * (1.0 - self->m_attack_coeff);
+        SAMPLE_RATE * ((m_attack_time_scalar * m_attack_time_msec) / 1000.0);
+    m_attack_coeff = exp(-log((1.0 + m_attack_tco) / m_attack_tco) / d_samples);
+    m_attack_offset = (1.0 + m_attack_tco) * (1.0 - m_attack_coeff);
 }
 
-void eg_calculate_decay_time(envelope_generator *self)
+void EnvelopeGenerator::CalculateDecayTime()
 {
     double d_samples =
-        SAMPLE_RATE *
-        ((self->m_decay_time_scalar * self->m_decay_time_msec) / 1000.0);
-    self->m_decay_coeff =
-        exp(-log((1.0 + self->m_decay_tco) / self->m_decay_tco) / d_samples);
-    self->m_decay_offset = (self->m_sustain_level - self->m_decay_tco) *
-                           (1.0 - self->m_decay_coeff);
+        SAMPLE_RATE * ((m_decay_time_scalar * m_decay_time_msec) / 1000.0);
+    m_decay_coeff = exp(-log((1.0 + m_decay_tco) / m_decay_tco) / d_samples);
+    m_decay_offset = (m_sustain_level - m_decay_tco) * (1.0 - m_decay_coeff);
 }
 
-void eg_calculate_release_time(envelope_generator *self)
+void EnvelopeGenerator::CalculateReleaseTime()
 {
-    double d_samples = SAMPLE_RATE * (self->m_release_time_msec / 1000.0);
-    self->m_release_coeff = exp(
-        -log((1.0 + self->m_release_tco) / self->m_release_tco) / d_samples);
-    self->m_release_offset =
-        -self->m_release_tco * (1.0 - self->m_release_coeff);
+    double d_samples = SAMPLE_RATE * (m_release_time_msec / 1000.0);
+    m_release_coeff =
+        exp(-log((1.0 + m_release_tco) / m_release_tco) / d_samples);
+    m_release_offset = -m_release_tco * (1.0 - m_release_coeff);
 }
 
-void eg_set_attack_time_msec(envelope_generator *self, double time)
+void EnvelopeGenerator::SetAttackTimeMsec(double time)
 {
-    self->m_attack_time_msec = time;
-    eg_calculate_attack_time(self);
+    m_attack_time_msec = time;
+    CalculateAttackTime();
 }
 
-void eg_set_decay_time_msec(envelope_generator *self, double time)
+void EnvelopeGenerator::SetDecayTimeMsec(double time)
 {
-    self->m_decay_time_msec = time;
-    eg_calculate_decay_time(self);
+    m_decay_time_msec = time;
+    CalculateDecayTime();
 }
 
-void eg_set_release_time_msec(envelope_generator *self, double time)
+void EnvelopeGenerator::SetReleaseTimeMsec(double time)
 {
-    self->m_release_time_msec = time;
-    eg_calculate_release_time(self);
+    m_release_time_msec = time;
+    CalculateReleaseTime();
 }
 
-void eg_set_shutdown_time_msec(envelope_generator *self, double time)
+void EnvelopeGenerator::SetShutdownTimeMsec(double time)
 {
-    self->m_shutdown_time_msec = time;
+    m_shutdown_time_msec = time;
 }
 
-void eg_set_sustain_level(envelope_generator *self, double level)
+void EnvelopeGenerator::SetSustainLevel(double level)
 {
-    self->m_sustain_level = level;
-    eg_calculate_decay_time(self);
-    if (self->m_state != RELEASE)
-        eg_calculate_release_time(self);
+    m_sustain_level = level;
+    CalculateDecayTime();
+    if (m_state != RELEASE)
+        CalculateReleaseTime();
 }
 
-void eg_set_sustain_override(envelope_generator *self, bool b)
+void EnvelopeGenerator::SetSustainOverride(bool b)
 {
-    self->m_sustain_override = b;
-    if (self->m_release_pending && !self->m_sustain_override)
+    m_sustain_override = b;
+    if (m_release_pending && !m_sustain_override)
     {
-        self->m_release_pending = false;
-        eg_note_off(self);
+        m_release_pending = false;
+        NoteOff();
     }
 }
 
-void eg_start_eg(envelope_generator *self)
+void EnvelopeGenerator::StartEg()
 {
-    if (self->m_legato_mode && self->m_state != OFFF &&
-        self->m_state != RELEASE)
+    if (m_legato_mode && m_state != OFFF && m_state != RELEASE)
     {
         return;
     }
 
-    eg_reset(self);
-    self->m_state = ATTACK;
+    Reset();
+    m_state = ATTACK;
 }
 
-void eg_release(envelope_generator *self)
+void EnvelopeGenerator::Release()
 {
-    if (self->m_state == SUSTAIN)
-        self->m_state = RELEASE;
+    if (m_state == SUSTAIN)
+        m_state = RELEASE;
 }
 
-void eg_stop_eg(envelope_generator *self) { self->m_state = OFFF; }
+void EnvelopeGenerator::StopEg() { m_state = OFFF; }
 
-void eg_init_global_parameters(envelope_generator *self,
-                               global_eg_params *params)
+void EnvelopeGenerator::InitGlobalParameters(GlobalEgParams *params)
 {
-    self->m_global_eg_params = params;
+    global_eg_params = params;
 
-    self->m_global_eg_params->attack_time_msec = self->m_attack_time_msec;
-    self->m_global_eg_params->decay_time_msec = self->m_decay_time_msec;
-    self->m_global_eg_params->release_time_msec = self->m_release_time_msec;
-    self->m_global_eg_params->sustain_level = self->m_sustain_level;
-    self->m_global_eg_params->shutdown_time_msec = self->m_shutdown_time_msec;
-    self->m_global_eg_params->reset_to_zero = self->m_reset_to_zero;
-    self->m_global_eg_params->legato_mode = self->m_legato_mode;
-    self->m_global_eg_params->sustain_override = self->m_sustain_override;
+    global_eg_params->attack_time_msec = m_attack_time_msec;
+    global_eg_params->decay_time_msec = m_decay_time_msec;
+    global_eg_params->release_time_msec = m_release_time_msec;
+    global_eg_params->sustain_level = m_sustain_level;
+    global_eg_params->shutdown_time_msec = m_shutdown_time_msec;
+    global_eg_params->reset_to_zero = m_reset_to_zero;
+    global_eg_params->legato_mode = m_legato_mode;
+    global_eg_params->sustain_override = m_sustain_override;
 }
 
-void eg_update(envelope_generator *self)
+void EnvelopeGenerator::Update()
 {
-    if (self->m_global_eg_params)
+    if (global_eg_params)
     {
-        if (self->m_sustain_override !=
-            self->m_global_eg_params->sustain_override)
+        if (m_sustain_override != global_eg_params->sustain_override)
         {
-            eg_set_sustain_override(self,
-                                    self->m_global_eg_params->sustain_override);
+            SetSustainOverride(global_eg_params->sustain_override);
         }
 
-        if (self->m_attack_time_msec !=
-            self->m_global_eg_params->attack_time_msec)
+        if (m_attack_time_msec != global_eg_params->attack_time_msec)
         {
-            eg_set_attack_time_msec(self,
-                                    self->m_global_eg_params->attack_time_msec);
+            SetAttackTimeMsec(global_eg_params->attack_time_msec);
         }
 
-        if (self->m_decay_time_msec !=
-            self->m_global_eg_params->decay_time_msec)
-            eg_set_decay_time_msec(self,
-                                   self->m_global_eg_params->attack_time_msec);
+        if (m_decay_time_msec != global_eg_params->decay_time_msec)
+            SetDecayTimeMsec(global_eg_params->attack_time_msec);
 
-        if (self->m_release_time_msec !=
-            self->m_global_eg_params->release_time_msec)
-            eg_set_release_time_msec(
-                self, self->m_global_eg_params->release_time_msec);
+        if (m_release_time_msec != global_eg_params->release_time_msec)
+            SetReleaseTimeMsec(global_eg_params->release_time_msec);
 
-        if (self->m_sustain_level != self->m_global_eg_params->sustain_level)
-            eg_set_sustain_level(self, self->m_global_eg_params->sustain_level);
+        if (m_sustain_level != global_eg_params->sustain_level)
+            SetSustainLevel(global_eg_params->sustain_level);
 
-        self->m_shutdown_time_msec =
-            self->m_global_eg_params->shutdown_time_msec;
-        self->m_reset_to_zero = self->m_global_eg_params->reset_to_zero;
-        self->m_legato_mode = self->m_global_eg_params->legato_mode;
+        m_shutdown_time_msec = global_eg_params->shutdown_time_msec;
+        m_reset_to_zero = global_eg_params->reset_to_zero;
+        m_legato_mode = global_eg_params->legato_mode;
     }
 
-    if (!self->m_v_modmatrix)
+    if (!modmatrix)
     {
         return;
     }
 
     // --- with mod matrix, when value is 0 there is NO modulation, so here
-    if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
-        self->m_attack_time_scalar == 1.0)
+    if (m_mod_source_eg_attack_scaling != DEST_NONE &&
+        m_attack_time_scalar == 1.0)
     {
-        double scale =
-            self->m_v_modmatrix
-                ->m_destinations[self->m_mod_source_eg_attack_scaling];
-        if (self->m_attack_time_scalar != 1.0 - scale)
+        double scale = modmatrix->destinations[m_mod_source_eg_attack_scaling];
+        if (m_attack_time_scalar != 1.0 - scale)
         {
-            self->m_attack_time_scalar = 1.0 - scale;
-            eg_calculate_attack_time(self);
+            m_attack_time_scalar = 1.0 - scale;
+            CalculateAttackTime();
         }
     }
 
     // --- for vel->attack and note#->decay scaling modulation
     //     NOTE: make sure this is only called ONCE during a new note event!
-    if (self->m_mod_source_eg_decay_scaling != DEST_NONE &&
-        self->m_decay_time_scalar == 1.0)
+    if (m_mod_source_eg_decay_scaling != DEST_NONE &&
+        m_decay_time_scalar == 1.0)
     {
-        double scale =
-            self->m_v_modmatrix
-                ->m_destinations[self->m_mod_source_eg_decay_scaling];
-        if (self->m_decay_time_scalar != 1.0 - scale)
+        double scale = modmatrix->destinations[m_mod_source_eg_decay_scaling];
+        if (m_decay_time_scalar != 1.0 - scale)
         {
-            self->m_decay_time_scalar = 1.0 - scale;
-            eg_calculate_decay_time(self);
+            m_decay_time_scalar = 1.0 - scale;
+            CalculateDecayTime();
         }
     }
 }
 
-double eg_do_envelope(envelope_generator *self, double *p_biased_output)
+double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
 {
-    switch (self->m_state)
+    switch (m_state)
     {
     case OFFF:
     {
-        if (self->m_reset_to_zero)
-            self->m_envelope_output = 0.0;
+        if (m_reset_to_zero)
+            m_envelope_output = 0.0;
         break;
     }
     case ATTACK:
     {
-        self->m_envelope_output =
-            self->m_attack_offset +
-            self->m_envelope_output * self->m_attack_coeff;
-        if (self->m_envelope_output >= 1.0 ||
-            self->m_attack_time_scalar * self->m_attack_time_msec <= 0.0)
+        m_envelope_output =
+            m_attack_offset + m_envelope_output * m_attack_coeff;
+        if (m_envelope_output >= 1.0 ||
+            m_attack_time_scalar * m_attack_time_msec <= 0.0)
         {
-            self->m_envelope_output = 1.0;
-            self->m_state = DECAY;
+            m_envelope_output = 1.0;
+            m_state = DECAY;
             break;
         }
         break;
     }
     case DECAY:
     {
-        self->m_envelope_output = self->m_decay_offset +
-                                  self->m_envelope_output * self->m_decay_coeff;
-        if (self->m_envelope_output <= self->m_sustain_level ||
-            self->m_decay_time_scalar * self->m_decay_time_msec <= 0.0)
+        m_envelope_output = m_decay_offset + m_envelope_output * m_decay_coeff;
+        if (m_envelope_output <= m_sustain_level ||
+            m_decay_time_scalar * m_decay_time_msec <= 0.0)
         {
-            self->m_envelope_output = self->m_sustain_level;
-            if (self->drum_mode)
-                self->m_state = RELEASE;
+            m_envelope_output = m_sustain_level;
+            if (drum_mode)
+                m_state = RELEASE;
             else
-                self->m_state = SUSTAIN;
+                m_state = SUSTAIN;
             break;
         }
         break;
     }
     case SUSTAIN:
     {
-        self->m_envelope_output = self->m_sustain_level;
+        m_envelope_output = m_sustain_level;
         break;
     }
     case RELEASE:
     {
-        if (self->m_sustain_override)
+        if (m_sustain_override)
         {
-            self->m_envelope_output = self->m_sustain_level;
+            m_envelope_output = m_sustain_level;
             break;
         }
         else
         {
-            self->m_envelope_output =
-                self->m_release_offset +
-                self->m_envelope_output * self->m_release_coeff;
+            m_envelope_output =
+                m_release_offset + m_envelope_output * m_release_coeff;
         }
 
-        if (self->m_envelope_output <= 0.0 || self->m_release_time_msec <= 0.0)
+        if (m_envelope_output <= 0.0 || m_release_time_msec <= 0.0)
         {
-            self->m_envelope_output = 0.0;
-            self->m_state = OFFF;
+            m_envelope_output = 0.0;
+            m_state = OFFF;
             break;
         }
         break;
     }
     case SHUTDOWN:
     {
-        if (self->m_reset_to_zero)
+        if (m_reset_to_zero)
         {
-            self->m_envelope_output += self->m_inc_shutdown;
-            if (self->m_envelope_output <= 0)
+            m_envelope_output += m_inc_shutdown;
+            if (m_envelope_output <= 0)
             {
-                self->m_envelope_output = 0.0;
-                self->m_state = OFFF;
+                m_envelope_output = 0.0;
+                m_state = OFFF;
                 break;
             }
         }
         else
         {
-            self->m_state = OFFF;
+            m_state = OFFF;
         }
         break;
     }
     }
 
-    if (self->m_v_modmatrix)
+    if (modmatrix)
     {
-        self->m_v_modmatrix->m_sources[self->m_mod_dest_eg_output] =
-            self->m_envelope_output;
-        self->m_v_modmatrix->m_sources[self->m_mod_dest_eg_biased_output] =
-            self->m_envelope_output - self->m_sustain_level;
+        modmatrix->sources[m_mod_dest_eg_output] = m_envelope_output;
+        modmatrix->sources[m_mod_dest_eg_biased_output] =
+            m_envelope_output - m_sustain_level;
     }
 
     if (p_biased_output)
-        *p_biased_output = self->m_envelope_output - self->m_sustain_level;
+        *p_biased_output = m_envelope_output - m_sustain_level;
 
-    return self->m_envelope_output;
+    return m_envelope_output;
 }
 
-void eg_note_off(envelope_generator *self)
+void EnvelopeGenerator::NoteOff()
 {
-    if (self->m_sustain_override)
+    if (m_sustain_override)
     {
-        self->m_release_pending = true;
+        m_release_pending = true;
         return;
     }
 
-    if (self->m_envelope_output > 0)
+    if (m_envelope_output > 0)
     {
-        self->m_state = RELEASE;
+        m_state = RELEASE;
     }
     else
     {
-        self->m_state = OFFF;
+        m_state = OFFF;
     }
 }
 
-void eg_shutdown(envelope_generator *self)
+void EnvelopeGenerator::Shutdown()
 {
-    if (self->m_legato_mode)
+    if (m_legato_mode)
         return;
-    self->m_inc_shutdown = -(1000.0 * self->m_envelope_output) /
-                           self->m_shutdown_time_msec / SAMPLE_RATE;
-    self->m_state = SHUTDOWN;
-    self->m_sustain_override = false;
-    self->m_release_pending = false;
+    m_inc_shutdown =
+        -(1000.0 * m_envelope_output) / m_shutdown_time_msec / SAMPLE_RATE;
+    m_state = SHUTDOWN;
+    m_sustain_override = false;
+    m_release_pending = false;
 }
 
-void eg_set_drum_mode(envelope_generator *eg, bool b) { eg->drum_mode = b; }
+void EnvelopeGenerator::SetDrumMode(bool b) { drum_mode = b; }

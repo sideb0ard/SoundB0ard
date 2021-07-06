@@ -7,7 +7,6 @@
 
 #include <ableton_link_wrapper.h>
 #include <defjams.h>
-#include <digisynth.h>
 #include <dxsynth.h>
 #include <fx/fx.h>
 #include <minisynth.h>
@@ -173,9 +172,7 @@ struct Mixer
 
     void AddMinisynth();
     void AddDxsynth();
-    void AddDrumsynth();
     void AddSample(std::string sample_path);
-    void AddDigisynth(std::string sample_path);
     void AddLooper(std::string filename, bool loop_mode);
 
     void AddSoundGenerator(std::shared_ptr<SoundGenerator> sg);

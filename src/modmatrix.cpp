@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
+
 #include "midi_freq_table.h"
 #include "modmatrix.h"
 #include "synthfunctions.h"
@@ -64,133 +66,71 @@ const char *s_dest_enum_to_name[] = {
     // --- END OF LAYER 1 DESTINATIONS
     "MAX_DESTINATIONS"};
 
-modmatrix *new_modmatrix(void)
+std::shared_ptr<ModMatrixRow> CreateMatrixRow(unsigned src, unsigned dest,
+                                              double *intensity, double *range,
+                                              unsigned transformation,
+                                              bool enable)
 {
-    modmatrix *m;
-    m = (modmatrix *)calloc(1, sizeof(modmatrix));
-    if (m == NULL)
-        return NULL;
+    auto row = std::make_shared<ModMatrixRow>();
+    row->source_index = src;
+    row->destination_index = dest;
+    row->mod_intensity = intensity;
+    row->mod_range = range;
+    row->source_transform = transformation;
+    row->enable = enable;
 
-    create_matrix_core(m);
-
-    return m;
+    return row;
 }
 
-int get_matrix_size(modmatrix *self)
+int ModulationMatrix::GetMatrixSize() { return matrix_core.size(); }
+
+void ModulationMatrix::ClearSources()
 {
-    int sz = 0;
-    for (int i = 0; i < MAX_SOURCES * MAX_DESTINATIONS; i++)
+    std::fill(std::begin(sources), std::end(sources), 0);
+}
+
+inline void ModulationMatrix::ClearDestinations()
+{
+    std::fill(std::begin(destinations), std::end(destinations), 0);
+}
+
+void ModulationMatrix::AddMatrixRow(std::shared_ptr<ModMatrixRow> row)
+{
+
+    if (!MatrixRowExists(row->source_index, row->destination_index))
+        matrix_core.push_back(row);
+}
+
+bool ModulationMatrix::MatrixRowExists(unsigned sourceidx, unsigned destidx)
+{
+    for (auto mr : matrix_core)
     {
-        matrixrow *mr = self->m_matrix_core[i];
-        if (mr)
-            sz++;
-    }
-    return sz;
-}
-
-void matrix_clear_sources(modmatrix *self)
-{
-    for (int i = 0; i < MAX_SOURCES; i++)
-        self->m_sources[i] = 0.0;
-}
-
-inline void matrix_clear_destinations(modmatrix *self)
-{
-    memset(self->m_destinations, 0, sizeof(double) * MAX_DESTINATIONS);
-}
-
-void create_matrix_core(modmatrix *self)
-{
-    if (self->m_matrix_core)
-    {
-        delete_matrix_core(self);
-    }
-
-    self->m_matrix_core = (matrixrow **)calloc(MAX_SOURCES * MAX_DESTINATIONS,
-                                               sizeof(matrixrow *));
-}
-
-void clear_matrix_core(modmatrix *self)
-{
-    if (!self->m_matrix_core)
-        return;
-    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
-    {
-        free(self->m_matrix_core[i]);
-    }
-    self->m_num_rows_in_matrix_core = 0;
-}
-
-void delete_matrix_core(modmatrix *self)
-{
-    printf("DLETE MATRIX CORE CALLED!\n");
-    clear_matrix_core(self);
-    free(self->m_matrix_core);
-}
-
-matrixrow **get_matrix_core(modmatrix *self) { return self->m_matrix_core; }
-
-void set_matrix_core(modmatrix *self, matrixrow **matrix)
-{
-    if (self->m_matrix_core)
-    {
-        clear_matrix_core(self);
-        free(self->m_matrix_core);
-    }
-    self->m_matrix_core = matrix;
-    self->m_num_rows_in_matrix_core = get_matrix_size(self);
-}
-
-void add_matrix_row(modmatrix *self, matrixrow *row)
-{
-    if (!self->m_matrix_core)
-        create_matrix_core(self);
-
-    if (!matrix_row_exists(self, row->m_source_index, row->m_destination_index))
-        self->m_matrix_core[self->m_num_rows_in_matrix_core++] = row;
-    else
-        free(row);
-}
-
-bool matrix_row_exists(modmatrix *self, unsigned sourceidx, unsigned destidx)
-{
-    if (!self->m_matrix_core)
-        return false;
-
-    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
-    {
-        matrixrow *mr = self->m_matrix_core[i];
-        if (mr->m_source_index == sourceidx &&
-            mr->m_destination_index == destidx)
+        if (mr->source_index == sourceidx && mr->destination_index == destidx)
             return true;
     }
     return false;
 }
 
-bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,
-                       bool enable)
+bool ModulationMatrix::EnableMatrixRow(unsigned sourceidx, unsigned destidx,
+                                       bool enable)
 {
-    if (!self->m_matrix_core)
-        return false;
-
-    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+    for (auto mr : matrix_core)
     {
-        matrixrow *mr = self->m_matrix_core[i];
-        if (mr->m_source_index == sourceidx &&
-            mr->m_destination_index == destidx)
+        if (mr->source_index == sourceidx && mr->destination_index == destidx)
         {
-            mr->m_enable = enable;
+            mr->enable = enable;
             return true;
         }
     }
     return false;
 }
 
-bool inline check_destination_layer(unsigned layer, matrixrow *row)
+bool ModulationMatrix::CheckDestinationLayer(unsigned layer,
+                                             std::shared_ptr<ModMatrixRow> row)
 {
     bool layer0 = false;
-    if (row->m_destination_index >= DEST_LFO1_FO &&
-        row->m_destination_index <= DEST_ALL_EG_SUSTAIN_OVERRIDE)
+    if (row->destination_index >= DEST_LFO1_FO &&
+        row->destination_index <= DEST_ALL_EG_SUSTAIN_OVERRIDE)
         layer0 = true;
 
     if (layer == 0)
@@ -201,158 +141,23 @@ bool inline check_destination_layer(unsigned layer, matrixrow *row)
     return false;
 }
 
-matrixrow *create_matrix_row(unsigned src, unsigned dest, double *intensity,
-                             double *range, unsigned transformation,
-                             bool enable)
-{
-    matrixrow *row = (matrixrow *)calloc(1, sizeof(matrixrow));
-    row->m_source_index = src;
-    row->m_destination_index = dest;
-    row->m_mod_intensity = intensity;
-    row->m_mod_range = range;
-    row->m_source_transform = transformation;
-    row->m_enable = enable;
-
-    return row;
-}
-
-void print_modulation_matrix(modmatrix *self)
-{
-    if (!self->m_matrix_core)
-    {
-        printf("NAE MATRIX CORE, MATE!\n");
-        return;
-    }
-    for (int layer = 0; layer < 2; layer++)
-    {
-        for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
-        {
-
-            matrixrow *mr = self->m_matrix_core[i];
-
-            if (!mr)
-                continue; // shouldn't happen. but jist in case!
-            if (!check_destination_layer(layer, mr))
-            {
-                continue;
-            }
-
-            printf("From %s => %s ModIntensity:%.2f ModRange:%.2f Enabled?%s\n",
-                   s_source_enum_to_name[mr->m_source_index],
-                   s_dest_enum_to_name[mr->m_destination_index],
-                   (*mr->m_mod_intensity), (*mr->m_mod_range),
-                   mr->m_enable ? "true" : "false");
-        }
-    }
-}
-
-void print_modulation_matrix_info_lfo1(modmatrix *self, wchar_t *status_string)
-{
-    if (!self->m_matrix_core)
-    {
-        printf("NAE MATRIX CORE, MATE!\n");
-        return;
-    }
-    swprintf(status_string, 1024, L"");
-    wchar_t scratch[1024];
-
-    for (int layer = 0; layer < 2; layer++)
-    {
-        for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
-        {
-
-            matrixrow *mr = self->m_matrix_core[i];
-
-            if (!mr)
-                continue; // shouldn't happen. but jist in case!
-            if (mr->m_source_index != SOURCE_LFO1)
-                continue;
-            if (!mr->m_enable)
-                continue;
-            if (!check_destination_layer(layer, mr))
-            {
-                continue;
-            }
-
-            swprintf(
-                scratch, 1023,
-                L"      Dest:%s ModIntensity:%.2f ModRange:%.2f Enabled?%s\n",
-                s_dest_enum_to_name[mr->m_destination_index],
-                (*mr->m_mod_intensity), (*mr->m_mod_range),
-                mr->m_enable ? "true" : "false");
-            wcscat(status_string, scratch);
-        }
-    }
-}
-
-void print_modulation_matrix_info_eg1(modmatrix *self, wchar_t *status_string)
-{
-    if (!self->m_matrix_core)
-    {
-        printf("NAE MATRIX CORE, MATE!\n");
-        return;
-    }
-    swprintf(status_string, 1024, L"");
-    wchar_t scratch[1024];
-
-    for (int layer = 0; layer < 2; layer++)
-    {
-        for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
-        {
-
-            matrixrow *mr = self->m_matrix_core[i];
-
-            if (!mr)
-                continue; // shouldn't happen. but jist in case!
-            if (mr->m_source_index != SOURCE_EG1 &&
-                mr->m_source_index != SOURCE_BIASED_EG1)
-                continue;
-            if (!mr->m_enable)
-                continue;
-            if (!check_destination_layer(layer, mr))
-            {
-                continue;
-            }
-
-            swprintf(
-                scratch, 1023,
-                L"      Dest:%s ModIntensity:%.2f ModRange:%.2f Enabled?%s\n",
-                s_dest_enum_to_name[mr->m_destination_index],
-                (*mr->m_mod_intensity), (*mr->m_mod_range),
-                mr->m_enable ? "true" : "false");
-            wcscat(status_string, scratch);
-        }
-    }
-}
-
 // this is the REAL mod matrix, yehhhhhh!
-void do_modulation_matrix(modmatrix *self, unsigned layer)
+void ModulationMatrix::DoModMatrix(unsigned layer)
 {
-    if (!self->m_matrix_core)
-    {
-        printf("NAE MATRIX CORE, MATE!\n");
-        return;
-    }
+    ClearDestinations();
 
-    matrix_clear_destinations(self);
-
-    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+    for (auto mr : matrix_core)
     {
 
-        matrixrow *mr = self->m_matrix_core[i];
-
-        if (!mr)
-            continue; // shouldn't happen. but jist in case!
-        if (!mr->m_enable)
+        if (!mr->enable)
             continue;
-        if (!check_destination_layer(layer, mr))
-        {
+
+        if (!CheckDestinationLayer(layer, mr))
             continue;
-        }
 
-        double src = self->m_sources[mr->m_source_index];
+        double src = sources[mr->source_index];
 
-        switch (mr->m_source_transform)
+        switch (mr->source_transform)
         {
         case TRANSFORM_UNIPOLAR_TO_BIPOLAR:
             src = unipolar_to_bipolar(src);
@@ -387,80 +192,91 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
         }
 
         // destination += source*intensity*range
-        double modval = src * (*mr->m_mod_intensity) * (*mr->m_mod_range);
+        double modval = src * (*mr->mod_intensity) * (*mr->mod_range);
 
-        switch (mr->m_destination_index)
+        switch (mr->destination_index)
         {
         case DEST_ALL_OSC_FO:
-            self->m_destinations[DEST_OSC1_FO] += modval;
-            self->m_destinations[DEST_OSC2_FO] += modval;
-            self->m_destinations[DEST_OSC2_FO] += modval;
-            self->m_destinations[DEST_OSC4_FO] += modval;
-            self->m_destinations[DEST_ALL_OSC_FO] += modval;
+            destinations[DEST_OSC1_FO] += modval;
+            destinations[DEST_OSC2_FO] += modval;
+            destinations[DEST_OSC2_FO] += modval;
+            destinations[DEST_OSC4_FO] += modval;
+            destinations[DEST_ALL_OSC_FO] += modval;
         case DEST_ALL_OSC_PULSEWIDTH:
-            self->m_destinations[DEST_OSC1_PULSEWIDTH] += modval;
-            self->m_destinations[DEST_OSC2_PULSEWIDTH] += modval;
-            self->m_destinations[DEST_OSC2_PULSEWIDTH] += modval;
-            self->m_destinations[DEST_OSC4_PULSEWIDTH] += modval;
-            self->m_destinations[DEST_ALL_OSC_PULSEWIDTH] += modval;
+            destinations[DEST_OSC1_PULSEWIDTH] += modval;
+            destinations[DEST_OSC2_PULSEWIDTH] += modval;
+            destinations[DEST_OSC2_PULSEWIDTH] += modval;
+            destinations[DEST_OSC4_PULSEWIDTH] += modval;
+            destinations[DEST_ALL_OSC_PULSEWIDTH] += modval;
         case DEST_ALL_OSC_FO_RATIO:
-            self->m_destinations[DEST_OSC1_FO_RATIO] += modval;
-            self->m_destinations[DEST_OSC2_FO_RATIO] += modval;
-            self->m_destinations[DEST_OSC2_FO_RATIO] += modval;
-            self->m_destinations[DEST_OSC4_FO_RATIO] += modval;
-            self->m_destinations[DEST_ALL_OSC_FO_RATIO] += modval;
+            destinations[DEST_OSC1_FO_RATIO] += modval;
+            destinations[DEST_OSC2_FO_RATIO] += modval;
+            destinations[DEST_OSC2_FO_RATIO] += modval;
+            destinations[DEST_OSC4_FO_RATIO] += modval;
+            destinations[DEST_ALL_OSC_FO_RATIO] += modval;
         case DEST_ALL_OSC_OUTPUT_AMP:
-            self->m_destinations[DEST_OSC1_OUTPUT_AMP] += modval;
-            self->m_destinations[DEST_OSC2_OUTPUT_AMP] += modval;
-            self->m_destinations[DEST_OSC2_OUTPUT_AMP] += modval;
-            self->m_destinations[DEST_OSC4_OUTPUT_AMP] += modval;
-            self->m_destinations[DEST_ALL_OSC_OUTPUT_AMP] += modval;
+            destinations[DEST_OSC1_OUTPUT_AMP] += modval;
+            destinations[DEST_OSC2_OUTPUT_AMP] += modval;
+            destinations[DEST_OSC2_OUTPUT_AMP] += modval;
+            destinations[DEST_OSC4_OUTPUT_AMP] += modval;
+            destinations[DEST_ALL_OSC_OUTPUT_AMP] += modval;
         case DEST_ALL_LFO_FO:
-            self->m_destinations[DEST_LFO1_FO] += modval;
-            self->m_destinations[DEST_LFO2_FO] += modval;
-            self->m_destinations[DEST_ALL_LFO_FO] += modval;
+            destinations[DEST_LFO1_FO] += modval;
+            destinations[DEST_LFO2_FO] += modval;
+            destinations[DEST_ALL_LFO_FO] += modval;
         case DEST_ALL_LFO_OUTPUT_AMP:
-            self->m_destinations[DEST_LFO1_OUTPUT_AMP] += modval;
-            self->m_destinations[DEST_LFO2_OUTPUT_AMP] += modval;
-            self->m_destinations[DEST_ALL_LFO_OUTPUT_AMP] += modval;
+            destinations[DEST_LFO1_OUTPUT_AMP] += modval;
+            destinations[DEST_LFO2_OUTPUT_AMP] += modval;
+            destinations[DEST_ALL_LFO_OUTPUT_AMP] += modval;
             break;
         case DEST_ALL_FILTER_FC:
             // printf("Writing to DEST_FILTER1_FC! %f\n", modval);
-            self->m_destinations[DEST_FILTER1_FC] += modval;
-            self->m_destinations[DEST_FILTER2_FC] += modval;
-            self->m_destinations[DEST_ALL_FILTER_FC] += modval;
+            destinations[DEST_FILTER1_FC] += modval;
+            destinations[DEST_FILTER2_FC] += modval;
+            destinations[DEST_ALL_FILTER_FC] += modval;
             break;
 
         case DEST_ALL_FILTER_KEYTRACK:
-            self->m_destinations[DEST_FILTER1_KEYTRACK] += modval;
-            self->m_destinations[DEST_FILTER2_KEYTRACK] += modval;
-            self->m_destinations[DEST_ALL_FILTER_KEYTRACK] += modval;
+            destinations[DEST_FILTER1_KEYTRACK] += modval;
+            destinations[DEST_FILTER2_KEYTRACK] += modval;
+            destinations[DEST_ALL_FILTER_KEYTRACK] += modval;
             break;
 
         case DEST_ALL_EG_ATTACK_SCALING:
-            self->m_destinations[DEST_EG1_ATTACK_SCALING] += modval;
-            self->m_destinations[DEST_EG2_ATTACK_SCALING] += modval;
-            self->m_destinations[DEST_EG3_ATTACK_SCALING] += modval;
-            self->m_destinations[DEST_EG4_ATTACK_SCALING] += modval;
-            self->m_destinations[DEST_ALL_EG_ATTACK_SCALING] += modval;
+            destinations[DEST_EG1_ATTACK_SCALING] += modval;
+            destinations[DEST_EG2_ATTACK_SCALING] += modval;
+            destinations[DEST_EG3_ATTACK_SCALING] += modval;
+            destinations[DEST_EG4_ATTACK_SCALING] += modval;
+            destinations[DEST_ALL_EG_ATTACK_SCALING] += modval;
             break;
 
         case DEST_ALL_EG_DECAY_SCALING:
-            self->m_destinations[DEST_EG1_DECAY_SCALING] += modval;
-            self->m_destinations[DEST_EG2_DECAY_SCALING] += modval;
-            self->m_destinations[DEST_EG3_DECAY_SCALING] += modval;
-            self->m_destinations[DEST_EG4_DECAY_SCALING] += modval;
-            self->m_destinations[DEST_ALL_EG_DECAY_SCALING] += modval;
+            destinations[DEST_EG1_DECAY_SCALING] += modval;
+            destinations[DEST_EG2_DECAY_SCALING] += modval;
+            destinations[DEST_EG3_DECAY_SCALING] += modval;
+            destinations[DEST_EG4_DECAY_SCALING] += modval;
+            destinations[DEST_ALL_EG_DECAY_SCALING] += modval;
             break;
 
         case DEST_ALL_EG_SUSTAIN_OVERRIDE:
-            self->m_destinations[DEST_EG1_SUSTAIN_OVERRIDE] += modval;
-            self->m_destinations[DEST_EG2_SUSTAIN_OVERRIDE] += modval;
-            self->m_destinations[DEST_EG3_SUSTAIN_OVERRIDE] += modval;
-            self->m_destinations[DEST_EG4_SUSTAIN_OVERRIDE] += modval;
+            destinations[DEST_EG1_SUSTAIN_OVERRIDE] += modval;
+            destinations[DEST_EG2_SUSTAIN_OVERRIDE] += modval;
+            destinations[DEST_EG3_SUSTAIN_OVERRIDE] += modval;
+            destinations[DEST_EG4_SUSTAIN_OVERRIDE] += modval;
             break;
         default:
-            self->m_destinations[mr->m_destination_index] += modval;
+            destinations[mr->destination_index] += modval;
         }
     }
+}
+
+std::vector<std::shared_ptr<ModMatrixRow>> &ModulationMatrix::GetModMatrixCore()
+{
+    return matrix_core;
+}
+
+void ModulationMatrix::SetModMatrixCore(
+    std::vector<std::shared_ptr<ModMatrixRow>> &core)
+{
+    matrix_core = core;
 }

@@ -9,6 +9,7 @@
 #include <modmatrix.h>
 #include <oscillator.h>
 #include <soundgenerator.h>
+#include <voice.h>
 
 #define MAX_DX_VOICES 16
 
@@ -93,11 +94,11 @@ typedef struct dxsynthsettings
 
 } dxsynthsettings;
 
-class dxsynth : public SoundGenerator
+class DXSynth : public SoundGenerator
 {
   public:
-    dxsynth();
-    ~dxsynth();
+    DXSynth();
+    ~DXSynth() = default;
     stereo_val genNext() override;
     std::string Info() override;
     std::string Status() override;
@@ -115,11 +116,12 @@ class dxsynth : public SoundGenerator
     void Save(std::string preset_name) override;
 
   public:
-    dxsynth_voice *m_voices[MAX_DX_VOICES];
+    std::array<std::shared_ptr<DXSynthVoice>, MAX_VOICES> voices_;
 
     // global modmatrix, core is shared by all voices
-    modmatrix m_global_modmatrix; // routing structure for sound generation
-    global_synth_params m_global_synth_params;
+    ModulationMatrix modmatrix; // routing structure for sound generation
+
+    GlobalSynthParams global_synth_params;
 
     dxsynthsettings m_settings;
     dxsynthsettings m_settings_backup_while_getting_crazy;
@@ -127,66 +129,48 @@ class dxsynth : public SoundGenerator
     int active_midi_osc; // for midi controller routing
 
     double m_last_note_frequency;
+
+    void Reset();
+    void Update();
+
+    bool PrepareForPlay();
+
+    void IncrementVoiceTimestamps();
+    std::shared_ptr<DXSynthVoice> GetOldestVoice();
+    std::shared_ptr<DXSynthVoice> GetOldestVoiceWithNote(int midi_note);
+
+    void ResetVoices();
+
+    bool ListPresets(void);
+    bool CheckIfPresetExists(char *preset_to_find);
+
+    void SetBitwise(bool b);
+    void SetBitwiseMode(int mode);
+
+    void SetFilterMod(double mod);
+
+    void SetLFO1Intensity(double val);
+    void SetLFO1Rate(double val);
+    void SetLFO1Waveform(unsigned int val);
+    void SetLFO1ModDest(unsigned int moddest, unsigned int dest);
+
+    void SetOpWaveform(unsigned int op, unsigned int val);
+    void SetOpRatio(unsigned int op, double val);
+    void SetOpDetune(unsigned int op, double val);
+    void SetEGAttackMs(unsigned int eg, double val);
+    void SetEGDecayMs(unsigned int eg, double val);
+    void SetEGReleaseMs(unsigned int eg, double val);
+    void SetEGSustainLevel(unsigned int eg, double val);
+    void SetOpOutputLevel(unsigned int op, double val);
+    void SetOp4Feedback(double val);
+
+    void SetPortamentoTimeMs(double val);
+    void SetVolumeDb(double val);
+    void SetPitchbendRange(unsigned int val);
+    void SetVoiceMode(unsigned int val);
+    void SetVelocityToAttackScaling(bool b);
+    void SetNoteNumberToDecayScaling(bool b);
+    void SetResetToZero(bool b);
+    void SetLegatoMode(bool b);
+    void SetActiveMidiOsc(int oscnum);
 };
-
-void dxsynth_reset(dxsynth *dx);
-
-bool dxsynth_prepare_for_play(dxsynth *synth);
-void dxsynth_update(dxsynth *synth);
-
-void dxsynth_increment_voice_timestamps(dxsynth *synth);
-dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *synth);
-dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
-                                                  int midi_note);
-
-void dxsynth_reset_voices(dxsynth *self);
-
-void dxsynth_print_settings(dxsynth *ms);
-void dxsynth_print_modulation_routings(dxsynth *ms);
-void dxsynth_print_lfo1_routing_info(dxsynth *ms, wchar_t *scratch);
-void dxsynth_print_lfo2_routing_info(dxsynth *ms, wchar_t *scratch);
-void dxsynth_print_eg1_routing_info(dxsynth *ms, wchar_t *scratch);
-void dxsynth_print_eg2_routing_info(dxsynth *ms, wchar_t *scratch);
-
-bool dxsynth_list_presets(void);
-bool dxsynth_check_if_preset_exists(char *preset_to_find);
-
-// void dxsynth_set_arpeggiate(dxsynth *ms, bool b);
-// void dxsynth_set_arpeggiate_latch(dxsynth *ms, bool b);
-// void dxsynth_set_arpeggiate_single_note_repeat(dxsynth *ms, bool b);
-// void dxsynth_set_arpeggiate_octave_range(dxsynth *ms, int val);
-// void dxsynth_set_arpeggiate_mode(dxsynth *ms, unsigned int mode);
-// void dxsynth_set_arpeggiate_rate(dxsynth *ms, unsigned int mode);
-
-void dxsynth_set_bitwise(dxsynth *ms, bool b);
-void dxsynth_set_bitwise_mode(dxsynth *ms, int mode);
-
-void dxsynth_set_filter_mod(dxsynth *ms, double mod);
-
-void dxsynth_print(dxsynth *ms);
-
-void dxsynth_set_lfo1_intensity(dxsynth *d, double val);
-void dxsynth_set_lfo1_rate(dxsynth *d, double val);
-void dxsynth_set_lfo1_waveform(dxsynth *d, unsigned int val);
-void dxsynth_set_lfo1_mod_dest(dxsynth *d, unsigned int mod_dest,
-                               unsigned int dest);
-
-void dxsynth_set_op_waveform(dxsynth *d, unsigned int op, unsigned int val);
-void dxsynth_set_op_ratio(dxsynth *d, unsigned int op, double val);
-void dxsynth_set_op_detune(dxsynth *d, unsigned int op, double val);
-void dxsynth_set_eg_attack_ms(dxsynth *d, unsigned int eg, double val);
-void dxsynth_set_eg_decay_ms(dxsynth *d, unsigned int eg, double val);
-void dxsynth_set_eg_release_ms(dxsynth *d, unsigned int eg, double val);
-void dxsynth_set_eg_sustain_lvl(dxsynth *d, unsigned int eg, double val);
-void dxsynth_set_op_output_lvl(dxsynth *d, unsigned int op, double val);
-void dxsynth_set_op4_feedback(dxsynth *d, double val);
-
-void dxsynth_set_portamento_time_ms(dxsynth *d, double val);
-void dxsynth_set_volume_db(dxsynth *d, double val);
-void dxsynth_set_pitchbend_range(dxsynth *d, unsigned int val);
-void dxsynth_set_voice_mode(dxsynth *d, unsigned int val);
-void dxsynth_set_velocity_to_attack_scaling(dxsynth *d, bool b);
-void dxsynth_set_note_number_to_decay_scaling(dxsynth *d, bool b);
-void dxsynth_set_reset_to_zero(dxsynth *d, bool b);
-void dxsynth_set_legato_mode(dxsynth *d, bool b);
-void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num);

@@ -61,7 +61,6 @@ looper::looper(char *filename, bool loop_mode)
     if (strncmp(filename, "none", 4) != 0)
         looper_import_file(this, filename);
 
-    envelope_generator_init(&m_eg1); // start/stop env
     m_eg1.m_attack_time_msec = 10;
     m_eg1.m_release_time_msec = 50;
 
@@ -277,8 +276,8 @@ stereo_val looper::genNext()
         }
     }
 
-    eg_update(&m_eg1);
-    double eg_amp = eg_do_envelope(&m_eg1, NULL);
+    m_eg1.Update();
+    double eg_amp = m_eg1.DoEnvelope(NULL);
 
     pan = fmin(pan, 1.0);
     pan = fmax(pan, -1.0);
@@ -333,7 +332,7 @@ std::string looper::Info()
 
 void looper::start()
 {
-    eg_start_eg(&m_eg1);
+    m_eg1.StartEg();
     active = true;
     stop_pending = false;
     engine.started = false;
@@ -341,7 +340,7 @@ void looper::start()
 
 void looper::stop()
 {
-    eg_release(&m_eg1);
+    m_eg1.Release();
     stop_pending = true;
 }
 
@@ -423,11 +422,11 @@ void sound_grain_init(sound_grain *g, sound_grain_params params)
     // printf("ATTACKMS: %f RELEASEMS: %f\n", attack_time_ms,
     // release_time_ms);
 
-    envelope_generator_init(&g->eg);
-    eg_set_attack_time_msec(&g->eg, attack_time_ms);
-    eg_set_decay_time_msec(&g->eg, 0);
-    eg_set_release_time_msec(&g->eg, release_time_ms);
-    eg_start_eg(&g->eg);
+    g->eg.Reset();
+    g->eg.SetAttackTimeMsec(attack_time_ms);
+    g->eg.SetDecayTimeMsec(0);
+    g->eg.SetReleaseTimeMsec(release_time_ms);
+    g->eg.StartEg();
 
     g->active = true;
 }
@@ -535,9 +534,9 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
         }
         break;
     case (LOOPER_ENV_GENERATOR):
-        g->amp = eg_do_envelope(&g->eg, NULL);
+        g->amp = g->eg.DoEnvelope(NULL);
         if (percent_pos > (100 - g->release_time_pct))
-            eg_note_off(&g->eg);
+            g->eg.NoteOff();
         break;
     case (LOOPER_ENV_EXPONENTIAL_CURVE):
         if (g->grain_counter_frames <
@@ -780,11 +779,11 @@ void looper_set_step_mode(looper *g, bool b)
     g->step_mode = b;
     if (b)
     {
-        eg_note_off(&g->m_eg1);
+        g->m_eg1.NoteOff();
     }
     else
     {
-        eg_start_eg(&g->m_eg1);
+        g->m_eg1.StartEg();
     }
 }
 
@@ -884,13 +883,13 @@ void looper_set_trace_envelope(looper *l) { l->debug_pending = true; }
 void looper::noteOn(midi_event ev)
 {
     (void)ev;
-    eg_start_eg(&m_eg1);
+    m_eg1.StartEg();
 }
 
 void looper::noteOff(midi_event ev)
 {
     (void)ev;
-    eg_note_off(&m_eg1);
+    m_eg1.NoteOff();
 }
 
 void looper::SetParam(std::string name, double val)

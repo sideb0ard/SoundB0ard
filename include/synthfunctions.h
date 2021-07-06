@@ -3,8 +3,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-// OSCILLATOR ///////////////////////////
-typedef struct
+struct GlobalOscillatorParams
 {
     // --- common
     double osc_fo;
@@ -18,10 +17,9 @@ typedef struct
     // --- LFOs
     unsigned int lfo_mode; // to store MODE
     unsigned int loop_mode;
-} global_oscillator_params;
+};
 
-// FILTER ///////////////////////////////////
-typedef struct
+struct GlobalFilterParams
 {
     double fc_control;
     double q_control;
@@ -29,10 +27,9 @@ typedef struct
     double saturation;
     unsigned int filter_type;
     unsigned int nlp;
-} global_filter_params;
+};
 
-// ENVELOPE GENERATOR //////////////////////
-typedef struct
+struct GlobalEgParams
 {
     double attack_time_msec;  // att: is a time duration
     double decay_time_msec;   // dcy: is a time to decay 1->0
@@ -42,17 +39,15 @@ typedef struct
     bool reset_to_zero;
     bool legato_mode;
     bool sustain_override;
-} global_eg_params;
+};
 
-// DCA GENERATOR //////////////////////
-typedef struct
+struct GlobalDCAParams
 {
     double amplitude_db; // the user's control setting in dB
     double pan_control;
-} global_dca_params;
+};
 
-// VOICE PARAMS
-typedef struct
+struct GlobalVoiceParams
 {
     unsigned int voice_mode;
     bool hard_sync;
@@ -115,27 +110,25 @@ typedef struct
     double op2_feedback;
     double op3_feedback;
     double op4_feedback;
+};
 
-} global_voice_params;
-
-// SYNTH  /////////////////////////////
-typedef struct
+struct GlobalSynthParams
 {
-    global_voice_params voice_params;
-    global_oscillator_params osc1_params;
-    global_oscillator_params osc2_params;
-    global_oscillator_params osc3_params;
-    global_oscillator_params osc4_params;
-    global_oscillator_params lfo1_params;
-    global_oscillator_params lfo2_params;
-    global_filter_params filter1_params;
-    global_filter_params filter2_params;
-    global_eg_params eg1_params;
-    global_eg_params eg2_params;
-    global_eg_params eg3_params;
-    global_eg_params eg4_params;
-    global_dca_params dca_params;
-} global_synth_params;
+    GlobalVoiceParams voice_params;
+    GlobalOscillatorParams osc1_params;
+    GlobalOscillatorParams osc2_params;
+    GlobalOscillatorParams osc3_params;
+    GlobalOscillatorParams osc4_params;
+    GlobalOscillatorParams lfo1_params;
+    GlobalOscillatorParams lfo2_params;
+    GlobalFilterParams filter1_params;
+    GlobalFilterParams filter2_params;
+    GlobalEgParams eg1_params;
+    GlobalEgParams eg2_params;
+    GlobalEgParams eg3_params;
+    GlobalEgParams eg4_params;
+    GlobalDCAParams dca_params;
+};
 
 double midi_to_pan_value(unsigned int midi_val);
 double mma_midi_to_atten_dB(unsigned int midi_val);

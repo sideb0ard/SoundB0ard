@@ -2,342 +2,283 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-minisynth_voice *new_minisynth_voice(void)
+#include <iostream>
+
+MiniSynthVoice::MiniSynthVoice()
 {
-    minisynth_voice *msv =
-        (minisynth_voice *)calloc(1, sizeof(minisynth_voice));
-    if (msv == NULL)
-        return NULL;
-    minisynth_voice_init(msv);
-
-    return msv;
-}
-
-void minisynth_voice_init(minisynth_voice *msv)
-{
-    // initializes 4 x envelope generators and
-    // 2 x lfos, and dca in base class
-    voice_init(&msv->m_voice);
-
-    // initialize all my oscillators
-    osc_new_settings(&msv->m_osc1.osc);
-    qb_set_sound_generator_interface(&msv->m_osc1);
-    osc_new_settings(&msv->m_osc2.osc);
-    qb_set_sound_generator_interface(&msv->m_osc2);
-    osc_new_settings(&msv->m_osc3.osc);
-    qb_set_sound_generator_interface(&msv->m_osc3);
-    osc_new_settings(&msv->m_osc4.osc);
-    qb_set_sound_generator_interface(&msv->m_osc4);
-    // or use wavetable versions
-    // wt_initialize(&msv->m_osc1);
-    // wt_initialize(&msv->m_osc2);
-    // wt_initialize(&msv->m_osc3);
-    // wt_initialize(&msv->m_osc4);
-
-    // attach oscillators to my base class
-    msv->m_voice.m_osc1 = (oscillator *)&msv->m_osc1;
-    msv->m_voice.m_osc2 = (oscillator *)&msv->m_osc2;
-    msv->m_voice.m_osc3 = (oscillator *)&msv->m_osc3;
-    msv->m_voice.m_osc4 = (oscillator *)&msv->m_osc4;
-
-    // initialize my filter
-    filter_moog_init(&msv->m_filter);
-    // filter_ck35_init(&msv->m_filter);
+    // attach oscillators to base class
+    m_osc1 = &m_op1;
+    m_osc2 = &m_op2;
+    m_osc3 = &m_op3;
+    m_osc4 = &m_op4;
 
     // attach to base class
-    msv->m_voice.m_filter1 = (filter *)&msv->m_filter;
-    msv->m_voice.m_filter2 = NULL;
+    m_filter1 = &m_filter;
+    m_filter2 = NULL;
 
-    msv->m_filter.f.m_aux_control = 0.0;
+    m_filter.m_aux_control = 0.0;
 
     // voice mode 0
-    msv->m_osc1.osc.m_waveform = SAW1;
-    msv->m_osc2.osc.m_waveform = SAW1;
-    msv->m_osc3.osc.m_waveform = SAW1;
-    msv->m_osc4.osc.m_waveform = NOISE;
+    m_osc1->m_waveform = SAW1;
+    m_osc2->m_waveform = SAW1;
+    m_osc3->m_waveform = SAW1;
+    m_osc4->m_waveform = NOISE;
 
-    eg_set_eg_mode(&msv->m_voice.m_eg1, ANALOG);
-    msv->m_voice.m_eg1.m_output_eg = true;
+    m_eg1.SetEgMode(ANALOG);
+    m_eg1.m_output_eg = true;
 
-    dca_initialize(&msv->m_voice.m_dca);
-    msv->m_voice.m_dca.m_mod_source_eg = DEST_DCA_EG;
+    m_dca.m_mod_source_eg = DEST_DCA_EG;
 }
 
-void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,
-                                          modmatrix *matrix)
+void MiniSynthVoice::InitializeModMatrix(ModulationMatrix *matrix)
 {
-    voice_initialize_modmatrix(&msv->m_voice, matrix);
+    Voice::InitializeModMatrix(matrix);
 
-    if (!get_matrix_core(matrix))
-        return;
-
-    matrixrow *row = NULL;
+    std::shared_ptr<ModMatrixRow> row = NULL;
 
     // LFO1 -> ALL OSC1 FO
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_ALL_OSC_FO,
-        &msv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity,
-        &msv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        true);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_ALL_OSC_FO,
+                          &m_global_voice_params->lfo1_osc_mod_intensity,
+                          &m_global_voice_params->osc_fo_mod_range,
+                          TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> FILTER1 FC
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_ALL_FILTER_FC,
-        &msv->m_voice.m_global_voice_params->lfo1_filter1_mod_intensity,
-        &msv->m_voice.m_global_voice_params->filter_mod_range, TRANSFORM_NONE,
-        true);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_ALL_FILTER_FC,
+                          &m_global_voice_params->lfo1_filter1_mod_intensity,
+                          &m_global_voice_params->filter_mod_range,
+                          TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
 
     // LFO1 (-1 -> +1) -> DCA Amp Mod (0->1)
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_DCA_AMP,
-        &msv->m_voice.m_global_voice_params->lfo1_dca_amp_mod_intensity,
-        &msv->m_voice.m_global_voice_params->amp_mod_range,
-        TRANSFORM_BIPOLAR_TO_UNIPOLAR, true);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_DCA_AMP,
+                          &m_global_voice_params->lfo1_dca_amp_mod_intensity,
+                          &m_global_voice_params->amp_mod_range,
+                          TRANSFORM_BIPOLAR_TO_UNIPOLAR, true);
+    matrix->AddMatrixRow(row);
 
     // LFO1 (-1 -> +1) -> DCA Pan Mod (0->1)
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_DCA_PAN,
-        &msv->m_voice.m_global_voice_params->lfo1_dca_pan_mod_intensity,
-        &msv->m_voice.m_default_mod_range, TRANSFORM_NONE, true);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_DCA_PAN,
+                          &m_global_voice_params->lfo1_dca_pan_mod_intensity,
+                          &m_default_mod_range, TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
 
     // LFO1 -> PULSE WIDTH
-    row = create_matrix_row(SOURCE_LFO1, DEST_ALL_OSC_PULSEWIDTH,
-                            &msv->m_voice.m_default_mod_intensity,
-                            &msv->m_voice.m_default_mod_range, TRANSFORM_NONE,
-                            true);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_ALL_OSC_PULSEWIDTH,
+                          &m_default_mod_intensity, &m_default_mod_range,
+                          TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
 
     // LFO2 -> ALL OSC FO
-    row = create_matrix_row(
-        SOURCE_LFO2, DEST_ALL_OSC_FO,
-        &msv->m_voice.m_global_voice_params->lfo2_osc_mod_intensity,
-        &msv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO2, DEST_ALL_OSC_FO,
+                          &m_global_voice_params->lfo2_osc_mod_intensity,
+                          &m_global_voice_params->osc_fo_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
 
     // LFO2 -> FILTER1 FC
-    row = create_matrix_row(
-        SOURCE_LFO2, DEST_ALL_FILTER_FC,
-        &msv->m_voice.m_global_voice_params->lfo2_filter1_mod_intensity,
-        &msv->m_voice.m_global_voice_params->filter_mod_range, TRANSFORM_NONE,
-        false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO2, DEST_ALL_FILTER_FC,
+                          &m_global_voice_params->lfo2_filter1_mod_intensity,
+                          &m_global_voice_params->filter_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
 
     // LFO2 (-1 -> +1) -> DCA Amp Mod (0->1)
-    row = create_matrix_row(
-        SOURCE_LFO2, DEST_DCA_AMP,
-        &msv->m_voice.m_global_voice_params->lfo2_dca_amp_mod_intensity,
-        &msv->m_voice.m_global_voice_params->amp_mod_range,
-        TRANSFORM_BIPOLAR_TO_UNIPOLAR, false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO2, DEST_DCA_AMP,
+                          &m_global_voice_params->lfo2_dca_amp_mod_intensity,
+                          &m_global_voice_params->amp_mod_range,
+                          TRANSFORM_BIPOLAR_TO_UNIPOLAR, false);
+    matrix->AddMatrixRow(row);
 
-    row = create_matrix_row(
-        SOURCE_LFO2, DEST_DCA_PAN,
-        &msv->m_voice.m_global_voice_params->lfo2_dca_pan_mod_intensity,
-        &msv->m_voice.m_default_mod_range, TRANSFORM_NONE, false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO2, DEST_DCA_PAN,
+                          &m_global_voice_params->lfo2_dca_pan_mod_intensity,
+                          &m_default_mod_range, TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
 
     // LFO2 -> PULSE WIDTH
-    row = create_matrix_row(SOURCE_LFO2, DEST_ALL_OSC_PULSEWIDTH,
-                            &msv->m_voice.m_default_mod_intensity,
-                            &msv->m_voice.m_default_mod_range, TRANSFORM_NONE,
-                            false);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_LFO2, DEST_ALL_OSC_PULSEWIDTH,
+                          &m_default_mod_intensity, &m_default_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
 
     // EG1 -> FILTER1 FC
-    row = create_matrix_row(
-        SOURCE_BIASED_EG1, DEST_ALL_FILTER_FC,
-        &msv->m_voice.m_global_voice_params->eg1_filter1_mod_intensity,
-        &msv->m_voice.m_global_voice_params->filter_mod_range, TRANSFORM_NONE,
-        true);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_BIASED_EG1, DEST_ALL_FILTER_FC,
+                          &m_global_voice_params->eg1_filter1_mod_intensity,
+                          &m_global_voice_params->filter_mod_range,
+                          TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
 
     // EG1 -> DCA EG
-    row = create_matrix_row(
-        SOURCE_EG1, DEST_DCA_EG,
-        &msv->m_voice.m_global_voice_params->eg1_dca_amp_mod_intensity,
-        &msv->m_voice.m_default_mod_range, TRANSFORM_NONE, true);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_EG1, DEST_DCA_EG,
+                          &m_global_voice_params->eg1_dca_amp_mod_intensity,
+                          &m_default_mod_range, TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
 
     // EG1 -> ALL OSC
-    row = create_matrix_row(
-        SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
-        &msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity,
-        &msv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        true);
-    add_matrix_row(matrix, row);
+    row = CreateMatrixRow(SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
+                          &m_global_voice_params->eg1_osc_mod_intensity,
+                          &m_global_voice_params->osc_fo_mod_range,
+                          TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
 }
 
-void minisynth_voice_init_global_parameters(minisynth_voice *msv,
-                                            global_synth_params *sp)
+void MiniSynthVoice::InitGlobalParameters(GlobalSynthParams *sp)
 {
-    voice_init_global_parameters(&msv->m_voice, sp);
+    Voice::InitGlobalParameters(sp);
 
-    msv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->lfo1_filter1_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->lfo1_filter2_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->lfo1_dca_pan_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->lfo1_dca_amp_mod_intensity = 0.0;
+    m_global_voice_params->lfo1_osc_mod_intensity = 1.0;
+    m_global_voice_params->lfo1_filter1_mod_intensity = 1.0;
+    m_global_voice_params->lfo1_filter2_mod_intensity = 1.0;
+    m_global_voice_params->lfo1_dca_pan_mod_intensity = 1.0;
+    m_global_voice_params->lfo1_dca_amp_mod_intensity = 1.0;
 
-    msv->m_voice.m_global_voice_params->lfo2_osc_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->lfo2_filter1_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->lfo2_filter2_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->lfo2_dca_pan_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->lfo2_dca_amp_mod_intensity = 0.0;
+    m_global_voice_params->lfo2_osc_mod_intensity = 1.0;
+    m_global_voice_params->lfo2_filter1_mod_intensity = 1.0;
+    m_global_voice_params->lfo2_filter2_mod_intensity = 1.0;
+    m_global_voice_params->lfo2_dca_pan_mod_intensity = 1.0;
+    m_global_voice_params->lfo2_dca_amp_mod_intensity = 1.0;
 
-    msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->eg1_filter1_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->eg1_filter2_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->eg1_dca_amp_mod_intensity = 0.0;
+    m_global_voice_params->eg1_osc_mod_intensity = 1.0;
+    m_global_voice_params->eg1_filter1_mod_intensity = 1.0;
+    m_global_voice_params->eg1_filter2_mod_intensity = 1.0;
+    m_global_voice_params->eg1_dca_amp_mod_intensity = 1.0;
 
-    msv->m_voice.m_global_voice_params->eg2_osc_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->eg2_filter1_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->eg2_filter2_mod_intensity = 0.0;
-    msv->m_voice.m_global_voice_params->eg2_dca_amp_mod_intensity = 0.0;
+    m_global_voice_params->eg2_osc_mod_intensity = 1.0;
+    m_global_voice_params->eg2_filter1_mod_intensity = 1.0;
+    m_global_voice_params->eg2_filter2_mod_intensity = 1.0;
+    m_global_voice_params->eg2_dca_amp_mod_intensity = 1.0;
 }
 
-void minisynth_voice_prepare_for_play(minisynth_voice *msv)
+void MiniSynthVoice::PrepareForPlay()
 {
-    voice_prepare_for_play(&msv->m_voice);
-    msv->m_voice.m_dca.m_mod_source_eg = DEST_DCA_EG;
-    minisynth_voice_reset(msv);
+    Voice::PrepareForPlay();
+    Reset();
 }
 
-void minisynth_voice_update(minisynth_voice *msv)
+void MiniSynthVoice::Update()
 {
-    if (!msv->m_voice.m_global_voice_params)
+    if (!m_global_voice_params)
         return;
-    unsigned int current_voice_mode = msv->m_voice.m_voice_mode;
 
-    voice_update(&msv->m_voice);
-    if (msv->m_voice.m_voice_mode != current_voice_mode)
+    // save this as base class will override
+    unsigned int current_voice_mode = m_voice_mode;
+
+    Voice::Update();
+
+    if (m_voice_mode != current_voice_mode)
     {
-        msv->m_voice.m_voice_mode =
-            msv->m_voice.m_global_voice_params->voice_mode;
-        msv->m_osc3.osc.m_octave = -1.0;
-        msv->m_voice.m_global_synth_params->osc4_params.waveform = NOISE;
+        m_voice_mode = m_global_voice_params->voice_mode;
+        m_osc3->m_octave = -1.0;
+        m_global_synth_params->osc4_params.waveform = NOISE;
 
-        switch (msv->m_voice.m_voice_mode)
+        switch (m_voice_mode)
         {
         case Saw3:
-            msv->m_voice.m_global_synth_params->osc1_params.waveform = SAW1;
-            msv->m_voice.m_global_synth_params->osc2_params.waveform = SAW1;
-            msv->m_voice.m_global_synth_params->osc3_params.waveform = SAW1;
+            m_global_synth_params->osc1_params.waveform = SAW1;
+            m_global_synth_params->osc2_params.waveform = SAW1;
+            m_global_synth_params->osc3_params.waveform = SAW1;
             break;
         case Sqr3:
-            msv->m_voice.m_global_synth_params->osc1_params.waveform = SQUARE;
-            msv->m_voice.m_global_synth_params->osc2_params.waveform = SQUARE;
-            msv->m_voice.m_global_synth_params->osc3_params.waveform = SQUARE;
+            m_global_synth_params->osc1_params.waveform = SQUARE;
+            m_global_synth_params->osc2_params.waveform = SQUARE;
+            m_global_synth_params->osc3_params.waveform = SQUARE;
             break;
         case Saw2Sqr:
-            msv->m_voice.m_global_synth_params->osc1_params.waveform = SAW1;
-            msv->m_voice.m_global_synth_params->osc2_params.waveform = SQUARE;
-            msv->m_voice.m_global_synth_params->osc3_params.waveform = SAW1;
+            m_global_synth_params->osc1_params.waveform = SAW1;
+            m_global_synth_params->osc2_params.waveform = SQUARE;
+            m_global_synth_params->osc3_params.waveform = SAW1;
             break;
         case Tri2Saw:
-            msv->m_voice.m_global_synth_params->osc1_params.waveform = TRI;
-            msv->m_voice.m_global_synth_params->osc2_params.waveform = SAW1;
-            msv->m_voice.m_global_synth_params->osc3_params.waveform = TRI;
+            m_global_synth_params->osc1_params.waveform = TRI;
+            m_global_synth_params->osc2_params.waveform = SAW1;
+            m_global_synth_params->osc3_params.waveform = TRI;
             break;
         case Tri2Sqr:
-            msv->m_voice.m_global_synth_params->osc1_params.waveform = TRI;
-            msv->m_voice.m_global_synth_params->osc2_params.waveform = SQUARE;
-            msv->m_voice.m_global_synth_params->osc3_params.waveform = TRI;
+            m_global_synth_params->osc1_params.waveform = TRI;
+            m_global_synth_params->osc2_params.waveform = SQUARE;
+            m_global_synth_params->osc3_params.waveform = TRI;
             break;
         case Sin2Sqr:
-            msv->m_voice.m_global_synth_params->osc1_params.waveform = SINE;
-            msv->m_voice.m_global_synth_params->osc2_params.waveform = SQUARE;
-            msv->m_voice.m_global_synth_params->osc3_params.waveform = SINE;
+            m_global_synth_params->osc1_params.waveform = SINE;
+            m_global_synth_params->osc2_params.waveform = SQUARE;
+            m_global_synth_params->osc3_params.waveform = SINE;
             break;
         default:
-            msv->m_voice.m_global_synth_params->osc1_params.waveform = SAW1;
-            msv->m_voice.m_global_synth_params->osc2_params.waveform = SAW1;
-            msv->m_voice.m_global_synth_params->osc3_params.waveform = SAW1;
+            m_global_synth_params->osc1_params.waveform = SAW1;
+            m_global_synth_params->osc2_params.waveform = SAW1;
+            m_global_synth_params->osc3_params.waveform = SAW1;
             break;
         }
-        msv->m_osc1.osc.reset_oscillator((oscillator *)&msv->m_osc1);
-        msv->m_osc2.osc.reset_oscillator((oscillator *)&msv->m_osc2);
-        msv->m_osc3.osc.reset_oscillator((oscillator *)&msv->m_osc3);
-        msv->m_osc4.osc.reset_oscillator((oscillator *)&msv->m_osc4);
+        m_osc1->Reset();
+        m_osc2->Reset();
+        m_osc3->Reset();
+        m_osc4->Reset();
     }
 }
 
-void minisynth_voice_reset(minisynth_voice *msv)
+void MiniSynthVoice::Reset()
 {
-    voice_reset(&msv->m_voice);
-    msv->m_voice.m_portamento_inc = 0.0;
-    msv->m_osc1.osc.m_waveform = SAW1;
+    Voice::Reset();
+    m_portamento_inc = 0.0;
+    m_osc1->m_waveform = SAW1;
+    m_osc1->m_waveform = SAW1;
+    m_osc1->m_waveform = SAW1;
+    m_osc1->m_waveform = NOISE;
 }
 
-bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
-                             double *right_output)
+bool MiniSynthVoice::DoVoice(double *left_output, double *right_output)
 {
-    if (!voice_gennext(&msv->m_voice, left_output, right_output))
+    if (!Voice::DoVoice(left_output, right_output))
     {
         return false;
     }
 
     //// layer 0 //////////////////////////////
-    do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 0);
+    modmatrix.DoModMatrix(0);
 
     ////// update layer 1 modulators
-    eg_update(&msv->m_voice.m_eg1);
-    osc_update((oscillator *)&msv->m_voice.m_lfo1);
-    osc_update((oscillator *)&msv->m_voice.m_lfo2);
+    m_eg1.Update();
+    m_lfo1.Update();
+    m_lfo2.Update();
 
     ////// gen next val layer 1 mods
-    eg_do_envelope(&msv->m_voice.m_eg1, NULL);
-    lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1, NULL);
-    lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo2, NULL);
+    m_eg1.DoEnvelope(NULL);
+    m_lfo1.DoOscillate(NULL);
+    m_lfo2.DoOscillate(NULL);
 
     ////// layer 1 //////////////////////////////
-    do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 1);
+    modmatrix.DoModMatrix(1);
 
-    dca_update(&msv->m_voice.m_dca);
-    // msv->m_filter.f.update((filter *)&msv->m_filter);
-    moog_update((filter *)&msv->m_filter);
+    Update();
+    m_dca.Update();
+    m_filter.Update();
 
-    osc_update((oscillator *)&msv->m_osc1);
-    osc_update((oscillator *)&msv->m_osc2);
-    osc_update((oscillator *)&msv->m_osc3);
-    osc_update((oscillator *)&msv->m_osc4);
+    m_osc1->Update();
+    m_osc2->Update();
+    m_osc3->Update();
+    m_osc4->Update();
 
     double osc_mix = 0.;
-    if (msv->m_voice.hard_sync)
+    if (hard_sync)
     {
-        qb_do_oscillate((oscillator *)&msv->m_osc1, NULL);
-        if (msv->m_osc1.osc.just_wrapped)
-            qb_start_oscillator((oscillator *)&msv->m_osc2);
-        osc_mix = 0.666 * qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +
-                  0.333 * qb_do_oscillate((oscillator *)&msv->m_osc3, NULL) +
-                  qb_do_oscillate((oscillator *)&msv->m_osc4, NULL);
+        m_osc1->DoOscillate(NULL);
+        if (m_osc1->just_wrapped)
+            m_osc2->StartOscillator();
+        osc_mix = 0.666 * m_osc2->DoOscillate(NULL) +
+                  0.333 * m_osc3->DoOscillate(NULL) + m_osc4->DoOscillate(NULL);
     }
     else
     {
-        osc_mix = 0.333 * qb_do_oscillate((oscillator *)&msv->m_osc1, NULL) +
-                  0.333 * qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +
-                  0.333 * qb_do_oscillate((oscillator *)&msv->m_osc3, NULL) +
-                  qb_do_oscillate((oscillator *)&msv->m_osc4, NULL);
+        osc_mix = 0.333 * m_osc1->DoOscillate(NULL) +
+                  0.333 * m_osc2->DoOscillate(NULL) +
+                  0.333 * m_osc3->DoOscillate(NULL) + m_osc4->DoOscillate(NULL);
     }
 
-    double filter_out =
-        // msv->m_filter.f.gennext((filter *)&msv->m_filter, osc_mix);
-        moog_gennext((filter *)&msv->m_filter, osc_mix);
+    double filter_out = m_filter.DoFilter(osc_mix);
 
-    dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
-                right_output);
+    m_dca.DoDCA(filter_out, filter_out, left_output, right_output);
 
     return true;
 }
 
-void minisynth_voice_set_filter_mod(minisynth_voice *ms, double mod)
-{
-    // filter_set_fc_mod(&ms->m_moog_ladder_filter.f, mod);
-    ms->m_filter.f.set_fc_mod(&ms->m_filter.f, mod);
-}
-
-void minisynth_voice_free_self(minisynth_voice *ms) { free(ms); }
+void MiniSynthVoice::SetFilterMod(double mod) { m_filter.SetFcMod(mod); }

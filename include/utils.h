@@ -47,7 +47,7 @@ double concave_inverted_transform(double value);
 
 double do_pn_sequence(unsigned *pn_register);
 double do_white_noise(void);
-void check_wrap_index(double *index);
+void CheckWrapIndex(double *index);
 double do_blep_n(const double *blep_table, double table_len, double modulo,
                  double inc, double height, bool rising_edge,
                  double points_per_side, bool interpolate);
