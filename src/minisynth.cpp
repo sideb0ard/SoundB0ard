@@ -591,15 +591,15 @@ void MiniSynth::Update()
                                : pow(10.0, m_settings.m_sub_osc_db / 20.0);
 
     // --- osc3 is sub osc
-    // m_global_synth_params.osc3_params.amplitude = sub_amplitude;
-    m_global_synth_params.osc3_params.amplitude = m_settings.osc3_amp;
+    m_global_synth_params.osc3_params.amplitude = sub_amplitude;
+    // m_global_synth_params.osc3_params.amplitude = m_settings.osc3_amp;
     m_global_synth_params.osc3_params.octave = m_settings.osc3_oct;
     m_global_synth_params.osc3_params.semitones = m_settings.osc3_semis;
     m_global_synth_params.osc3_params.cents = m_settings.osc3_cents;
 
     // --- osc4 is noise osc
-    // m_global_synth_params.osc4_params.amplitude = noise_amplitude;
-    m_global_synth_params.osc4_params.amplitude = m_settings.osc4_amp;
+    m_global_synth_params.osc4_params.amplitude = noise_amplitude;
+    // m_global_synth_params.osc4_params.amplitude = m_settings.osc4_amp;
     m_global_synth_params.osc4_params.octave = m_settings.osc4_oct;
     m_global_synth_params.osc4_params.semitones = m_settings.osc4_semis;
     m_global_synth_params.osc4_params.cents = m_settings.osc4_cents;
@@ -2136,6 +2136,7 @@ void MiniSynth::SetParam(std::string name, double val)
         SetKeytrack(val);
     else if (name == "ndscale")
         SetNoteToDecayScaling(val);
+
     else if (name == "osc1")
         SetOscType(1, val);
     else if (name == "o1amp")
@@ -2161,7 +2162,10 @@ void MiniSynth::SetParam(std::string name, double val)
     else if (name == "osc3")
         SetOscType(2, val);
     else if (name == "o3amp")
-        SetOscAmp(3, val);
+    {
+        std::cout << "Use 'subosc' param to change osc3" << std::endl;
+        // SetOscAmp(3, val);
+    }
     else if (name == "o3oct")
         SetOctave(val);
     else if (name == "o3semi")
@@ -2170,7 +2174,9 @@ void MiniSynth::SetParam(std::string name, double val)
     else if (name == "osc4")
         SetOscType(4, val);
     else if (name == "o4amp")
-        SetOscAmp(4, val);
+    {
+        std::cout << "Use 'noisedb' param to change osc4" << std::endl;
+    }
     else if (name == "o4oct")
         SetOctave(val);
     else if (name == "o4semi")
@@ -2178,6 +2184,8 @@ void MiniSynth::SetParam(std::string name, double val)
 
     else if (name == "noisedb")
         SetNoiseOscDb(val);
+    else if (name == "octave")
+        SetOctave(val);
     else if (name == "pitchrange")
         SetPitchbendRange(val);
     else if (name == "porta")

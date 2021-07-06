@@ -1,17 +1,59 @@
 
+
+let inversion = fn(val)
+{
+  return 60 + (60 - val);
+}
+
+# let ntz = [52, 50, 48, 47, 43, 45, 47, 40, ~]
+
+
 let blah_gen = gen()
 {
   setup()
   {
-    let r = 0;
+
+    let dxmel = [47, 47, ~, 40, ~, ~ , ~, ~];
+    let velz = [127, 110, 90, 60, 50];
+    let vx = 0;
+    let invntz = map(ntz, inversion);
+    let rot = 2;
+    let swing = 30;
+    let hpatr = rand_array(24, 0, 1);
   }
   run()
   {
-    if (count % 4 == 0) {
-      hatp = rand_rand_array(24, 0, 1);
+    play_array(mo, ntz);
+    play_array(mo, rotate(invntz, rot));
+    rot = incr(rot, 0, len(ntz));
+
+    if (count % 3 == 0) {
+      hpatr = rand_array(24, 0, 1);
+      play_array(dx100, rotate(dxmel, rot));
+    }
+    for (i = 0; i < 24; ++i) {
+      if (hpatr[i] == 1) {
+        if (i % 2 == 1) {
+          note_on_at(hh, 1, i * 160, vel=velz[vx]);
+        } else {
+          note_on_at(hh, 1, i * 160 + swing);
+        }
+      }
+    }
+    swing = swing + 10;
+    if (swing > 100) {
+      swing = 20;
     }
 
-    play_array(hh, hatp);
+    for (i = 0; i < 4; ++i) {
+      note_on_at(bd, 1, i * 960 + swing, vel=velz[vx]);
+    }
+
+    vx = incr(vx, 9, len(velz));
+
+    #play_array(sn, bjork(1, 8));
+    #play_array(sn2, bjork(5, 8));
+
   }
 }
 
