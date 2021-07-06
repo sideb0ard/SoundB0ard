@@ -528,8 +528,6 @@ bool MiniSynth::PrepareForPlay()
         if (voices_[i])
             voices_[i]->PrepareForPlay();
     }
-    std::cout << "**** INSIDE PREPAER FOR PLAY = AFTER VOICE PREPARE == AMP IS "
-              << m_global_synth_params.osc1_params.amplitude << std::endl;
 
     Update();
     m_last_note_frequency = -1.0;

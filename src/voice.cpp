@@ -210,10 +210,7 @@ void Voice::InitGlobalParameters(GlobalSynthParams *sp)
 
     // --- init sub-components
     if (m_osc1)
-    {
-        std::cout << "INITI OSC1 PARAMSZZZ!\n";
         m_osc1->InitGlobalParameters(&m_global_synth_params->osc1_params);
-    }
     if (m_osc2)
         m_osc2->InitGlobalParameters(&m_global_synth_params->osc2_params);
     if (m_osc3)
