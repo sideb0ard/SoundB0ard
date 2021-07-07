@@ -1,4 +1,22 @@
 
+#bd = Sampler(kicks/gaborKick.aiff) vol:0.70 pan:0.00 pitch:2.00
+#cp = Sampler(claps/djkhaledClap.aiff) vol:0.70 pan:0.00 pitch:1.00
+#dx100 = DxSynth(RAVER) vol:0.70 pan:0.00 algo:1
+#hh = Sampler(hats/SNDhat.aiff) vol:0.70 pan:0.00 pitch:1.00
+#     fx0 delayms:136 fb:2.00 ratio:0.20 wetmx:0.70 mode:TAP2(1) sync:1 synclen:16TH(2)
+#hh2 = Sampler(hats/dr606closedhh.aif) vol:0.70 pan:0.00 pitch:1.00
+#kick = Sampler(kicks/gaborKick.aiff) vol:0.70 pan:0.00 pitch:1.00
+#mo = Moog(default) vol:0.7 pan:0 voice:SQR3(1)
+#sn = Sampler(snrs/nord808_snr.aif) vol:0.70 pan:0.00 pitch:1.00
+#xen = loops/xennakisGlitch.aiff vol:1 pan:0 pitch:1 idx:46 mode:LOOP(0) step:0 len:4
+#      fx0 delayms:136 fb:2.00 ratio:0.20 wetmx:0.70 mode:TAP2(1) sync:1 synclen:16TH(2)
+#      fx1 Distortion! threshold:0.71
+#      fx2 bitdepth:6 bitrate:4096 sample_hold_freq:1.00
+
+
+#probabilities
+let garage_kick_bar1 = { 0 : 90, 5 : 90, 15:90};
+let garage_kick_bar2 = {0:95, 5:90, 9:90, 15:70, 18:50, 21:50};
 
 let inversion = fn(val)
 {
@@ -7,52 +25,60 @@ let inversion = fn(val)
 
 # let ntz = [52, 50, 48, 47, 43, 45, 47, 40, ~]
 
-
 let blah_gen = gen()
 {
   setup()
   {
-
-    let dxmel = [47, 47, ~, 40, ~, ~ , ~, ~];
-    let velz = [127, 110, 90, 60, 50];
-    let vx = 0;
-    let invntz = map(ntz, inversion);
-    let rot = 2;
-    let swing = 30;
-    let hpatr = rand_array(24, 0, 1);
+    let pulses_per_24th = 3840 / 24;
+    let rx = 0;
+    let rx2 = 0;
+    let randz = [100, 90, 70, 30, 10];
+    let rx = 0;
   }
   run()
   {
-    play_array(mo, ntz);
-    play_array(mo, rotate(invntz, rot));
-    rot = incr(rot, 0, len(ntz));
-
-    if (count % 3 == 0) {
-      hpatr = rand_array(24, 0, 1);
-      play_array(dx100, rotate(dxmel, rot));
+    let beat_prob = garage_kick_bar1;
+    if (count % 2 == 1) {
+      beat_prob = garage_kick_bar2;
     }
-    for (i = 0; i < 24; ++i) {
-      if (hpatr[i] == 1) {
-        if (i % 2 == 1) {
-          note_on_at(hh, 1, i * 160, vel=velz[vx]);
-        } else {
-          note_on_at(hh, 1, i * 160 + swing);
+
+    let velocity = 128;
+
+    if (rand(100) < randz[rx]) {
+      for (i = 0; i < 24; ++i) {
+        if (beat_prob[i]) {
+          let prob = beat_prob[i];
+          if (rand(100) < prob) {
+            if (i != 1) {
+              velocity = rand(88) + 60;
+            }
+            note_on_at(bd, 1, i * pulses_per_24th, vel=velocity);
+            note_on_at(mo, rf[rx], i * pulses_per_24th, vel=velocity);
+            rx = incr(rx, 0, len(rf));
+          }
+        }
+        else {
+          note_on_at(dx100, rf[rx2], i * pulses_per_24th, vel=velocity);
+          rx2 = incr(rx2, 0, len(rf));
         }
       }
     }
-    swing = swing + 10;
-    if (swing > 100) {
-      swing = 20;
+    rx = incr(rx, 0, len(randz));
+
+
+    for (i = 0; i < 16; ++i) {
+      let swing_mid = 0;
+      if (i % 4 == 2) {
+        if (i % 8 == 6) {
+          swing_mid = rand(pp/2);
+        }
+        note_on_at(hh, 1, pp * i + swing_mid, vel=(rand(88) + 60));
+      }
     }
 
-    for (i = 0; i < 4; ++i) {
-      note_on_at(bd, 1, i * 960 + swing, vel=velz[vx]);
+    if (count % 4 == 0) {
+      rf = riff();
     }
-
-    vx = incr(vx, 9, len(velz));
-
-    #play_array(sn, bjork(1, 8));
-    #play_array(sn2, bjork(5, 8));
 
   }
 }

@@ -431,6 +431,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
          {
+             if (args.size() < 2)
+                 return evaluator::NewError("`note_on` requires at least two "
+                                            "args - a sound_generator target "
+                                            "and a midi_note to play.");
+
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
              if (soundgen)
@@ -472,6 +477,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
          {
+             if (args.size() < 3)
+                 return evaluator::NewError(
+                     "`note_on_at` requires at least three args - a "
+                     "sound_generator target, a midi_note to play and a time "
+                     "in the future specified in midi ticks.");
+
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
              if (soundgen)
@@ -762,7 +773,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto number = std::dynamic_pointer_cast<object::Number>(args[0]);
              if (number)
              {
-                 auto rand_number = rand() % (int)number->value_;
+                 int rand_number = 0;
+                 if (number->value_ > 0)
+                     rand_number = rand() % (int)number->value_;
                  return std::make_shared<object::Number>(rand_number);
              }
 
