@@ -63,21 +63,22 @@ const TokenType SLANG_OR = "||";
 // /////////////////////////
 
 const TokenType SLANG_BPM = "BPM";
-const TokenType SLANG_EVERY = "EVERY";
-const TokenType SLANG_OVER = "OVER";
-const TokenType SLANG_RAMP = "RAMP";
-const TokenType SLANG_OSC = "OSCILLATE";
-const TokenType SLANG_PS = "PS";
-const TokenType SLANG_LS = "LS";
-const TokenType SLANG_HELP = "HELP";
-const TokenType SLANG_SET = "SET";
-const TokenType SLANG_PAN = "PAN";
-const TokenType SLANG_PLAY = "PLAY";
-const TokenType SLANG_PITCH = "PITCH";
-const TokenType SLANG_VOLUME = "VOLUME";
 const TokenType SLANG_DURATION = "DURATION";
-const TokenType SLANG_VELOCITY = "VELOCITY";
+const TokenType SLANG_EVERY = "EVERY";
+const TokenType SLANG_HELP = "HELP";
 const TokenType SLANG_INFO = "INFO";
+const TokenType SLANG_LS = "LS";
+const TokenType SLANG_OSC = "OSCILLATE";
+const TokenType SLANG_OVER = "OVER";
+const TokenType SLANG_PAN = "PAN";
+const TokenType SLANG_PITCH = "PITCH";
+const TokenType SLANG_PLAY = "PLAY";
+const TokenType SLANG_PS = "PS";
+const TokenType SLANG_RAMP = "RAMP";
+const TokenType SLANG_SET = "SET";
+const TokenType SLANG_STRATEGY = "STRATEGY";
+const TokenType SLANG_VELOCITY = "VELOCITY";
+const TokenType SLANG_VOLUME = "VOLUME";
 
 // instruments
 const TokenType SLANG_SAMPLE = "SAMPLE";

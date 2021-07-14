@@ -16,6 +16,7 @@
 #include <interpreter/builtins.hpp>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/object.hpp>
+#include <obliquestrategies.h>
 #include <pitch_detection.hpp>
 #include <tsqueue.hpp>
 
@@ -399,6 +400,14 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     {
         audio_action_queue_item action_req{.type = AudioAction::HELP};
         audio_queue.push(action_req);
+    }
+
+    std::shared_ptr<ast::StrategyStatement> strat_expr =
+        std::dynamic_pointer_cast<ast::StrategyStatement>(node);
+    if (strat_expr)
+    {
+        std::string strategy = oblique_strategy();
+        repl_queue.push(strategy);
     }
 
     std::shared_ptr<ast::VolumeStatement> vol_stmt =

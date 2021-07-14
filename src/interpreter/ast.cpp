@@ -93,6 +93,15 @@ std::string LsStatement::String() const
 
     return ss.str();
 }
+std::string StrategyStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << ";";
+
+    return ss.str();
+}
+
 std::string PlayStatement::String() const
 {
     std::stringstream ss;

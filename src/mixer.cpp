@@ -288,6 +288,9 @@ void Mixer::Help()
            << " // create a var named 'x' with val 1\n";
         ss << COOL_COLOR_MAUVE << "let add1 = fn(val) { return val + 1; };";
         ss << ANSI_COLOR_RESET << " // create function and assign to a var\n";
+        ss << COOL_COLOR_MAUVE << "strategy;";
+        ss << ANSI_COLOR_RESET
+           << " // get a random Brian Eno Oblique Strategy!\n";
         ss << ANSI_COLOR_WHITE;
         ss << "######## Add Sound Generators ########################\n";
         ss << ANSI_COLOR_RESET;
