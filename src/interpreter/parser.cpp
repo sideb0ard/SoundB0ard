@@ -1063,6 +1063,12 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
     while (CurTokenIs(token::SLANG_PIPE))
         ConsumePatternFunctions(process);
 
+    if (!process->pattern_expression_)
+    {
+        std::cout << "WUFF< COULDNT WORK OUT EXPRESSSION!" << std::endl;
+        return nullptr;
+    }
+
     process->name = process->pattern_expression_->String();
 
     return process;
