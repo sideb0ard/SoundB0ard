@@ -124,7 +124,7 @@ std::vector<int> GetNotesInCurrentKey()
 
     mixer_timing_info my_info = mixr->timing_info;
 
-    notes.push_back(my_info.key);
+    notes.push_back(my_info.key + 0);
     notes.push_back(my_info.key + 2);
     notes.push_back(my_info.key + 4);
     notes.push_back(my_info.key + 5);

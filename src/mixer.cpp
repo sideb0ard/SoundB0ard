@@ -678,9 +678,9 @@ void Mixer::PrintMidiInfo()
 {
 
     std::stringstream ss;
-    ss << "Midi Notes:\n";
-    ss << "C:0 C#:1 D:2 D#:3 E:4 F:5 F#:6 G:7 G#:8 A:9 A#:10 B:11\n";
-    ss << "(For other octaves, add 12)\n";
+    ss << "Midi Notes (octave 3):\n";
+    ss << "C3:60 C#:61 D:62 D#:63 E:64 F:65 F#:66 G:67 G#:68 A:69 A#:70 B:71\n";
+    ss << "(For other octaves, add or subtract 12)\n";
 
     repl_queue.push(ss.str());
 }

@@ -67,20 +67,50 @@ let map = fn(arrray, fooonction)
   return mapduh;
 }
 
-
-let play_array = fn(sound_generator_target, note_seq)
+let generate_note_map = fn(note_seq, len_pulses, note_map, offset)
 {
   let nlen = len(note_seq);
-  let pulses_per = 3840 / nlen;
+  let pulses_per = len_pulses / nlen;
 
   for (i = 0; i < nlen; ++i) {
     if (note_seq[i])  {
-      if (note_seq[i] > 0) {
-        note_on_at(sound_generator_target, note_seq[i], i * pulses_per);
+      if (is_array(note_seq[i])) {
+        generate_note_map(note_seq[i], pulses_per, note_map, i*pulses_per);
+      } else {
+        note_map[offset + i*pulses_per] = note_seq[i];
+      }
+    }
+  }
+  return note_map;
+}
+
+let rec_play_array = fn(sound_generator_target, note_seq)
+{
+  let note_map = {};
+  generate_note_map(note_seq, 3840, note_map, 0);
+
+  for (i = 0; i < 3840; ++i) {
+    if (note_map[i]) {
+      if (note_map[i] > 0) {
+        note_on_at(sound_generator_target, note_map[i], i)
       }
     }
   }
 }
+
+# let play_array = fn(sound_generator_target, note_seq)
+# {
+#   let nlen = len(note_seq);
+#   let pulses_per = 3840 / nlen;
+#
+#   for (i = 0; i < nlen; ++i) {
+#     if (note_seq[i])  {
+#       if (note_seq[i] > 0) {
+#         note_on_at(sound_generator_target, note_seq[i], i * pulses_per);
+#       }
+#     }
+#   }
+# }
 
 let play_chord = fn(sound_generator_target, note_seq)
 {
