@@ -662,7 +662,6 @@ EvalHashIndexExpressionUpdate(std::shared_ptr<object::Object> hash_obj,
                               std::shared_ptr<object::Object> key,
                               std::shared_ptr<object::Object> new_value)
 {
-    std::cout << "YO< UPDATEING HASH!\n";
     std::shared_ptr<object::Hash> my_hash =
         std::dynamic_pointer_cast<object::Hash>(hash_obj);
 
@@ -673,6 +672,18 @@ EvalHashIndexExpressionUpdate(std::shared_ptr<object::Object> hash_obj,
     auto hpair_it = my_hash->pairs_.find(hashed);
     if (hpair_it != my_hash->pairs_.end())
         hpair_it->second.value_ = new_value;
+    else
+    {
+        if (!IsHashable(key))
+            return NewError("unusable as hash key: %s", key->Type());
+
+        object::HashKey hashed = MakeHashKey(key);
+
+        auto new_pair = std::make_shared<object::HashPair>(key, new_value);
+
+        my_hash->pairs_.insert(std::pair<object::HashKey, object::HashPair>(
+            hashed, object::HashPair{key, new_value}));
+    }
 
     return NULLL;
 }

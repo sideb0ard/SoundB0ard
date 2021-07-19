@@ -99,6 +99,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                             array_obj->elements_.size());
                     }
 
+                    std::shared_ptr<object::Hash> map_obj =
+                        std::dynamic_pointer_cast<object::Hash>(input[0]);
+                    if (map_obj)
+                    {
+                        return std::make_shared<object::Number>(
+                            map_obj->pairs_.size());
+                    }
+
                     return evaluator::NewError(
                         "argument to `len` not supported, got %s",
                         input[0]->Type());
@@ -356,6 +364,22 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
+    {"is_array", std::make_shared<object::BuiltIn>(
+                     [](std::vector<std::shared_ptr<object::Object>> input)
+                         -> std::shared_ptr<object::Object>
+                     {
+                         if (input.size() != 1)
+                             return evaluator::NewError(
+                                 "`invert` requires a single args - an array");
+
+                         std::shared_ptr<object::Array> array_obj =
+                             std::dynamic_pointer_cast<object::Array>(input[0]);
+                         if (array_obj)
+                         {
+                             return evaluator::NativeBoolToBooleanObject(true);
+                         }
+                         return evaluator::NativeBoolToBooleanObject(false);
+                     })},
     {"invert",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
