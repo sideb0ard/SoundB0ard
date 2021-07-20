@@ -2,7 +2,6 @@
 
 ABLETONASIOINCDIR=${HOME}/Code/link/modules/asio-standalone/asio/include
 READLINEINCDIR=${HOME}/homebrew/opt/readline/include
-RANGE3INCDIR=${HOME}/Code/range-v3/include/
 HOMEBREWINCDIR=${HOME}/homebrew/include
 PERLININCDIR=${HOME}/Code/PerlinNoise/
 
@@ -11,7 +10,6 @@ INCDIRS=-I/usr/local/include \
 				-Iinclude \
 				-I${HOME}/Code/link/include \
 				-I${HOMEBREWINCDIR} \
-				-I${RANGE3INCDIR} \
 				-I${ABLETONASIOINCDIR} \
 				-I${READLINEINCDIR} \
 				-I${PERLININCDIR}
@@ -31,8 +29,7 @@ SRC = $(shell find src -type f -name '*.cpp')
 OBJDIR = obj
 OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
 
-LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -lffts -lmlpack -larmadillo -llo
-#LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo -lffts -lmlpack -larmadillo
+LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo
 
 WARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wno-variadic-macros -Wno-c99-extensions -Wno-vla-extension -Wno-unused-parameter -Wno-four-char-constants
 CPPFLAGS = -isystem $(GTEST_DIR)/include

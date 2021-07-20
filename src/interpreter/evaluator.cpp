@@ -17,7 +17,6 @@
 #include <interpreter/evaluator.hpp>
 #include <interpreter/object.hpp>
 #include <obliquestrategies.h>
-#include <pitch_detection.hpp>
 #include <tsqueue.hpp>
 
 extern Tsqueue<event_queue_item> process_event_queue;
@@ -371,17 +370,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                            .preview_filename =
                                                play_expr->path_};
             audio_queue.push(action);
-        }
-    }
-
-    std::shared_ptr<ast::PitchStatement> pitch_expr =
-        std::dynamic_pointer_cast<ast::PitchStatement>(node);
-    if (pitch_expr)
-    {
-        if (!pitch_expr->path_.empty())
-        {
-            auto pitch = DetectMidiPitch(pitch_expr->path_);
-            repl_queue.push(std::to_string(pitch));
         }
     }
 

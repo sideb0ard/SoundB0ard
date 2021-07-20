@@ -67,7 +67,6 @@ class Parser
     // bool ParseSetStatementValue(std::string &value_result);
     std::shared_ptr<ast::PanStatement> ParsePanStatement();
     std::shared_ptr<ast::PlayStatement> ParsePlayStatement();
-    std::shared_ptr<ast::PitchStatement> ParsePitchStatement();
     std::shared_ptr<ast::ProcessStatement> ParseProcessStatement();
     void ConsumePatternFunctions(std::shared_ptr<ast::ProcessStatement> proc);
     std::shared_ptr<ast::VolumeStatement> ParseVolumeStatement();

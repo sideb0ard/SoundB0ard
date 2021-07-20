@@ -30,7 +30,6 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"osc", SLANG_OSC},
     {"over", SLANG_OVER},
     {"pan", SLANG_PAN},
-    {"pitch", SLANG_PITCH},
     {"play", SLANG_PLAY},
     {"proc", SLANG_PROC},
     {"ps", SLANG_PS},
