@@ -84,33 +84,26 @@ let generate_note_map = fn(note_seq, len_pulses, note_map, offset)
   return note_map;
 }
 
-let rec_play_array = fn(sound_generator_target, note_seq)
+let play_array_over = fn(sound_generator_target, note_seq, multiplier)
 {
-  let note_map = {};
-  generate_note_map(note_seq, 3840, note_map, 0);
 
-  for (i = 0; i < 3840; ++i) {
+  let midi_len = 3840 * multiplier;
+  let note_map = {};
+  generate_note_map(note_seq, midi_len, note_map, 0);
+
+  for (i = 0; i < midi_len; ++i) {
     if (note_map[i]) {
       if (note_map[i] > 0) {
-        note_on_at(sound_generator_target, note_map[i], i)
+        note_on_at(sound_generator_target, note_map[i], i, dur=40)
       }
     }
   }
 }
 
-# let play_array = fn(sound_generator_target, note_seq)
-# {
-#   let nlen = len(note_seq);
-#   let pulses_per = 3840 / nlen;
-#
-#   for (i = 0; i < nlen; ++i) {
-#     if (note_seq[i])  {
-#       if (note_seq[i] > 0) {
-#         note_on_at(sound_generator_target, note_seq[i], i * pulses_per);
-#       }
-#     }
-#   }
-# }
+let play_array = fn(sound_generator_target, note_seq)
+{
+  play_array_over(sound_generator_target, note_seq, 1);
+}
 
 let play_chord = fn(sound_generator_target, note_seq)
 {
