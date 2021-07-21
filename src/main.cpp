@@ -214,7 +214,7 @@ int main()
     lo::ServerThread st(9000);
     if (!st.is_valid())
     {
-        std::cout << "Nope." << std::endl;
+        std::cout << "Already Running?\n\n" << std::endl;
         return 1;
     }
 

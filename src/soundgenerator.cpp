@@ -44,11 +44,7 @@ std::string SoundGenerator::Status() { return std::string{"BASE CLASS, YO"}; }
 void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 {
 
-    int cur_midi_tick = tinfo.midi_tick % PPBAR;
     int midi_note = ev.data1;
-
-    int midi_notes[3] = {midi_note, 0, 0};
-    int midi_notes_len = 1; // default single note
 
     switch (ev.event_type)
     {
@@ -87,7 +83,6 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
     (void)event;
-    int idx = tinfo.midi_tick % PPBAR;
 
     if (!active)
         return;

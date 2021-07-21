@@ -13,7 +13,6 @@
 #include <process.hpp>
 #include <soundgenerator.h>
 #include <table.h>
-#include <value_generator.h>
 
 typedef enum
 {

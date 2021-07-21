@@ -51,7 +51,6 @@
 #define MAX_TRACKS_PER_SCENE 100
 #define MAX_NUM_PROC 100
 #define MAX_NUM_SOUND_GENERATORS 100
-#define MAX_NUM_VALUE_GENERATORS 100
 #define NUM_PROGRESSIONS 4
 
 // previously in sequenceengine.h -why?!

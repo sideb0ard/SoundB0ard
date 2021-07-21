@@ -13,7 +13,6 @@
 #include <looper.h>
 #include <midimaaan.h>
 #include <mixer.h>
-#include <pattern_utils.h>
 #include <process.hpp>
 #include <tsqueue.hpp>
 #include <utils.h>

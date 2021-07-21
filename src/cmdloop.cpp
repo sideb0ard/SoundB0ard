@@ -20,7 +20,6 @@
 #include <synth_cmds.h>
 #include <tsqueue.hpp>
 #include <utils.h>
-#include <value_generator_cmds.h>
 
 namespace fs = std::filesystem;
 

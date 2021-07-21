@@ -8,7 +8,6 @@
 #include "sequenceengine.h"
 #include "utils.h"
 #include <drumsampler.h>
-#include <pattern_utils.h>
 
 extern const int key_midi_mapping[NUM_KEYS];
 extern const char *key_names[NUM_KEYS];

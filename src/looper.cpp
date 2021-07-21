@@ -8,7 +8,6 @@
 #include <defjams.h>
 #include <looper.h>
 #include <mixer.h>
-#include <pattern_utils.h>
 #include <utils.h>
 
 extern Mixer *mixr;
