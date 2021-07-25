@@ -324,6 +324,12 @@ std::string SynthSaveExpression::String() const
 
     return ss.str();
 }
+std::string PatternExpression::String() const
+{
+    std::stringstream ss;
+    ss << "PATTERN:" << string_pattern;
+    return ss.str();
+}
 
 std::string SampleExpression::String() const { return "SAMPLE"; }
 

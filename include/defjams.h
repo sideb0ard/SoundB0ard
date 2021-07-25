@@ -203,49 +203,49 @@ typedef enum
 
 typedef struct mixer_timing_info
 {
-    int frames_per_midi_tick;
-    double ms_per_midi_tick;
-    double midi_ticks_per_ms;
+    int frames_per_midi_tick{0};
+    double ms_per_midi_tick{0};
+    double midi_ticks_per_ms{0};
 
-    double time_of_next_midi_tick;
+    double time_of_next_midi_tick{0};
 
     // perpetually incrementing counters
-    int sixteenth_note_tick;
-    int midi_tick;
+    int sixteenth_note_tick{0};
+    int midi_tick{0};
 
-    int loop_beat;
-    bool loop_started;
+    int loop_beat{0};
+    bool loop_started{false};
 
-    int cur_sample; // inverse of SAMPLE RATE
+    int cur_sample{0}; // inverse of SAMPLE RATE
 
-    unsigned int key;
-    unsigned int chord_progression_index;
-    unsigned int chord;
-    unsigned int chord_type;
-    unsigned int octave;
-    unsigned int notes[8];
-    unsigned int quantize;
+    unsigned int key{0};
+    unsigned int chord_progression_index{0};
+    unsigned int chord{0};
+    unsigned int chord_type{0};
+    unsigned int octave{0};
+    unsigned int notes[8] = {};
+    unsigned int quantize{0};
 
     // informational for other sound generators
-    unsigned int loop_len_in_frames;
-    unsigned int loop_len_in_ticks;
+    unsigned int loop_len_in_frames{0};
+    unsigned int loop_len_in_ticks{0};
     // these are in frames
-    unsigned int size_of_thirtysecond_note;
-    unsigned int size_of_sixteenth_note;
-    unsigned int size_of_eighth_note;
-    unsigned int size_of_quarter_note;
+    unsigned int size_of_thirtysecond_note{0};
+    unsigned int size_of_sixteenth_note{0};
+    unsigned int size_of_eighth_note{0};
+    unsigned int size_of_quarter_note{0};
 
-    bool has_started;
-    bool is_start_of_loop; // true for one sample during loop time
-    bool is_thirtysecond;
-    bool is_twentyfourth;
-    bool is_sixteenth;
-    bool is_twelth;
-    bool is_eighth;
-    bool is_sixth;
-    bool is_quarter;
-    bool is_third;
-    bool is_midi_tick;
+    bool has_started{false};
+    bool is_start_of_loop{false}; // true for one sample during loop time
+    bool is_thirtysecond{false};
+    bool is_twentyfourth{false};
+    bool is_sixteenth{false};
+    bool is_twelth{false};
+    bool is_eighth{false};
+    bool is_sixth{false};
+    bool is_quarter{false};
+    bool is_third{false};
+    bool is_midi_tick{false};
 
 } mixer_timing_info;
 
@@ -323,6 +323,11 @@ class midi_event
 struct MusicalEvent
 {
     MusicalEvent() = default;
+    MusicalEvent(std::string value)
+        : MusicalEvent(value, /* midi velocity */ 127, /* duration in ms */ 300,
+                       ENV)
+    {
+    }
     MusicalEvent(std::string value, ProcessPatternTarget target_type)
         : MusicalEvent(value, /* midi velocity */ 127, /* duration in ms */ 300,
                        target_type)

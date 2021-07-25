@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <functional>
 #include <map>
 #include <memory>
@@ -8,6 +9,7 @@
 #include <vector>
 
 #include <interpreter/ast.hpp>
+#include <pattern_parser/ast.hpp>
 
 namespace object
 {
@@ -33,6 +35,7 @@ constexpr char ARRAY_OBJ[] = "ARRAY";
 constexpr char HASH_OBJ[] = "HASH";
 
 constexpr char PROCESS_OBJ[] = "PROCESS";
+constexpr char PATTERN_OBJ[] = "PATTERN";
 
 constexpr char SYNTH_OBJ[] = "SYNTH";
 constexpr char SAMPLE_OBJ[] = "SAMPLE";
@@ -209,6 +212,33 @@ class Function : public Object
     std::vector<std::shared_ptr<ast::Identifier>> parameters_;
     std::shared_ptr<Environment> env_;
     std::shared_ptr<ast::BlockStatement> body_;
+};
+
+class Pattern : public Object
+{
+  public:
+    Pattern(std::string string_pattern);
+    ~Pattern() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  private:
+    int eval_counter{0};
+    std::string string_pattern{};
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root{nullptr};
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
+        pattern_events;
+
+  public:
+    void Eval();
+    // void RunPattern();
+
+  private:
+    void ParseStringPattern();
+
+    void
+    EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
+                int target_start, int target_end);
 };
 
 class Generator : public Object

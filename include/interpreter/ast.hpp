@@ -186,6 +186,17 @@ class GeneratorLiteral : public Expression
     std::shared_ptr<BlockStatement> run_{nullptr};
 };
 
+class PatternExpression : public Expression
+{
+  public:
+    PatternExpression() {}
+    explicit PatternExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+
+  public:
+    std::string string_pattern{};
+};
+
 class SynthExpression : public Expression
 {
   public:

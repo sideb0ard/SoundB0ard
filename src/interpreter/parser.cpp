@@ -604,6 +604,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
              cur_token_.type_ == token::SLANG_DIGI_SYNTH ||
              cur_token_.type_ == token::SLANG_DRUM_SYNTH)
         return ParseSynthExpression();
+    else if (cur_token_.type_ == token::SLANG_PATTERN)
+        return ParsePatternExpression();
     else if (cur_token_.type_ == token::SLANG_SAMPLE)
         return ParseSampleExpression();
     else if (cur_token_.type_ == token::SLANG_STRING)
@@ -896,6 +898,36 @@ std::shared_ptr<ast::Expression> Parser::ParseGranularExpression()
 
     std::cout << "AST Granular EXPRESSION ALL GOOD!\n";
     return granular;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParsePatternExpression()
+{
+    auto pattern = std::make_shared<ast::PatternExpression>(cur_token_);
+
+    if (!ExpectPeek(token::SLANG_LPAREN))
+        return nullptr;
+    NextToken();
+
+    std::stringstream ss;
+    while (!CurTokenIs(token::SLANG_EOFF) && !CurTokenIs(token::SLANG_RPAREN))
+    {
+        ss << cur_token_.literal_;
+        NextToken();
+    }
+    pattern->string_pattern = ss.str();
+
+    if (!CurTokenIs(token::SLANG_RPAREN))
+    {
+        std::cout << "OOFT! where ya PAREN?\n";
+        return nullptr;
+    }
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
+
+    std::cout << "YO, returning ya PATTERN!:" << pattern->string_pattern
+              << std::endl;
+    return pattern;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()

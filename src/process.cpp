@@ -350,8 +350,8 @@ void Process::EvalPattern(
         return;
     else if (node->euclidean_hits_ && node->euclidean_steps_)
     {
-        std::string euclidean_string = generate_euclidean_string(
-            node->euclidean_hits_, node->euclidean_steps_);
+        auto euclidean_rhythm =
+            GenerateBjork(node->euclidean_hits_, node->euclidean_steps_);
         // copy node without hits and steps - TODO - this is only implememnted
         // for Leaf nodes currently.
         auto leafy =
@@ -361,13 +361,12 @@ void Process::EvalPattern(
             std::shared_ptr<pattern_parser::PatternLeaf> leafy_copy =
                 std::make_shared<pattern_parser::PatternLeaf>(leafy->value_);
 
-            int spacing = target_len / euclidean_string.size();
+            int spacing = target_len / euclidean_rhythm.size();
             for (int i = 0, new_target_start = target_start;
-                 i < (int)euclidean_string.size() &&
-                 new_target_start < target_end;
+                 i < euclidean_rhythm.size() && new_target_start < target_end;
                  i++, new_target_start += spacing)
             {
-                if (euclidean_string[i] == '1')
+                if (euclidean_rhythm[i])
                 {
                     EvalPattern(leafy_copy, new_target_start,
                                 new_target_start + spacing);

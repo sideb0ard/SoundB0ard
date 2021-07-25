@@ -274,11 +274,6 @@ int main()
 
     // all done, time to go home
     pa_teardown();
-    if (mixr->have_midi_controller)
-    {
-        Pm_Close(mixr->midi_stream);
-        Pm_Terminate();
-    }
 
     return 0;
 }

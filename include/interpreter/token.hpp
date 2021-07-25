@@ -71,6 +71,7 @@ const TokenType SLANG_LS = "LS";
 const TokenType SLANG_OSC = "OSCILLATE";
 const TokenType SLANG_OVER = "OVER";
 const TokenType SLANG_PAN = "PAN";
+const TokenType SLANG_PATTERN = "PATTERN";
 const TokenType SLANG_PLAY = "PLAY";
 const TokenType SLANG_PS = "PS";
 const TokenType SLANG_RAMP = "RAMP";

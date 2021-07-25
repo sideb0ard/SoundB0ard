@@ -2,7 +2,6 @@
 #define MIXER_H
 
 #include <portaudio.h>
-#include <portmidi.h>
 #include <pthread.h>
 
 #include <ableton_link_wrapper.h>
@@ -78,48 +77,20 @@ struct Mixer
         sound_generators_[MAX_NUM_SOUND_GENERATORS] = {};
     std::atomic_int soundgen_num{0}; // actual number of SGs
 
-    std::vector<DelayedMidiEvent> _action_items;
+    std::vector<DelayedMidiEvent> _action_items = {};
 
-    AbletonLink *m_ableton_link;
+    AbletonLink *m_ableton_link{nullptr};
 
-    stereo_val
-        soundgen_cur_val[MAX_NUM_SOUND_GENERATORS]; // cache for current val,
-    // currently used for sidechain
-    // compressor TODO there are no
-    // checks for this num
-    double
-        soundgen_volume[MAX_NUM_SOUND_GENERATORS]; // separating instrument amp
-    // from mixer volume per channel
+    stereo_val soundgen_cur_val[MAX_NUM_SOUND_GENERATORS] = {};
+    double soundgen_volume[MAX_NUM_SOUND_GENERATORS] = {};
 
-    bool debug_mode;
+    bool debug_mode{false};
 
-    PortMidiStream *midi_stream;
-    bool have_midi_controller;
+    double bpm{140};
 
-    bool midi_print_notes;
-    char midi_controller_name[128];
-    unsigned int midi_control_destination;
-    unsigned int m_midi_controller_mode; // to switch control knob routing
-    unsigned int midi_bank_num;
+    mixer_timing_info timing_info = {};
 
-    int active_midi_soundgen_num;
-    int active_midi_soundgen_effect_num;
-
-    double bpm;
-
-    mixer_timing_info timing_info;
-
-    double volume;
-
-    int bars_per_chord;
-    int bar_counter;
-
-    // chord progressions
-    int prog_len;
-    int prog_degrees[6]; // max prog_len
-    int prog_degrees_idx;
-    unsigned int progression_type;
-    bool should_progress_chords;
+    double volume{0.7};
 
     void CheckForDelayedEvents();
 
@@ -153,9 +124,6 @@ struct Mixer
     void VolChange(int sig, float vol);
     void PanChange(int sig, float vol);
 
-    void ToggleMidiMode();
-    void ToggleKeyMode();
-
     void UpdateTimingInfo(long long int frame_time);
     int GenNext(float *out, int frames_per_buffer);
 
@@ -163,25 +131,10 @@ struct Mixer
     bool IsValidSoundgenNum(int soundgen_num);
     bool IsValidFx(int soundgen_num, int fx_num);
 
-    void SetKey(unsigned int key);
-    void SetKey(std::string str_key);
-    void SetNotes();
-    void SetOctave(int octave);
-    void SetBarsPerChord(int bars);
-
     double GetHzPerBar();
     double GetHzPerTimingUnit(unsigned int timing_unit);
     int GetTicksPerCycleUnit(unsigned int event_type);
-    void SetChordProgression(unsigned int prog_num);
-    void ChangeChord(unsigned int root, unsigned int chord_type);
-    int GetKeyFromDegree(unsigned int scale_degree);
-    void EnablePrintMidi(bool b);
-    void CheckForMidiMessages();
     void CheckForAudioActionQueueMessages();
-    void SetMidiBank(int num);
-    void SetShouldProgressChords(bool b);
-    bool ShouldProgressChords(int tick);
-    void NextChord();
 
     void AddFileToMonitor(std::string filepath);
 };

@@ -16,60 +16,12 @@
 #include <mixer.h>
 #include <utils.h>
 
-extern Mixer *mixr;
-
 extern char *s_synth_waves[6];
 
 // static void print_midi_event_rec(midi_event ev)
 //{
 //    printf("[Midi] note: %d\n", ev.data1);
 //}
-
-void *midi_init(void *)
-{
-    printf("MIDI maaaaan!\n");
-    pthread_setname_np("Midimaaaan");
-
-    PmError retval = Pm_Initialize();
-    if (retval != pmNoError)
-        printf("Err running Pm_Initialize: %s\n", Pm_GetErrorText(retval));
-
-    int cnt;
-    const PmDeviceInfo *info;
-
-    int dev = 0;
-
-    if ((cnt = Pm_CountDevices()))
-    {
-        for (int i = 0; i < cnt; i++)
-        {
-            info = Pm_GetDeviceInfo(i);
-            if (info->input && (strncmp(info->name, "MPKmini2", 8) == 0))
-            {
-                dev = i;
-                strncpy(mixr->midi_controller_name, info->name, 127);
-                break;
-            }
-        }
-    }
-    else
-    {
-        Pm_Terminate();
-        return NULL;
-    }
-
-    retval = Pm_OpenInput(&mixr->midi_stream, dev, NULL, 512L, NULL, NULL);
-    if (retval != pmNoError)
-    {
-        printf("Err opening input for MPKmini2: %s\n", Pm_GetErrorText(retval));
-        Pm_Terminate();
-        return NULL;
-    }
-
-    mixr->have_midi_controller = true;
-
-    return NULL;
-}
 
 midi_event new_midi_event(unsigned int event_type, unsigned int data1,
                           unsigned int data2)

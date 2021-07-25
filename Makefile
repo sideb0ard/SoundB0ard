@@ -29,7 +29,7 @@ SRC = $(shell find src -type f -name '*.cpp')
 OBJDIR = obj
 OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
 
-LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo
+LIBS=-lportaudio -lreadline -lm -lpthread -lsndfile -lprofiler -llo
 
 WARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wno-variadic-macros -Wno-c99-extensions -Wno-vla-extension -Wno-unused-parameter -Wno-four-char-constants
 CPPFLAGS = -isystem $(GTEST_DIR)/include

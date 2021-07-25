@@ -92,64 +92,19 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
     }
 }
 
-std::vector<std::vector<std::string>> GenerateMelody()
-{
-
-    std::vector<std::vector<std::string>> melody;
-    // TODO - tests - i think this is brittle, especially getting this key_str
-    std::string key_str = GetNoteFromMidiNum(mixr->timing_info.key);
-    for (int i = 0; i < mixr->prog_len; i++)
-    {
-        std::vector<std::string> chord;
-
-        int root_note = GetNthDegree(mixr->timing_info.key,
-                                     mixr->prog_degrees[i], key_str[0]);
-        chord.push_back(GetNoteFromMidiNum(root_note));
-
-        int third = GetThird(root_note, key_str[0]);
-        chord.push_back(GetNoteFromMidiNum(third));
-
-        int fifth = GetFifth(root_note, key_str[0]);
-        chord.push_back(GetNoteFromMidiNum(fifth));
-
-        melody.push_back(chord);
-    }
-
-    return melody;
-}
-
-std::vector<int> GetNotesInCurrentKey()
+std::vector<int> GetNotesInKey(int root)
 {
     std::vector<int> notes;
 
-    mixer_timing_info my_info = mixr->timing_info;
-
-    notes.push_back(my_info.key + 0);
-    notes.push_back(my_info.key + 2);
-    notes.push_back(my_info.key + 4);
-    notes.push_back(my_info.key + 5);
-    notes.push_back(my_info.key + 7);
-    notes.push_back(my_info.key + 9);
-    notes.push_back(my_info.key + 11);
+    notes.push_back(root + 0);
+    notes.push_back(root + 2);
+    notes.push_back(root + 4);
+    notes.push_back(root + 5);
+    notes.push_back(root + 7);
+    notes.push_back(root + 9);
+    notes.push_back(root + 11);
 
     return notes;
-}
-
-std::vector<int> GetNotesInCurrentChord()
-{
-    std::vector<std::string> notes;
-
-    mixer_timing_info my_info = mixr->timing_info;
-
-    auto root_note = GetRootNote(my_info.key, my_info.chord);
-
-    auto notes_in_chord =
-        GetMidiNotesInChord(root_note, get_chord_type(my_info.chord));
-
-    // for (auto n : notes_in_chord)
-    // notes.push_back(GetNoteFromMidiNum(n));
-
-    return notes_in_chord;
 }
 
 } // namespace interpreter_sound_cmds

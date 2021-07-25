@@ -39,9 +39,9 @@ let distrhythms_string = gen()
   }
 }
 
-let riff = fn()
+let riff = fn(root)
 {
-  let valid_notes = notes_in_key();
+  let valid_notes = notes_in_key(root);
   #print("VALLEYNOTES:", valid_notes);
   let beat = bjork(rand(9) + 2, 16);
   for ( i = 0; i < 16; ++i) {

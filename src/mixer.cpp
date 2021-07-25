@@ -75,16 +75,12 @@ Mixer::Mixer(double output_latency)
 
     volume = 0.7;
     UpdateBpm(DEFAULT_BPM);
-    m_midi_controller_mode =
-        KEY_MODE_ONE; // dunno whether this should be on mixer or synth
-    midi_control_destination = NONE;
 
     for (int i = 0; i < MAX_NUM_PROC; i++)
         processes_[i] = std::make_shared<Process>();
     proc_initialized_ = true;
 
     // the lifetime of these booleans is a single sample
-
     timing_info.cur_sample = -1;
     timing_info.midi_tick = -1;
     timing_info.sixteenth_note_tick = -1;
@@ -101,15 +97,6 @@ Mixer::Mixer(double output_latency)
     timing_info.is_sixth = true;
     timing_info.is_quarter = true;
     timing_info.is_third = true;
-
-    active_midi_soundgen_num = -99;
-
-    timing_info.key = C;
-    timing_info.octave = 3;
-    SetNotes();
-    SetChordProgression(1);
-    bars_per_chord = 4;
-    should_progress_chords = false;
 
     std::string contents = ReadFileContents(kStartupConfigFile);
     eval_command_queue.push(contents);
@@ -128,12 +115,7 @@ std::string Mixer::StatusMixr()
     << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat << COOL_COLOR_GREEN
     << " phase:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.phase << COOL_COLOR_GREEN
     << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
-    << "::::::::::\n"
-    << ":::::::::: key:" << ANSI_COLOR_WHITE <<  key_names[timing_info.key] << COOL_COLOR_GREEN
-    << " type:"<< ANSI_COLOR_WHITE << chord_type_names[timing_info.chord_type] << COOL_COLOR_GREEN
-    << " octave:" << ANSI_COLOR_WHITE << timing_info.octave << COOL_COLOR_GREEN << " soundgen_num:"<< ANSI_COLOR_WHITE << soundgen_num << COOL_COLOR_GREEN
-    << " move:" << ANSI_COLOR_WHITE << should_progress_chords << COOL_COLOR_GREEN << " prog:("<< ANSI_COLOR_WHITE << progression_type << COOL_COLOR_GREEN << ")"
-    << ANSI_COLOR_WHITE << s_progressions[progression_type] << "\n";
+    << "::::::::::\n";
     // clang-format on
 
     return ss.str();
@@ -310,9 +292,8 @@ void Mixer::Help()
         ss << ANSI_COLOR_WHITE;
         ss << "######## Array Value generators and modifiers "
               "###################\n";
-        ss << COOL_COLOR_MAUVE << "notes_in_key();" << ANSI_COLOR_RESET
-           << " // returns array of midi notes in scale of\n";
-        ss << "                // current key (see ps for key)\n";
+        ss << COOL_COLOR_MAUVE << "notes_in_key(root);" << ANSI_COLOR_RESET
+           << " // returns array of midi notes in scale of root\n";
         ss << COOL_COLOR_MAUVE << "play_array(soundgen, array_of_midi_nums);"
            << ANSI_COLOR_RESET << " // plays the array\n";
         ss << "                                          // spaced evenly\n";
@@ -500,7 +481,6 @@ void Mixer::MidiTick()
     timing_info.is_start_of_loop = false;
 
     CheckForAudioActionQueueMessages();
-    CheckForMidiMessages(); // from external
 
     if (timing_info.midi_tick % PPBAR == 0)
         timing_info.is_start_of_loop = true;
@@ -555,31 +535,6 @@ void Mixer::MidiTick()
     CheckForDelayedEvents();
 }
 
-bool Mixer::ShouldProgressChords(int tick)
-{
-    int chance = rand() % 100;
-    if (should_progress_chords == false)
-        return false;
-
-    if (tick == 0)
-    {
-        if (chance > 75)
-            return true;
-    }
-    else if (tick == PPQN * 2)
-    {
-        if (chance > 97)
-            return true;
-    }
-    else if (tick == PPQN * 3)
-    {
-        if (chance > 99)
-            return true;
-    }
-
-    return false;
-}
-
 int Mixer::GenNext(float *out, int frames_per_buffer)
 {
 
@@ -602,9 +557,6 @@ int Mixer::GenNext(float *out, int frames_per_buffer)
         if (link_is_midi_tick(m_ableton_link, &timing_info, i))
         {
             int current_tick_within_bar = timing_info.midi_tick % PPBAR;
-            if (ShouldProgressChords(current_tick_within_bar))
-                NextChord();
-
             MidiTick();
         }
 
@@ -635,9 +587,6 @@ bool Mixer::DelSoundgen(int soundgen_num)
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
         std::shared_ptr<SoundGenerator> sg = sound_generators_[soundgen_num];
 
-        if (active_midi_soundgen_num == soundgen_num)
-            active_midi_soundgen_num = -99;
-
         sound_generators_[soundgen_num] = nullptr;
     }
     return true;
@@ -660,18 +609,6 @@ bool Mixer::IsValidFx(int soundgen_num, int fx_num)
             return true;
     }
     return false;
-}
-
-void Mixer::SetNotes()
-{
-    timing_info.notes[0] = timing_info.key;
-    timing_info.notes[1] = (timing_info.key + 2) % NUM_KEYS;  // W step
-    timing_info.notes[2] = (timing_info.key + 4) % NUM_KEYS;  // W step
-    timing_info.notes[3] = (timing_info.key + 5) % NUM_KEYS;  // H step
-    timing_info.notes[4] = (timing_info.key + 7) % NUM_KEYS;  // W step
-    timing_info.notes[5] = (timing_info.key + 9) % NUM_KEYS;  // W step
-    timing_info.notes[6] = (timing_info.key + 11) % NUM_KEYS; // W step
-    timing_info.notes[7] = (timing_info.key + 12) % NUM_KEYS; // H step
 }
 
 void Mixer::PrintMidiInfo()
@@ -765,114 +702,6 @@ int Mixer::GetTicksPerCycleUnit(unsigned int event_type)
     }
     return ticks;
 }
-void Mixer::SetOctave(int octave)
-{
-    if (octave > -10 && octave < 10)
-        timing_info.octave = octave;
-}
-void Mixer::SetBarsPerChord(int bars)
-{
-    if (bars > 0 && bars < 32)
-        bars_per_chord = bars;
-}
-
-void Mixer::SetKey(unsigned int key)
-{
-    if (key < NUM_KEYS)
-        timing_info.key = key;
-}
-
-void Mixer::SetKey(std::string str_key)
-{
-    str_lower(str_key);
-
-    int key = -1;
-    if (str_key == "c#" || str_key == "dm")
-        key = 1;
-    else if (str_key == "d#" || str_key == "em")
-        key = 3;
-    else if (str_key == "f#" || str_key == "gm")
-        key = 6;
-    else if (str_key == "g#" || str_key == "am")
-        key = 8;
-    else if (str_key == "a#" || str_key == "bm")
-        key = 10;
-    else if (str_key == "c")
-        key = 0;
-    else if (str_key == "d")
-        key = 2;
-    else if (str_key == "e")
-        key = 4;
-    else if (str_key == "f")
-        key = 5;
-    else if (str_key == "g")
-        key = 7;
-    else if (str_key == "a")
-        key = 9;
-    else if (str_key == "b")
-        key = 11;
-
-    if (key != -1)
-        SetKey(key);
-}
-
-void Mixer::SetChordProgression(unsigned int prog_num)
-{
-    if (prog_num < NUM_PROGRESSIONS)
-    {
-        switch (prog_num)
-        {
-        case (0):
-            progression_type = 0;
-            prog_len = 3;
-            prog_degrees[0] = 0; // I
-            prog_degrees[1] = 3; // IV
-            prog_degrees[2] = 4; // V
-            break;
-        case (1):
-            progression_type = 1;
-            prog_len = 4;
-            prog_degrees[0] = 0; // I
-            prog_degrees[1] = 4; // V
-            prog_degrees[2] = 5; // vi
-            prog_degrees[3] = 3; // IV
-            break;
-        case (2):
-            progression_type = 2;
-            prog_len = 4;
-            prog_degrees[0] = 0; // I
-            prog_degrees[1] = 5; // vi
-            prog_degrees[2] = 3; // IV
-            prog_degrees[3] = 4; // V
-            break;
-        case (3):
-            progression_type = 3;
-            prog_len = 4;
-            prog_degrees[0] = 5; // vi
-            prog_degrees[1] = 1; // ii
-            prog_degrees[2] = 4; // V
-            prog_degrees[3] = 0; // I
-            break;
-        }
-        prog_degrees_idx = 0;
-        timing_info.chord_progression_index = prog_degrees_idx;
-        timing_info.chord = prog_degrees[prog_degrees_idx];
-    }
-}
-void Mixer::ChangeChord(unsigned int root, unsigned int chord_type)
-{
-    if (root < NUM_KEYS && chord_type < NUM_CHORD_TYPES)
-    {
-        timing_info.chord = root;
-        timing_info.chord_type = chord_type;
-        EmitEvent((broadcast_event){.type = TIME_CHORD_CHANGE});
-    }
-}
-
-int Mixer::GetKeyFromDegree(unsigned int scale_degree)
-{
-    return timing_info.key + scale_degree;
-}
 
 void Mixer::PreviewAudio(char *filename)
 {
@@ -916,8 +745,6 @@ stereo_val preview_buffer_generate(preview_buffer *buffy)
     return ret;
 }
 
-void Mixer::EnablePrintMidi(bool b) { midi_print_notes = b; }
-
 void Mixer::CheckForAudioActionQueueMessages()
 {
     while (auto action = audio_queue.try_pop())
@@ -954,14 +781,6 @@ void Mixer::CheckForAudioActionQueueMessages()
                 interpreter_sound_cmds::ParseFXCmd(action->args);
             else if (action->type == AudioAction::BPM)
                 UpdateBpm(action->new_bpm);
-            else if (action->type == AudioAction::MIXER_UPDATE)
-            {
-                if (action->param_name == "key")
-                    SetKey(action->param_val);
-                else if (action->param_name == "prog")
-                    SetChordProgression(
-                        std::stoi(action->param_val, nullptr, 0));
-            }
             else if (action->type == AudioAction::MIDI_EVENT_ADD ||
                      action->type == AudioAction::MIDI_EVENT_ADD_DELAYED)
             {
@@ -1103,73 +922,6 @@ void Mixer::CheckForAudioActionQueueMessages()
             }
         }
     }
-}
-
-void Mixer::CheckForMidiMessages()
-{
-    PmEvent msg[32];
-    if (Pm_Poll(midi_stream))
-    {
-        int cnt = Pm_Read(midi_stream, msg, 32);
-        for (int i = 0; i < cnt; i++)
-        {
-            int status = Pm_MessageStatus(msg[i].message);
-            int data1 = Pm_MessageData1(msg[i].message);
-            int data2 = Pm_MessageData2(msg[i].message);
-
-            if (status == 176)
-            {
-                if (data1 == 9)
-                    SetMidiBank(0);
-                if (data1 == 10)
-                    SetMidiBank(1);
-                if (data1 == 11)
-                    SetMidiBank(2);
-                if (data1 == 12)
-                    SetMidiBank(3);
-            }
-
-            if (midi_print_notes)
-                printf("[MIDI message] status:%d data1:%d "
-                       "data2:%d\n",
-                       status, data1, data2);
-
-            if (midi_control_destination != NONE &&
-                IsValidSoundgenNum(active_midi_soundgen_num))
-            {
-
-                std::shared_ptr<SoundGenerator> sg =
-                    sound_generators_[active_midi_soundgen_num];
-
-                midi_event ev = new_midi_event(status, data1, data2);
-
-                ev.source = EXTERNAL_DEVICE;
-                ev.delete_after_use = false;
-
-                sg->parseMidiEvent(ev, timing_info);
-            }
-            else
-            {
-                printf("Got midi but not connected to "
-                       "synth\n");
-            }
-        }
-    }
-}
-
-void Mixer::SetMidiBank(int num)
-{
-    if (num >= 0 && num < 4)
-        midi_bank_num = num;
-}
-
-void Mixer::SetShouldProgressChords(bool b) { should_progress_chords = b; }
-
-void Mixer::NextChord()
-{
-    prog_degrees_idx = (prog_degrees_idx + 1) % prog_len;
-    timing_info.chord_progression_index = prog_degrees_idx;
-    timing_info.chord = prog_degrees[prog_degrees_idx];
 }
 
 void Mixer::AddFileToMonitor(std::string filepath)
