@@ -230,7 +230,7 @@ class Pattern : public Object
         pattern_events;
 
   public:
-    void Eval();
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Eval();
     // void RunPattern();
 
   private:

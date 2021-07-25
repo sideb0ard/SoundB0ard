@@ -33,6 +33,32 @@ const std::vector<std::string> FILES_TO_IGNORE = {".DS_Store"};
 
 namespace
 {
+
+std::shared_ptr<object::Array> ExtractArrayFromPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> evaluated_pat)
+{
+    auto return_array = std::make_shared<object::Array>(
+        std::vector<std::shared_ptr<object::Object>>());
+
+    for (auto ep : evaluated_pat)
+    {
+        auto midi_tick_array = std::make_shared<object::Array>(
+            std::vector<std::shared_ptr<object::Object>>());
+        if (!ep.empty())
+        {
+            for (auto p : ep)
+            {
+                midi_tick_array->elements_.push_back(
+                    std::make_shared<object::String>(p->value_));
+            }
+        }
+
+        return_array->elements_.push_back(midi_tick_array);
+    }
+
+    return return_array;
+}
+
 bool ShouldIgnore(std::string filename)
 {
     auto result =
@@ -68,6 +94,96 @@ std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz)
     }
     return midi_nums;
 }
+
+void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
+                int vel, int dur)
+{
+    audio_action_queue_item action_req{.type =
+                                           AudioAction::MIDI_EVENT_ADD_DELAYED,
+                                       .soundgen_num = sgid,
+                                       .notes = midi_nums,
+                                       .velocity = vel,
+                                       .duration = dur,
+                                       .note_start_time = note_start_time};
+    audio_queue.push(action_req);
+}
+
+void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur)
+{
+    audio_action_queue_item action_req{.type = AudioAction::MIDI_EVENT_ADD,
+                                       .soundgen_num = sgid,
+                                       .notes = midi_nums,
+                                       .velocity = vel,
+                                       .duration = dur};
+    audio_queue.push(action_req);
+}
+
+void play_array_on(std::shared_ptr<object::Object> soundgen,
+                   std::shared_ptr<object::Object> pattern)
+{
+    auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(soundgen);
+
+    std::shared_ptr<object::Array> play_pattern;
+    auto pat_obj = std::dynamic_pointer_cast<object::Pattern>(pattern);
+    if (pat_obj)
+        play_pattern = ExtractArrayFromPattern(pat_obj->Eval());
+    else
+        play_pattern = std::dynamic_pointer_cast<object::Array>(pattern);
+
+    if (sg && play_pattern)
+    {
+    }
+}
+
+void play_array(std::shared_ptr<object::Object> pattern)
+{
+    std::cout << "PLAY AARRYY\n";
+    std::shared_ptr<object::Array> play_pattern;
+    auto pat_obj = std::dynamic_pointer_cast<object::Pattern>(pattern);
+    if (pat_obj)
+        play_pattern = ExtractArrayFromPattern(pat_obj->Eval());
+    else
+        play_pattern = std::dynamic_pointer_cast<object::Array>(pattern);
+    if (play_pattern)
+    {
+        std::cout << "GOT A PLAYBACK PATTERN\n";
+        std::vector<int> notes;
+        notes.push_back(1);
+        for (int i = 0; i < PPBAR; ++i)
+        {
+            auto ppattern = std::dynamic_pointer_cast<object::Array>(
+                play_pattern->elements_[i]);
+            if (ppattern)
+            {
+                for (auto item : ppattern->elements_)
+                {
+                    auto sg =
+                        std::dynamic_pointer_cast<object::SoundGenerator>(item);
+                    if (sg)
+                    {
+                        std::cout << "GOTs AN SGGGG\n";
+                        int sgid = sg->soundgen_id_;
+                        int vel = 128;
+                        int dur = 240;
+                        note_on_at(sgid, notes, i, vel, dur);
+                    }
+
+                    auto sg_string =
+                        std::dynamic_pointer_cast<object::String>(item);
+                    if (sg_string)
+                    {
+                        auto sg_name = sg_string->value_;
+                        std::stringstream ss;
+                        ss << "note_on_at(" << sg_name << ", 1, " << i << ")";
+                        eval_command_queue.push(ss.str());
+                        std::cout << "GOT A STRING - cmd is " << ss.str();
+                    }
+                }
+            }
+        }
+    }
+}
+
 } // namespace
 
 namespace builtin
@@ -344,6 +460,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  auto rotate_by =
                      (int)number->value_ % return_array->elements_.size();
 
+                 if (array_obj->elements_.size() == 3840 && rotate_by < 16)
+                 {
+                     std::cout << "OOh, rotating a PPBAR pattern\n";
+                     rotate_by *= 240;
+                 }
+
                  std::rotate(return_array->elements_.begin(),
                              return_array->elements_.begin() + rotate_by,
                              return_array->elements_.end());
@@ -477,13 +599,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      }
                  }
 
-                 audio_action_queue_item action_req{
-                     .type = AudioAction::MIDI_EVENT_ADD,
-                     .soundgen_num = sgid,
-                     .notes = midi_nums,
-                     .velocity = vel,
-                     .duration = dur};
-                 audio_queue.push(action_req);
+                 note_on(sgid, midi_nums, vel, dur);
              }
 
              return evaluator::NULLL;
@@ -532,14 +648,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      }
                  }
 
-                 audio_action_queue_item action_req{
-                     .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
-                     .soundgen_num = sgid,
-                     .notes = midi_nums,
-                     .velocity = vel,
-                     .duration = dur,
-                     .note_start_time = note_start_time};
-                 audio_queue.push(action_req);
+                 note_on_at(sgid, midi_nums, note_start_time, vel, dur);
              }
 
              return evaluator::NULLL;
@@ -888,21 +997,28 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"play_pattern", std::make_shared<object::BuiltIn>(
-                         [](std::vector<std::shared_ptr<object::Object>> args)
-                             -> std::shared_ptr<object::Object>
-                         {
-                             int args_size = args.size();
-                             if (args_size == 1)
-                             {
-                                 auto pat_obj =
-                                     std::dynamic_pointer_cast<object::Pattern>(
-                                         args[0]);
-                                 if (pat_obj)
-                                     pat_obj->Eval();
-                             }
-                             return evaluator::NULLL;
-                         })},
+    {"eval_pattern",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 1)
+             {
+                 auto pat_obj =
+                     std::dynamic_pointer_cast<object::Pattern>(args[0]);
+                 if (pat_obj)
+                 {
+                     auto evaluated_pat = pat_obj->Eval();
+
+                     std::shared_ptr<object::Array> return_array =
+                         ExtractArrayFromPattern(evaluated_pat);
+
+                     return return_array;
+                 }
+             }
+             return evaluator::NULLL;
+         })},
     {"notes_in_key",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -917,6 +1033,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  {
                      auto return_array = std::make_shared<object::Array>(
                          std::vector<std::shared_ptr<object::Object>>());
+
                      std::vector<int> notez =
                          interpreter_sound_cmds::GetNotesInKey(num_obj->value_);
 
@@ -965,6 +1082,29 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
+    {"play_array", std::make_shared<object::BuiltIn>(
+                       [](std::vector<std::shared_ptr<object::Object>> args)
+                           -> std::shared_ptr<object::Object>
+                       {
+                           std::cout << "BUILTINZZ PLAY ARRAY\n";
+                           int args_size = args.size();
+                           if (args_size >= 2)
+                               play_array_on(args[0], args[1]);
+                           else
+                               play_array(args[0]);
+
+                           return evaluator::NULLL;
+                       })},
+    {"type", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> args)
+                     -> std::shared_ptr<object::Object>
+                 {
+                     int args_size = args.size();
+                     if (args_size == 1)
+                         repl_queue.push("Type:" + args[0]->Type());
+
+                     return evaluator::NULLL;
+                 })},
 };
 
 } // namespace builtin
