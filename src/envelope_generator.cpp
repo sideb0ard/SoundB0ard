@@ -6,44 +6,6 @@
 #include "defjams.h"
 #include "envelope_generator.h"
 
-EnvelopeGenerator::EnvelopeGenerator()
-{
-    m_attack_time_msec = EG_DEFAULT_STATE_TIME;
-    m_decay_time_msec = EG_DEFAULT_STATE_TIME;
-    m_release_time_msec = EG_DEFAULT_STATE_TIME;
-
-    m_attack_time_scalar = 1.0;
-    m_decay_time_scalar = 1.0;
-
-    m_sustain_level = 1;
-    m_envelope_output = 0.0;
-
-    m_inc_shutdown = 0.0;
-
-    m_shutdown_time_msec = 10.0;
-
-    m_state = OFFF;
-    m_sustain_override = false;
-    m_release_pending = false;
-    m_output_eg = false;
-
-    SetEgMode(ANALOG);
-
-    m_reset_to_zero = false;
-    m_legato_mode = false;
-
-    modmatrix = NULL;
-
-    m_mod_dest_eg_output = SOURCE_NONE;
-    m_mod_dest_eg_biased_output = SOURCE_NONE;
-
-    m_mod_source_eg_attack_scaling = DEST_NONE;
-    m_mod_source_eg_decay_scaling = DEST_NONE;
-    m_mod_source_sustain_override = DEST_NONE;
-
-    global_eg_params = NULL;
-}
-
 unsigned int EnvelopeGenerator::GetState() { return m_state; }
 
 bool EnvelopeGenerator::IsActive()
@@ -285,10 +247,7 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
             m_decay_time_scalar * m_decay_time_msec <= 0.0)
         {
             m_envelope_output = m_sustain_level;
-            if (drum_mode)
-                m_state = RELEASE;
-            else
-                m_state = SUSTAIN;
+            m_state = SUSTAIN;
             break;
         }
         break;
@@ -380,5 +339,3 @@ void EnvelopeGenerator::Shutdown()
     m_sustain_override = false;
     m_release_pending = false;
 }
-
-void EnvelopeGenerator::SetDrumMode(bool b) { drum_mode = b; }

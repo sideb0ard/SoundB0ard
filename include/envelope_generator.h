@@ -29,62 +29,62 @@ class EnvelopeGenerator
 {
 
   public:
-    EnvelopeGenerator();
+    EnvelopeGenerator() = default;
     ~EnvelopeGenerator() = default;
 
     ModulationMatrix *modmatrix{nullptr};
     GlobalEgParams *global_eg_params{nullptr};
 
-    unsigned m_mod_source_eg_attack_scaling;
-    unsigned m_mod_source_eg_decay_scaling;
-    unsigned m_mod_source_sustain_override;
+    ///////// MOD MATRIXXXXXX....
+    unsigned m_mod_source_eg_attack_scaling{DEST_NONE};
+    unsigned m_mod_source_eg_decay_scaling{DEST_NONE};
+    unsigned m_mod_source_sustain_override{DEST_NONE};
 
-    unsigned m_mod_dest_eg_output;
-    unsigned m_mod_dest_eg_biased_output;
+    unsigned m_mod_dest_eg_output{SOURCE_NONE};
+    unsigned m_mod_dest_eg_biased_output{SOURCE_NONE};
 
     /////////////////////////////////////////
 
-    bool drum_mode; // no sustain
-    bool m_sustain_override;
-    bool m_release_pending;
+    bool m_sustain_override{false};
+    bool m_release_pending{false};
 
-    unsigned m_eg_mode; // enum above, analog or digital
+    unsigned m_eg_mode{0}; // enum above, analog or digital
     // special modes
-    bool m_reset_to_zero;
-    bool m_legato_mode;
-    bool m_output_eg; // i.e. this instance is going direct to output, rather
-                      // than into an intermediatery
+    bool m_reset_to_zero{false};
+    bool m_legato_mode{false};
+    bool m_output_eg{false}; // i.e. this instance is going direct to output,
+                             // rather than into an intermediatery
 
     // double m_eg1_osc_intensity;
-    double m_envelope_output;
+    double m_envelope_output{0};
 
-    double m_attack_coeff;
-    double m_attack_offset;
-    double m_attack_tco;
+    double m_attack_coeff{0};
+    double m_attack_offset{0};
+    double m_attack_tco{0};
 
-    double m_decay_coeff;
-    double m_decay_offset;
-    double m_decay_tco;
+    double m_decay_coeff{0};
+    double m_decay_offset{0};
+    double m_decay_tco{0};
 
-    double m_release_coeff;
-    double m_release_offset;
-    double m_release_tco;
+    double m_release_coeff{0};
+    double m_release_offset{0};
+    double m_release_tco{0};
 
-    double m_attack_time_msec;
-    double m_decay_time_msec;
-    double m_release_time_msec;
+    double m_attack_time_msec{EG_DEFAULT_STATE_TIME};
+    double m_decay_time_msec{EG_DEFAULT_STATE_TIME};
+    double m_release_time_msec{EG_DEFAULT_STATE_TIME};
 
-    double m_shutdown_time_msec;
+    double m_shutdown_time_msec{10.};
 
-    double m_sustain_level;
+    double m_sustain_level{1};
 
-    double m_attack_time_scalar; // for velocity -> attack time mod
-    double m_decay_time_scalar;  // for note# -> decay time mod
+    double m_attack_time_scalar{1.}; // for velocity -> attack time mod
+    double m_decay_time_scalar{1.};  // for note# -> decay time mod
 
-    double m_inc_shutdown;
+    double m_inc_shutdown{0};
 
     // enum above
-    unsigned int m_state;
+    unsigned int m_state{OFFF};
 
   public:
     unsigned int GetState();
@@ -123,5 +123,4 @@ class EnvelopeGenerator
     double DoEnvelope(double *p_biased_output);
 
     void Release();
-    void SetDrumMode(bool b);
 };

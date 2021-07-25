@@ -46,14 +46,10 @@
 
 #define NUM_COMPAT_NOTES 6
 
-// previously defined in mixer.h
-#define MAX_SCENES 100
-#define MAX_TRACKS_PER_SCENE 100
 #define MAX_NUM_PROC 100
 #define MAX_NUM_SOUND_GENERATORS 100
 #define NUM_PROGRESSIONS 4
 
-// previously in sequenceengine.h -why?!
 #define MAX_NUM_MIDI_LOOPS 64
 #define MAX_VOICES 4
 #define DEFAULT_LEGATO_MODE 0
@@ -67,8 +63,6 @@ constexpr int kMaxNumSoundGenFx = 20;
 constexpr float kMaxDelayLenSecs = 30.0;
 
 const std::string kStartupConfigFile = "startup.sb";
-
-// #define sparkchars L"\u2581\u2582\u2583\u2585\u2586\u2587"
 
 #define ANSI_COLOR_BLUE "\x1b[34m"
 #define ANSI_COLOR_CYAN "\x1b[36m"

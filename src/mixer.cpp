@@ -992,7 +992,6 @@ void Mixer::CheckForAudioActionQueueMessages()
                         }
                         else
                         {
-
                             sg->noteOn(event_on);
                         }
                         int midi_off_tick =
@@ -1187,7 +1186,9 @@ void Mixer::CheckForDelayedEvents()
         {
             // TODO - push to action queue not call function
             if (it->sg)
+            {
                 it->sg->parseMidiEvent(it->event, timing_info);
+            }
             // `erase()` invalidates the iterator, use returned iterator
             it = _action_items.erase(it);
         }

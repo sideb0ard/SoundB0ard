@@ -10,26 +10,6 @@
 
 extern const char *s_dest_enum_to_name[];
 
-DCA::DCA()
-{
-    m_amplitude_control = 1.0;
-    m_amp_mod_db = 0.0;
-    m_gain = 1.0;
-    m_amplitude_db = 0.0;
-    m_eg_mod = 1.0;
-    m_pan_control = 0.0;
-    m_pan_mod = 0.0;
-    m_midi_velocity = 127;
-
-    modmatrix = nullptr;
-    global_dca_params = nullptr;
-
-    m_mod_source_eg = DEST_NONE;
-    m_mod_source_amp_db = DEST_NONE;
-    m_mod_source_velocity = DEST_NONE;
-    m_mod_source_pan = DEST_NONE;
-}
-
 void DCA::SetMidiVelocity(unsigned int vel) { m_midi_velocity = vel; }
 
 void DCA::SetPanControl(double pan) { m_pan_control = pan; }

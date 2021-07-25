@@ -10,7 +10,6 @@
 #include <filesystem>
 #include <iostream>
 
-#include <algo_cmds.h>
 #include <cmdloop.h>
 #include <filereader.hpp>
 #include <midi_cmds.h>

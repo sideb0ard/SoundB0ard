@@ -9,28 +9,30 @@
 struct DCA
 {
 
-    DCA();
+    DCA() = default;
     ~DCA() = default;
 
     ModulationMatrix *modmatrix{nullptr};
     GlobalDCAParams *global_dca_params{nullptr};
 
-    unsigned m_mod_source_eg;
-    unsigned m_mod_source_amp_db;
-    unsigned m_mod_source_velocity;
-    unsigned m_mod_source_pan;
+    unsigned m_mod_source_eg{DEST_NONE};
+    unsigned m_mod_source_amp_db{DEST_NONE};
+    unsigned m_mod_source_velocity{DEST_NONE};
+    unsigned m_mod_source_pan{DEST_NONE};
 
-    double m_gain;
+    double m_gain{1};
 
-    unsigned int m_midi_velocity;
+    unsigned int m_midi_velocity{127};
 
-    double m_amplitude_db; // gui?
-    double m_amplitude_control;
+    double m_amplitude_db{0};
+    double m_amplitude_control{1};
 
-    double m_pan_control;
-    double m_amp_mod_db;
-    double m_eg_mod;
-    double m_pan_mod;
+    double m_amp_mod_db{0};
+    double m_eg_mod{1};
+    double m_pan_control{0};
+    double m_pan_mod{0};
+
+    //// funcz
 
     void SetPanControl(double pan);
     void Reset();

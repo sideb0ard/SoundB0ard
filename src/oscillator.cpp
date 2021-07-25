@@ -11,50 +11,7 @@
 #include "soundgenerator.h"
 #include "utils.h"
 
-Oscillator::Oscillator()
-{
-    m_note_on = false;
-    m_midi_note_number = 0;
-    m_modulo = 0.0;
-    m_inc = 0.0;
-    m_osc_fo = OSC_FO_DEFAULT; // GUI
-    m_amplitude = 1.0;         // default ON
-    m_pulse_width = OSC_PULSEWIDTH_DEFAULT;
-    m_pulse_width_control = OSC_PULSEWIDTH_DEFAULT; // GUI
-    m_fo = OSC_FO_DEFAULT;
-
-    m_pn_register = rand();
-
-    // --- continue inits
-    m_rsh_counter = -1; // flag for reset condition
-    m_rsh_value = 0.0;
-    m_amp_mod = 1.0; // note default to 1 to avoid silent osc
-    m_fo_mod_lin = 0.0;
-    m_phase_mod = 0.0;
-    m_fo_mod = 0.0;
-    m_pitch_bend_mod = 0.0;
-    m_pw_mod = 0.0;
-    m_octave = 0.0;
-    m_semitones = 0.0;
-    m_cents = 0.0;
-    m_fo_ratio = 1.0;
-    m_lfo_mode = 0; // LFOSYNC
-
-    // --- pitched
-    m_waveform = SINE;
-
-    // --- default modulation matrix inits
-    modmatrix = NULL;
-
-    // --- everything is disconnected unless you use mod matrix
-    m_mod_source_fo = DEST_NONE;
-    m_mod_source_pulse_width = DEST_NONE;
-    m_mod_source_amp = DEST_NONE;
-    m_mod_dest_output1 = SOURCE_NONE;
-    m_mod_dest_output2 = SOURCE_NONE;
-
-    global_oscillator_params = NULL;
-}
+Oscillator::Oscillator() { m_pn_register = rand(); }
 
 void Oscillator::IncModulo() { m_modulo += m_inc; }
 

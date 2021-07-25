@@ -23,27 +23,6 @@ typedef enum
     Q2
 } quantize_size;
 
-typedef struct environment_variable
-{
-    char key[ENVIRONMENT_KEY_SIZE];
-    unsigned int env_var_type;
-    void *data;
-    int val;
-} env_var;
-
-typedef struct soundgen_track
-{
-    int soundgen_num;
-    int soundgen_track_num;
-} soundgen_track;
-
-struct scene
-{
-    int num_bars_to_play;
-    int num_tracks;
-    soundgen_track soundgen_tracks[MAX_TRACKS_PER_SCENE];
-};
-
 typedef unsigned int compat_key_list[6];
 
 // struct AbletonLink AbletonLink;
@@ -112,9 +91,6 @@ struct Mixer
         soundgen_volume[MAX_NUM_SOUND_GENERATORS]; // separating instrument amp
     // from mixer volume per channel
 
-    env_var environment[ENVIRONMENT_ARRAY_SIZE];
-    int env_var_count;
-
     bool debug_mode;
 
     PortMidiStream *midi_stream;
@@ -132,9 +108,6 @@ struct Mixer
     double bpm;
 
     mixer_timing_info timing_info;
-
-    bool scene_mode;
-    bool scene_start_pending;
 
     double volume;
 
@@ -182,7 +155,6 @@ struct Mixer
 
     void ToggleMidiMode();
     void ToggleKeyMode();
-    void PlayScene(int scene_num);
 
     void UpdateTimingInfo(long long int frame_time);
     int GenNext(float *out, int frames_per_buffer);

@@ -6,36 +6,6 @@
 
 #include <iostream>
 
-Voice::Voice()
-{
-    m_global_synth_params = NULL;
-    m_global_voice_params = NULL;
-
-    m_portamento_time_msec = 0.0;
-    m_note_on = false;
-    m_timestamp = 0;
-    m_note_pending = false;
-    m_voice_mode = 0; // this will vary in meaning depending on synth
-    m_hs_ratio = 1.0;
-    m_osc_pitch = OSC_FO_DEFAULT;
-    m_osc_pitch_pending = OSC_FO_DEFAULT;
-    m_portamento_start = OSC_FO_DEFAULT;
-    m_modulo_portamento = OSC_FO_DEFAULT;
-    m_portamento_inc = 0.0;
-    m_portamento_semitones = 0.0;
-    m_legato_mode = LEGATO;
-    m_default_mod_intensity = 1.0;
-    m_default_mod_range = 1.0;
-
-    m_osc1 = NULL;
-    m_osc2 = NULL;
-    m_osc3 = NULL;
-    m_osc4 = NULL;
-
-    m_filter1 = NULL;
-    m_filter2 = NULL;
-}
-
 void Voice::InitializeModMatrix(ModulationMatrix *matrix)
 {
     std::shared_ptr<ModMatrixRow> row;
