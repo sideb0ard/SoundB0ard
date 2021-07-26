@@ -584,12 +584,10 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     if (pattern)
     {
 
-        std::cout << "OOH! EVAL AST PATTERN:" << pattern->string_pattern
-                  << std::endl;
         if (!pattern->string_pattern.empty())
             return std::make_shared<object::Pattern>(pattern->string_pattern);
         else
-            std::cerr << "Nae sample path!!\n";
+            std::cerr << "Nae pattern?!!\n";
     }
 
     std::shared_ptr<ast::GranularExpression> gran =

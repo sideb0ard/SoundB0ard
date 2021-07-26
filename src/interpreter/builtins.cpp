@@ -118,10 +118,78 @@ void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur)
     audio_queue.push(action_req);
 }
 
+void play_pattern_array_on(std::shared_ptr<object::SoundGenerator> sg,
+                           std::shared_ptr<object::Array> play_pattern)
+{
+    if (!sg || play_pattern->elements_.size() != PPBAR)
+        return;
+    for (int i = 0; i < PPBAR; ++i)
+    {
+        auto ppattern = std::dynamic_pointer_cast<object::Array>(
+            play_pattern->elements_[i]);
+        if (ppattern)
+        {
+            std::vector<int> midi_nums;
+            for (auto item : ppattern->elements_)
+            {
+                auto sg_string =
+                    std::dynamic_pointer_cast<object::String>(item);
+                if (sg_string)
+                    midi_nums.push_back(std::stoi(sg_string->value_));
+            }
+            note_on_at(sg->soundgen_id_, midi_nums, i, 127, 20);
+        }
+    }
+}
+
+void RecursiveScaler(std::array<std::vector<int>, PPBAR> &scaled_pattern,
+                     std::shared_ptr<object::Array> play_pattern, int midi_len,
+                     int offset)
+{
+    int nlen = play_pattern->elements_.size();
+    int pulses_per = midi_len / nlen;
+
+    for (int i = 0; i < nlen; ++i)
+    {
+        auto item = play_pattern->elements_[i];
+        auto val = std::dynamic_pointer_cast<object::Number>(item);
+        if (val)
+            scaled_pattern[offset + i * pulses_per].push_back(val->value_);
+
+        auto aval = std::dynamic_pointer_cast<object::Array>(item);
+        if (aval)
+            RecursiveScaler(scaled_pattern, aval, pulses_per, i * pulses_per);
+    }
+}
+
+void PrintPattern(std::array<std::vector<int>, PPBAR> &patternn)
+{
+    for (int i = 0; i < PPBAR; ++i)
+    {
+        if (patternn[i].size() > 0)
+        {
+            for (auto item : patternn[i])
+                std::cout << "[" << i << "] " << item << std::endl;
+        }
+    }
+}
+
+std::array<std::vector<int>, PPBAR>
+ScalePattern(std::shared_ptr<object::Array> play_pattern)
+{
+    std::array<std::vector<int>, PPBAR> scaled_pattern;
+    int midi_len = PPBAR;
+    RecursiveScaler(scaled_pattern, play_pattern, midi_len, 0);
+
+    return scaled_pattern;
+}
+
 void play_array_on(std::shared_ptr<object::Object> soundgen,
                    std::shared_ptr<object::Object> pattern)
 {
     auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(soundgen);
+    if (!sg)
+        return;
 
     std::shared_ptr<object::Array> play_pattern;
     auto pat_obj = std::dynamic_pointer_cast<object::Pattern>(pattern);
@@ -130,14 +198,66 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
     else
         play_pattern = std::dynamic_pointer_cast<object::Array>(pattern);
 
-    if (sg && play_pattern)
+    if (play_pattern)
     {
+        if (play_pattern->elements_.size() == PPBAR)
+        {
+            play_pattern_array_on(sg, play_pattern);
+            return;
+        }
+
+        std::array<std::vector<int>, PPBAR> scaled_pattern =
+            ScalePattern(play_pattern);
+
+        // PrintPattern(scaled_pattern);
+        for (int i = 0; i < PPBAR; ++i)
+        {
+            auto ppattern = scaled_pattern[i];
+            if (ppattern.size() > 0)
+            {
+                std::vector<int> midi_nums;
+                for (auto item : ppattern)
+                {
+                    if (item > 0)
+                        midi_nums.push_back(item);
+                }
+
+                if (midi_nums.size() > 0)
+                    note_on_at(sg->soundgen_id_, midi_nums, i, 127, 20);
+            }
+        }
+    }
+}
+
+void play_pattern_array(std::shared_ptr<object::Array> play_pattern)
+{
+    if (play_pattern->elements_.size() != PPBAR)
+        return;
+
+    for (int i = 0; i < PPBAR; ++i)
+    {
+        auto ppattern = std::dynamic_pointer_cast<object::Array>(
+            play_pattern->elements_[i]);
+        if (ppattern)
+        {
+            for (auto item : ppattern->elements_)
+            {
+                auto sg_string =
+                    std::dynamic_pointer_cast<object::String>(item);
+                if (sg_string)
+                {
+                    auto sg_name = sg_string->value_;
+                    std::stringstream ss;
+                    ss << "note_on_at(" << sg_name << ", 1, " << i << ")";
+                    eval_command_queue.push(ss.str());
+                }
+            }
+        }
     }
 }
 
 void play_array(std::shared_ptr<object::Object> pattern)
 {
-    std::cout << "PLAY AARRYY\n";
     std::shared_ptr<object::Array> play_pattern;
     auto pat_obj = std::dynamic_pointer_cast<object::Pattern>(pattern);
     if (pat_obj)
@@ -146,40 +266,10 @@ void play_array(std::shared_ptr<object::Object> pattern)
         play_pattern = std::dynamic_pointer_cast<object::Array>(pattern);
     if (play_pattern)
     {
-        std::cout << "GOT A PLAYBACK PATTERN\n";
-        std::vector<int> notes;
-        notes.push_back(1);
-        for (int i = 0; i < PPBAR; ++i)
+        if (play_pattern->elements_.size() == PPBAR)
         {
-            auto ppattern = std::dynamic_pointer_cast<object::Array>(
-                play_pattern->elements_[i]);
-            if (ppattern)
-            {
-                for (auto item : ppattern->elements_)
-                {
-                    auto sg =
-                        std::dynamic_pointer_cast<object::SoundGenerator>(item);
-                    if (sg)
-                    {
-                        std::cout << "GOTs AN SGGGG\n";
-                        int sgid = sg->soundgen_id_;
-                        int vel = 128;
-                        int dur = 240;
-                        note_on_at(sgid, notes, i, vel, dur);
-                    }
-
-                    auto sg_string =
-                        std::dynamic_pointer_cast<object::String>(item);
-                    if (sg_string)
-                    {
-                        auto sg_name = sg_string->value_;
-                        std::stringstream ss;
-                        ss << "note_on_at(" << sg_name << ", 1, " << i << ")";
-                        eval_command_queue.push(ss.str());
-                        std::cout << "GOT A STRING - cmd is " << ss.str();
-                    }
-                }
-            }
+            play_pattern_array(play_pattern);
+            return;
         }
     }
 }
@@ -462,7 +552,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                  if (array_obj->elements_.size() == 3840 && rotate_by < 16)
                  {
-                     std::cout << "OOh, rotating a PPBAR pattern\n";
                      rotate_by *= 240;
                  }
 
@@ -1086,9 +1175,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object>
                        {
-                           std::cout << "BUILTINZZ PLAY ARRAY\n";
                            int args_size = args.size();
-                           if (args_size >= 2)
+                           if (args_size < 1)
+                           {
+                               std::cerr << "Need an array to play..\n";
+                               return evaluator::NULLL;
+                           }
+                           if (args_size == 2)
                                play_array_on(args[0], args[1]);
                            else
                                play_array(args[0]);

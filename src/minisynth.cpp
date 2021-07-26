@@ -475,7 +475,6 @@ void MiniSynth::allNotesOff()
 
 void MiniSynth::noteOff(midi_event ev)
 {
-    std::cout << "NOTEOFF:" << ev.data1 << std::endl;
     for (int i = 0; i < MAX_VOICES; i++)
     {
         auto msv = GetOldestVoiceWithNote(ev.data1);

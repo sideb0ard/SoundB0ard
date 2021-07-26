@@ -1,0 +1,52 @@
+
+let bd = sample(garage/BassDrumtrax06.wav);
+let sn = sample(snrs/nord808_snr.aif);
+let hh = sample(hats/weekendCHat.aiff);
+let rm = sample(rims/hes23rim1.aif);
+let tr = sample(perc/triangle.aiff);
+let ch = sample(garage/HHCH-606_80.wav);
+
+let incy = 1;
+let blah_gen = gen()
+{
+  setup()
+  {
+    let pat = pattern("[ ch [ <hh*3 hh*7 hh> < ch*7 ch>] hh*6 <rm(3,8) [rm tr*2]>, <bd(7,16) bd(3,16) bd(5,8)> ]");
+    #let pat = pattern("[ ch [<hh2 hh2*3> ch] hh*6 <[rm tr*2] tr*2 rm(3,8)>, bd(5,8) ]");
+    #let pat = pattern("<bd(3,8) bd(5,8)>");
+    #let pat = pattern("<sn*3 bd*4>");
+    #let pat = pattern("[bd(5,8), [~ sn]*2, hh*7]");
+  }
+  run()
+  {
+    let beat = eval_pattern(pat);
+    if (count % 3 == 0) {
+      # beat = rotate(beat, rand(16) * 240);
+      beat = rotate(beat, incy);
+    }
+    play_array(beat);
+    incy = incr(incy, 1, 12);
+
+  }
+}
+
+let moah_gen = gen()
+{
+  setup()
+  {
+    let pat = pattern("[47 31] <47 43(3,8)> [44 47 51] <~ 53*2>");
+  }
+  run()
+  {
+    let beat = eval_pattern(pat);
+    if (count % 3 == 0) {
+      beat = rotate(beat, incy);
+    }
+    if (count % 4 == 0) {
+      beat = reverse(beat);
+      play_array(dx100, beat);
+    }
+    play_array(mo, beat);
+  }
+}
+

@@ -925,8 +925,6 @@ std::shared_ptr<ast::Expression> Parser::ParsePatternExpression()
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
 
-    std::cout << "YO, returning ya PATTERN!:" << pattern->string_pattern
-              << std::endl;
     return pattern;
 }
 

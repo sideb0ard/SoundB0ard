@@ -14,7 +14,6 @@ namespace object
 
 Pattern::Pattern(std::string string_pattern) : string_pattern{string_pattern}
 {
-    std::cout << "OBJECT! PATTERN ODE " << std::endl;
     ParseStringPattern();
 }
 std::string Pattern::Inspect()
@@ -44,24 +43,6 @@ std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Pattern::Eval()
     ++eval_counter;
 
     return pattern_events;
-
-    // for (int i = 0; i < PPBAR; ++i)
-    //{
-    //    auto events = pattern_events[i];
-
-    //    for (auto e : events)
-    //    {
-    //        if (e->value_ == "~") // skip blank markers
-    //            continue;
-    //        std::stringstream ss;
-    //        ss << "note_on_at(" << e->value_ << ", 1, " << i << ")";
-
-    //        eval_command_queue.push(ss.str());
-    //        let blah_fn = fn()
-    //        {
-    //        }
-    //    }
-    //}
 }
 
 void Pattern::EvalPattern(
@@ -77,6 +58,7 @@ void Pattern::EvalPattern(
     {
         auto euclidean_rhythm =
             GenerateBjork(node->euclidean_hits_, node->euclidean_steps_);
+
         // copy node without hits and steps - TODO - this is only implememnted
         // for Leaf nodes currently.
         auto leafy =
