@@ -58,6 +58,35 @@ std::shared_ptr<object::Array> ExtractArrayFromPattern(
 
     return return_array;
 }
+std::array<std::vector<int>, PPBAR> ExtractIntsFromEvalPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> evaluated_pat)
+{
+    std::array<std::vector<int>, PPBAR> return_array;
+
+    for (int i = 0; i < PPBAR; ++i)
+    {
+        auto ep = evaluated_pat[i];
+        if (!ep.empty())
+        {
+            for (auto p : ep)
+            {
+                int p_val = 1;
+                try
+                {
+                    p_val = std::stoi(p->value_);
+                }
+                catch (...)
+                {
+                    // expected sometimes.
+                }
+
+                return_array[i].push_back(p_val);
+            }
+        }
+    }
+
+    return return_array;
+}
 
 bool ShouldIgnore(std::string filename)
 {
@@ -116,6 +145,21 @@ void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur)
                                        .velocity = vel,
                                        .duration = dur};
     audio_queue.push(action_req);
+}
+
+std::array<int, 16>
+ShrinkPatternToStepSequence(std::array<std::vector<int>, PPBAR> &pattern)
+{
+    std::array<int, 16> shrunk{0};
+    for (int i = 0; i < 16; ++i)
+    {
+        for (int j = 0; j < 240; ++j)
+        {
+            if (pattern[i * 240 + j].size() > 0)
+                shrunk[i] = pattern[i * 240 + j][0];
+        }
+    }
+    return shrunk;
 }
 
 std::array<std::vector<int>, PPBAR>
@@ -588,22 +632,23 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
-    {"is_array", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> input)
-                         -> std::shared_ptr<object::Object>
-                     {
-                         if (input.size() != 1)
-                             return evaluator::NewError(
-                                 "`invert` requires a single args - an array");
+    {"is_array",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object>
+         {
+             if (input.size() != 1)
+                 return evaluator::NewError(
+                     "`is_array` requires a single args - an array");
 
-                         std::shared_ptr<object::Array> array_obj =
-                             std::dynamic_pointer_cast<object::Array>(input[0]);
-                         if (array_obj)
-                         {
-                             return evaluator::NativeBoolToBooleanObject(true);
-                         }
-                         return evaluator::NativeBoolToBooleanObject(false);
-                     })},
+             std::shared_ptr<object::Array> array_obj =
+                 std::dynamic_pointer_cast<object::Array>(input[0]);
+             if (array_obj)
+             {
+                 return evaluator::NativeBoolToBooleanObject(true);
+             }
+             return evaluator::NativeBoolToBooleanObject(false);
+         })},
     {"invert",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
@@ -617,6 +662,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  std::dynamic_pointer_cast<object::Array>(input[0]);
              if (array_obj)
              {
+
                  auto return_array = std::make_shared<object::Array>(
                      std::vector<std::shared_ptr<object::Object>>());
 
@@ -633,6 +679,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                              std::make_shared<object::Number>(!num_obj->value_);
                          return_array->elements_.push_back(new_num_obj);
                      }
+                     else if (e->Type() == "NULL")
+                     {
+                         auto new_num_obj = std::make_shared<object::Number>(1);
+                         return_array->elements_.push_back(new_num_obj);
+                     }
                      else
                      {
                          auto new_num_obj = std::make_shared<object::Number>(0);
@@ -640,6 +691,25 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      }
                  }
 
+                 return return_array;
+             }
+             auto pattern_obj =
+                 std::dynamic_pointer_cast<object::Pattern>(input[0]);
+             if (pattern_obj)
+             {
+                 auto evaluated_pat = pattern_obj->Print();
+                 auto intz = ExtractIntsFromEvalPattern(evaluated_pat);
+                 auto stepseq = ShrinkPatternToStepSequence(intz);
+
+                 auto return_array = std::make_shared<object::Array>(
+                     std::vector<std::shared_ptr<object::Object>>());
+
+                 for (int i = 0; i < (int)stepseq.size(); ++i)
+                 {
+                     auto new_num_obj =
+                         std::make_shared<object::Number>(!stepseq[i]);
+                     return_array->elements_.push_back(new_num_obj);
+                 }
                  return return_array;
              }
 
@@ -1116,6 +1186,36 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      std::shared_ptr<object::Array> return_array =
                          ExtractArrayFromPattern(evaluated_pat);
 
+                     return return_array;
+                 }
+             }
+             return evaluator::NULLL;
+         })},
+    {"print_pattern",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 1)
+             {
+                 auto pat_obj =
+                     std::dynamic_pointer_cast<object::Pattern>(args[0]);
+                 if (pat_obj)
+                 {
+                     auto evaluated_pat = pat_obj->Print();
+                     auto intz = ExtractIntsFromEvalPattern(evaluated_pat);
+                     auto stepseq = ShrinkPatternToStepSequence(intz);
+
+                     auto return_array = std::make_shared<object::Array>(
+                         std::vector<std::shared_ptr<object::Object>>());
+
+                     for (int i = 0; i < (int)stepseq.size(); ++i)
+                     {
+                         auto new_num_obj =
+                             std::make_shared<object::Number>(stepseq[i]);
+                         return_array->elements_.push_back(new_num_obj);
+                     }
                      return return_array;
                  }
              }

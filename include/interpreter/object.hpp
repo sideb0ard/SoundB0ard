@@ -231,6 +231,7 @@ class Pattern : public Object
 
   public:
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Eval();
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Print();
     // void RunPattern();
 
   private:

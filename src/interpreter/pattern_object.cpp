@@ -15,6 +15,7 @@ namespace object
 Pattern::Pattern(std::string string_pattern) : string_pattern{string_pattern}
 {
     ParseStringPattern();
+    EvalPattern(pattern_root, 0, PPBAR);
 }
 std::string Pattern::Inspect()
 {
@@ -42,6 +43,11 @@ std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Pattern::Eval()
     EvalPattern(pattern_root, 0, PPBAR);
     ++eval_counter;
 
+    return pattern_events;
+}
+
+std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Pattern::Print()
+{
     return pattern_events;
 }
 
