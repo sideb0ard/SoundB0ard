@@ -11,11 +11,12 @@ let blah_gen = gen()
 {
   setup()
   {
-    let pat = pattern("[ ch [ <hh*3 hh*7 hh> < ch*7 ch>] hh*6 <rm(3,8) [rm tr*2]>, <bd(7,16) bd(3,16) bd(5,8)> ]");
-    #let pat = pattern("[ ch [<hh2 hh2*3> ch] hh*6 <[rm tr*2] tr*2 rm(3,8)>, bd(5,8) ]");
-    #let pat = pattern("<bd(3,8) bd(5,8)>");
-    #let pat = pattern("<sn*3 bd*4>");
-    #let pat = pattern("[bd(5,8), [~ sn]*2, hh*7]");
+    let pat = pattern("[ <tr*2 ch> [ <hh*3 hh*7 hh> < ch*7 ch>] hh*6 <rm(3,8) [rm tr*2]>, <bd(7,16) bd(3,16) bd(5,8)> ]");
+
+    let sampz = [hh, rm, tr, ch, sn, bd];
+    let sx = 0;
+    let ptchz = [2, 1, 0.7, 0.8, 1.2, 1.5];
+    let px = 0;
   }
   run()
   {
@@ -24,8 +25,20 @@ let blah_gen = gen()
       # beat = rotate(beat, rand(16) * 240);
       beat = rotate(beat, incy);
     }
-    play_array(beat);
-    incy = incr(incy, 1, 12);
+    if (rand(100) < 80) {
+      play_array(beat);
+      set_pitch(sampz[sx], ptchz[px]);
+      sx = incr(sx, 0, len(sampz));
+      px = incr(px, 0, len(ptchz));
+    } else {
+      if (rand(100) < 40) {
+        print("HIT ME YO");
+        play_array_over(beat, 2);
+        play_array_over(beat, 3);
+      }
+    }
+
+    incy = incr(incy, 1, 15);
 
   }
 }
@@ -34,19 +47,27 @@ let moah_gen = gen()
 {
   setup()
   {
-    let pat = pattern("[47 31] <47 43(3,8)> [44 47 51] <~ 53*2>");
+    let rif = pattern("<20 ~ 23 ~ 23(3,8)> ~ [~ <23 ~ 23 20>] [~ <~ 20 20(3,8)>]");
+    let rif2 = pattern("<13*3 ~ 14*14 17(3,8)> ~ ~ [~ <14 12 13 7>]");
   }
   run()
   {
-    let beat = eval_pattern(pat);
-    if (count % 3 == 0) {
-      beat = rotate(beat, incy);
+
+    let rf = eval_pattern(rif);
+    if (rand(100) > 90) {
+      rf  = eval_pattern(rif2);
     }
-    if (count % 4 == 0) {
-      beat = reverse(beat);
-      play_array(dx100, beat);
+
+    if (count % incy == 0) {
+      rf = rotate(rf, incy);
+      rf = map(rf, fn(v) { return v - incy; });
     }
-    play_array(mo, beat);
+    for (i = 0; i < 3840; ++i) {
+      if (is_array(rf[i]) && len(rf[i]) > 0) {
+        let root = rf[i][0];
+        let notes = notes_in_chord(rf[i][0], 0, true);
+        note_on_at(dx100, notes, i);
+      }
+    }
   }
 }
-

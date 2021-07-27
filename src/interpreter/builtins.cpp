@@ -118,28 +118,26 @@ void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur)
     audio_queue.push(action_req);
 }
 
-void play_pattern_array_on(std::shared_ptr<object::SoundGenerator> sg,
-                           std::shared_ptr<object::Array> play_pattern)
+std::array<std::vector<int>, PPBAR>
+ExtractIntsFromObjectArray(std::shared_ptr<object::Array> play_pattern)
 {
-    if (!sg || play_pattern->elements_.size() != PPBAR)
-        return;
+    std::array<std::vector<int>, PPBAR> return_pattern;
     for (int i = 0; i < PPBAR; ++i)
     {
         auto ppattern = std::dynamic_pointer_cast<object::Array>(
             play_pattern->elements_[i]);
         if (ppattern)
         {
-            std::vector<int> midi_nums;
             for (auto item : ppattern->elements_)
             {
                 auto sg_string =
                     std::dynamic_pointer_cast<object::String>(item);
                 if (sg_string)
-                    midi_nums.push_back(std::stoi(sg_string->value_));
+                    return_pattern[i].push_back(std::stoi(sg_string->value_));
             }
-            note_on_at(sg->soundgen_id_, midi_nums, i, 127, 20);
         }
     }
+    return return_pattern;
 }
 
 void RecursiveScaler(std::array<std::vector<int>, PPBAR> &scaled_pattern,
@@ -185,7 +183,7 @@ ScalePattern(std::shared_ptr<object::Array> play_pattern)
 }
 
 void play_array_on(std::shared_ptr<object::Object> soundgen,
-                   std::shared_ptr<object::Object> pattern)
+                   std::shared_ptr<object::Object> pattern, float speed)
 {
     auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(soundgen);
     if (!sg)
@@ -200,19 +198,19 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
 
     if (play_pattern)
     {
-        if (play_pattern->elements_.size() == PPBAR)
-        {
-            play_pattern_array_on(sg, play_pattern);
-            return;
-        }
+        std::array<std::vector<int>, PPBAR> live_pattern;
 
-        std::array<std::vector<int>, PPBAR> scaled_pattern =
-            ScalePattern(play_pattern);
+        if (play_pattern->elements_.size() >= PPBAR &&
+            play_pattern->elements_[0]->Type() == "ARRAY")
+            live_pattern = ExtractIntsFromObjectArray(play_pattern);
+        else if (play_pattern->elements_.size() > 0 &&
+                 play_pattern->elements_[0]->Type() == "NUMBER")
+            live_pattern = ScalePattern(play_pattern);
 
-        // PrintPattern(scaled_pattern);
-        for (int i = 0; i < PPBAR; ++i)
+        // PrintPattern(live_pattern);
+        for (int i = 0; i < (int)live_pattern.size(); ++i)
         {
-            auto ppattern = scaled_pattern[i];
+            auto ppattern = live_pattern[i];
             if (ppattern.size() > 0)
             {
                 std::vector<int> midi_nums;
@@ -223,13 +221,14 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
                 }
 
                 if (midi_nums.size() > 0)
-                    note_on_at(sg->soundgen_id_, midi_nums, i, 127, 20);
+                    note_on_at(sg->soundgen_id_, midi_nums, i * speed, 127, 20);
             }
         }
     }
 }
 
-void play_pattern_array(std::shared_ptr<object::Array> play_pattern)
+void play_pattern_array(std::shared_ptr<object::Array> play_pattern,
+                        float speed)
 {
     if (play_pattern->elements_.size() != PPBAR)
         return;
@@ -248,7 +247,8 @@ void play_pattern_array(std::shared_ptr<object::Array> play_pattern)
                 {
                     auto sg_name = sg_string->value_;
                     std::stringstream ss;
-                    ss << "note_on_at(" << sg_name << ", 1, " << i << ")";
+                    ss << "note_on_at(" << sg_name << ", 1, " << i * speed
+                       << ")";
                     eval_command_queue.push(ss.str());
                 }
             }
@@ -256,19 +256,20 @@ void play_pattern_array(std::shared_ptr<object::Array> play_pattern)
     }
 }
 
-void play_array(std::shared_ptr<object::Object> pattern)
+// Assuming this is a Tidal Notation Pattern
+void play_array(std::shared_ptr<object::Object> pattern, float speed)
 {
     std::shared_ptr<object::Array> play_pattern;
     auto pat_obj = std::dynamic_pointer_cast<object::Pattern>(pattern);
     if (pat_obj)
         play_pattern = ExtractArrayFromPattern(pat_obj->Eval());
-    else
+    else // Already Eval()'d
         play_pattern = std::dynamic_pointer_cast<object::Array>(pattern);
     if (play_pattern)
     {
         if (play_pattern->elements_.size() == PPBAR)
         {
-            play_pattern_array(play_pattern);
+            play_pattern_array(play_pattern, speed);
             return;
         }
     }
@@ -1145,12 +1146,33 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              int args_size = args.size();
              if (args_size >= 2)
              {
+                 float root_note_value = 0;
                  auto root_note =
                      std::dynamic_pointer_cast<object::Number>(args[0]);
+                 if (!root_note)
+                 {
+                     auto root_note_string =
+                         std::dynamic_pointer_cast<object::String>(args[0]);
+                     if (!root_note_string)
+                     {
+                         std::cerr << "NAE ROOT NOTE! numpty!\n";
+                         return evaluator::NULLL;
+                     }
+                     root_note_value = std::stoi(root_note_string->value_);
+                 }
+                 else
+                 {
+                     root_note_value = root_note->value_;
+                 }
 
                  // can be MAJOR (0), MINOR (1), DIMINISHED (2)
                  auto chord_type =
                      std::dynamic_pointer_cast<object::Number>(args[1]);
+                 if (!chord_type)
+                 {
+                     std::cerr << "NAE CHORD TYPE! numpty!\n";
+                     return evaluator::NULLL;
+                 }
 
                  auto return_array = std::make_shared<object::Array>(
                      std::vector<std::shared_ptr<object::Object>>());
@@ -1158,8 +1180,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  bool seventh = false;
                  if (args_size == 3)
                      seventh = true;
+
                  std::vector<int> notez = GetMidiNotesInChord(
-                     root_note->value_, chord_type->value_, seventh);
+                     root_note_value, chord_type->value_, seventh);
 
                  for (int i = 0; i < (int)notez.size(); i++)
                  {
@@ -1182,12 +1205,40 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                                return evaluator::NULLL;
                            }
                            if (args_size == 2)
-                               play_array_on(args[0], args[1]);
+                               play_array_on(args[0], args[1], 1);
                            else
-                               play_array(args[0]);
+                               play_array(args[0], 1);
 
                            return evaluator::NULLL;
                        })},
+    {"play_array_over",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size < 2)
+             {
+                 std::cerr << "Need an array to play and a speed..\n";
+                 return evaluator::NULLL;
+             }
+             if (args_size == 3)
+             {
+                 auto speed_obj =
+                     std::dynamic_pointer_cast<object::Number>(args[2]);
+                 if (speed_obj)
+                     play_array_on(args[0], args[1], speed_obj->value_);
+             }
+             else
+             {
+                 auto speed_obj =
+                     std::dynamic_pointer_cast<object::Number>(args[1]);
+                 if (speed_obj)
+                     play_array(args[0], speed_obj->value_);
+             }
+
+             return evaluator::NULLL;
+         })},
     {"type", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> args)
                      -> std::shared_ptr<object::Object>
