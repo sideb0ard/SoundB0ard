@@ -133,7 +133,19 @@ ExtractIntsFromObjectArray(std::shared_ptr<object::Array> play_pattern)
                 auto sg_string =
                     std::dynamic_pointer_cast<object::String>(item);
                 if (sg_string)
-                    return_pattern[i].push_back(std::stoi(sg_string->value_));
+                {
+                    int sg_val = 1;
+                    try
+                    {
+                        sg_val = std::stoi(sg_string->value_);
+                    }
+                    catch (...)
+                    {
+                        // expected sometimes.
+                    }
+
+                    return_pattern[i].push_back(sg_val);
+                }
             }
         }
     }

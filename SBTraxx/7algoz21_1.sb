@@ -71,3 +71,21 @@ let moah_gen = gen()
     }
   }
 }
+
+let dgen = gen()
+{
+  setup()
+  {
+    let rotz = [0, 6, 10, 2];
+    let rx = 0;
+  }
+  run()
+  {
+    let pat = pattern("< bd(3,8) bd(5,8) bd(9, 16) bd(11,16) bd(5,16) bd(7,16)>");
+    #print_pattern(pat);
+    let p = eval_pattern(pat);
+    play_array(bd, rotate(p, rotz[rx]));
+    rx = incr(rx, 0, len(rotz));
+  }
+}
+
