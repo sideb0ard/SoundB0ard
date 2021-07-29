@@ -1199,11 +1199,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              int args_size = args.size();
              if (args_size == 1)
              {
-                 auto pat_obj =
-                     std::dynamic_pointer_cast<object::Pattern>(args[0]);
-                 if (pat_obj)
+                 auto pat = std::dynamic_pointer_cast<object::Pattern>(args[0]);
+
+                 if (pat)
                  {
-                     auto evaluated_pat = pat_obj->Print();
+                     auto evaluated_pat = pat->Print();
                      auto intz = ExtractIntsFromEvalPattern(evaluated_pat);
                      auto stepseq = ShrinkPatternToStepSequence(intz);
 
@@ -1217,6 +1217,28 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          return_array->elements_.push_back(new_num_obj);
                      }
                      return return_array;
+                 }
+                 else
+                 {
+                     auto pat_array =
+                         std::dynamic_pointer_cast<object::Array>(args[0]);
+                     if (pat_array && pat_array->elements_.size() == PPBAR)
+                     {
+                         std::cout << "Ah, an evaluated pattern!\n";
+                         auto intz = ExtractIntsFromObjectArray(pat_array);
+                         auto stepseq = ShrinkPatternToStepSequence(intz);
+
+                         auto return_array = std::make_shared<object::Array>(
+                             std::vector<std::shared_ptr<object::Object>>());
+
+                         for (int i = 0; i < (int)stepseq.size(); ++i)
+                         {
+                             auto new_num_obj =
+                                 std::make_shared<object::Number>(stepseq[i]);
+                             return_array->elements_.push_back(new_num_obj);
+                         }
+                         return return_array;
+                     }
                  }
              }
              return evaluator::NULLL;
@@ -1361,6 +1383,67 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                      return evaluator::NULLL;
                  })},
+    {"stutter",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 1)
+             {
+                 std::shared_ptr<object::Array> array_to_stutter;
+
+                 if (array_to_stutter)
+                 {
+                     auto return_array = std::make_shared<object::Array>(
+                         std::vector<std::shared_ptr<object::Object>>());
+                     int read_idx = 0;
+                     for (int i = 0;
+                          i < (int)array_to_stutter->elements_.size(); i++)
+                     {
+                         return_array->elements_.push_back(
+                             array_to_stutter->elements_[read_idx]);
+                         if (random() % 100 > 47)
+                             ++read_idx;
+                     }
+
+                     return return_array;
+                 }
+                 else
+                 {
+                     auto pattern_obj =
+                         std::dynamic_pointer_cast<object::Pattern>(args[0]);
+                     if (pattern_obj)
+                     {
+                         std::cout << "PATTERN YO!";
+                         array_to_stutter =
+                             ExtractArrayFromPattern(pattern_obj->Eval());
+
+                         std::cout << "SIZE OF EXTRACTED ARRAY:"
+                                   << array_to_stutter->elements_.size()
+                                   << std::endl;
+
+                         auto return_array = std::make_shared<object::Array>(
+                             std::vector<std::shared_ptr<object::Object>>());
+                         int read_idx = 0;
+                         for (int i = 0; i < 16; i++)
+                         {
+                             for (int j = 0; j < PPBAR / 16; ++j)
+                             {
+                                 return_array->elements_.push_back(
+                                     array_to_stutter->elements_[read_idx + j]);
+                             }
+                             if (random() % 100 > 47)
+                                 ++read_idx;
+                         }
+
+                         return return_array;
+                     }
+                 }
+             }
+
+             return evaluator::NULLL;
+         })},
 };
 
 } // namespace builtin
