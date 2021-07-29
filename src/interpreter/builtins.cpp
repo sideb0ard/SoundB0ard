@@ -672,9 +672,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          std::dynamic_pointer_cast<object::Number>(e);
                      if (num_obj)
                      {
-                         // std::cout << "VAL:" << num_obj->value_ << std::endl;
-                         // std::cout << "NOTVAL:" << !num_obj->value_
-                         //          << std::endl;
                          auto new_num_obj =
                              std::make_shared<object::Number>(!num_obj->value_);
                          return_array->elements_.push_back(new_num_obj);
@@ -1205,6 +1202,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  {
                      auto evaluated_pat = pat->Print();
                      auto intz = ExtractIntsFromEvalPattern(evaluated_pat);
+                     PrintPattern(intz);
                      auto stepseq = ShrinkPatternToStepSequence(intz);
 
                      auto return_array = std::make_shared<object::Array>(
@@ -1222,22 +1220,32 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  {
                      auto pat_array =
                          std::dynamic_pointer_cast<object::Array>(args[0]);
-                     if (pat_array && pat_array->elements_.size() == PPBAR)
+                     if (pat_array)
                      {
-                         std::cout << "Ah, an evaluated pattern!\n";
-                         auto intz = ExtractIntsFromObjectArray(pat_array);
-                         auto stepseq = ShrinkPatternToStepSequence(intz);
-
-                         auto return_array = std::make_shared<object::Array>(
-                             std::vector<std::shared_ptr<object::Object>>());
-
-                         for (int i = 0; i < (int)stepseq.size(); ++i)
+                         if (pat_array->elements_.size() == PPBAR)
                          {
-                             auto new_num_obj =
-                                 std::make_shared<object::Number>(stepseq[i]);
-                             return_array->elements_.push_back(new_num_obj);
+                             auto intz = ExtractIntsFromObjectArray(pat_array);
+                             PrintPattern(intz);
+                             auto stepseq = ShrinkPatternToStepSequence(intz);
+
+                             auto return_array =
+                                 std::make_shared<object::Array>(
+                                     std::vector<
+                                         std::shared_ptr<object::Object>>());
+
+                             for (int i = 0; i < (int)stepseq.size(); ++i)
+                             {
+                                 auto new_num_obj =
+                                     std::make_shared<object::Number>(
+                                         stepseq[i]);
+                                 return_array->elements_.push_back(new_num_obj);
+                             }
+                             return return_array;
                          }
-                         return return_array;
+                         else
+                         {
+                             return pat_array;
+                         }
                      }
                  }
              }
@@ -1391,20 +1399,40 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              int args_size = args.size();
              if (args_size == 1)
              {
-                 std::shared_ptr<object::Array> array_to_stutter;
+                 auto array_to_stutter =
+                     std::dynamic_pointer_cast<object::Array>(args[0]);
 
                  if (array_to_stutter)
                  {
                      auto return_array = std::make_shared<object::Array>(
                          std::vector<std::shared_ptr<object::Object>>());
+
                      int read_idx = 0;
-                     for (int i = 0;
-                          i < (int)array_to_stutter->elements_.size(); i++)
+                     if (array_to_stutter->elements_.size() == PPBAR)
                      {
-                         return_array->elements_.push_back(
-                             array_to_stutter->elements_[read_idx]);
-                         if (random() % 100 > 47)
-                             ++read_idx;
+                         for (int i = 0; i < 16; i++)
+                         {
+                             for (int j = 0; j < PPBAR / 16; ++j)
+                             {
+                                 return_array->elements_.push_back(
+                                     array_to_stutter->elements_[read_idx + j]);
+                             }
+                             if (array_to_stutter->elements_[read_idx] == 0 ||
+                                 random() % 100 > 47)
+                                 read_idx += PPBAR / 16;
+                         }
+                     }
+                     else
+                     {
+                         for (int i = 0;
+                              i < (int)array_to_stutter->elements_.size(); i++)
+                         {
+                             return_array->elements_.push_back(
+                                 array_to_stutter->elements_[read_idx]);
+                             if (array_to_stutter->elements_[read_idx] == 0 ||
+                                 random() % 100 > 47)
+                                 ++read_idx;
+                         }
                      }
 
                      return return_array;
@@ -1415,13 +1443,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          std::dynamic_pointer_cast<object::Pattern>(args[0]);
                      if (pattern_obj)
                      {
-                         std::cout << "PATTERN YO!";
                          array_to_stutter =
                              ExtractArrayFromPattern(pattern_obj->Eval());
-
-                         std::cout << "SIZE OF EXTRACTED ARRAY:"
-                                   << array_to_stutter->elements_.size()
-                                   << std::endl;
 
                          auto return_array = std::make_shared<object::Array>(
                              std::vector<std::shared_ptr<object::Object>>());
@@ -1433,8 +1456,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                                  return_array->elements_.push_back(
                                      array_to_stutter->elements_[read_idx + j]);
                              }
-                             if (random() % 100 > 47)
-                                 ++read_idx;
+                             if (array_to_stutter->elements_[read_idx] == 0 ||
+                                 random() % 100 > 47)
+                                 read_idx += PPBAR / 16;
                          }
 
                          return return_array;

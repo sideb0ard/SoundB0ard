@@ -1,10 +1,10 @@
-let bd = sample(kicks/djkhaledKick.aiff);
+let bd = sample(kicks/technotronBD.aiff);
 let tr = sample(perc/triangle.aiff);
 let cp = sample(claps/mawClap.aiff);
-let hh = sample(hats/SNDhat.aiff);
-let sn = sample(snrs/nord808_snr.aif);
+let hh = sample(hats/chezHat.aiff);
+let sn = sample(snrs/delayedDubSnar.aiff);
 
-load_dir("TT-NOCERA");
+#load_dir("TT-NOCERA");
 
 
 
@@ -12,47 +12,25 @@ let blah_gen = gen()
 {
   setup()
   {
-    #let pat = pattern("[ <bd(3,8) bd(5,8)>, < [~ sn]*2  [~ ~ sn ~]   >, ~ hh*16 ~ <tr(3,8) ~>  ]  ");
-    let pat = pattern("[ bd(3,8), [~ sn]*2 ]  ");
-    let sampz = [piano, piano2, badum, umPIAN, whhs, wumpAH];
-    let sx = 0;
+    let pat = pattern("[ <bd(3,8) bd(5,8)>, < [~ sn]*2  [~ ~ sn ~]   >, ~ hh*2 ~ <tr(3,8) ~>  ]  ");
+    #let pat = pattern("[ bd(3,8), [~ sn]*2 ]  ");
+    #let sampz = [piano, piano2, badum, umPIAN, whhs, wumpAH];
+    #let sx = 0;
     let rot = 3;
   }
   run()
   {
 
-    let p = eval_pattern(pat);
-    if (count % 2 == 0) {
-      print("STUTTER!");
-      stutter(p)
+    let ep = eval_pattern(pat);
+    if (count % 3 == 0) {
+      ep = stutter(ep);
     }
-    play_array(p);
-    #let pt = eval_pattern(pat);
-    #if (count % 3 == 0) {
-      #  pt = rotate(pt, rot);
-      #}
-    #rot = incr(rot, 0, 13);
-    ##print(pt);
-
-    #let inv = invert(pat);
-    ##print(inv);
-    #play_array(pt);
-    #if (count % 4 == 0) {
-      #  play_array_over(pt, 2);
-      #}
-    #if (count % 7 == 0) {
-      #  play_array_over(hh, inv, pt, 0.25);
-      #}
-    #play_array(hh, inv);
-
-    #let c = 0;
-    #for (i = 0; i < 16; ++i) {
-      #  if (inv[i] > 0 && c % rot == 0) {
-        #    note_on_at(sampz[sx], 1, i*pp);
-        #    ++c;
-        #    sx = incr(sx, 0, len(sampz));
-        #  }
-      #}
+    if (count % 7 == 0) {
+      ep = rotate(pat, rot);
+      rot = incr(rot, 0, 7);
+    }
+    play_array(ep);
+    ##print("STITTER?");
   }
 }
 
@@ -60,11 +38,28 @@ let snh_gen = gen()
 {
   setup()
   {
-    let pat = pattern("<3 4 7 12> <~ 4 3> <~ [~ 13]> < ~ ~ ~ 21>");
+    #let pat = pattern("<43 44 47 12> <~ 44 34> <~ [~ 13]> < ~ ~ ~ 21>");
+    let pat = pattern("<23 24 27 12> <~ 24 24> <~ [2 ~ 13]> < ~ 23 21>");
+    #let pat = riff(3);
+    let rel = 100;
   }
   run()
   {
-    play_array(dx100, pat);
+    set dx100:e1rel rel;
+    set dx100:porta rel;
+    rel = rel + 74;
+    if (rel > 700) {
+      rel = 374;
+    }
+    let ep = eval_pattern(pat);
+    if (count % 3 == 0) {
+      ep = stutter(ep);
+      play_array_over(dx100, pat, 2);
+    }
+    if (count % 7 == 0) {
+      ep = reverse(ep);
+    }
+    play_array(dx100, ep);
   }
 }
 
