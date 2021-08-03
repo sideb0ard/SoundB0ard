@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 #include "defjams.h"
 #include "envelope_generator.h"
 
@@ -236,6 +238,7 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
         {
             m_envelope_output = 1.0;
             m_state = DECAY;
+
             break;
         }
         break;

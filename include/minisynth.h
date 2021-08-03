@@ -180,10 +180,11 @@ class MiniSynth : public SoundGenerator
     void stop() override;
     void noteOn(midi_event ev) override;
     void noteOff(midi_event ev) override;
+    void ChordOn(midi_event ev) override;
+    void allNotesOff() override;
     void control(midi_event ev) override;
     void pitchBend(midi_event ev) override;
     void randomize() override;
-    void allNotesOff() override;
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
     void Save(std::string preset_name) override;

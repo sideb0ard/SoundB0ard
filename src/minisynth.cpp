@@ -434,6 +434,7 @@ void MiniSynth::noteOn(midi_event ev)
     }
 
     bool steal_note = true;
+    int vx = 0;
     for (auto v : voices_)
     {
         if (!v->m_note_on)
@@ -446,12 +447,11 @@ void MiniSynth::noteOn(midi_event ev)
             steal_note = false;
             break;
         }
+        ++vx;
     }
 
     if (steal_note)
     {
-        // if (mixr->debug_mode)
-        printf("STEAL NOTE\n");
         auto msv = GetOldestVoice();
         if (msv)
         {
@@ -465,7 +465,6 @@ void MiniSynth::noteOn(midi_event ev)
 
 void MiniSynth::allNotesOff()
 {
-    std::cout << "ALL NOTES OFF:" << std::endl;
     for (int i = 0; i < MAX_VOICES; i++)
     {
         if (voices_[i])
@@ -480,6 +479,21 @@ void MiniSynth::noteOff(midi_event ev)
         auto msv = GetOldestVoiceWithNote(ev.data1);
         if (msv)
             msv->NoteOff(ev.data1);
+    }
+}
+
+void MiniSynth::ChordOn(midi_event ev)
+{
+    allNotesOff();
+    for (unsigned int d : ev.dataz)
+    {
+
+        midi_event note_on = {.event_type = MIDI_ON,
+                              .data1 = d,
+                              .data2 = ev.data2,
+                              .delete_after_use = true,
+                              .source = EXTERNAL_OSC};
+        noteOn(note_on);
     }
 }
 

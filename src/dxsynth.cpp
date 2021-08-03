@@ -204,13 +204,8 @@ void DXSynth::noteOn(midi_event ev)
             break;
         }
     }
-    // std::cout << "STEAL NOTE! " << (steal_note ? "true" : "false") <<
-    // std::endl;
-
     if (steal_note)
     {
-        // if (mixr->debug_mode)
-        // std::cout << "STEAL NOTE\n";
         auto v = GetOldestVoice();
         if (v)
         {
@@ -233,6 +228,21 @@ void DXSynth::noteOff(midi_event ev)
 
     for (auto v : voices_)
         v->NoteOff(ev.data1);
+}
+
+void DXSynth::ChordOn(midi_event ev)
+{
+    allNotesOff();
+    for (unsigned int d : ev.dataz)
+    {
+
+        midi_event note_on = {.event_type = MIDI_ON,
+                              .data1 = d,
+                              .data2 = ev.data2,
+                              .delete_after_use = true,
+                              .source = EXTERNAL_OSC};
+        noteOn(note_on);
+    }
 }
 
 void DXSynth::control(midi_event ev) { (void)ev; }

@@ -314,6 +314,7 @@ void Voice::NoteOn(int midi_note, int midi_velocity, double frequency,
                 m_osc4->m_osc_fo = m_osc_pitch;
         }
 
+        // needed for sample based oscillators
         if (m_osc1)
             m_osc1->m_midi_note_number = m_midi_note_number;
         if (m_osc2)

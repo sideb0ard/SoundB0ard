@@ -51,7 +51,7 @@
 #define NUM_PROGRESSIONS 4
 
 #define MAX_NUM_MIDI_LOOPS 64
-#define MAX_VOICES 4
+#define MAX_VOICES 10
 #define DEFAULT_LEGATO_MODE 0
 #define DEFAULT_RESET_TO_ZERO 0
 #define DEFAULT_FILTER_KEYTRACK 0
@@ -120,6 +120,8 @@ enum
 {
     MIDI_ON = 144,
     MIDI_OFF = 128,
+    CHORD_ON = 172,
+    CHORD_OFF = 173,
     MIDI_CONTROL = 176,
     MIDI_PITCHBEND = 224,
 };
@@ -312,12 +314,13 @@ class midi_event
   public:
     friend std::ostream &operator<<(std::ostream &, const midi_event &);
 
-    unsigned int source;
-    unsigned int event_type;
-    unsigned int data1;
-    unsigned int data2;
-    int hold; // millisecond hold value
-    bool delete_after_use;
+    unsigned int source{};
+    unsigned int event_type{};
+    unsigned int data1{};
+    unsigned int data2{};
+    std::vector<int> dataz{};
+    int hold{}; // millisecond hold value
+    bool delete_after_use{false};
 };
 
 struct MusicalEvent

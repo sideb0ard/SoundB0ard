@@ -38,8 +38,8 @@ let snh_gen = gen()
 {
   setup()
   {
-    #let pat = pattern("<43 44 47 12> <~ 44 34> <~ [~ 13]> < ~ ~ ~ 21>");
-    let pat = pattern("<23 24 27 12> <~ 24 24> <~ [2 ~ 13]> < ~ 23 21>");
+    let pat = pattern("<43 44 47 12> <~ 44 34> <~ [~ 13]> < ~ ~ ~ 21>");
+    #let pat = pattern("<23 24 27 12> <~ 24 24> <~ [2 ~ 13]> < ~ 23 21>");
     #let pat = riff(3);
     let rel = 100;
   }
@@ -50,6 +50,7 @@ let snh_gen = gen()
     rel = rel + 74;
     if (rel > 700) {
       rel = 374;
+      play_array_over(dx100, pat, 3);
     }
     let ep = eval_pattern(pat);
     if (count % 3 == 0) {
@@ -58,6 +59,9 @@ let snh_gen = gen()
     }
     if (count % 7 == 0) {
       ep = reverse(ep);
+      play_array_over(dx100, ep, 4);
+      play_array_over(mo, ep, 3);
+      play_array_over(mo, pat, 3);
     }
     play_array(dx100, ep);
   }

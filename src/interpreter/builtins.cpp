@@ -124,6 +124,30 @@ std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz)
     return midi_nums;
 }
 
+void chord_on_at(int sgid, std::vector<int> midi_nums, int chord_start_time,
+                 int vel, int dur)
+{
+    audio_action_queue_item action_req{
+        .type = AudioAction::MIDI_CHORD_EVENT_ADD_DELAYED,
+        .soundgen_num = sgid,
+        .notes = midi_nums,
+        .velocity = vel,
+        .duration = dur,
+        .note_start_time = chord_start_time};
+    audio_queue.push(action_req);
+}
+
+void chord_on(int sgid, std::vector<int> midi_nums, int vel, int dur)
+{
+    audio_action_queue_item action_req{.type =
+                                           AudioAction::MIDI_CHORD_EVENT_ADD,
+                                       .soundgen_num = sgid,
+                                       .notes = midi_nums,
+                                       .velocity = vel,
+                                       .duration = dur};
+    audio_queue.push(action_req);
+}
+
 void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
                 int vel, int dur)
 {
@@ -712,27 +736,127 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
-    // TODO - fix for many synth types
-    //{"keys",
-    // std::make_shared<object::BuiltIn>(
-    //     [](std::vector<std::shared_ptr<object::Object>> args)
-    //         -> std::shared_ptr<object::Object> {
-    //         if (args.size() == 1)
-    //         {
-    //             auto synth =
-    //             std::dynamic_pointer_cast<object::Synth>(args[0]);
-    //             if (synth)
-    //             {
-    //                 if (mixer_is_valid_soundgen_num(mixr,
-    //                 synth->soundgen_id_))
-    //                 {
-    //                     midi_set_destination(mixr,
-    //                     synth->soundgen_id_);
-    //                 }
-    //             }
-    //         }
-    //         return evaluator::NULLL;
-    //     })},
+    {"stop",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             if (args.size() != 1)
+                 return evaluator::NewError(
+                     "`stop` requires a sound_generator target");
+
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen)
+             {
+                 audio_action_queue_item action_req{.type = AudioAction::STOP,
+                                                    .soundgen_num =
+                                                        soundgen->soundgen_id_};
+                 audio_queue.push(action_req);
+             }
+             return evaluator::NULLL;
+         })},
+    {"chord_on",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             if (args.size() < 2)
+                 return evaluator::NewError("`chord_on` requires at least two "
+                                            "args - a sound_generator target "
+                                            "and a midi_note to play.");
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen)
+             {
+                 int sgid = soundgen->soundgen_id_;
+                 std::vector<int> object_val = GetMidiNotes(args[1]);
+
+                 if (object_val.empty())
+                     return evaluator::NULLL;
+
+                 std::vector<int> notez =
+                     GetMidiNotesInChord(object_val[0], 0, true);
+
+                 int vel = 128;
+                 int dur = 240;
+
+                 for (auto a : args)
+                 {
+                     if (a->Type() == object::DURATION_OBJ)
+                     {
+                         auto dur_obj =
+                             std::dynamic_pointer_cast<object::Duration>(a);
+                         dur = dur_obj->value_;
+                     }
+                     else if (a->Type() == object::VELOCITY_OBJ)
+                     {
+                         auto vel_obj =
+                             std::dynamic_pointer_cast<object::Velocity>(a);
+                         vel = vel_obj->value_;
+                     }
+                 }
+
+                 chord_on(sgid, notez, vel, dur);
+             }
+             return evaluator::NULLL;
+         })},
+    {"chord_on_at",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             if (args.size() < 3)
+                 return evaluator::NewError(
+                     "`chord_on_at` requires at least three args - a "
+                     "sound_generator target, a midi_note to play and a time "
+                     "in the future specified in midi ticks.");
+
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen)
+             {
+                 int sgid = soundgen->soundgen_id_;
+
+                 std::vector<int> object_val = GetMidiNotes(args[1]);
+
+                 if (object_val.empty())
+                     return evaluator::NULLL;
+
+                 std::vector<int> notez =
+                     GetMidiNotesInChord(object_val[0], 0, true);
+
+                 auto num_obj =
+                     std::dynamic_pointer_cast<object::Number>(args[2]);
+
+                 if (!num_obj)
+                     return evaluator::NULLL;
+
+                 int vel = 128;
+                 int dur = 240;
+                 int note_start_time = num_obj->value_;
+
+                 for (auto a : args)
+                 {
+                     if (a->Type() == object::DURATION_OBJ)
+                     {
+                         auto dur_obj =
+                             std::dynamic_pointer_cast<object::Duration>(a);
+                         dur = dur_obj->value_;
+                     }
+                     else if (a->Type() == object::VELOCITY_OBJ)
+                     {
+                         auto vel_obj =
+                             std::dynamic_pointer_cast<object::Velocity>(a);
+                         vel = vel_obj->value_;
+                     }
+                 }
+
+                 chord_on_at(sgid, notez, note_start_time, vel, dur);
+             }
+
+             return evaluator::NULLL;
+         })},
     {"note_on",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

@@ -290,7 +290,7 @@ void Mixer::Help()
            << ANSI_COLOR_RESET
            << " // play 'A2' at 104 midi ticks from now()\n";
         ss << ANSI_COLOR_WHITE;
-        ss << "######## Array Value generators and modifiers "
+        ss << "######## Arrays, value generators and modifiers "
               "###################\n";
         ss << COOL_COLOR_MAUVE << "notes_in_key(root);" << ANSI_COLOR_RESET
            << " // returns array of midi notes in scale of root\n";
@@ -333,8 +333,20 @@ void Mixer::Help()
         ss << COOL_COLOR_MAUVE << "rotate(src_array, num_pos);"
            << ANSI_COLOR_RESET
            << " // returns a (copy of) src_array, rotated left by num_pos\n";
-
-        ss << ANSI_COLOR_RESET;
+        ss << ANSI_COLOR_WHITE;
+        ss << "######## Pattern Evaluation ###################\n";
+        ss << COOL_COLOR_MAUVE << "let mel = pattern(\"[60 <63 70>] 67(3,8)\");"
+           << ANSI_COLOR_RESET;
+        ss << " // Creates a TidalCycles style pattern.\n";
+        ss << "                                           // Pattern can be "
+              "either passed to a function as is\n";
+        ss << "                                           // (e.g. reverse, "
+              "rotate or play_array)\n";
+        ss << "                                           // Or you can take a "
+              "copy through `eval_pattern(mel)`;\n";
+        ss << "                                           // Similarly, you "
+              "view it more concisely with "
+              "print_pattern(mel)\n";
 
         reply = ss.str();
     }
@@ -555,10 +567,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer)
         }
 
         if (link_is_midi_tick(m_ableton_link, &timing_info, i))
-        {
-            int current_tick_within_bar = timing_info.midi_tick % PPBAR;
             MidiTick();
-        }
 
         if (soundgen_num > 0)
         {
@@ -825,6 +834,45 @@ void Mixer::CheckForAudioActionQueueMessages()
 
                         _action_items.push_back(ev);
                     }
+                }
+            }
+            else if (action->type == AudioAction::MIDI_CHORD_EVENT_ADD ||
+                     action->type == AudioAction::MIDI_CHORD_EVENT_ADD_DELAYED)
+            {
+
+                if (IsValidSoundgenNum(action->soundgen_num))
+                {
+                    auto sg = sound_generators_[action->soundgen_num];
+
+                    midi_event chord_on = {.event_type = CHORD_ON,
+                                           .data2 =
+                                               (unsigned int)action->velocity,
+                                           .dataz = action->notes,
+                                           .delete_after_use = false,
+                                           .source = EXTERNAL_OSC};
+
+                    if (action->type ==
+                        AudioAction::MIDI_CHORD_EVENT_ADD_DELAYED)
+                    {
+                        chord_on.delete_after_use = true;
+                        auto ev = DelayedMidiEvent(timing_info.midi_tick +
+                                                       action->note_start_time,
+                                                   chord_on, sg);
+                        _action_items.push_back(ev);
+                    }
+                    else
+                    {
+                        sg->ChordOn(chord_on);
+                    }
+                }
+            }
+            else if (action->type == AudioAction::STOP)
+            {
+
+                if (IsValidSoundgenNum(action->soundgen_num))
+                {
+                    auto sg = sound_generators_[action->soundgen_num];
+                    sg->allNotesOff();
                 }
             }
             else if (action->type == AudioAction::UPDATE)

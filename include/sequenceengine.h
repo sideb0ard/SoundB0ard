@@ -24,7 +24,7 @@ class sequenceengine
 
     // these used to traverse the pattern in fun ways
     // float count_by;
-    float cur_step;
+    float cur_step{0};
     bool started{false};
 };
 

@@ -14,6 +14,8 @@ enum AudioAction
     LOAD_PRESET,
     MIDI_EVENT_ADD,
     MIDI_EVENT_ADD_DELAYED,
+    MIDI_CHORD_EVENT_ADD,
+    MIDI_CHORD_EVENT_ADD_DELAYED,
     MIDI_EVENT_CLEAR,
     MIDI_INIT,
     MIXER_UPDATE,
@@ -23,6 +25,7 @@ enum AudioAction
     RAND,
     SAVE_PRESET,
     STATUS,
+    STOP,
     UPDATE,
 };
 
