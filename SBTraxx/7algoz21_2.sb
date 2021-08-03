@@ -1,0 +1,45 @@
+
+let down = fn(an_array, a_num_of_chords)
+{
+  print("DOWN!");
+  return map(an_array,
+      fn(v) { return v - 12*a_num_of_chords; });
+}
+let up = fn(an_array, a_num_of_chords)
+{
+  return map(an_array,
+      fn(v) { return v + 12*a_num_of_chords; });
+}
+
+
+
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let mel = pattern("[60 <63 70>] 67(3,8)");
+    let rotr = 3;
+  }
+  run()
+  {
+    let ep = eval_pattern(mel);
+
+    if (count % 2 == 0) {
+      ep = rotate(ep, rotr);
+      rotr = incr(rotr, 0, 7);
+      #ep = up(ep, rotr);
+    }
+
+    #if (count % 4 == 0) {
+      #  ep = reverse(ep);
+      #}
+    if (count % 5 == 0) {
+      play_array_over(mo, ep, rotr);
+    }
+
+    #print_pattern(ep);
+    play_array(mo, ep);
+  }
+}
+

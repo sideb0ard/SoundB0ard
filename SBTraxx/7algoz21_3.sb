@@ -1,0 +1,47 @@
+#let chordz = [65, 67, 60, 62];
+let chordz = [07, 13, 13, 24]
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let cx = 0;
+  }
+  run()
+  {
+
+    #chord_on(mo, chordz[cx]);
+    if (count % 4 == 0) {
+      cx = incr(cx, 0, len(chordz));
+    }
+
+    let bt = rand_beat();
+    let noz = notes_in_chord(chordz[cx], 0);
+    for (i = 0; i < 16; ++i) {
+      note_on_at(dx100, noz, pp * i);
+    }
+
+  }
+}
+
+let drumz_gen = gen()
+{
+  setup()
+  {
+    let beatz = pattern("[<~ bd(3,8) bd(5,8)>, ~]");
+    let haz = pattern("<hh(7,13) hh3(3,8) hh2*3 hh3(7,8)>");
+  }
+  run()
+  {
+    let ez = eval_pattern(beatz);
+    if (count % 2 == 0) {
+      play_array_over(ez, 2);
+    }
+    if (count % 3 == 0) {
+      play_array_over(ez, 4);
+    }
+    play_array(beatz);
+    play_array(haz);
+  }
+}
+
