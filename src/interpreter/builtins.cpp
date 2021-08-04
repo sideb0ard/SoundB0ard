@@ -739,6 +739,32 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          auto new_num_obj = std::make_shared<object::Number>(1);
                          return_array->elements_.push_back(new_num_obj);
                      }
+                     else if (e->Type() == "ARRAY")
+                     {
+                         std::shared_ptr<object::Array> inner_array_obj =
+                             std::dynamic_pointer_cast<object::Array>(e);
+                         if (inner_array_obj)
+                         {
+                             if (inner_array_obj->elements_.size() > 0)
+                             {
+                                 auto new_num_obj =
+                                     std::make_shared<object::Number>(1);
+                                 return_array->elements_.push_back(new_num_obj);
+                             }
+                             else
+                             {
+                                 auto new_num_obj =
+                                     std::make_shared<object::Number>(0);
+                                 return_array->elements_.push_back(new_num_obj);
+                             }
+                         }
+                         else
+                         {
+                             auto new_num_obj =
+                                 std::make_shared<object::Number>(0);
+                             return_array->elements_.push_back(new_num_obj);
+                         }
+                     }
                      else
                      {
                          auto new_num_obj = std::make_shared<object::Number>(0);

@@ -1,40 +1,23 @@
-#let chordz = [65, 67, 60, 62];
-let chordz = [07, 13, 13, 24]
 
 let blah_gen = gen()
 {
   setup()
   {
-    let cx = 0;
+    let bt = bjork(3,8);
+    let pat = pattern("[bd*4, sn(3,8)]");
+    let rotr = 3;
   }
   run()
   {
-
-    #chord_on(mo, chordz[cx]);
-    if (count % 4 == 0) {
-      cx = incr(cx, 0, len(chordz));
+    if (count % 3 == 0) {
+      let ep = eval_pattern(pat);
+      play_array(rotate(ep,rotr));
+      rotr = incr(rotr, 1, 7);
+      play_array(sh, invert(ep));
+    } else {
+      play_array(pat);
+      play_array(sh, invert(pat));
     }
-
-    let bt = rand_beat();
-    let noz = notes_in_chord(chordz[cx], 0);
-    for (i = 0; i < 16; ++i) {
-      note_on_at(dx100, noz, pp * i);
-    }
-
-  }
-}
-
-let drumz_gen = gen()
-{
-  setup()
-  {
-    let beatz = bjork(3,8);
-  }
-  run()
-  {
-    play_array(bd, beatz);
-    play_array(sn, rotate(beatz, 8));
-    fast(ch, beatz, 6);
   }
 }
 
