@@ -88,6 +88,24 @@ std::array<std::vector<int>, PPBAR> ExtractIntsFromEvalPattern(
     return return_array;
 }
 
+std::array<std::vector<std::string>, PPBAR> ExtractStringsFromEvalPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> evaluated_pat)
+{
+    std::array<std::vector<std::string>, PPBAR> return_array;
+
+    for (int i = 0; i < PPBAR; ++i)
+    {
+        auto ep = evaluated_pat[i];
+        if (!ep.empty())
+        {
+            for (auto p : ep)
+                return_array[i].push_back(p->value_);
+        }
+    }
+
+    return return_array;
+}
+
 bool ShouldIgnore(std::string filename)
 {
     auto result =
@@ -171,10 +189,11 @@ void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur)
     audio_queue.push(action_req);
 }
 
-std::array<int, 16>
-ShrinkPatternToStepSequence(std::array<std::vector<int>, PPBAR> &pattern)
+template <typename T>
+std::array<T, 16>
+ShrinkPatternToStepSequence(std::array<std::vector<T>, PPBAR> &pattern)
 {
-    std::array<int, 16> shrunk{0};
+    std::array<T, 16> shrunk{};
     for (int i = 0; i < 16; ++i)
     {
         for (int j = 0; j < 240; ++j)
@@ -240,7 +259,8 @@ void RecursiveScaler(std::array<std::vector<int>, PPBAR> &scaled_pattern,
     }
 }
 
-void PrintPattern(std::array<std::vector<int>, PPBAR> &patternn)
+template <typename T>
+void PrintPattern(std::array<std::vector<T>, PPBAR> &patternn)
 {
     for (int i = 0; i < PPBAR; ++i)
     {
@@ -287,21 +307,30 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
                  play_pattern->elements_[0]->Type() == "NUMBER")
             live_pattern = ScalePattern(play_pattern);
 
-        // PrintPattern(live_pattern);
-        for (int i = 0; i < (int)live_pattern.size(); ++i)
+        for (int j = 0; j < speed; ++j)
         {
-            auto ppattern = live_pattern[i];
-            if (ppattern.size() > 0)
-            {
-                std::vector<int> midi_nums;
-                for (auto item : ppattern)
-                {
-                    if (item > 0)
-                        midi_nums.push_back(item);
-                }
+            float j_offset = (int)live_pattern.size() / speed * j;
 
-                if (midi_nums.size() > 0)
-                    note_on_at(sg->soundgen_id_, midi_nums, i * speed, 127, 20);
+            // PrintPattern(live_pattern);
+            for (int i = 0; i < (int)live_pattern.size(); ++i)
+            {
+                float i_offset = i / speed;
+
+                auto ppattern = live_pattern[i];
+
+                if (ppattern.size() > 0)
+                {
+                    std::vector<int> midi_nums;
+                    for (auto item : ppattern)
+                    {
+                        if (item > 0)
+                            midi_nums.push_back(item);
+                    }
+
+                    if (midi_nums.size() > 0)
+                        note_on_at(sg->soundgen_id_, midi_nums,
+                                   j_offset + i_offset, 127, 20);
+                }
             }
         }
     }
@@ -313,23 +342,28 @@ void play_pattern_array(std::shared_ptr<object::Array> play_pattern,
     if (play_pattern->elements_.size() != PPBAR)
         return;
 
-    for (int i = 0; i < PPBAR; ++i)
+    for (int j = 0; j < speed; ++j)
     {
-        auto ppattern = std::dynamic_pointer_cast<object::Array>(
-            play_pattern->elements_[i]);
-        if (ppattern)
+        float j_offset = PPBAR / speed * j;
+        for (int i = 0; i < PPBAR; ++i)
         {
-            for (auto item : ppattern->elements_)
+            float i_offset = i / speed;
+            auto ppattern = std::dynamic_pointer_cast<object::Array>(
+                play_pattern->elements_[i]);
+            if (ppattern)
             {
-                auto sg_string =
-                    std::dynamic_pointer_cast<object::String>(item);
-                if (sg_string)
+                for (auto item : ppattern->elements_)
                 {
-                    auto sg_name = sg_string->value_;
-                    std::stringstream ss;
-                    ss << "note_on_at(" << sg_name << ", 1, " << i * speed
-                       << ")";
-                    eval_command_queue.push(ss.str());
+                    auto sg_string =
+                        std::dynamic_pointer_cast<object::String>(item);
+                    if (sg_string)
+                    {
+                        auto sg_name = sg_string->value_;
+                        std::stringstream ss;
+                        ss << "note_on_at(" << sg_name << ", 1, "
+                           << j_offset + i_offset << ")";
+                        eval_command_queue.push(ss.str());
+                    }
                 }
             }
         }
@@ -1325,18 +1359,18 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  if (pat)
                  {
                      auto evaluated_pat = pat->Print();
-                     auto intz = ExtractIntsFromEvalPattern(evaluated_pat);
-                     PrintPattern(intz);
-                     auto stepseq = ShrinkPatternToStepSequence(intz);
+                     auto spat = ExtractStringsFromEvalPattern(evaluated_pat);
+                     PrintPattern(spat);
+                     auto stepseq = ShrinkPatternToStepSequence(spat);
 
                      auto return_array = std::make_shared<object::Array>(
                          std::vector<std::shared_ptr<object::Object>>());
 
                      for (int i = 0; i < (int)stepseq.size(); ++i)
                      {
-                         auto new_num_obj =
-                             std::make_shared<object::Number>(stepseq[i]);
-                         return_array->elements_.push_back(new_num_obj);
+                         auto new_string_obj =
+                             std::make_shared<object::String>(stepseq[i]);
+                         return_array->elements_.push_back(new_string_obj);
                      }
                      return return_array;
                  }
@@ -1460,6 +1494,42 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
+    {"fast", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> args)
+                     -> std::shared_ptr<object::Object>
+                 {
+                     int args_size = args.size();
+                     if (args_size < 2)
+                     {
+                         std::cerr << "Need an array to play and a speed..\n";
+                         return evaluator::NULLL;
+                     }
+
+                     if (args_size == 3)
+                     {
+                         auto speed_obj =
+                             std::dynamic_pointer_cast<object::Number>(args[2]);
+                         if (!speed_obj)
+                         {
+                             std::cerr << "NAE SPEED! numpty!\n";
+                             return evaluator::NULLL;
+                         }
+                         play_array_on(args[0], args[1], speed_obj->value_);
+                     }
+                     else
+                     {
+                         auto speed_obj =
+                             std::dynamic_pointer_cast<object::Number>(args[1]);
+                         if (!speed_obj)
+                         {
+                             std::cerr << "NAE SPEED! numpty!\n";
+                             return evaluator::NULLL;
+                         }
+                         play_array(args[0], speed_obj->value_);
+                     }
+
+                     return evaluator::NULLL;
+                 })},
     {"play_array", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object>

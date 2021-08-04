@@ -28,20 +28,13 @@ let drumz_gen = gen()
 {
   setup()
   {
-    let beatz = pattern("[<~ bd(3,8) bd(5,8)>, ~]");
-    let haz = pattern("<hh(7,13) hh3(3,8) hh2*3 hh3(7,8)>");
+    let beatz = bjork(3,8);
   }
   run()
   {
-    let ez = eval_pattern(beatz);
-    if (count % 2 == 0) {
-      play_array_over(ez, 2);
-    }
-    if (count % 3 == 0) {
-      play_array_over(ez, 4);
-    }
-    play_array(beatz);
-    play_array(haz);
+    play_array(bd, beatz);
+    play_array(sn, rotate(beatz, 8));
+    fast(ch, beatz, 6);
   }
 }
 
