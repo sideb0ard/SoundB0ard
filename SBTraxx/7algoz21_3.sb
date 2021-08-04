@@ -3,9 +3,9 @@ let blah_gen = gen()
 {
   setup()
   {
-    let bt = bjork(3,8);
     let pat = pattern("[bd*4, sn(3,8)]");
     let rotr = 3;
+    let rf = riff(rotr);
   }
   run()
   {
@@ -17,6 +17,14 @@ let blah_gen = gen()
     } else {
       play_array(pat);
       play_array(sh, invert(pat));
+    }
+
+    if (count % 3 == 0) {
+      play_array(dx100, rf);
+    }
+    if (count % 4 == 0) {
+      play_array(dx100, rotate(rf, rotr));
+      play_array(mo, invert(rotate(rf, rotr)));
     }
   }
 }
