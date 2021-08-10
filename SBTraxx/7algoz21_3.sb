@@ -155,23 +155,12 @@ let synth_gen = gen()
           }
         }
       }
-    } else {
-      if (count % 7 == 0) {
-        let ppx = 3840 / 8;
-        for (i = 0; i < 8; ++i) {
-          if (b[i] == 1) {
-            note_on_at(mo, up(notes_in_chord(notez[nx], 0, true), moct), ppx * i, dur=dr+100);
-          }
-        }
-        set mo:l1rate synchz(sz[sx]);
-        sx = incr(sx, 0, len(sz));
-      }
     }
     nx = incr(nx, 0, len(notez));
     bx = incr(bx, 0, len(blenz));
 
     if (count % 12 == 0) {
-      note_on(dx100, notes_in_chord(notez[nx]+48, 1), dur = 700);
+      note_on(dx100, notes_in_chord(notez[nx], 1, true), dur = 700);
     }
 
   }

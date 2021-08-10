@@ -658,6 +658,28 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              auto number = std::dynamic_pointer_cast<object::Number>(input[1]);
 
+             auto pat_obj =
+                 std::dynamic_pointer_cast<object::Pattern>(input[0]);
+             if (pat_obj && number)
+             {
+                 auto evaluated_pat = pat_obj->Eval();
+                 auto return_array = ExtractArrayFromPattern(evaluated_pat);
+
+                 auto rotate_by =
+                     (int)number->value_ % return_array->elements_.size();
+
+                 if (return_array->elements_.size() == 3840 && rotate_by < 16)
+                 {
+                     rotate_by *= 240;
+                 }
+
+                 std::rotate(return_array->elements_.begin(),
+                             return_array->elements_.begin() + rotate_by,
+                             return_array->elements_.end());
+
+                 return return_array;
+             }
+
              std::shared_ptr<object::Array> array_obj =
                  std::dynamic_pointer_cast<object::Array>(input[0]);
              if (array_obj && number)
