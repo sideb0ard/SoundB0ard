@@ -283,7 +283,8 @@ ScalePattern(std::shared_ptr<object::Array> play_pattern)
 }
 
 void play_array_on(std::shared_ptr<object::Object> soundgen,
-                   std::shared_ptr<object::Object> pattern, float speed)
+                   std::shared_ptr<object::Object> pattern, float speed,
+                   int dur, int vel)
 {
     auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(soundgen);
     if (!sg)
@@ -329,7 +330,7 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
 
                     if (midi_nums.size() > 0)
                         note_on_at(sg->soundgen_id_, midi_nums,
-                                   j_offset + i_offset, 127, 20);
+                                   j_offset + i_offset, vel, dur);
                 }
             }
         }
@@ -337,7 +338,7 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
 }
 
 void play_pattern_array(std::shared_ptr<object::Array> play_pattern,
-                        float speed)
+                        float speed, int dur, int vel)
 {
     if (play_pattern->elements_.size() != PPBAR)
         return;
@@ -361,7 +362,8 @@ void play_pattern_array(std::shared_ptr<object::Array> play_pattern,
                         auto sg_name = sg_string->value_;
                         std::stringstream ss;
                         ss << "note_on_at(" << sg_name << ", 1, "
-                           << j_offset + i_offset << ")";
+                           << j_offset + i_offset << ", dur=" << dur
+                           << ", vel=" << vel << ")";
                         eval_command_queue.push(ss.str());
                     }
                 }
@@ -371,7 +373,8 @@ void play_pattern_array(std::shared_ptr<object::Array> play_pattern,
 }
 
 // Assuming this is a Tidal Notation Pattern
-void play_array(std::shared_ptr<object::Object> pattern, float speed)
+void play_array(std::shared_ptr<object::Object> pattern, float speed, int dur,
+                int vel)
 {
     std::shared_ptr<object::Array> play_pattern;
     auto pat_obj = std::dynamic_pointer_cast<object::Pattern>(pattern);
@@ -383,7 +386,7 @@ void play_array(std::shared_ptr<object::Object> pattern, float speed)
     {
         if (play_pattern->elements_.size() == PPBAR)
         {
-            play_pattern_array(play_pattern, speed);
+            play_pattern_array(play_pattern, speed, dur, vel);
             return;
         }
     }
@@ -1205,6 +1208,80 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
+    {"cos", std::make_shared<object::BuiltIn>(
+                [](std::vector<std::shared_ptr<object::Object>> args)
+                    -> std::shared_ptr<object::Object>
+                {
+                    int args_size = args.size();
+                    if (args_size == 1)
+                    {
+                        auto x =
+                            std::dynamic_pointer_cast<object::Number>(args[0]);
+                        if (x)
+                        {
+                            auto val = cos(x->value_);
+                            auto number_obj =
+                                std::make_shared<object::Number>(val);
+                            return number_obj;
+                        }
+                    }
+                    return evaluator::NULLL;
+                })},
+    {"abs", std::make_shared<object::BuiltIn>(
+                [](std::vector<std::shared_ptr<object::Object>> args)
+                    -> std::shared_ptr<object::Object>
+                {
+                    int args_size = args.size();
+                    if (args_size == 1)
+                    {
+                        auto x =
+                            std::dynamic_pointer_cast<object::Number>(args[0]);
+                        if (x)
+                        {
+                            auto val = abs(x->value_);
+                            auto number_obj =
+                                std::make_shared<object::Number>(val);
+                            return number_obj;
+                        }
+                    }
+                    return evaluator::NULLL;
+                })},
+    {"synchz",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 1)
+             {
+                 auto x = std::dynamic_pointer_cast<object::Number>(args[0]);
+                 if (x)
+                 {
+                     double val = 0;
+                     switch ((int)x->value_)
+                     {
+                     case 2:
+                         val = mixr->GetHzPerTimingUnit(Quantize::Q2);
+                         break;
+                     case 4:
+                         val = mixr->GetHzPerTimingUnit(Quantize::Q4);
+                         break;
+                     case 8:
+                         val = mixr->GetHzPerTimingUnit(Quantize::Q8);
+                         break;
+                     case 16:
+                         val = mixr->GetHzPerTimingUnit(Quantize::Q16);
+                         break;
+                     case 32:
+                         val = mixr->GetHzPerTimingUnit(Quantize::Q32);
+                         break;
+                     }
+                     auto number_obj = std::make_shared<object::Number>(val);
+                     return number_obj;
+                 }
+             }
+             return evaluator::NULLL;
+         })},
     {"scale",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -1520,59 +1597,102 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"fast", std::make_shared<object::BuiltIn>(
-                 [](std::vector<std::shared_ptr<object::Object>> args)
-                     -> std::shared_ptr<object::Object>
+    {"fast",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size < 2)
+             {
+                 std::cerr << "Need an array to play and a speed..\n";
+                 return evaluator::NULLL;
+             }
+             int vel = 128;
+             int dur = 240;
+
+             for (auto a : args)
+             {
+                 if (a->Type() == object::DURATION_OBJ)
                  {
-                     int args_size = args.size();
-                     if (args_size < 2)
-                     {
-                         std::cerr << "Need an array to play and a speed..\n";
-                         return evaluator::NULLL;
-                     }
+                     auto dur_obj =
+                         std::dynamic_pointer_cast<object::Duration>(a);
+                     dur = dur_obj->value_;
+                 }
+                 else if (a->Type() == object::VELOCITY_OBJ)
+                 {
+                     auto vel_obj =
+                         std::dynamic_pointer_cast<object::Velocity>(a);
+                     vel = vel_obj->value_;
+                 }
+             }
 
-                     if (args_size == 3)
-                     {
-                         auto speed_obj =
-                             std::dynamic_pointer_cast<object::Number>(args[2]);
-                         if (!speed_obj)
-                         {
-                             std::cerr << "NAE SPEED! numpty!\n";
-                             return evaluator::NULLL;
-                         }
-                         play_array_on(args[0], args[1], speed_obj->value_);
-                     }
-                     else
-                     {
-                         auto speed_obj =
-                             std::dynamic_pointer_cast<object::Number>(args[1]);
-                         if (!speed_obj)
-                         {
-                             std::cerr << "NAE SPEED! numpty!\n";
-                             return evaluator::NULLL;
-                         }
-                         play_array(args[0], speed_obj->value_);
-                     }
-
+             auto sg =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (sg)
+             {
+                 auto speed_obj =
+                     std::dynamic_pointer_cast<object::Number>(args[2]);
+                 if (!speed_obj)
+                 {
+                     std::cerr << "NAE SPEED! numpty!\n";
                      return evaluator::NULLL;
-                 })},
-    {"play_array", std::make_shared<object::BuiltIn>(
-                       [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object>
-                       {
-                           int args_size = args.size();
-                           if (args_size < 1)
-                           {
-                               std::cerr << "Need an array to play..\n";
-                               return evaluator::NULLL;
-                           }
-                           if (args_size == 2)
-                               play_array_on(args[0], args[1], 1);
-                           else
-                               play_array(args[0], 1);
+                 }
+                 play_array_on(args[0], args[1], speed_obj->value_, dur, vel);
+             }
+             else
+             {
+                 auto speed_obj =
+                     std::dynamic_pointer_cast<object::Number>(args[1]);
+                 if (!speed_obj)
+                 {
+                     std::cerr << "NAE SPEED! numpty!\n";
+                     return evaluator::NULLL;
+                 }
+                 play_array(args[0], speed_obj->value_, dur, vel);
+             }
 
-                           return evaluator::NULLL;
-                       })},
+             return evaluator::NULLL;
+         })},
+    {"play_array",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size < 1)
+             {
+                 std::cerr << "Need an array to play..\n";
+                 return evaluator::NULLL;
+             }
+
+             int vel = 128;
+             int dur = 240;
+
+             for (auto a : args)
+             {
+                 if (a->Type() == object::DURATION_OBJ)
+                 {
+                     auto dur_obj =
+                         std::dynamic_pointer_cast<object::Duration>(a);
+                     dur = dur_obj->value_;
+                 }
+                 else if (a->Type() == object::VELOCITY_OBJ)
+                 {
+                     auto vel_obj =
+                         std::dynamic_pointer_cast<object::Velocity>(a);
+                     vel = vel_obj->value_;
+                 }
+             }
+             auto sg =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (sg)
+                 play_array_on(args[0], args[1], 1, dur, vel);
+             else
+                 play_array(args[0], 1, dur, vel);
+
+             return evaluator::NULLL;
+         })},
     {"play_array_over",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -1584,19 +1704,40 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  std::cerr << "Need an array to play and a speed..\n";
                  return evaluator::NULLL;
              }
-             if (args_size == 3)
+             int vel = 128;
+             int dur = 240;
+
+             for (auto a : args)
+             {
+                 if (a->Type() == object::DURATION_OBJ)
+                 {
+                     auto dur_obj =
+                         std::dynamic_pointer_cast<object::Duration>(a);
+                     dur = dur_obj->value_;
+                 }
+                 else if (a->Type() == object::VELOCITY_OBJ)
+                 {
+                     auto vel_obj =
+                         std::dynamic_pointer_cast<object::Velocity>(a);
+                     vel = vel_obj->value_;
+                 }
+             }
+             auto sg =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (sg)
              {
                  auto speed_obj =
                      std::dynamic_pointer_cast<object::Number>(args[2]);
                  if (speed_obj)
-                     play_array_on(args[0], args[1], speed_obj->value_);
+                     play_array_on(args[0], args[1], speed_obj->value_, dur,
+                                   vel);
              }
              else
              {
                  auto speed_obj =
                      std::dynamic_pointer_cast<object::Number>(args[1]);
                  if (speed_obj)
-                     play_array(args[0], speed_obj->value_);
+                     play_array(args[0], speed_obj->value_, dur, vel);
              }
 
              return evaluator::NULLL;

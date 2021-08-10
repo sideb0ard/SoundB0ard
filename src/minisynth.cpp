@@ -610,14 +610,12 @@ void MiniSynth::Update()
     // m_global_synth_params.osc3_params.amplitude = m_settings.osc3_amp;
     m_global_synth_params.osc3_params.octave = m_settings.osc3_oct;
     m_global_synth_params.osc3_params.semitones = m_settings.osc3_semis;
-    m_global_synth_params.osc3_params.cents = m_settings.osc3_cents;
 
     // --- osc4 is noise osc
     m_global_synth_params.osc4_params.amplitude = noise_amplitude;
     // m_global_synth_params.osc4_params.amplitude = m_settings.osc4_amp;
     m_global_synth_params.osc4_params.octave = m_settings.osc4_oct;
     m_global_synth_params.osc4_params.semitones = m_settings.osc4_semis;
-    m_global_synth_params.osc4_params.cents = m_settings.osc4_cents;
 
     // --- pulse width
     m_global_synth_params.osc1_params.pulse_width_control =
@@ -1571,7 +1569,6 @@ void MiniSynth::SetOscAmp(unsigned int osc_num, double val)
             m_settings.osc2_amp = val;
             break;
         case (3):
-            std::cout << "SET OSC3 amp to " << val << std::endl;
             m_settings.osc3_amp = val;
             break;
         case (4):
@@ -2101,25 +2098,47 @@ void MiniSynth::SetResetToZero(unsigned int val)
 void MiniSynth::SetMonophonic(bool b) { m_settings.m_monophonic = b; }
 void MiniSynth::SetGenerate(bool b) { m_settings.m_generate_active = b; }
 
-void MiniSynth::SetOscType(int osc, unsigned int osc_type)
+// void MiniSynth::SetOscType(int osc, unsigned int osc_type)
+//{
+//    if (osc > 0 && osc < 4 && osc_type < MAX_OSC)
+//    {
+//        printf("Setting OSC %d to %s(%d)\n", osc, s_waveform_names[osc_type],
+//               osc_type);
+//        switch (osc)
+//        {
+//        case (1):
+//            m_settings.osc1_wave = osc_type;
+//            break;
+//        case (2):
+//            m_settings.osc2_wave = osc_type;
+//            break;
+//        case (3):
+//            m_settings.osc3_wave = osc_type;
+//            break;
+//        case (4):
+//            m_settings.osc4_wave = osc_type;
+//            break;
+//        }
+//    }
+//}
+
+void MiniSynth::SetOscSemitones(unsigned int osc, int semitones)
 {
-    if (osc > 0 && osc < 4 && osc_type < MAX_OSC)
+    if (osc > 0 && osc < 4 && semitones > -100 && semitones < 100)
     {
-        printf("Setting OSC %d to %s(%d)\n", osc, s_waveform_names[osc_type],
-               osc_type);
         switch (osc)
         {
         case (1):
-            m_global_synth_params.osc1_params.waveform = osc_type;
+            m_settings.osc1_semis = semitones;
             break;
         case (2):
-            m_global_synth_params.osc2_params.waveform = osc_type;
+            m_settings.osc2_semis = semitones;
             break;
         case (3):
-            m_global_synth_params.osc3_params.waveform = osc_type;
+            m_settings.osc3_semis = semitones;
             break;
         case (4):
-            m_global_synth_params.osc4_params.waveform = osc_type;
+            m_settings.osc4_semis = semitones;
             break;
         }
     }
@@ -2153,49 +2172,44 @@ void MiniSynth::SetParam(std::string name, double val)
         SetNoteToDecayScaling(val);
 
     else if (name == "osc1")
-        SetOscType(1, val);
+        std::cout << "Change voice to change osc types.\n";
     else if (name == "o1amp")
         SetOscAmp(1, val);
     else if (name == "o1oct")
         SetOctave(val);
     else if (name == "o1semi")
-        std::cout << "Not implemented.\n";
+        SetOscSemitones(1, val);
     else if (name == "o1cents")
-        std::cout << "Use detune setting to adjust cents..\n";
+        std::cout << "Use detune to adjust cents\n";
 
     else if (name == "osc2")
-        SetOscType(2, val);
+        std::cout << "Change voice to change osc types.\n";
     else if (name == "o2amp")
         SetOscAmp(2, val);
     else if (name == "o2oct")
         SetOctave(val);
     else if (name == "o2semi")
-        std::cout << "Not implemented.\n";
+        SetOscSemitones(2, val);
     else if (name == "o2cents")
-        std::cout << "Use detune setting to adjust cents..\n";
+        std::cout << "Use detune to adjust cents\n";
 
     else if (name == "osc3")
-        SetOscType(2, val);
+        std::cout << "Change voice to change osc types.\n";
     else if (name == "o3amp")
-    {
         std::cout << "Use 'subosc' param to change osc3" << std::endl;
-        // SetOscAmp(3, val);
-    }
     else if (name == "o3oct")
         SetOctave(val);
     else if (name == "o3semi")
-        std::cout << "Not implemented.\n";
+        SetOscSemitones(3, val);
 
     else if (name == "osc4")
-        SetOscType(4, val);
+        std::cout << "Can't change noise ooooooosc\n";
     else if (name == "o4amp")
-    {
         std::cout << "Use 'noisedb' param to change osc4" << std::endl;
-    }
     else if (name == "o4oct")
         SetOctave(val);
     else if (name == "o4semi")
-        std::cout << "Not implemented.\n";
+        SetOscSemitones(4, val);
 
     else if (name == "noisedb")
         SetNoiseOscDb(val);

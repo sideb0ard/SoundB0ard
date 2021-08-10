@@ -104,6 +104,15 @@ const std::string kStartupConfigFile = "startup.sb";
 
 #define MAX_LENGTH_VAR_VALUE 128
 
+enum Quantize
+{
+    Q32,
+    Q16,
+    Q8,
+    Q4,
+    Q2
+};
+
 enum
 {
     LEFT,

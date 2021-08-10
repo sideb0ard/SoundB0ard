@@ -1,31 +1,180 @@
 
-let blah_gen = gen()
+#let chz = [60, 65, 67, 67];
+let chz = [12, 17, 19, 19];
+#let chz = [70, 74, 73, 77];
+let spd = [2, 4, 8, 16];
+
+let bpmz = [160, 147];
+let bpmx = 0;
+
+
+let bd = sample(kicks/808Kkick.wav);
+let th = sample(kicks/THclick.aiff);
+let wk = sample(kicks/wuk77.aiff);
+let thp = sample(kicks/THUMP.aiff);
+
+let lhh = sample(hats/LOUhat.aiff);
+vol lhh 0.4;
+let ahh = sample(hats/AbraHat.aiff);
+vol ahh 0.3;
+let hh3 = sample(hats/hh8.aif);
+vol hh3 0.4;
+
+let cp = sample(claps/gaborClap.aiff);
+let cp2 = sample(claps/mawClap.aiff);
+
+let tm = sample(toms/DR660808CongaHigh.aif);
+let lt = sample(toms/FloorTom_bip.aif);
+
+let sf = sample(perc/surfaceFalle.aiff);
+let gl = sample(perc/glotcjh.aiff);
+let cow = sample(perc/808cowbell.aiff);
+
+let ah = sample(brandyvocalz/ah2.wav);
+
+
+# let br = loop(brandy-acapella.wav);
+
+
+let dblah_gen = gen()
 {
   setup()
   {
-    let pat = pattern("[bd*4, sn(3,8)]");
-    let rotr = 3;
-    let rf = riff(rotr);
+    let pat = pattern("[th*3, hh3(3,8) ah] <[lt*2 <tm sf>] cp cp(3,8)> [~ <wk ahh*3 ah>] [gl(3,8), <gl sf th*3 cow>]");
+    let rotr = 0;
+    let spdz = [0.5, 2, 0.6];
+    let sx = 0;
+
+    let bz = [3, 5, 3, 7];
+    let bx = 0;
+    let bt = bjork(3, 8);
   }
   run()
   {
-    if (count % 3 == 0) {
-      let ep = eval_pattern(pat);
-      play_array(rotate(ep,rotr));
-      rotr = incr(rotr, 1, 7);
-      play_array(sh, invert(ep));
-    } else {
-      play_array(pat);
-      play_array(sh, invert(pat));
+    let ep = eval_pattern(pat);
+    if (count % 3 == 1) {
+      ep = rotate(ep, rotr);
+    }
+    if (count % 3 == 2) {
+      ep = rotate(ep, rotr+1);
+      fast(ep, 0.5);
+    }
+    rotr = incr(rotr, 0, 7);
+
+    if (count % 7 == 0) {
+      ep = reverse(ep);
     }
 
-    if (count % 3 == 0) {
-      play_array(dx100, rf);
+    if (count % 8 < 6) {
+      play_array(ep);
+    } else {
+
+      fast(ep, spdz[sx]);
+      sx = incr(sx, 0, len(spdz));
     }
-    if (count % 4 == 0) {
-      play_array(dx100, rotate(rf, rotr));
-      play_array(mo, invert(rotate(rf, rotr)));
+
+    if (count % 8 < 7) {
+      play_array(bd, bjork(bz[bx], 8));
+      bx = incr(bx, 0, len(bz));
     }
   }
 }
+
+let hh_gen = gen()
+{
+  setup()
+  {
+    let lenz = [16, 16, 12, 8];
+    let lx = 0;
+    let hhz = [lhh, ahh, hh3];
+    let hhzx = 0;
+    let swingz = [120, 130, 140, 170];
+    let sx = 0;
+    let vz = 127;
+    let pithz = [0.6, 1, 2, 1.5, 0.7];
+    let px = 0;
+
+  }
+  run()
+  {
+    let pp = 3840 / lenz[lx];
+    for (i = 0; i < lenz[lx]; ++i) {
+      if (i % 2 == 0) {
+        note_on_at(hhz[hhzx], 1, i * pp, vel=vz);
+      } else {
+        note_on_at(hhz[hhzx], 1, i * pp + swingz[sx], vel=vz);
+      }
+      hhzx = incr(hhzx, 0, len(hhz));
+      vz = incr(vz, 74, 127);
+    }
+    sx = incr(sx, 0, len(swingz));
+    px = incr(px, 0, len(pithz));
+    set_pitch(hhz[hhzx], pithz[px]);
+  }
+}
+
+
+
+let synth_gen = gen()
+{
+  setup()
+  {
+    #let notez = [74, 74, 77, 70, 70, 73, 82];
+    #let notez = [24, 30, 13, 133];
+    let notez = [29, 31, 24, 26];
+    let nx = 0;
+    let blenz = [3, 5, 7, 6];
+    let bx = 0;
+    let dr = 100;
+
+    let rot = [2, 3];
+    let rx = 0;
+    let moct = 0;
+
+    let sz = [2, 4, 8, 16];
+    let sx = 0;
+  }
+  run()
+  {
+
+    let b = bjork(blenz[bx], 8);
+    if (count % 7 == 0) {
+      b = rotate(b, rot[rx]);
+      rx = incr(rx, 0, len(rot));
+    }
+
+    if (count % 4 == 0) {
+      for (i = 0; i < 8; ++i) {
+        if (b[i] == 1) {
+          note_on_at(dx100, up(notes_in_chord(notez[nx], 0, true), moct), pp * i, dur=dr);
+          note_on_at(dx100, notez[nx], pp * i + pp*2, dur=dr, vel=100);
+          dr = dr + 10;
+          if (dr > 700) {
+            moct = incr(moct, 0, 2);
+            dr = 60;
+          }
+        }
+      }
+    } else {
+      if (count % 7 == 0) {
+        let ppx = 3840 / 8;
+        for (i = 0; i < 8; ++i) {
+          if (b[i] == 1) {
+            note_on_at(mo, up(notes_in_chord(notez[nx], 0, true), moct), ppx * i, dur=dr+100);
+          }
+        }
+        set mo:l1rate synchz(sz[sx]);
+        sx = incr(sx, 0, len(sz));
+      }
+    }
+    nx = incr(nx, 0, len(notez));
+    bx = incr(bx, 0, len(blenz));
+
+    if (count % 12 == 0) {
+      note_on(dx100, notes_in_chord(notez[nx]+48, 1), dur = 700);
+    }
+
+  }
+}
+
 

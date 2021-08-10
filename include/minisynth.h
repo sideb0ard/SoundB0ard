@@ -273,8 +273,8 @@ class MiniSynth : public SoundGenerator
     void SetNoteToDecayScaling(unsigned int val);
     void SetNoiseOscDb(double val);
     void SetOctave(int val);
-    void SetOscType(int osc, unsigned int osc_type);
     void SetOscAmp(unsigned int osc_num, double val);
+    void SetOscSemitones(unsigned int osc_num, int val);
     void SetPitchbendRange(int val);
     void SetPortamentoTimeMs(double val);
     void SetPulsewidthPct(double val);

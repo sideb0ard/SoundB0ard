@@ -13,15 +13,6 @@
 #include <soundgenerator.h>
 #include <table.h>
 
-typedef enum
-{
-    Q32,
-    Q16,
-    Q8,
-    Q4,
-    Q2
-} quantize_size;
-
 typedef unsigned int compat_key_list[6];
 
 // struct AbletonLink AbletonLink;

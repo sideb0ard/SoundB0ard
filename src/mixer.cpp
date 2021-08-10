@@ -627,6 +627,7 @@ void Mixer::PrintMidiInfo()
     ss << "Midi Notes (octave 3):\n";
     ss << "C3:60 C#:61 D:62 D#:63 E:64 F:65 F#:66 G:67 G#:68 A:69 A#:70 B:71\n";
     ss << "(For other octaves, add or subtract 12)\n";
+    ss << "Chord Progressions: I-IV-V, I-V-vi-IV, I-vi-IV-V, vi-ii-V-I\n";
 
     repl_queue.push(ss.str());
 }
@@ -671,15 +672,15 @@ double Mixer::GetHzPerTimingUnit(unsigned int timing_unit)
 {
     double return_val = 0;
     double hz_per_beat = (60. / bpm);
-    if (timing_unit == Q2)
+    if (timing_unit == Quantize::Q2)
         return_val = hz_per_beat / 2.;
-    if (timing_unit == Q4)
+    if (timing_unit == Quantize::Q4)
         return_val = hz_per_beat;
-    else if (timing_unit == Q8)
+    else if (timing_unit == Quantize::Q8)
         return_val = hz_per_beat * 2;
-    else if (timing_unit == Q16)
+    else if (timing_unit == Quantize::Q16)
         return_val = hz_per_beat * 4;
-    else if (timing_unit == Q32)
+    else if (timing_unit == Quantize::Q32)
         return_val = hz_per_beat * 8;
 
     return return_val;
@@ -879,20 +880,7 @@ void Mixer::CheckForAudioActionQueueMessages()
             {
                 if (IsValidSoundgenNum(action->mixer_soundgen_idx))
                 {
-                    double param_val = 0.;
-
-                    if (action->param_val == "sync32")
-                        param_val = GetHzPerTimingUnit(Q32);
-                    if (action->param_val == "sync16")
-                        param_val = GetHzPerTimingUnit(Q16);
-                    else if (action->param_val == "sync8")
-                        param_val = GetHzPerTimingUnit(Q8);
-                    else if (action->param_val == "sync4")
-                        param_val = GetHzPerTimingUnit(Q4);
-                    else if (action->param_val == "sync2")
-                        param_val = GetHzPerTimingUnit(Q2);
-                    else
-                        param_val = std::stod(action->param_val);
+                    double param_val = std::stod(action->param_val);
 
                     auto sg = sound_generators_[action->mixer_soundgen_idx];
                     if (!sg)
