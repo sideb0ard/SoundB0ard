@@ -77,6 +77,24 @@ void print_vec_of_vec(std::vector<std::vector<int>> &vec)
 }
 } // namespace
 
+namespace utils
+{
+float LinTerp(float x1, float x2, float y1, float y2, float x)
+{
+    float denom = x2 - x1;
+    if (denom == 0)
+        return y1; // should not ever happen
+
+    // calculate decimal position of x
+    float dx = (x - x1) / (x2 - x1);
+
+    // use weighted sum method of interpolating
+    float result = dx * y2 + (1 - dx) * y1;
+
+    return result;
+}
+} // namespace utils
+
 audio_buffer_details import_file_contents(double **buffer, char *filename)
 {
     SNDFILE *snd_file;
@@ -738,8 +756,8 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
             {
                 float idx = (1.0 + t) * blep_table_center;
                 float frac = idx - (int)idx;
-                blep = lin_terp(0, 1, blep_table[(int)idx],
-                                blep_table[(int)idx + 1], frac);
+                blep = utils::LinTerp(0, 1, blep_table[(int)idx],
+                                      blep_table[(int)idx + 1], frac);
             }
 
             if (!rising_edge)
@@ -762,11 +780,11 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
             {
                 float frac = idx - (int)idx;
                 if ((int)idx + 1 >= table_len)
-                    blep = lin_terp(0, 1, blep_table[(int)idx], blep_table[0],
-                                    frac);
+                    blep = utils::LinTerp(0, 1, blep_table[(int)idx],
+                                          blep_table[0], frac);
                 else
-                    blep = lin_terp(0, 1, blep_table[(int)idx],
-                                    blep_table[(int)idx + 1], frac);
+                    blep = utils::LinTerp(0, 1, blep_table[(int)idx],
+                                          blep_table[(int)idx + 1], frac);
             }
 
             if (!rising_edge)
@@ -777,21 +795,6 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
     }
 
     return 0.0;
-}
-
-float lin_terp(float x1, float x2, float y1, float y2, float x)
-{
-    float denom = x2 - x1;
-    if (denom == 0)
-        return y1; // should not ever happen
-
-    // calculate decimal position of x
-    float dx = (x - x1) / (x2 - x1);
-
-    // use weighted sum method of interpolating
-    float result = dx * y2 + (1 - dx) * y1;
-
-    return result;
 }
 
 void print_midi_event(int midi_num)

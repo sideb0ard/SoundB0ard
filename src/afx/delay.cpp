@@ -75,7 +75,7 @@ double delay_read_delay(delay *d)
 
     double frac_delay = d->m_delay_in_samples - (int)d->m_delay_in_samples;
 
-    return lin_terp(0, 1, yn, yn_1, frac_delay);
+    return utils::LinTerp(0, 1, yn, yn_1, frac_delay);
 }
 
 double delay_read_delay_at(delay *d, double msec)
@@ -93,7 +93,7 @@ double delay_read_delay_at(delay *d, double msec)
 
     double frac_delay = d->m_delay_in_samples - (int)d->m_delay_in_samples;
 
-    return lin_terp(0, 1, yn, yn_1, frac_delay);
+    return utils::LinTerp(0, 1, yn, yn_1, frac_delay);
 }
 
 bool delay_process_audio(delay *d, double *in, double *out)

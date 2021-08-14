@@ -84,8 +84,8 @@ double WTOscillator::DoWaveTable(double *read_idx, double wt_inc)
     int i_read_idx = abs((int)mod_read_idx);
     float frac = mod_read_idx - i_read_idx;
     int read_idx_next = i_read_idx + 1 > WT_LENGTH - 1 ? 0 : i_read_idx + 1;
-    out = lin_terp(0, 1, m_current_table[i_read_idx],
-                   m_current_table[read_idx_next], frac);
+    out = utils::LinTerp(0, 1, m_current_table[i_read_idx],
+                         m_current_table[read_idx_next], frac);
     *read_idx += wt_inc;
 
     CheckWrapIndex(read_idx);

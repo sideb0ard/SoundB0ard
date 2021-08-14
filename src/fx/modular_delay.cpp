@@ -8,8 +8,6 @@ constexpr char const *mod_type_as_string[] = {"FLANGER", "VIBRATO", "CHORUS"};
 
 ModDelay::ModDelay()
 {
-    ddl_initialize(&m_ddl_);
-
     type_ = MODDELAY;
     enabled_ = true;
 
@@ -86,7 +84,7 @@ void ModDelay::UpdateDdl()
 {
     if (m_mod_type_ != VIBRATO)
         m_ddl_.m_feedback_pct = m_feedback_percent_;
-    ddl_cook_variables(&m_ddl_);
+    m_ddl_.Update();
 }
 
 double ModDelay::CalculateDelayOffset(double lfo_sample)
@@ -126,9 +124,9 @@ bool ModDelay::ProcessAudio(double *input_left, double *input_right,
         delay = CalculateDelayOffset(yqn);
 
     m_ddl_.m_delay_ms = delay;
-    ddl_cook_variables(&m_ddl_);
+    m_ddl_.Update();
 
-    ddl_process_audio_frame(&m_ddl_, input_left, output_left, 1, 1);
+    m_ddl_.ProcessAudio(input_left, output_left);
 
     return true;
 }

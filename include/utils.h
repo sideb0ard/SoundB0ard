@@ -52,7 +52,6 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
                  double inc, double height, bool rising_edge,
                  double points_per_side, bool interpolate);
 
-float lin_terp(float x1, float x2, float y1, float y2, float x);
 void print_midi_event(int midi_num);
 void print_bin_num(int num);
 std::string bin_num_to_string(uint16_t num);
@@ -81,3 +80,8 @@ bool IsValidIdentifier(char c);
 bool IsBalanced(std::string &input);
 
 std::vector<int> GenerateBjork(int num_pulses, int seq_length);
+
+namespace utils
+{
+float LinTerp(float x1, float x2, float y1, float y2, float x);
+}

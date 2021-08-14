@@ -466,8 +466,8 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     {
         int read_next_idx = read_idx + 1;
         sound_grain_check_idx(&read_next_idx, audio_buffer_len);
-        out.left = lin_terp(0, 1, audio_buffer[read_idx],
-                            audio_buffer[read_next_idx], frac);
+        out.left = utils::LinTerp(0, 1, audio_buffer[read_idx],
+                                  audio_buffer[read_next_idx], frac);
         out.left *= g->amp;
         out.right = out.left;
     }
@@ -475,16 +475,16 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     {
         int read_next_idx = read_idx + 2;
         sound_grain_check_idx(&read_next_idx, audio_buffer_len);
-        out.left = lin_terp(0, 1, audio_buffer[read_idx],
-                            audio_buffer[read_next_idx], frac);
+        out.left = utils::LinTerp(0, 1, audio_buffer[read_idx],
+                                  audio_buffer[read_next_idx], frac);
         out.left *= g->amp;
 
         int read_idx_right = read_idx + 1;
         sound_grain_check_idx(&read_idx_right, audio_buffer_len);
         int read_next_idx_right = read_idx_right + 2;
         sound_grain_check_idx(&read_next_idx_right, audio_buffer_len);
-        out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
-                             audio_buffer[read_next_idx_right], frac);
+        out.right = utils::LinTerp(0, 1, audio_buffer[read_idx_right],
+                                   audio_buffer[read_next_idx_right], frac);
         out.right *= g->amp;
     }
 

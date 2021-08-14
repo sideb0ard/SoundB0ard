@@ -61,7 +61,7 @@ class Oscillator
 
   public:
     Oscillator();
-    ~Oscillator() = default;
+    virtual ~Oscillator() = default;
 
     // modulation matrix, owned by voice we are part of
     ModulationMatrix *modmatrix{nullptr};

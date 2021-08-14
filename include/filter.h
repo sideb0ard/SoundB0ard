@@ -30,7 +30,7 @@ typedef enum
 struct Filter
 {
     Filter();
-    ~Filter() = default;
+    virtual ~Filter() = default;
 
     ModulationMatrix *modmatrix{nullptr};
     GlobalFilterParams *global_filter_params{nullptr};

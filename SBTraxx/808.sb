@@ -68,18 +68,26 @@ let dblah_gen = gen()
     let rx = 0;
     let notz = [20, 17, 14, 20, 13, 7, 4];
     let nx = 0;
+    let dr = 10;
   }
   run()
   {
     if (count % 8 < 7) {
       play_array(bd, rotate(bjork(modrz[mx], 8), rotrz[rx]));
       if (count % 2 ==0) {
-        note_on(dx100, notz[nx]);
+        note_on(dx100, notz[nx], dur=dr);
         nx = incr(nx, 0, len(notz));
       }
 
       if (count % 3 == 0) {
-        note_on_at(dx100, notz[nx]+12, pp % count);
+        note_on_at(dx100, notz[nx]+7, pp * count, dur=dr);
+      }
+      if (count % 4 == 0) {
+        note_on_at(dx100, notz[nx]-4, pp * count*3, dur=dr);
+      }
+      dr = dr + 50;
+      if (dr > 1000) {
+        dr = 10;
       }
     }
     if (count % 3 == 0) {
@@ -141,10 +149,18 @@ let cblah_gen = gen()
   setup()
   {
     let pat = pattern("<[clav ~ ~ clav] [~ clav] [~ clav ~ ah <[~ cp2 clav] ~ > ~ ~ ");
+    let rotrz = [0, 2, 3];
+    let rx = 0;
+    let ptchz = [1, 0.6, 0.7, 1.5, 0.8, 2];
+    let px = 0;
+    vol clav 0.4;
   }
   run()
   {
-    play_array(pat);
+    play_array(rotate(pat, rotrz[rx]));
+    rx = incr(rx, 0, len(rotrz));
+    set clav:pitch ptchz[px];
+    px = incr(px, 0, len(ptchz));
   }
 }
 

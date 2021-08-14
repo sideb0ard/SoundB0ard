@@ -140,7 +140,8 @@ int SoundGenerator::AddDelay(float duration)
     printf("Booya, adding a new DELAY to "
            "SoundGenerator: %f!\n",
            duration);
-    StereoDelay *sd = new StereoDelay(duration);
+    StereoDelay *sd = new StereoDelay();
+    sd->SetDelayTimeMs(duration);
     return AddFx((Fx *)sd);
 }
 

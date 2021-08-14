@@ -41,7 +41,7 @@ class ModDelay : Fx
 
   private:
     WTOscillator m_lfo_;
-    ddlmodule m_ddl_;
+    DDLModule m_ddl_;
 
     double m_min_delay_msec_;
     double m_max_delay_msec_;
