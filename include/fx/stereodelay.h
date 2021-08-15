@@ -16,6 +16,14 @@ enum DelayMode
     pingpong,
 };
 
+enum DelaySyncLen
+{
+    NO_DELAY,
+    QUARTER,
+    EIGHTH,
+    SIXTEENTH,
+};
+
 class StereoDelay : Fx
 {
 
@@ -34,6 +42,8 @@ class StereoDelay : Fx
     void SetWetMix(double wet_mix);
 
     void SyncTempo();
+    void SetSync(bool b);
+    void SetSyncLen(unsigned int);
 
     void Reset();
     void Update();
@@ -50,4 +60,6 @@ class StereoDelay : Fx
     double m_tap2_left_delay_time_ms_{0};
     double m_tap2_right_delay_time_ms_{0};
     DelayMode m_mode_{DelayMode::norm};
+    DelaySyncLen sync_len_{DelaySyncLen::SIXTEENTH};
+    bool sync_{false};
 };

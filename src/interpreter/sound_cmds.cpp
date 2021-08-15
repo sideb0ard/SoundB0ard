@@ -28,7 +28,7 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
                 else if (str_obj->value_ == "compressor")
                     sg->AddCompressor();
                 else if (str_obj->value_ == "delay")
-                    sg->AddDelay(200);
+                    sg->AddDelay();
                 else if (str_obj->value_ == "distort")
                     sg->AddDistortion();
                 else if (str_obj->value_ == "filter")

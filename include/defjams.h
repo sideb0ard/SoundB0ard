@@ -60,7 +60,7 @@
 
 constexpr int kMaxNumSoundGenFx = 20;
 
-constexpr float kMaxDelayLenSecs = 30.0;
+constexpr int kMaxDelayLenSecs = 10;
 
 const std::string kStartupConfigFile = "startup.sb";
 

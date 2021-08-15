@@ -5,7 +5,7 @@
 #include <fx/ddlmodule.h>
 #include <utils.h>
 
-DDLModule::DDLModule() { m_buffer.resize(DELAY_SECS * SAMPLE_RATE); }
+DDLModule::DDLModule() { ResetDelay(); }
 
 void DDLModule::Update()
 {
@@ -21,9 +21,7 @@ void DDLModule::Update()
 
 void DDLModule::ResetDelay()
 {
-    int delay_len = m_buffer.size();
-    m_buffer.clear();
-    m_buffer.reserve(delay_len);
+    m_buffer.fill(0);
     m_write_index = 0;
     m_read_index = 0;
 }
@@ -37,13 +35,13 @@ void DDLModule::SetDelayMs(double delay_time_ms)
 double DDLModule::ReadDelay()
 {
 
-    double yn = m_buffer[m_read_index];
+    double yn = m_buffer.at(m_read_index);
     int read_index_1 = m_read_index - 1;
     if (read_index_1 < 0)
     {
         read_index_1 = m_buffer.size() - 1;
     }
-    double yn_1 = m_buffer[read_index_1];
+    double yn_1 = m_buffer.at(read_index_1);
 
     double frac_delay = m_delay_in_samples - (int)m_delay_in_samples;
 
@@ -59,13 +57,13 @@ double DDLModule::ReadDelayAt(double time_in_ms)
     if (read_index < 0)
         read_index += m_buffer.size();
 
-    double yn = m_buffer[read_index];
+    double yn = m_buffer.at(read_index);
 
     int read_index_1 = read_index - 1;
     if (read_index_1 < 0)
         read_index_1 = m_buffer.size() - 1;
 
-    double yn_1 = m_buffer[read_index_1];
+    double yn_1 = m_buffer.at(read_index_1);
 
     double frac_delay = m_delay_in_samples - (int)m_delay_in_samples;
 
@@ -78,11 +76,11 @@ void DDLModule::WriteDelayAndInc(double delay_input)
     m_buffer[m_write_index] = delay_input;
 
     m_write_index++;
-    if (m_write_index >= m_buffer.size())
+    if (m_write_index >= (int)m_buffer.size())
         m_write_index = 0;
 
     m_read_index++;
-    if (m_read_index >= m_buffer.size())
+    if (m_read_index >= (int)m_buffer.size())
         m_read_index = 0;
 }
 

@@ -1,7 +1,6 @@
 #pragma once
-#include <vector>
-
-const int DELAY_SECS = 10;
+#include <array>
+#include <defjams.h>
 
 class DDLModule
 {
@@ -9,7 +8,7 @@ class DDLModule
     DDLModule();
     ~DDLModule() = default;
 
-    std::vector<double> m_buffer{};
+    std::array<double, kMaxDelayLenSecs * SAMPLE_RATE> m_buffer{};
 
     double m_delay_in_samples{0};
     double m_feedback{0};

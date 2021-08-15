@@ -190,11 +190,26 @@ void StereoDelay::Status(char *status_string)
     case DelayMode::pingpong:
         mode = "pingpong";
     }
+    std::string sync_len{};
+    switch (sync_len_)
+    {
+    case DelaySyncLen::NO_DELAY:
+        sync_len = "none";
+        break;
+    case DelaySyncLen::QUARTER:
+        sync_len = "1/4";
+        break;
+    case DelaySyncLen::EIGHTH:
+        sync_len = "1/8";
+        break;
+    case DelaySyncLen::SIXTEENTH:
+        sync_len = "1/16";
+    }
     snprintf(status_string, MAX_STATIC_STRING_SZ,
              "delayms:%.0f fb:%.2f ratio:%.2f "
-             "wetmx:%.2f mode:%s ",
+             "wetmx:%.2f mode:%s sync:%d sync_len:%s",
              m_delay_time_ms_, m_feedback_percent_, m_delay_ratio_, m_wet_mix_,
-             mode.c_str());
+             mode.c_str(), sync_, sync_len.c_str());
 }
 
 stereo_val StereoDelay::Process(stereo_val input)
@@ -217,6 +232,10 @@ void StereoDelay::SetParam(std::string name, double val)
         SetWetMix(val);
     else if (name == "mode")
         SetMode(val);
+    else if (name == "sync")
+        SetSync(val);
+    else if (name == "sync_len")
+        SetSyncLen(val);
 }
 void StereoDelay::SetMode(unsigned mode)
 {
@@ -235,4 +254,45 @@ void StereoDelay::SetMode(unsigned mode)
         m_mode_ = DelayMode::pingpong;
         break;
     }
+}
+
+void StereoDelay::SyncTempo()
+{
+    double delay_time_quarter_note_ms = 60 / mixr->bpm * 1000;
+    if (sync_len_ == DelaySyncLen::QUARTER)
+        m_delay_time_ms_ = delay_time_quarter_note_ms;
+    else if (sync_len_ == DelaySyncLen::EIGHTH)
+        m_delay_time_ms_ = delay_time_quarter_note_ms * 0.5;
+    else if (sync_len_ == DelaySyncLen::SIXTEENTH)
+        m_delay_time_ms_ = delay_time_quarter_note_ms * 0.25;
+
+    Update();
+}
+
+void StereoDelay::SetSync(bool b)
+{
+    sync_ = b;
+    if (b)
+        SyncTempo();
+}
+
+void StereoDelay::SetSyncLen(unsigned int len)
+{
+    switch (len)
+    {
+    case 0:
+        sync_len_ = DelaySyncLen::NO_DELAY;
+        break;
+    case 1:
+        sync_len_ = DelaySyncLen::QUARTER;
+        break;
+    case 2:
+        sync_len_ = DelaySyncLen::EIGHTH;
+        break;
+    case 3:
+        sync_len_ = DelaySyncLen::SIXTEENTH;
+        break;
+    }
+    if (sync_)
+        SyncTempo();
 }

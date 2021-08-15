@@ -23,7 +23,6 @@ LIBDIRS=-L/usr/local/lib -L${HOMEBREWLIBDIR} -L${READLINELIBDIR}
 ## I *THINK* THATS THE END OF THINGS YOU NEED TO CHANGE!
 
 CC = clang++
-#CC = g++
 
 
 SRC = $(shell find src -type f -name '*.cpp')
@@ -34,10 +33,10 @@ LIBS=-lportaudio -lreadline -lm -lpthread -lsndfile -lprofiler -llo
 
 WARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wno-variadic-macros -Wno-c99-extensions -Wno-vla-extension -Wno-unused-parameter -Wno-four-char-constants -Weffc++ -Wuninitialized
 CPPFLAGS = -isystem $(GTEST_DIR)/include
-CXXFLAGS += -std=c++17 $(WARNFLAGS) -glldb -O3 -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls
+#CXXFLAGS += -std=c++17 $(WARNFLAGS) -glldb -O3 -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls
 #CXXFLAGS += -std=c++17 $(WARNFLAGS) -ggdb -O1 -fsanitize=thread -fno-omit-frame-pointer
 #CXXFLAGS += -std=c++17 $(WARNFLAGS) -ggdb -O1 -fsanitize=thread -fno-omit-frame-pointer
-#CXXFLAGS += -std=c++17 $(WARNFLAGS) -glldb -O3 -fno-omit-frame-pointer
+CXXFLAGS += -std=c++17 $(WARNFLAGS) -glldb -O3
 
 
 $(OBJDIR)/%.o: %.cpp
