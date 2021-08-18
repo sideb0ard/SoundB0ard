@@ -6,13 +6,23 @@
 DrumSynth::DrumSynth()
 {
     osc1.m_waveform = SINE;
-    osc2.m_waveform = NOISE;
+    // osc2.m_waveform = NOISE;
 
-    env1.SetEgMode(ANALOG);
-    env1.SetAttackTimeMsec(1);
-    env1.SetDecayTimeMsec(1);
-    env1.m_output_eg = true;
-    env1.ramp_mode = true;
+    mod_env.SetEgMode(ANALOG);
+    mod_env.SetAttackTimeMsec(0);
+    mod_env.SetDecayTimeMsec(3000);
+    mod_env.SetSustainLevel(0);
+    mod_env.SetReleaseTimeMsec(0);
+    mod_env.ramp_mode = true;
+
+    amp_env.SetEgMode(ANALOG);
+    amp_env.SetAttackTimeMsec(0);
+    amp_env.SetDecayTimeMsec(0);
+    amp_env.SetSustainLevel(0);
+    amp_env.SetReleaseTimeMsec(3000);
+    amp_env.m_output_eg = true;
+    amp_env.ramp_mode = true;
+    amp_env.m_reset_to_zero = true;
 
     m_dca.m_mod_source_eg = DEST_DCA_EG;
 
@@ -31,15 +41,21 @@ stereo_val DrumSynth::genNext()
         double accum_out_left = 0.0;
         double accum_out_right = 0.0;
 
-        double eg_out = env1.DoEnvelope(nullptr);
+        // Osc Pitch Modulation Envelope
+        double mod_env_val = 0.0;
+        mod_env.DoEnvelope(&mod_env_val);
 
+        osc1.SetFoModExp(mod_env_int * OSC_FO_MOD_RANGE * mod_env_val);
         osc1.Update();
         double osc1_out = osc1.DoOscillate(nullptr);
 
-        osc2.Update();
-        double osc2_out = osc2.DoOscillate(nullptr);
+        // Amp Envelope
+        double eg_out = amp_env.DoEnvelope(nullptr);
+        // std::cout << "AMP ENV:" << eg_out << std::endl;
+        m_dca.SetEgMod(eg_out);
+        m_dca.Update();
 
-        double osc_mix = osc1_out + osc2_out;
+        double osc_mix = osc1_out;
 
         filter1.Update();
         double filter_out = filter1.DoFilter(osc_mix);
@@ -53,10 +69,10 @@ stereo_val DrumSynth::genNext()
         out = Effector(out);
     }
 
-    if (env1.GetState() == OFFF)
+    if (amp_env.GetState() == OFFF)
     {
         osc1.StopOscillator();
-        env1.StopEg();
+        amp_env.StopEg();
     }
     return out;
 }
@@ -64,12 +80,24 @@ stereo_val DrumSynth::genNext()
 void DrumSynth::SetParam(std::string name, double val)
 {
 
-    if (name == "e1attack")
-        env1.SetAttackTimeMsec(val);
-    else if (name == "e1decay")
-        env1.SetDecayTimeMsec(val);
-    else if (name == "e1release")
-        env1.SetReleaseTimeMsec(val);
+    if (name == "mod_env_attack")
+        mod_env.SetAttackTimeMsec(val);
+    if (name == "mod_env_decay")
+        mod_env.SetDecayTimeMsec(val);
+    if (name == "mod_env_sustain")
+        mod_env.SetSustainLevel(val);
+    if (name == "mod_env_release")
+        mod_env.SetReleaseTimeMsec(val);
+    if (name == "mod_env_int")
+        mod_env_int = val;
+    if (name == "amp_env_attack")
+        amp_env.SetAttackTimeMsec(val);
+    if (name == "amp_env_decay")
+        amp_env.SetDecayTimeMsec(val);
+    if (name == "amp_env_sustain")
+        amp_env.SetSustainLevel(val);
+    if (name == "amp_env_release")
+        amp_env.SetReleaseTimeMsec(val);
     else if (name == "filter")
         filter1.SetType(val);
     else if (name == "fc")
@@ -86,11 +114,16 @@ std::string DrumSynth::Status()
     else
         ss << ANSI_COLOR_CYAN;
     ss << "DrumSynth osc1:" << osc1.m_osc_fo
-       << " e1attack:" << env1.m_attack_time_msec
-       << " e1decay:" << env1.m_decay_time_msec
-       << " e1release:" << env1.m_release_time_msec
        << " filter:" << filter1.m_filter_type << " fc:" << filter1.m_fc
-       << " fq:" << filter1.m_q;
+       << " fq:" << filter1.m_q << " mod_env_int:" << mod_env_int << std::endl;
+    ss << "     mod_env_attack:" << mod_env.m_attack_time_msec
+       << " mod_env_decay:" << mod_env.m_decay_time_msec
+       << " mod_env_sustain:" << mod_env.m_sustain_level
+       << " mod_env_release:" << mod_env.m_release_time_msec << std::endl;
+    ss << "     amp_env_attack:" << amp_env.m_attack_time_msec
+       << " amp_env_decay:" << amp_env.m_decay_time_msec
+       << " amp_env_sustain:" << amp_env.m_sustain_level
+       << " amp_env_release:" << amp_env.m_release_time_msec;
 
     return ss.str();
 }
@@ -124,5 +157,7 @@ void DrumSynth::noteOn(midi_event ev)
 
     osc1.m_note_on = true;
     osc1.m_osc_fo = get_midi_freq(midinote);
-    env1.StartEg();
+    osc1.StartOscillator();
+    mod_env.StartEg();
+    amp_env.StartEg();
 }

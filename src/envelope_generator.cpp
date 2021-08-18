@@ -225,12 +225,14 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
     {
     case OFFF:
     {
+        // std::cout << "OFF!!\n";
         if (m_reset_to_zero)
             m_envelope_output = 0.0;
         break;
     }
     case ATTACK:
     {
+        // std::cout << "ATTACK!!\n";
         m_envelope_output =
             m_attack_offset + m_envelope_output * m_attack_coeff;
         if (m_envelope_output >= 1.0 ||
@@ -245,6 +247,7 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
     }
     case DECAY:
     {
+        // std::cout << "DECAY!!\n";
         m_envelope_output = m_decay_offset + m_envelope_output * m_decay_coeff;
         if (m_envelope_output <= m_sustain_level ||
             m_decay_time_scalar * m_decay_time_msec <= 0.0)
@@ -260,11 +263,13 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
     }
     case SUSTAIN:
     {
+        // std::cout << "SUSTAIN!!\n";
         m_envelope_output = m_sustain_level;
         break;
     }
     case RELEASE:
     {
+        // std::cout << "REEEEEEElease!!\n";
         if (m_sustain_override)
         {
             m_envelope_output = m_sustain_level;
@@ -272,12 +277,17 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
         }
         else
         {
+            // std::cout << "ELSE:offset:" << m_release_offset
+            //          << " env_out:" << m_envelope_output
+            //          << " * m_release_coeff:" << m_release_coeff <<
+            //          std::endl;
             m_envelope_output =
                 m_release_offset + m_envelope_output * m_release_coeff;
         }
 
         if (m_envelope_output <= 0.0 || m_release_time_msec <= 0.0)
         {
+            // std::cout << "*** WOW LESS THAN **!\n";
             m_envelope_output = 0.0;
             m_state = OFFF;
             break;
@@ -286,6 +296,7 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
     }
     case SHUTDOWN:
     {
+        /// std::cout << "SHUTDOooooWN!!\n";
         if (m_reset_to_zero)
         {
             m_envelope_output += m_inc_shutdown;
@@ -306,6 +317,7 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
 
     if (modmatrix)
     {
+        /// std::cout << "MODMATRIX!\n";
         modmatrix->sources[m_mod_dest_eg_output] = m_envelope_output;
         modmatrix->sources[m_mod_dest_eg_biased_output] =
             m_envelope_output - m_sustain_level;
@@ -314,6 +326,7 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
     if (p_biased_output)
         *p_biased_output = m_envelope_output - m_sustain_level;
 
+    // std::cout << "ENV OUTPUT:" << m_envelope_output << std::endl;
     return m_envelope_output;
 }
 
@@ -337,6 +350,7 @@ void EnvelopeGenerator::NoteOff()
 
 void EnvelopeGenerator::Shutdown()
 {
+    // std::cout << "EG SHUTDOWN\n";
     if (m_legato_mode)
         return;
     m_inc_shutdown =

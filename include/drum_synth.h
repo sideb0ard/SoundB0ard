@@ -22,13 +22,13 @@ class DrumSynth : public SoundGenerator
 
     QBLimitedOscillator osc1;
     MoogLadder filter1;
-    EnvelopeGenerator env1;
 
-    QBLimitedOscillator osc2;
-    MoogLadder filter2;
-    EnvelopeGenerator env2;
-
+    EnvelopeGenerator amp_env;
     EnvelopeGenerator mod_env;
+    float mod_env_int{0.75};
+
+    // QBLimitedOscillator osc2;
+    // MoogLadder filter2;
 
     DCA m_dca;
 };

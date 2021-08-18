@@ -77,7 +77,7 @@ class EnvelopeGenerator
 
     double m_shutdown_time_msec{10.};
 
-    double m_sustain_level{1};
+    double m_sustain_level{0.7};
 
     double m_attack_time_scalar{1.}; // for velocity -> attack time mod
     double m_decay_time_scalar{1.};  // for note# -> decay time mod
