@@ -3,164 +3,31 @@
 let chz = [12, 17, 19, 19];
 #let chz = [70, 74, 73, 77];
 let spd = [2, 4, 8, 16];
+let mel_idx = 0;
 
-let bpmz = [160, 147];
-let bpmx = 0;
-
-
-let bd = sample(kicks/808Kkick.wav);
-let th = sample(kicks/THclick.aiff);
-let wk = sample(kicks/wuk77.aiff);
-let thp = sample(kicks/THUMP.aiff);
-
-let lhh = sample(hats/LOUhat.aiff);
-vol lhh 0.2;
-let ahh = sample(hats/AbraHat.aiff);
-vol ahh 0.2;
-let hh3 = sample(hats/hh8.aif);
-vol hh3 0.2;
-
-let cp = sample(claps/gaborClap.aiff);
-let cp2 = sample(claps/mawClap.aiff);
-let clav = sample(perc/808clave.aif);
-
-let tm = sample(toms/DR660808CongaHigh.aif);
-let lt = sample(toms/FloorTom_bip.aif);
-
-let sf = sample(perc/surfaceFalle.aiff);
-let gl = sample(perc/glotcjh.aiff);
-let cow = sample(perc/808cowbell.aiff);
-
-let ah = sample(brandyvocalz/ah2.wav);
-let gu = sample(brandyvocalz/gu.wav);
-let waii = sample(brandyvocalz/waii.wav);
-
-let uhb = sample(TT-LIMELIFE-RIGHTONTIME/uhbass.wav);
+let combinor = fn(rhythm, melody)
+{
+  let return_melody= [];
+  for (i=0; i < len(rhythm); ++i)
+  {
+    if (rhythm[i] > 0) {
+      return_melody = push(return_melody, melody[mel_idx]);
+      mel_idx = incr(mel_idx, 0, len(melody));
+    } else {
+      return_melody = push(return_melody, 0);
+    }
+  }
+  return return_melody;
+}
 
 let blah_gen = gen()
 {
   setup()
   {
-    let pat = pattern("[~ <sf [lt tm]>] [lhh*3 ahh*2]");
-    let pat2 = pattern("[~ <[tm lt] sf*2>] [lhh(3,8), ahh] [~ gl] [~ <cow ah>]");
-    let pat3 = pattern("[~ <sf [lt*2 tm]>] <wk gu> <uhb waii>");
-    let patz = [pat, pat2, pat3];
-    let px = 0;
-
-    let rotrz = [0, 2, 3];
-    let rx = 0;
-
   }
   run()
   {
-    play_array(rotate(patz[px], rotrz[rx]));
-    px = incr(px, 0, len(patz));
-    rx = incr(rx, 0, len(rotrz));
-  }
-}
-let dblah_gen = gen()
-{
-  setup()
-  {
-    let modrz = [ 3, 5];
-    let mx = 0;
-    let rotrz = [0, 2, 3];
-    let rx = 0;
-    let notz = [20, 17, 14, 20, 13, 7, 4];
-    let nx = 0;
-    let dr = 10;
-  }
-  run()
-  {
-    if (count % 8 < 7) {
-      play_array(bd, rotate(bjork(modrz[mx], 8), rotrz[rx]));
-      if (count % 2 ==0) {
-        note_on(dx100, notz[nx], dur=dr);
-        nx = incr(nx, 0, len(notz));
-      }
-
-      if (count % 3 == 0) {
-        note_on_at(dx100, notz[nx]+7, pp * count, dur=dr);
-      }
-      if (count % 4 == 0) {
-        note_on_at(dx100, notz[nx]-4, pp * count*3, dur=dr);
-      }
-      dr = dr + 50;
-      if (dr > 1000) {
-        dr = 10;
-      }
-    }
-    if (count % 3 == 0) {
-      play_array(cp, rotate(bjork(modrz[mx], 16), rotrz[rx] + 2));
-    }
-    if (count % 2 == 0) {
-      play_array(cp2, rotate(bjork(modrz[mx], 8), rotrz[rx] + 1));
-    }
-    mx = incr(mx, 0, len(modrz));
-    rx = incr(rx, 0, len(rotrz));
-  }
-}
-
-
-let hh_gen = gen()
-{
-  setup()
-  {
-    let lenz = [16, 16, 12, 8];
-    let lx = 0;
-    let hhz = [lhh, ahh, hh3];
-    let hhzx = 0;
-    let swingz = [120, 130, 140, 170];
-    let sx = 0;
-    let vz = 127;
-    let pithz = [0.6, 1, 2, 1.5, 0.7];
-    let px = 0;
-
-    let bjz = [7, 11, 15];
-    let bx = 0;
-
-  }
-  run()
-  {
-    if (count % 2 == 0) {
-      let pp = 3840 / lenz[lx];
-      for (i = 0; i < lenz[lx]; ++i) {
-        if (i % 2 == 0) {
-          note_on_at(hhz[hhzx], 1, i * pp, vel=vz);
-        } else {
-          note_on_at(hhz[hhzx], 1, i * pp + swingz[sx], vel=vz);
-        }
-        hhzx = incr(hhzx, 0, len(hhz));
-        vz = incr(vz, 74, 127);
-      }
-      sx = incr(sx, 0, len(swingz));
-      px = incr(px, 0, len(pithz));
-      set_pitch(hhz[hhzx], pithz[px]);
-    }
-    else {
-      play_array(hhz[hhzx], bjork(bjz[bx],16));
-      bx = incr(bx, 0, len(bjz));
-    }
-  }
-}
-
-let cblah_gen = gen()
-{
-  setup()
-  {
-    let pat = pattern("<[clav ~ ~ clav] [~ clav] [~ clav ~ ah <[~ cp2 clav] ~ > ~ ~ ");
-    let rotrz = [0, 2, 3];
-    let rx = 0;
-    let ptchz = [1, 0.6, 0.7, 1.5, 0.8, 2];
-    let px = 0;
-    vol clav 0.4;
-  }
-  run()
-  {
-    play_array(rotate(pat, rotrz[rx]));
-    rx = incr(rx, 0, len(rotrz));
-    set clav:pitch ptchz[px];
-    px = incr(px, 0, len(ptchz));
+    play_array(bd, combinor(bet, chz));
   }
 }
 

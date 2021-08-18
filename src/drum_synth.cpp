@@ -10,14 +10,14 @@ DrumSynth::DrumSynth()
 
     mod_env.SetEgMode(ANALOG);
     mod_env.SetAttackTimeMsec(0);
-    mod_env.SetDecayTimeMsec(3000);
+    mod_env.SetDecayTimeMsec(70);
     mod_env.SetSustainLevel(0);
     mod_env.SetReleaseTimeMsec(0);
     mod_env.ramp_mode = true;
 
     amp_env.SetEgMode(ANALOG);
     amp_env.SetAttackTimeMsec(0);
-    amp_env.SetDecayTimeMsec(0);
+    amp_env.SetDecayTimeMsec(300);
     amp_env.SetSustainLevel(0);
     amp_env.SetReleaseTimeMsec(3000);
     amp_env.m_output_eg = true;
