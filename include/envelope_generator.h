@@ -54,6 +54,7 @@ class EnvelopeGenerator
     bool m_legato_mode{false};
     bool m_output_eg{false}; // i.e. this instance is going direct to output,
                              // rather than into an intermediatery
+    bool ramp_mode{false};   // used for no sustain
 
     // double m_eg1_osc_intensity;
     double m_envelope_output{0};

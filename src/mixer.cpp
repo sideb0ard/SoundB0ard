@@ -13,6 +13,7 @@
 #include <ableton_link_wrapper.h>
 #include <audio_action_queue.h>
 #include <defjams.h>
+#include <drum_synth.h>
 #include <drumsampler.h>
 #include <dxsynth.h>
 #include <event_queue.h>
@@ -455,6 +456,13 @@ void Mixer::AddSoundGenerator(std::shared_ptr<SoundGenerator> sg)
     }
 }
 
+void Mixer::AddDrumSynth()
+{
+    std::cout << "ADDING A DRUM SYNTH YO!\n";
+    auto ds = std::make_shared<DrumSynth>();
+    AddSoundGenerator(ds);
+}
+
 void Mixer::AddMinisynth()
 {
     auto ms = std::make_shared<MiniSynth>();
@@ -778,6 +786,9 @@ void Mixer::CheckForAudioActionQueueMessages()
                     break;
                 case (DXSYNTH_TYPE):
                     AddDxsynth();
+                    break;
+                case (DRUMSYNTH_TYPE):
+                    AddDrumSynth();
                     break;
                 case (LOOPER_TYPE):
                     AddLooper(action->filepath, action->loop_mode);

@@ -156,6 +156,7 @@ typedef enum
     DXSYNTH_TYPE,
     LOOPER_TYPE,
     DRUMSAMPLER_TYPE,
+    DRUMSYNTH_TYPE,
     NUM_SOUNDGEN_TYPE
 } sound_generator_type;
 

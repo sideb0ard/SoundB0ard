@@ -106,6 +106,7 @@ struct Mixer
 
     void AddMinisynth();
     void AddDxsynth();
+    void AddDrumSynth();
     void AddSample(std::string sample_path);
     void AddLooper(std::string filename, bool loop_mode);
 

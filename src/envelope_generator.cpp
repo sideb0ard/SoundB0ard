@@ -250,7 +250,10 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
             m_decay_time_scalar * m_decay_time_msec <= 0.0)
         {
             m_envelope_output = m_sustain_level;
-            m_state = SUSTAIN;
+            if (ramp_mode)
+                NoteOff();
+            else
+                m_state = SUSTAIN;
             break;
         }
         break;

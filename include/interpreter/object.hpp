@@ -327,6 +327,15 @@ class FMSynth : public SoundGenerator
     std::string Inspect() override;
 };
 
+class DrumSynth : public SoundGenerator
+{
+  public:
+    DrumSynth();
+    ~DrumSynth() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+};
+
 class MoogSynth : public SoundGenerator
 {
   public:
