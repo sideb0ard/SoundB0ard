@@ -21,150 +21,150 @@ typedef struct synthsettings
 {
     char m_settings_name[256];
 
-    unsigned int m_voice_mode;
-    bool m_monophonic;
-    bool hard_sync;
+    unsigned int m_voice_mode{0};
+    bool m_monophonic{false};
+    bool hard_sync{false};
 
-    unsigned int osc1_wave;
-    double osc1_amp;
-    int osc1_oct;
-    int osc1_semis;
-    int osc1_cents;
+    unsigned int osc1_wave{0};
+    double osc1_amp{01};
+    int osc1_oct{0};
+    int osc1_semis{0};
+    int osc1_cents{0};
 
-    unsigned int osc2_wave;
-    double osc2_amp;
-    int osc2_oct;
-    int osc2_semis;
-    int osc2_cents;
+    unsigned int osc2_wave{0};
+    double osc2_amp{0};
+    int osc2_oct{0};
+    int osc2_semis{0};
+    int osc2_cents{0};
 
-    unsigned int osc3_wave;
-    double osc3_amp;
-    int osc3_oct;
-    int osc3_semis;
-    int osc3_cents;
+    unsigned int osc3_wave{0};
+    double osc3_amp{0};
+    int osc3_oct{0};
+    int osc3_semis{0};
+    int osc3_cents{0};
 
-    unsigned int osc4_wave;
-    double osc4_amp;
-    int osc4_oct;
-    int osc4_semis;
-    int osc4_cents;
+    unsigned int osc4_wave{0};
+    double osc4_amp{0};
+    int osc4_oct{0};
+    int osc4_semis{0};
+    int osc4_cents{0};
 
-    unsigned int m_lfo1_waveform;
-    unsigned int m_lfo1_dest;
-    unsigned int m_lfo1_mode;
-    double m_lfo1_rate;
-    double m_lfo1_amplitude;
+    unsigned int m_lfo1_waveform{0};
+    unsigned int m_lfo1_dest{0};
+    unsigned int m_lfo1_mode{0};
+    double m_lfo1_rate{0};
+    double m_lfo1_amplitude{0};
 
     // LFO1 -> OSC FO
-    double m_lfo1_osc_pitch_intensity;
-    bool m_lfo1_osc_pitch_enabled;
+    double m_lfo1_osc_pitch_intensity{0};
+    bool m_lfo1_osc_pitch_enabled{0};
 
     // LFO1 -> FILTER
-    double m_lfo1_filter_fc_intensity;
-    bool m_lfo1_filter_fc_enabled;
+    double m_lfo1_filter_fc_intensity{0};
+    bool m_lfo1_filter_fc_enabled{0};
 
     // LFO1 -> DCA
-    double m_lfo1_amp_intensity;
-    bool m_lfo1_amp_enabled;
-    double m_lfo1_pan_intensity;
-    bool m_lfo1_pan_enabled;
+    double m_lfo1_amp_intensity{0};
+    bool m_lfo1_amp_enabled{0};
+    double m_lfo1_pan_intensity{0};
+    bool m_lfo1_pan_enabled{0};
 
     // LFO1 -> Pulse Width
-    double m_lfo1_pulsewidth_intensity;
-    bool m_lfo1_pulsewidth_enabled;
+    double m_lfo1_pulsewidth_intensity{0};
+    bool m_lfo1_pulsewidth_enabled{0};
 
-    unsigned int m_lfo2_waveform;
-    unsigned int m_lfo2_dest;
-    unsigned int m_lfo2_mode;
-    double m_lfo2_rate;
-    double m_lfo2_amplitude;
+    unsigned int m_lfo2_waveform{0};
+    unsigned int m_lfo2_dest{0};
+    unsigned int m_lfo2_mode{0};
+    double m_lfo2_rate{0};
+    double m_lfo2_amplitude{0};
 
     // LFO2 -> OSC FO
-    double m_lfo2_osc_pitch_intensity;
-    bool m_lfo2_osc_pitch_enabled;
+    double m_lfo2_osc_pitch_intensity{0};
+    bool m_lfo2_osc_pitch_enabled{0};
 
     // LFO2 -> FILTER
-    double m_lfo2_filter_fc_intensity;
-    bool m_lfo2_filter_fc_enabled;
+    double m_lfo2_filter_fc_intensity{0};
+    bool m_lfo2_filter_fc_enabled{0};
 
     // LFO2 -> DCA
-    double m_lfo2_amp_intensity;
-    bool m_lfo2_amp_enabled;
-    double m_lfo2_pan_intensity;
-    bool m_lfo2_pan_enabled;
+    double m_lfo2_amp_intensity{0};
+    bool m_lfo2_amp_enabled{0};
+    double m_lfo2_pan_intensity{0};
+    bool m_lfo2_pan_enabled{0};
 
     // LFO2 -> Pulse Width
-    double m_lfo2_pulsewidth_intensity;
-    bool m_lfo2_pulsewidth_enabled;
+    double m_lfo2_pulsewidth_intensity{0};
+    bool m_lfo2_pulsewidth_enabled{0};
 
     // EG1  ////////////////////////////////////////
-    double m_eg1_attack_time_msec;
-    double m_eg1_decay_time_msec;
-    double m_eg1_release_time_msec;
-    double m_eg1_sustain_level;
+    double m_eg1_attack_time_msec{0};
+    double m_eg1_decay_time_msec{0};
+    double m_eg1_release_time_msec{0};
+    double m_eg1_sustain_level{0};
 
     // EG1 -> OSC
-    double m_eg1_osc_intensity;
-    bool m_eg1_osc_enabled;
+    double m_eg1_osc_intensity{0};
+    bool m_eg1_osc_enabled{0};
 
     // EG1 -> FILTER
-    double m_eg1_filter_intensity;
-    bool m_eg1_filter_enabled;
+    double m_eg1_filter_intensity{0};
+    bool m_eg1_filter_enabled{0};
 
     // EG1 -> DCA
-    double m_eg1_dca_intensity;
-    bool m_eg1_dca_enabled;
+    double m_eg1_dca_intensity{0};
+    bool m_eg1_dca_enabled{0};
 
-    unsigned int m_eg1_sustain_override;
+    unsigned int m_eg1_sustain_override{0};
 
     // EG2  ////////////////////////////////////////
-    double m_eg2_attack_time_msec;
-    double m_eg2_decay_time_msec;
-    double m_eg2_release_time_msec;
-    double m_eg2_sustain_level;
+    double m_eg2_attack_time_msec{0};
+    double m_eg2_decay_time_msec{0};
+    double m_eg2_release_time_msec{0};
+    double m_eg2_sustain_level{0};
 
     // EG2 -> OSC
-    double m_eg2_osc_intensity;
-    bool m_eg2_osc_enabled;
+    double m_eg2_osc_intensity{0};
+    bool m_eg2_osc_enabled{0};
 
     // EG2 -> FILTER
-    double m_eg2_filter_intensity;
-    bool m_eg2_filter_enabled;
+    double m_eg2_filter_intensity{0};
+    bool m_eg2_filter_enabled{0};
 
     // EG2 -> DCA
-    double m_eg2_dca_intensity;
-    bool m_eg2_dca_enabled;
+    double m_eg2_dca_intensity{0};
+    bool m_eg2_dca_enabled{0};
 
-    unsigned int m_eg2_sustain_override;
+    unsigned int m_eg2_sustain_override{0};
 
     ///////////////////////////////////////////////////////////////
 
-    double m_filter_keytrack_intensity;
+    double m_filter_keytrack_intensity{0};
 
-    int m_octave;
-    int m_pitchbend_range;
+    int m_octave{0};
+    int m_pitchbend_range{0};
 
-    double m_fc_control;
-    double m_q_control;
+    double m_fc_control{0};
+    double m_q_control{0};
 
-    double m_detune_cents;
-    double m_pulse_width_pct;
-    double m_sub_osc_db;
-    double m_noise_osc_db;
+    double m_detune_cents{0};
+    double m_pulse_width_pct{0};
+    double m_sub_osc_db{0};
+    double m_noise_osc_db{0};
 
-    unsigned int m_legato_mode;
-    unsigned int m_reset_to_zero;
-    unsigned int m_filter_keytrack;
-    unsigned int m_filter_type;
-    double m_filter_saturation;
+    unsigned int m_legato_mode{0};
+    unsigned int m_reset_to_zero{0};
+    unsigned int m_filter_keytrack{0};
+    unsigned int m_filter_type{0};
+    double m_filter_saturation{0};
 
-    unsigned int m_nlp;
-    unsigned int m_velocity_to_attack_scaling;
-    unsigned int m_note_number_to_decay_scaling;
-    double m_portamento_time_msec;
+    unsigned int m_nlp{0};
+    unsigned int m_velocity_to_attack_scaling{0};
+    unsigned int m_note_number_to_decay_scaling{0};
+    double m_portamento_time_msec{0};
 
-    bool m_generate_active;
-    unsigned m_generate_src;
+    bool m_generate_active{0};
+    unsigned m_generate_src{0};
 } synthsettings;
 
 class MiniSynth : public SoundGenerator

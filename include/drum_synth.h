@@ -21,14 +21,27 @@ class DrumSynth : public SoundGenerator
     double GetParam(std::string name) override;
 
     QBLimitedOscillator osc1;
-    MoogLadder filter1;
+    float osc1_amp{1};
+
+    QBLimitedOscillator osc2;
+    float osc2_amp{0};
 
     EnvelopeGenerator amp_env;
-    EnvelopeGenerator mod_env;
-    float mod_env_int{0.75};
+    bool amp_env_to_osc1{false};
+    bool amp_env_to_osc2{false};
+    float amp_env_int{1};
 
-    // QBLimitedOscillator osc2;
-    // MoogLadder filter2;
+    EnvelopeGenerator pitch_env;
+    bool pitch_env_to_osc1{true};
+    bool pitch_env_to_osc2{false};
+    float pitch_env_int{0.75};
+
+    MoogLadder filter1;
+    bool f1_osc1_enable{false};
+    bool f1_osc2_enable{false};
+    MoogLadder filter2;
+    bool f2_osc1_enable{false};
+    bool f2_osc2_enable{false};
 
     DCA m_dca;
 };

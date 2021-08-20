@@ -3,17 +3,57 @@
 #include <iostream>
 #include <sstream>
 
+namespace
+{
+std::string GetOscType(int type)
+{
+    std::string the_type = "dunno";
+    switch (type)
+    {
+    case 0:
+        the_type = "SINE";
+        break;
+    case 1:
+        the_type = "SAW1";
+        break;
+    case 2:
+        the_type = "SAW2";
+        break;
+    case 3:
+        the_type = "SAW3";
+        break;
+    case 4:
+        the_type = "TRI";
+        break;
+    case 5:
+        the_type = "SQUARE";
+        break;
+    case 6:
+        the_type = "NOISE";
+        break;
+    case 7:
+        the_type = "PNOISE";
+        break;
+    }
+
+    return the_type;
+}
+} // namespace
+
 DrumSynth::DrumSynth()
 {
     osc1.m_waveform = SINE;
-    // osc2.m_waveform = NOISE;
+    osc1_amp = 1;
+    osc2.m_waveform = NOISE;
+    osc2_amp = 0;
 
-    mod_env.SetEgMode(ANALOG);
-    mod_env.SetAttackTimeMsec(0);
-    mod_env.SetDecayTimeMsec(70);
-    mod_env.SetSustainLevel(0);
-    mod_env.SetReleaseTimeMsec(0);
-    mod_env.ramp_mode = true;
+    pitch_env.SetEgMode(ANALOG);
+    pitch_env.SetAttackTimeMsec(0);
+    pitch_env.SetDecayTimeMsec(70);
+    pitch_env.SetSustainLevel(0);
+    pitch_env.SetReleaseTimeMsec(0);
+    pitch_env.ramp_mode = true;
+    pitch_env_to_osc1 = true;
 
     amp_env.SetEgMode(ANALOG);
     amp_env.SetAttackTimeMsec(0);
@@ -38,24 +78,32 @@ stereo_val DrumSynth::genNext()
 
     if (osc1.m_note_on)
     {
-        double accum_out_left = 0.0;
-        double accum_out_right = 0.0;
+        // Pitch Envelope
+        double pitch_env_val = 0.0;
+        pitch_env.DoEnvelope(&pitch_env_val);
 
-        // Osc Pitch Modulation Envelope
-        double mod_env_val = 0.0;
-        mod_env.DoEnvelope(&mod_env_val);
-
-        osc1.SetFoModExp(mod_env_int * OSC_FO_MOD_RANGE * mod_env_val);
-        osc1.Update();
+        if (pitch_env_to_osc1)
+        {
+            osc1.SetFoModExp(pitch_env_int * OSC_FO_MOD_RANGE * pitch_env_val);
+            osc1.Update();
+        }
         double osc1_out = osc1.DoOscillate(nullptr);
 
+        if (pitch_env_to_osc2)
+        {
+            osc2.SetFoModExp(pitch_env_int * OSC_FO_MOD_RANGE * pitch_env_val);
+            osc2.Update();
+        }
+        double osc2_out = osc2.DoOscillate(nullptr);
+
+        double osc_mix = osc1_out * osc1_amp + osc2_out * osc2_amp;
+
         // Amp Envelope
-        double eg_out = amp_env.DoEnvelope(nullptr);
-        // std::cout << "AMP ENV:" << eg_out << std::endl;
+        double amp_env_val = 0.0;
+        double eg_out = amp_env.DoEnvelope(&amp_env_val);
+
         m_dca.SetEgMod(eg_out);
         m_dca.Update();
-
-        double osc_mix = osc1_out;
 
         filter1.Update();
         double filter_out = filter1.DoFilter(osc_mix);
@@ -72,6 +120,7 @@ stereo_val DrumSynth::genNext()
     if (amp_env.GetState() == OFFF)
     {
         osc1.StopOscillator();
+        osc2.StopOscillator();
         amp_env.StopEg();
     }
     return out;
@@ -79,17 +128,46 @@ stereo_val DrumSynth::genNext()
 
 void DrumSynth::SetParam(std::string name, double val)
 {
-
-    if (name == "mod_env_attack")
-        mod_env.SetAttackTimeMsec(val);
-    if (name == "mod_env_decay")
-        mod_env.SetDecayTimeMsec(val);
-    if (name == "mod_env_sustain")
-        mod_env.SetSustainLevel(val);
-    if (name == "mod_env_release")
-        mod_env.SetReleaseTimeMsec(val);
-    if (name == "mod_env_int")
-        mod_env_int = val;
+    if (name == "osc1")
+        osc1.m_waveform = val;
+    else if (name == "osc2")
+        osc2.m_waveform = val;
+    else if (name == "o1amp")
+        osc1_amp = val;
+    else if (name == "o2amp")
+        osc2_amp = val;
+    else if (name == "filter1")
+        filter1.SetType(val);
+    else if (name == "f1fc")
+        filter1.SetFcControl(val);
+    else if (name == "f1fq")
+        filter1.SetQControl(val);
+    else if (name == "f1_osc1_enable")
+        f1_osc1_enable = val;
+    else if (name == "filter2")
+        filter2.SetType(val);
+    else if (name == "f2fc")
+        filter2.SetFcControl(val);
+    else if (name == "f2fq")
+        filter2.SetQControl(val);
+    else if (name == "f2_osc1_enable")
+        f2_osc1_enable = val;
+    else if (name == "f2_osc2_enable")
+        f2_osc2_enable = val;
+    else if (name == "pitch_env_attack")
+        pitch_env.SetAttackTimeMsec(val);
+    if (name == "pitch_env_decay")
+        pitch_env.SetDecayTimeMsec(val);
+    if (name == "pitch_env_sustain")
+        pitch_env.SetSustainLevel(val);
+    if (name == "pitch_env_release")
+        pitch_env.SetReleaseTimeMsec(val);
+    if (name == "pitch_env_int")
+        pitch_env_int = val;
+    if (name == "pitch_env_to_osc1")
+        pitch_env_to_osc1 = val;
+    if (name == "pitch_env_to_osc2")
+        pitch_env_to_osc2 = val;
     if (name == "amp_env_attack")
         amp_env.SetAttackTimeMsec(val);
     if (name == "amp_env_decay")
@@ -98,12 +176,8 @@ void DrumSynth::SetParam(std::string name, double val)
         amp_env.SetSustainLevel(val);
     if (name == "amp_env_release")
         amp_env.SetReleaseTimeMsec(val);
-    else if (name == "filter")
-        filter1.SetType(val);
-    else if (name == "fc")
-        filter1.SetFcControl(val);
-    else if (name == "fq")
-        filter1.SetQControl(val);
+    if (name == "amp_env_int")
+        amp_env_int = val;
 }
 
 std::string DrumSynth::Status()
@@ -113,17 +187,34 @@ std::string DrumSynth::Status()
         ss << ANSI_COLOR_RESET;
     else
         ss << ANSI_COLOR_CYAN;
-    ss << "DrumSynth osc1:" << osc1.m_osc_fo
-       << " filter:" << filter1.m_filter_type << " fc:" << filter1.m_fc
-       << " fq:" << filter1.m_q << " mod_env_int:" << mod_env_int << std::endl;
-    ss << "     mod_env_attack:" << mod_env.m_attack_time_msec
-       << " mod_env_decay:" << mod_env.m_decay_time_msec
-       << " mod_env_sustain:" << mod_env.m_sustain_level
-       << " mod_env_release:" << mod_env.m_release_time_msec << std::endl;
+    ss << "DrumSynth osc1:" << GetOscType(osc1.m_waveform)
+       << " o1amp:" << osc1_amp << " osc2:" << GetOscType(osc2.m_waveform)
+       << " o2amp:" << osc2_amp << std::endl;
+    ss << "     filter1:" << filter1.m_filter_type << " f1fc:" << filter1.m_fc
+       << " f1fq:" << filter1.m_q
+       << " f1_osc1_enable:" << (f1_osc1_enable ? "true" : "false")
+       << " f1_osc2_enable:" << (f1_osc2_enable ? "true" : "false")
+       << std::endl;
+    ss << "     filter1:" << filter2.m_filter_type << " f2fc:" << filter2.m_fc
+       << " f2fq:" << filter1.m_q
+       << " f2_osc1_enable:" << (f2_osc1_enable ? "true" : "false")
+       << " f2_osc2_enable:" << (f2_osc2_enable ? "true" : "false")
+       << std::endl;
+
+    ss << "     pitch_env_attack:" << pitch_env.m_attack_time_msec
+       << " pitch_env_decay:" << pitch_env.m_decay_time_msec
+       << " pitch_env_sustain:" << pitch_env.m_sustain_level
+       << " pitch_env_release:" << pitch_env.m_release_time_msec << std::endl;
+    ss << "     pitch_env_to_osc1:" << (pitch_env_to_osc1 ? "true" : "false")
+       << " pitch_env_to_osc2:" << (pitch_env_to_osc2 ? "true" : "false")
+       << " pitch_env_int:" << pitch_env_int << std::endl;
     ss << "     amp_env_attack:" << amp_env.m_attack_time_msec
        << " amp_env_decay:" << amp_env.m_decay_time_msec
        << " amp_env_sustain:" << amp_env.m_sustain_level
-       << " amp_env_release:" << amp_env.m_release_time_msec;
+       << " amp_env_release:" << amp_env.m_release_time_msec << std::endl;
+    ss << "     amp_env_to_osc1:" << (amp_env_to_osc1 ? "true" : "false")
+       << " amp_env_to_osc2:" << (amp_env_to_osc2 ? "true" : "false")
+       << " amp_env_int:" << amp_env_int;
 
     return ss.str();
 }
@@ -158,6 +249,11 @@ void DrumSynth::noteOn(midi_event ev)
     osc1.m_note_on = true;
     osc1.m_osc_fo = get_midi_freq(midinote);
     osc1.StartOscillator();
-    mod_env.StartEg();
+
+    osc2.m_note_on = true;
+    osc2.m_osc_fo = get_midi_freq(midinote);
+    osc2.StartOscillator();
+
+    pitch_env.StartEg();
     amp_env.StartEg();
 }
