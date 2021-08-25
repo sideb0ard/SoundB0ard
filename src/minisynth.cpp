@@ -927,15 +927,15 @@ void MiniSynth::randomize()
     // minisynth_print_settings(ms);
 }
 
-void MiniSynth::Save(std::string preset_to_load)
+void MiniSynth::Save(std::string new_preset_name)
 {
-    if (preset_to_load.empty())
+    if (new_preset_name.empty())
     {
         printf("Play tha game, pal, need a name to save yer synth settings "
                "with\n");
         return;
     }
-    const char *preset_name = preset_to_load.c_str();
+    const char *preset_name = new_preset_name.c_str();
 
     printf("Saving '%s' settings for Minisynth to file %s\n", preset_name,
            MOOG_PRESET_FILENAME);

@@ -580,17 +580,17 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                              input[0]->Type());
                      }
 
-                     auto return_array = std::make_shared<object::Array>(
-                         std::vector<std::shared_ptr<object::Object>>());
+                     // auto return_array = std::make_shared<object::Array>(
+                     //    std::vector<std::shared_ptr<object::Object>>());
 
-                     int len_elems = array_obj->elements_.size();
-                     for (int i = 0; i < len_elems; i++)
-                         return_array->elements_.push_back(
-                             array_obj->elements_[i]);
+                     // int len_elems = array_obj->elements_.size();
+                     // for (int i = 0; i < len_elems; i++)
+                     //    return_array->elements_.push_back(
+                     //        array_obj->elements_[i]);
 
-                     return_array->elements_.push_back(input[1]);
+                     array_obj->elements_.push_back(input[1]);
 
-                     return return_array;
+                     return evaluator::NULLL;
                  })},
     {"print", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
@@ -1112,6 +1112,22 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              else
                  std::cerr << "BARF! ARG SIZE SHOULD BE 1 -  SIZE IS "
                            << args_size << std::endl;
+             return evaluator::NULLL;
+         })},
+    {"list_presets",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 1)
+             {
+                 auto cmd_name = std::make_shared<object::String>("list");
+                 args.push_back(cmd_name);
+                 audio_action_queue_item action_req{
+                     .type = AudioAction::LIST_PRESETS, .args = args};
+                 audio_queue.push(action_req);
+             }
              return evaluator::NULLL;
          })},
     {"load_preset",

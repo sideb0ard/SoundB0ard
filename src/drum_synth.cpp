@@ -257,3 +257,156 @@ void DrumSynth::noteOn(midi_event ev)
     pitch_env.StartEg();
     amp_env.StartEg();
 }
+
+void DrumSynth::Save(std::string new_preset_name)
+{
+    if (new_preset_name.empty())
+    {
+        printf("Play tha game, pal, need a name to save yer synth settings "
+               "with\n");
+        return;
+    }
+    const char *preset_name = new_preset_name.c_str();
+
+    printf("Saving '%s' settings for Minisynth to file %s\n", preset_name,
+           DRUM_SYNTH_PATCHES);
+    FILE *presetzzz = fopen(DRUM_SYNTH_PATCHES, "a+");
+    if (presetzzz == NULL)
+    {
+        printf("Couldn't save settings!!\n");
+        return;
+    }
+
+    patch_name = new_preset_name;
+    int settings_count = 0;
+
+    fprintf(presetzzz, "::name=%s", preset_name);
+    settings_count++;
+
+    fprintf(presetzzz, "::osc1=%d", osc1.m_waveform);
+    settings_count++;
+    fprintf(presetzzz, "::o1amp=%f", osc1_amp);
+    settings_count++;
+
+    fprintf(presetzzz, "::osc2=%d", osc2.m_waveform);
+    settings_count++;
+    fprintf(presetzzz, "::o2amp=%f", osc2_amp);
+    settings_count++;
+
+    fprintf(presetzzz, "::filter1=%d", filter1.m_filter_type);
+    settings_count++;
+    fprintf(presetzzz, "::f1fc=%f", filter1.m_fc);
+    settings_count++;
+    fprintf(presetzzz, "::f1fq=%f", filter1.m_q);
+    settings_count++;
+    fprintf(presetzzz, "::f1_osc1_enable=%d", f1_osc1_enable);
+    settings_count++;
+    fprintf(presetzzz, "::f1_osc2_enable=%d", f1_osc2_enable);
+    settings_count++;
+
+    fprintf(presetzzz, "::filter2=%d", filter2.m_filter_type);
+    settings_count++;
+    fprintf(presetzzz, "::f2fc=%f", filter2.m_fc);
+    settings_count++;
+    fprintf(presetzzz, "::f2fq=%f", filter2.m_q);
+    settings_count++;
+    fprintf(presetzzz, "::f2_osc1_enable=%d", f2_osc1_enable);
+    settings_count++;
+    fprintf(presetzzz, "::f2_osc2_enable=%d", f2_osc2_enable);
+    settings_count++;
+
+    fprintf(presetzzz, "::pitch_env_attack=%f", pitch_env.m_attack_time_msec);
+    settings_count++;
+    fprintf(presetzzz, "::pitch_env_decay=%f", pitch_env.m_decay_time_msec);
+    settings_count++;
+    fprintf(presetzzz, "::pitch_env_sustain=%f", pitch_env.m_sustain_level);
+    settings_count++;
+    fprintf(presetzzz, "::pitch_env_release=%f", pitch_env.m_release_time_msec);
+    settings_count++;
+    fprintf(presetzzz, "::pitch_env_to_osc1=%d", pitch_env_to_osc1);
+    settings_count++;
+    fprintf(presetzzz, "::pitch_env_to_osc2=%d", pitch_env_to_osc1);
+    settings_count++;
+
+    fprintf(presetzzz, "::amp_env_attack=%f", amp_env.m_attack_time_msec);
+    settings_count++;
+    fprintf(presetzzz, "::amp_env_decay=%f", amp_env.m_decay_time_msec);
+    settings_count++;
+    fprintf(presetzzz, "::amp_env_sustain=%f", amp_env.m_sustain_level);
+    settings_count++;
+    fprintf(presetzzz, "::amp_env_release=%f", amp_env.m_release_time_msec);
+    settings_count++;
+    fprintf(presetzzz, "::amp_env_int=%f", amp_env_int);
+    settings_count++;
+    fprintf(presetzzz, "::amp_env_to_osc1=%d", amp_env_to_osc1);
+    settings_count++;
+    fprintf(presetzzz, "::amp_env_to_osc2=%d", amp_env_to_osc1);
+    settings_count++;
+
+    fprintf(presetzzz, ":::\n");
+    fclose(presetzzz);
+    printf("Wrote %d settings\n", settings_count);
+}
+
+void DrumSynth::Load(std::string preset_name)
+{
+    if (preset_name.empty())
+    {
+        printf("Play tha game, pal, need a name to LOAD yer synth settings "
+               "with\n");
+        return;
+    }
+    const char *preset_to_load = preset_name.c_str();
+
+    char line[2048];
+    char setting_key[512];
+    char setting_val[512];
+    double scratch_val = 0.;
+
+    FILE *presetzzz = fopen(DRUM_SYNTH_PATCHES, "r+");
+    if (presetzzz == NULL)
+        return;
+
+    char *tok, *last_tok;
+    char const *sep = "::";
+
+    while (fgets(line, sizeof(line), presetzzz))
+    {
+        int settings_count = 0;
+
+        for (tok = strtok_r(line, sep, &last_tok); tok;
+             tok = strtok_r(NULL, sep, &last_tok))
+        {
+            sscanf(tok, "%[^=]=%s", setting_key, setting_val);
+            sscanf(setting_val, "%lf", &scratch_val);
+            if (strcmp(setting_key, "name") == 0)
+            {
+                if (strcmp(setting_val, preset_to_load) != 0)
+                    break;
+                patch_name = setting_val;
+                settings_count++;
+            }
+            else
+            {
+                SetParam(setting_key, scratch_val);
+            }
+        }
+    }
+
+    fclose(presetzzz);
+}
+
+void DrumSynth::ListPresets()
+{
+    FILE *presetzzz = fopen(DRUM_SYNTH_PATCHES, "r+");
+    if (presetzzz == NULL)
+        return;
+
+    char line[256];
+    while (fgets(line, sizeof(line), presetzzz))
+    {
+        printf("%s\n", line);
+    }
+
+    fclose(presetzzz);
+}

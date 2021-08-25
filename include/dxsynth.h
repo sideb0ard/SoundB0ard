@@ -142,7 +142,6 @@ class DXSynth : public SoundGenerator
 
     void ResetVoices();
 
-    bool ListPresets(void);
     bool CheckIfPresetExists(char *preset_to_find);
 
     void SetBitwise(bool b);

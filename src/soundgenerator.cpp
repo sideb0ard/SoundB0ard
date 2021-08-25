@@ -39,6 +39,11 @@ void SoundGenerator::Save(std::string preset_name)
     std::cout << "BASE CLASS SAVE " << preset_name << " - NO OP!" << std::endl;
 }
 
+void SoundGenerator::ListPresets()
+{
+    std::cout << "BASE CLASS LIST PREESEEEETS - NO OP!" << std::endl;
+}
+
 std::string SoundGenerator::Status() { return std::string{"BASE CLASS, YO"}; }
 
 void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)

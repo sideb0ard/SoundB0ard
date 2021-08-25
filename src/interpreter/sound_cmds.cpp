@@ -69,7 +69,8 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
 
 void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
 {
-    assert(args.size() == 3);
+    if (args.size() < 2)
+        return;
 
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
     if (soundgen)
@@ -81,12 +82,19 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
                 std::dynamic_pointer_cast<object::String>(args[1]);
             if (str_obj)
             {
-                std::shared_ptr<object::String> str_cmd =
-                    std::dynamic_pointer_cast<object::String>(args[2]);
-                if (str_cmd->value_ == "load")
-                    sg->Load(str_obj->value_);
-                else if (str_cmd->value_ == "save")
-                    sg->Save(str_obj->value_);
+                if (str_obj->value_ == "list")
+                {
+                    sg->ListPresets();
+                }
+                else if (args.size() == 3)
+                {
+                    std::shared_ptr<object::String> str_cmd =
+                        std::dynamic_pointer_cast<object::String>(args[2]);
+                    if (str_cmd->value_ == "load")
+                        sg->Load(str_obj->value_);
+                    else if (str_cmd->value_ == "save")
+                        sg->Save(str_obj->value_);
+                }
             }
         }
     }

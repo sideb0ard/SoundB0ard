@@ -1,9 +1,12 @@
 
-#let chz = [60, 65, 67, 67];
-let chz = [12, 17, 19, 19];
+let chz = [40, 45, 47, 47];
+#let chz = [12, 17, 19, 19];
 #let chz = [70, 74, 73, 77];
-let spd = [2, 4, 8, 16];
+let spd = [3, 5, 7];
+let sx = 0;
 let mel_idx = 0;
+let shiftz = [2, 3, 4];
+let shx = 0;
 
 let combinor = fn(rhythm, melody)
 {
@@ -24,10 +27,17 @@ let blah_gen = gen()
 {
   setup()
   {
+    let bet = bjork(spd[sx], 8);
   }
   run()
   {
+    if (count % 4 == 0) {
+      bet = bjork(spd[sx], 8);
+      sx = incr(sx, 0, len(spd));
+    }
     play_array(bd, combinor(bet, chz));
+    play_array(dx100, rotate(up(combinor(bet, chz),1), shiftz[shx]));
+    shx = incr(shx, 0, len(shiftz));
   }
 }
 

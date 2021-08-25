@@ -32,6 +32,7 @@ class SoundGenerator
     virtual void ChordOn(midi_event ev) { (void)ev; };
     virtual void Load(std::string preset_name);
     virtual void Save(std::string preset_name);
+    virtual void ListPresets();
 
     virtual void control(midi_event ev) { (void)ev; };
     virtual void pitchBend(midi_event ev) { (void)ev; };

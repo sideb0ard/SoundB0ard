@@ -954,6 +954,7 @@ void Mixer::CheckForAudioActionQueueMessages()
                 }
             }
             else if (action->type == AudioAction ::SAVE_PRESET ||
+                     action->type == AudioAction ::LIST_PRESETS ||
                      action->type == AudioAction::LOAD_PRESET)
             {
                 interpreter_sound_cmds::ParseSynthCmd(action->args);

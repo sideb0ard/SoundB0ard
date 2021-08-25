@@ -6,6 +6,8 @@
 #include <qblimited_oscillator.h>
 #include <soundgenerator.h>
 
+static const char DRUM_SYNTH_PATCHES[] = "settings/drumpresets.dat";
+
 class DrumSynth : public SoundGenerator
 {
   public:
@@ -19,6 +21,11 @@ class DrumSynth : public SoundGenerator
     void noteOn(midi_event ev) override;
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
+    void Load(std::string name) override;
+    void Save(std::string name) override;
+    void ListPresets() override;
+
+    std::string patch_name{};
 
     QBLimitedOscillator osc1;
     float osc1_amp{1};

@@ -11,6 +11,7 @@ enum AudioAction
     BPM,
     INFO,
     HELP,
+    LIST_PRESETS,
     LOAD_PRESET,
     MIDI_EVENT_ADD,
     MIDI_EVENT_ADD_DELAYED,
