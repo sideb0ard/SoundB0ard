@@ -113,7 +113,7 @@ stereo_val DrumSynth::genNext()
 
         m_dca.DoDCA(filter_out, filter_out, &out_left, &out_right);
 
-        out = {.left = out_left, .right = out_right};
+        out = {.left = out_left * volume, .right = out_right * volume};
         out = Effector(out);
     }
 
@@ -144,6 +144,8 @@ void DrumSynth::SetParam(std::string name, double val)
         filter1.SetQControl(val);
     else if (name == "f1_osc1_enable")
         f1_osc1_enable = val;
+    else if (name == "f1_osc2_enable")
+        f1_osc2_enable = val;
     else if (name == "filter2")
         filter2.SetType(val);
     else if (name == "f2fc")
@@ -195,7 +197,7 @@ std::string DrumSynth::Status()
        << " f1_osc1_enable:" << (f1_osc1_enable ? "true" : "false")
        << " f1_osc2_enable:" << (f1_osc2_enable ? "true" : "false")
        << std::endl;
-    ss << "     filter1:" << filter2.m_filter_type << " f2fc:" << filter2.m_fc
+    ss << "     filter2:" << filter2.m_filter_type << " f2fc:" << filter2.m_fc
        << " f2fq:" << filter1.m_q
        << " f2_osc1_enable:" << (f2_osc1_enable ? "true" : "false")
        << " f2_osc2_enable:" << (f2_osc2_enable ? "true" : "false")

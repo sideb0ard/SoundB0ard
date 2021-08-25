@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 #include "defjams.h"
 #include "filter.h"
 #include "utils.h"
@@ -30,6 +32,8 @@ void Filter::SetFcControl(double val)
     if (val >= FILTER_FC_MIN && val <= FILTER_FC_MAX)
     {
         m_fc_control = val;
+        std::cout << "SET FCCCCC!:" << val << std::endl;
+        Update();
     }
     else
     {
@@ -41,12 +45,19 @@ void Filter::SetFcMod(double val) { m_fc_mod = val; }
 void Filter::SetType(unsigned int type)
 {
     if (type < NUM_FILTER_TYPES)
+    {
         m_filter_type = type;
+        Update();
+    }
     else
         printf("Type must be between 0 and %d\n", NUM_FILTER_TYPES - 1);
 }
 
-void Filter::SetQControl(double val) { m_q_control = val; }
+void Filter::SetQControl(double val)
+{
+    m_q_control = val;
+    Update();
+}
 
 void Filter::Update()
 {
@@ -75,6 +86,8 @@ void Filter::Update()
         m_fc = FILTER_FC_MAX;
     if (m_fc < FILTER_FC_MIN)
         m_fc = FILTER_FC_MIN;
+
+    m_q = m_q_control;
 }
 
 void Filter::Reset() {}
