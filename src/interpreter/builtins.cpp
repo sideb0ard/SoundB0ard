@@ -590,7 +590,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                      array_obj->elements_.push_back(input[1]);
 
-                     return evaluator::NULLL;
+                     return array_obj;
                  })},
     {"print", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
@@ -1786,7 +1786,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  {
                      int args_size = args.size();
                      if (args_size == 1)
-                         repl_queue.push("Type:" + args[0]->Type());
+                         // repl_queue.push("Type:" + args[0]->Type());
+                         return std::make_shared<object::String>(
+                             args[0]->Type());
 
                      return evaluator::NULLL;
                  })},

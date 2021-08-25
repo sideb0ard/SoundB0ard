@@ -103,3 +103,19 @@ let down = fn(array_val, octaves)
 {
   return map(array_val, fn(v) { if (v > 0) { return v - 12*octaves; } else { return v;}  });
 }
+
+let combinor = fn(rhythm, melody)
+{
+  let return_melody= [];
+  for (i=0; i < len(rhythm); ++i)
+  {
+    if (rhythm[i] > 0) {
+      return_melody = push(return_melody, melody[mel_idx]);
+      mel_idx = incr(mel_idx, 0, len(melody));
+    } else {
+      return_melody = push(return_melody, 0);
+    }
+  }
+  return return_melody;
+}
+

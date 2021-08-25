@@ -1,43 +1,56 @@
 
-let chz = [40, 45, 47, 47];
-#let chz = [12, 17, 19, 19];
-#let chz = [70, 74, 73, 77];
-let spd = [3, 5, 7];
-let sx = 0;
-let mel_idx = 0;
-let shiftz = [2, 3, 4];
-let shx = 0;
-
-let combinor = fn(rhythm, melody)
-{
-  let return_melody= [];
-  for (i=0; i < len(rhythm); ++i)
-  {
-    if (rhythm[i] > 0) {
-      return_melody = push(return_melody, melody[mel_idx]);
-      mel_idx = incr(mel_idx, 0, len(melody));
-    } else {
-      return_melody = push(return_melody, 0);
-    }
-  }
-  return return_melody;
-}
+let ntz = {0:63, 4:63, 6:68, 9:63, 12:63, 14:63}];
 
 let blah_gen = gen()
 {
   setup()
   {
-    let bet = bjork(spd[sx], 8);
+    let tmz = [16, 32, 64, 128];
+    let tz = 0;
+
+    let offz = [0, 2, 3, 4, 7];
+    let ox = 0;
+
+    let mulz = [1, 2, 3, -2, -3];
+    let mx = 0;
   }
   run()
   {
-    if (count % 4 == 0) {
-      bet = bjork(spd[sx], 8);
-      sx = incr(sx, 0, len(spd));
+    let dr = 3840 / tmz[tz];
+    tz = incr(tz, 0, len(tmz));
+    for (i = 0; i < 16; ++i) {
+      if (type(ntz[i]) == "NUMBER") {
+        note_on_at(mo, ntz[i] * mulz[mx], i * pp, dur = dr);
+        note_on_at(mo, notes_in_chord(ntz[i] * mulz[mx], 1, true), i * pp + offz[ox] * dr, dur = dr);
+        if (count % 3 == 0) {
+          note_on_at(bd, ntz[i] - 20, i * pp);
+        } else {
+          note_on_at(bd, ntz[i], i * pp + offz[ox] * 3);
+        }
+      }
     }
-    play_array(bd, combinor(bet, chz));
-    play_array(dx100, rotate(up(combinor(bet, chz),1), shiftz[shx]));
-    shx = incr(shx, 0, len(shiftz));
+    ox = incr(ox, 0, len(offz));
+    mx = incr(mx, 0, len(mulz));
+  }
+}
+
+let hh_gen = gen()
+{
+  setup()
+  {
+    let swz = [0, 10, 20, 30, 40, 50, 77];
+    let sx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (i % 2 == 0) {
+        note_on_at(hh, 1, i*pp);
+      } else {
+        note_on_at(hh, 1, i*pp + swz[sx]);
+      }
+    }
+    sx = incr(sx, 0, len(swz));
   }
 }
 
