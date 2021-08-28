@@ -1,0 +1,53 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let notz = [48, 56];
+    let nx = 0;
+    let d = 25;
+    let v = 112;
+    let oct = 0;
+    let delay= 10;
+    let synz = [2, 4, 8, 16, 32];
+    let sx = 0;
+
+    let lenz = [4, 8, 12, 16];
+    let lx = 0;
+    let rotr = 2;
+  }
+  run()
+  {
+    let pp = 3840/ lenz[lx];
+    for (i = 0; i < lenz[lx]; ++i) {
+      let del = 0;
+      if (i % 2 ==0) {
+        del = d;
+      }
+      note_on_at(mo, notz[nx] + 12*oct, pp * i + del, dur = d, vel = v);
+    }
+    lx = incr(lx, 0, len(lenz));
+    set mo:o2semi lenz[lx];
+
+    nx = incr(nx, 0, len(notz));
+    d = d + 50;
+    if (d > 600) {
+      d = 50;
+    }
+    v = incr(v, 100, 127);
+    delay = incr(delay, 25, 175);
+
+    #oct = incr(oct, -2, 4);
+
+    set mo:l1rate synchz(synz[sx]);
+    sx = incr(sx, 0, len(synz));
+
+    play_array(bd, bjork(3,8));
+    if (count % 2 == 0) {
+      play_array(sn, rotate(bjork(3,8), rotr));
+      rotr = incr(rotr, 2, 4);
+    }
+
+  }
+}
+

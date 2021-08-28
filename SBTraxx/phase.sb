@@ -1,0 +1,42 @@
+let freqs=[64, 66, 71, 73, 74, 66, 64, 73, 71, 66, 74, 73];
+
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let pp = 3840 / len(freqs);
+    let bars_2_phase_over = 8;
+    let qpp = (3840* bars_2_phase_over - pp) / (len(freqs)*bars_2_phase_over);
+    print("QPP:", qpp);
+    let num_times_4_phase = 3840 / qpp;
+    let frx = 0;
+    let carry = 0;
+    let drz = [10, 20, 50, 100, 200, 277];
+    let dx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 12; ++i) {
+      note_on_at(mo, freqs[i], i * pp, dur=drz[dx]);
+    }
+
+    for (i = 0; i < num_times_4_phase; ++i) {
+      note_on_at(mo2, freqs[frx], i * qpp + carry, dur=drz[dx]);
+      frx = incr(frx, 0, len(freqs));
+
+      if ( i == floor(num_times_4_phase) - 1) {
+        print("I is ", i);
+        let last_place = (i * qpp) + carry;
+        print("LAST PLACE IS:", last_place);
+        let remainder = 3840 - last_place;
+        print("RMAINDERRR:", remainder);
+        carry = qpp - (3840 - last_place);
+        print("CARRY:", carry);
+      }
+
+    }
+    dx = incr(dx, 0, len(drz));
+  }
+}
+
