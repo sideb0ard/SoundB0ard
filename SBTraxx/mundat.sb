@@ -1,0 +1,27 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let pos = [{0:1420, 8:940, 14:3820}, {0:1900, 10:460, 14:2820}];
+    let px = 0;
+    let notz = [68, 63, 61];
+    let nx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      let my_pos = pos[px];
+
+      for (i = 0; i < 16; ++i) {
+        if (type(my_pos[i]) == "NUMBER") {
+          note_on_at(mo, notes_in_chord(notz[nx], 1, true), pp*i, dur=my_pos[i]);
+          nx = incr(nx, 0, len(notz));
+        }
+      }
+      px = incr(px, 0, len(pos));
+
+    }
+  }
+}
+

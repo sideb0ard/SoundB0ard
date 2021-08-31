@@ -1,11 +1,11 @@
 
-let ntz = {0:63, 4:63, 6:68, 9:63, 12:63, 14:63}];
+let ntz = [63, 63, 68, 63, 63, 63];
 
 let blah_gen = gen()
 {
   setup()
   {
-    let tmz = [16, 32, 64, 128];
+    let tmz = [50, 100, 150, 200, 30];
     let tz = 0;
 
     let offz = [0, 2, 3, 4, 7];
@@ -13,44 +13,45 @@ let blah_gen = gen()
 
     let mulz = [1, 2, 3, -2, -3];
     let mx = 0;
-  }
-  run()
-  {
-    let dr = 3840 / tmz[tz];
-    tz = incr(tz, 0, len(tmz));
-    for (i = 0; i < 16; ++i) {
-      if (type(ntz[i]) == "NUMBER") {
-        note_on_at(mo, ntz[i] * mulz[mx], i * pp, dur = dr);
-        note_on_at(mo, notes_in_chord(ntz[i] * mulz[mx], 1, true), i * pp + offz[ox] * dr, dur = dr);
-        if (count % 3 == 0) {
-          note_on_at(bd, ntz[i] - 20, i * pp);
-        } else {
-          note_on_at(bd, ntz[i], i * pp + offz[ox] * 3);
-        }
-      }
-    }
-    ox = incr(ox, 0, len(offz));
-    mx = incr(mx, 0, len(mulz));
-  }
-}
 
-let hh_gen = gen()
-{
-  setup()
-  {
-    let swz = [0, 10, 20, 30, 40, 50, 77];
-    let sx = 0;
+    let rtz = [3, 0, 4];
+    let rx = 0;
+
+    let beat = bjork(3,8);
+    let btz = [3, 3, 3, 5, 3, 3, 2];
+    let bx = 0;
+    let pp = 3840 / 8;
   }
   run()
   {
-    for (i = 0; i < 16; ++i) {
-      if (i % 2 == 0) {
-        note_on_at(hh, 1, i*pp);
-      } else {
-        note_on_at(hh, 1, i*pp + swz[sx]);
+
+    if (count % 4 == 0) {
+      beat = bjork(btz[bx], 8);
+      bx = incr(bx, 0, len(btz));
+    }
+
+    let mel = combinor(beat, ntz);
+
+    if (count % 4 == 0) {
+      mel = rotate(mel, rtz[rx]);
+      rx = incr(rx, 0, len(rtz));
+    }
+    if (count % 3 == 0) {
+      mel = reverse(mel);
+    }
+
+    if (count % 3 == 0) {
+      fast(dx, down(mel,2), rtz[rx], dur = tmz[tz]);
+      rx = incr(rx, 0, len(rtz));
+    }
+
+    for (i = 0; i < 8; ++i) {
+      if (mel[i] > 0) {
+        note_on_at(bd, mel[i]-20, i * pp);
+        note_on_at(dx, mel[i]-32, i * pp, dur = tmz[tz]);
+        tz = incr(tz, 0, len(tmz));
       }
     }
-    sx = incr(sx, 0, len(swz));
   }
 }
 

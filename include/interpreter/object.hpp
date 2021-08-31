@@ -22,6 +22,7 @@ constexpr char BOOLEAN_OBJ[] = "BOOLEAN";
 
 constexpr char RETURN_VALUE_OBJ[] = "RETURN_VALUE";
 
+constexpr char BREAK_OBJ[] = "BREAK";
 constexpr char FORLOOP_OBJ[] = "FOR LOOP";
 constexpr char FUNCTION_OBJ[] = "FUNCTION";
 constexpr char GENERATOR_OBJ[] = "GENERATOR";
@@ -75,6 +76,14 @@ class Object
     virtual ~Object() = default;
     virtual ObjectType Type() = 0;
     virtual std::string Inspect() = 0;
+};
+
+class Break : public Object
+{
+  public:
+    Break() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
 };
 
 class Number : public Object

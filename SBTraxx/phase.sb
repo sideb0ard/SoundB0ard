@@ -1,4 +1,9 @@
-let freqs=[64, 66, 71, 73, 74, 66, 64, 73, 71, 66, 74, 73];
+#let freqs=[64, 66, 71, 73, 74, 66, 64, 73, 71, 66, 74, 73];
+let freqs=[47, 44, 47, 43, 37, 44, 40];
+#let freqs=[30, 33, 34, 28, 44];
+#let freqs=[20, 22, 24, 23];
+
+let should_phase = false;
 
 
 let blah_gen = gen()
@@ -6,9 +11,8 @@ let blah_gen = gen()
   setup()
   {
     let pp = 3840 / len(freqs);
-    let bars_2_phase_over = 32;
+    let bars_2_phase_over = 4;
     let qpp = (3840* bars_2_phase_over) / (len(freqs) * bars_2_phase_over + 1);
-    print("QPP:", qpp);
     let num_times_4_phase = 3840 / qpp;
     let frx = 0;
     let carry = 0;
@@ -51,6 +55,108 @@ let blah_gen = gen()
     }
 
     dx = incr(dx, 0, len(drz));
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let beat = bjork(3,8);
+    let bz = [3, 5, 3, 7, 4];
+    let bx = 0;
+    let sx = 0;
+    let notz = [40, 40, 44, 47, 35];
+    let nx = 0;
+    let rotz = [3, 2, 4, 5];
+    let rx = 0;
+
+    let plz = 1;
+    let drz = [77, 74, 150, 200, 350, 42, 177, 57, 477, 84, 970 ];
+    let dx = 0;
+
+    let pp = 3840 / 8;
+    let bars_2_phase_over = 4;
+    let qpp = (3840* bars_2_phase_over) / (8 * bars_2_phase_over + 1);
+    let num_times_4_phase = 3840 / qpp;
+    let frx = 0;
+    let carry = 0;
+  }
+  run()
+  {
+    beat = bjork(bz[bx], 8);
+    let mz = combinor(beat, notz);
+    play_array(bd, mz);
+    if (count % 4 == 0) {
+      play_array(bd, mz);
+    }
+    play_array(sn, rotate(bjork(bz[sx], 8), rotz[rx]));
+
+    if (should_phase) {
+      for (i = 0; i < 8; ++i ) {
+        let time_at = i * qpp + carry;
+        note_on_at(bd2, mz[0], time_at);
+      }
+      let last_idx = (8 * qpp) + carry;
+      if (last_idx < 3840) {
+        note_on_at(bd2, mz[0], last_idx);
+        let diff = 3840 - last_idx;
+        carry = qpp - diff;
+      } else {
+        carry = last_idx - 3840;
+      }
+    }
+
+    if (count % 2 == 0) {
+      let beatnum = 0;
+      for (i = 0; i < 8; ++i) {
+        if (beat[i] == 1) {
+          ++beatnum;
+        }
+        if (beat[i] == 1 && beatnum == plz) {
+          note_on_at(mo, notes_in_chord(notz[nx], 0, true), i * (3840/8), dur=drz[dx]);
+          plz  = incr(plz, 1, 5);
+          dx  = incr(dx, 0, len(drz));
+          note_on_at(mo2, notes_in_chord(notz[nx], 0), (i+nx) * (3840/8), dur=drz[dx]);
+          nx = incr(nx, 0, len(notz));
+          #break;
+        }
+      }
+    }
+
+    bx = incr(bx, 0, len(bz));
+    sx = incr(sx, 0, 2);
+    nx = incr(nx, 0, len(notz));
+    rx = incr(rx, 0, len(rotz));
+
+
+  }
+}
+
+let hhah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [16, 16, 12, 8, 6, 4];
+    let lx = 0;
+    let swngz = [10, 17, 23, 27, 47];
+    let sx = 0;
+  }
+  run()
+  {
+    let pp = 3840 / lenz[lx];
+    let addn = 0;
+    for (i = 0; i < lenz[lx]; ++i) {
+      if (i % 2 == 0) {
+        addn = swngz[sx];
+        sx = incr(sx, 0, len(swngz));
+      }
+      note_on_at(hh, 1, pp * i + addn);
+    }
+
+    lx = incr(lx, 0, len(lenz));
+    sx = incr(sx, 0, len(swngz));
+
   }
 }
 

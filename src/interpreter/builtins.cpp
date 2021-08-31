@@ -1410,6 +1410,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      // not dealing with error, just return empty
                      if (num_pulses >= seq_length)
                          return return_array;
+                     if (seq_length < 1)
+                         return return_array;
 
                      std::vector<int> bjork_num =
                          GenerateBjork(num_pulses, seq_length);
@@ -1641,9 +1643,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              -> std::shared_ptr<object::Object>
          {
              int args_size = args.size();
-             if (args_size < 2)
+             if (args_size < 3)
              {
-                 std::cerr << "Need an array to play and a speed..\n";
+                 std::cerr << "Need a target, an array to play and a speed..\n";
                  return evaluator::NULLL;
              }
              int vel = 128;

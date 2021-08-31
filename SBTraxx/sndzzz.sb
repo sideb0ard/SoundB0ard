@@ -1,0 +1,40 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let notz = [45, 38, 43];
+    let ntx = 0;
+    let pp = 3840 / 16;
+    let beat = bjork(11, 16);
+    let drz = [30, 50, 100, 500, 700, 147, 177, 221];
+    let dx = 0;
+    let blnz = [3, 5, 8, 0, 4, 11];
+    let bx = 0;
+  }
+  run()
+  {
+
+    if (count % 2 == 0) {
+      beat = bjork(blnz[bx], 16);
+      bx = incr(bx, 0, len(blnz));
+    }
+
+    for (i = 0; i < 16; ++i) {
+      if (beat[i] == 1) {
+        if (ntx < 2) {
+          note_on_at(dx100, notes_in_chord(notz[ntx]-12, 1), i * pp, dur=drz[dx]);
+        } else {
+          note_on_at(dx100, notes_in_chord(notz[ntx], 0), i * pp, dur=drz[dx]);
+        }
+      }
+    }
+    if (count % 8 == 0) {
+      note_on(dx100, notes_in_chord(notz[ntx]+24, 0, true), dur=drz[dx]);
+      ntx = incr(ntx, 0, len(notz));
+      #note_on_at(dx100, notes_in_chord(notz[ntx]+24, 0, true), dur=drz[dx]);
+    }
+    dx = incr(dx, 0, len(drz));
+  }
+}
+

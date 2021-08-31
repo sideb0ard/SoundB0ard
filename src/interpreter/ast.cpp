@@ -29,6 +29,13 @@ std::string Program::String() const
     return ss.str();
 }
 
+std::string BreakStatement::String() const
+{
+    std::stringstream ss;
+
+    return "BREAK";
+}
+
 std::string VelocityExpression::String() const
 {
     std::stringstream ss;

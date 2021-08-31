@@ -39,6 +39,8 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
 {
     if (cur_token_.type_.compare(token::SLANG_LET) == 0)
         return ParseLetStatement();
+    else if (cur_token_.type_.compare(token::SLANG_BREAK) == 0)
+        return ParseBreakStatement();
     else if (cur_token_.type_.compare(token::SLANG_RETURN) == 0)
         return ParseReturnStatement();
     else if (cur_token_.type_.compare(token::SLANG_LS) == 0)
@@ -93,6 +95,20 @@ std::shared_ptr<ast::LetStatement> Parser::ParseLetStatement()
     NextToken();
 
     stmt->value_ = ParseExpression(Precedence::LOWEST);
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
+
+    return stmt;
+}
+
+std::shared_ptr<ast::BreakStatement> Parser::ParseBreakStatement()
+{
+
+    std::shared_ptr<ast::BreakStatement> stmt =
+        std::make_shared<ast::BreakStatement>(cur_token_);
+
+    NextToken();
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();

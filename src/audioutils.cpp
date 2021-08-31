@@ -240,7 +240,12 @@ std::vector<int> GetMidiNotesInChord(unsigned int root_note,
         notes_in_chord.push_back(root_note + 7);
 
     if (seventh)
-        notes_in_chord.push_back(root_note + 11);
+    {
+        if (chord_type == DIMINISHED_CHORD)
+            notes_in_chord.push_back(root_note + 10);
+        else
+            notes_in_chord.push_back(root_note + 11);
+    }
 
     return notes_in_chord;
 }

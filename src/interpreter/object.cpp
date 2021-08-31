@@ -100,6 +100,9 @@ object::HashKey String::HashKey()
     return object::HashKey(Type(), (uint64_t)hasher(value_));
 }
 
+std::string Break::Inspect() { return "break"; }
+ObjectType Break::Type() { return BREAK_OBJ; }
+
 std::string Null::Inspect() { return "null"; }
 ObjectType Null::Type() { return NULL_OBJ; }
 

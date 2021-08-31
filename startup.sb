@@ -15,17 +15,17 @@ let rhythms_string = [
 
 let rhythms_int = [
   #shiko
-  [1, ~, ~, ~, 1, ~, 1, ~, ~, ~, 1, ~, 1, ~, ~, ~],
+  [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
   #son
-  [1, ~, ~, 1, ~, ~, 1, ~, ~, ~, 1, ~, 1, ~, ~, ~],
+  [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
   #rumba
-  [1, ~, ~, 1, ~, ~, ~, 1, ~, ~, 1, ~, 1, ~, ~, ~],
+  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0],
   #soukous
-  [1, ~, ~, 1, ~, ~, 1, ~, ~, ~, 1, 1, ~, ~, ~, ~],
+  [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0],
   #gahu
-  [1, ~, ~, 1, ~, ~, 1, ~, ~, ~, 1, ~, ~, ~, 1, ~],
+  [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
   #bossa-nova
-  [1, ~, ~, 1, ~, ~, 1, ~, ~, ~, 1, ~, ~, 1, ~, ~]
+  [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0]
 ]
 
 let distrhythms_string = gen()
@@ -107,6 +107,7 @@ let down = fn(array_val, octaves)
 let combinor = fn(rhythm, melody)
 {
   let return_melody= [];
+  let mel_idx = 0;
   for (i=0; i < len(rhythm); ++i)
   {
     if (rhythm[i] > 0) {
@@ -119,3 +120,31 @@ let combinor = fn(rhythm, melody)
   return return_melody;
 }
 
+let phasefn = fn(soundgen1, soundgen2, pat_array, sg2_px, carry, bars_to_phase_over, note_dur)
+{
+  let pp = 3840 / len(pat_array);
+  let qpp = (3840* bars_to_phase_over) / (len(pat_array) * bars_to_phase_over + 1);
+
+  # normal time
+  for (i = 0; i < len(pat_array); ++i) {
+    #print("sg:", soundgen1, "I:", pat_array[i], " dru:" ,note_dur, " pp:", pp);
+    note_on_at(soundgen1, pat_array[i], i * pp, dur=note_dur);
+  }
+
+  # phased time
+  for (i = 0; i < len(pat_array); ++i ) {
+    let time_at = i * qpp + carry;
+    note_on_at(soundgen2, pat_array[sg2_px], time_at, dur=note_dur);
+    sg2_px = incr(sg2_px, 0, len(pat_array));
+  }
+  let last_idx = (len(pat_array) * qpp) + carry;
+  if (last_idx < 3840) {
+    note_on_at(soundgen2, pat_array[sg2_px], last_idx, dur=note_dur);
+    sg2_px = incr(sg2_px, 0, len(pat_array));
+    let diff = 3840 - last_idx;
+    carry = qpp - diff;
+  } else {
+    carry = last_idx - 3840;
+  }
+  return [sg2_px, carry];
+}

@@ -111,6 +111,13 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         return EvalProgram(prog_node->statements_, env);
     }
 
+    std::shared_ptr<ast::BreakStatement> break_statement_node =
+        std::dynamic_pointer_cast<ast::BreakStatement>(node);
+    if (break_statement_node)
+    {
+        return std::make_shared<object::Break>();
+    }
+
     std::shared_ptr<ast::BlockStatement> block_statement_node =
         std::dynamic_pointer_cast<ast::BlockStatement>(node);
     if (block_statement_node)
@@ -865,6 +872,10 @@ EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
     while (IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_)))
     {
         result = Eval(for_loop->body_, for_loop->env_);
+        if (result->Type() == object::BREAK_OBJ)
+        {
+            break;
+        }
         auto new_iterator_val = Eval(for_loop->increment_, for_loop->env_);
         if (IsError(new_iterator_val))
         {

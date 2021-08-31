@@ -368,6 +368,13 @@ class Statement : public Node
     explicit Statement(Token toke) : Node{toke} {};
 };
 
+class BreakStatement : public Statement
+{
+  public:
+    explicit BreakStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+};
+
 class LetStatement : public Statement
 {
   public:

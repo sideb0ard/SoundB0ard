@@ -38,6 +38,7 @@ const TokenType SLANG_RBRACE = "}";
 const TokenType SLANG_LBRACKET = "[";
 const TokenType SLANG_RBRACKET = "]";
 
+const TokenType SLANG_BREAK = "BREAK";
 const TokenType SLANG_FOR = "FOR";
 const TokenType SLANG_FUNCTION = "FUNCTION";
 const TokenType SLANG_GENERATOR = "GENERATOR";
