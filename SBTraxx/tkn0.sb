@@ -1,0 +1,65 @@
+
+let bdo = sample(TT-ROYALHOUSE/bdork.wav);
+let bg = sample(TT-ROYALHOUSE/bgn1.wav);
+let tri = sample(perc/triangle.aiff);
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let otime = 15;
+    let notz = [70, 34, 45];
+    let nx = 0;
+    let mpp = 3840 / 4;
+    let diff = 0;
+    let steppa = mpp / otime;
+
+    let pbeat = rand_beat();
+    let pbx = 3;
+
+    let notz = [21, 34, 46, 30, 22];
+    let n2x = 0;
+  }
+  run()
+  {
+    #print("DFF:", diff);
+    for (i = 0; i < 4; ++i) {
+      let mydiff = 0;
+      if (i % 2 == 1) {
+        mydiff = diff;
+      }
+      #print("MYDIFF:", mydiff);
+      let timr = i * mpp + mydiff ;
+      #print("PLAYING BEAT AT: ", timr);
+      #note_on_at(bd, notz[nx], timr);
+      #note_on_at(hh, notz[nx], timr + diff);
+      #note_on_at(dx, notz[nx], timr + diff, dur=70);
+    }
+
+    diff = diff + steppa;
+    if (diff > mpp) {
+      diff = 0;
+    }
+
+    nx = incr(nx, 0, len(notz));
+
+
+    let myidx = 0;
+    for (i = 0; i < 16; ++i) {
+      if (pbeat[myidx] > 0) {
+        note_on_at(bd, notz[n2x], i * pp, dur=50);
+        note_on_at(dx, notes_in_chord(notz[n2x] -12, 0, true), i * pp + diff, dur=10);
+        n2x = incr(n2x, 0, len(notz));
+      }
+      myidx = incr(myidx, 0, pbx);
+    }
+
+    if (count % 2 == 1 ) {
+      pbx = incr(pbx, 4, 16);
+    }
+    if (count % 11 == 0 ) {
+      pbeat = rand_beat();
+    }
+  }
+}
+

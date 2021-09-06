@@ -148,3 +148,20 @@ let phasefn = fn(soundgen1, soundgen2, pat_array, sg2_px, carry, bars_to_phase_o
   }
   return [sg2_px, carry];
 }
+
+let map_to_array = fn(the_map, len_array)
+{
+  let the_array = [];
+
+  for (i = 0; i < len_array; ++i) {
+    if (type(the_map[i]) == "NUMBER") {
+      push(the_array, the_map[i]);
+    } else {
+      push(the_array, 0);
+    }
+  }
+
+  return the_array;
+
+}
+

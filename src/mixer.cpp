@@ -633,7 +633,7 @@ void Mixer::PrintMidiInfo()
 
     std::stringstream ss;
     ss << "Midi Notes (octave 3):\n";
-    ss << "C3:60 C#:61 D:62 D#:63 E:64 F:65 F#:66 G:67 G#:68 A:69 A#:70 B:71\n";
+    ss << "C3:48 C#:49 D:50 D#:51 E:52 F:53 F#:54 G:55 G#:56 A:57 A#:58 B:59\n";
     ss << "(For other octaves, add or subtract 12)\n";
     ss << "Chord Progressions: I-IV-V, I-V-vi-IV, I-vi-IV-V, vi-ii-V-I\n";
 

@@ -757,6 +757,25 @@ void MiniSynth::Update()
     else
         modmatrix.EnableMatrixRow(SOURCE_EG1, DEST_DCA_EG, false);
 
+    // EG2 routings
+    if (m_settings.m_eg2_osc_enabled == 1)
+        modmatrix.EnableMatrixRow(SOURCE_BIASED_EG2, DEST_ALL_OSC_FO,
+                                  true); // enable
+    else
+        modmatrix.EnableMatrixRow(SOURCE_BIASED_EG2, DEST_ALL_OSC_FO, false);
+
+    if (m_settings.m_eg2_filter_enabled == 1)
+        modmatrix.EnableMatrixRow(SOURCE_BIASED_EG2, DEST_ALL_FILTER_FC,
+                                  true); // enable
+    else
+        modmatrix.EnableMatrixRow(SOURCE_BIASED_EG2, DEST_ALL_FILTER_FC, false);
+
+    if (m_settings.m_eg2_dca_enabled == 1)
+        modmatrix.EnableMatrixRow(SOURCE_EG2, DEST_DCA_EG,
+                                  true); // enable
+    else
+        modmatrix.EnableMatrixRow(SOURCE_EG2, DEST_DCA_EG, false);
+
     // Velocity to Attack
     if (m_settings.m_velocity_to_attack_scaling == 1)
         modmatrix.EnableMatrixRow(SOURCE_VELOCITY, DEST_ALL_EG_ATTACK_SCALING,
@@ -2309,6 +2328,29 @@ void MiniSynth::SetParam(std::string name, double val)
         SetEgDecayTimeMs(1, val);
     else if (name == "eg1_release")
         SetEgReleaseTimeMs(1, val);
+
+    else if (name == "eg2_filter_en")
+        SetEgFilterEnable(2, val);
+    else if (name == "eg2_osc_en")
+        SetEgOscEnable(2, val);
+    else if (name == "eg2_dca_en")
+        SetEgDcaEnable(2, val);
+    else if (name == "eg2_sustain")
+        SetEgSustainOverride(2, val);
+    else if (name == "eg2_filter_int")
+        SetEgFilterInt(2, val);
+    else if (name == "eg2_osc_int")
+        SetEgOscInt(2, val);
+    else if (name == "eg2_dca_int")
+        SetEgDcaInt(2, val);
+    else if (name == "eg2_sustainlvl")
+        SetEgSustain(2, val);
+    else if (name == "eg2_attack")
+        SetEgAttackTimeMs(2, val);
+    else if (name == "eg2_decay")
+        SetEgDecayTimeMs(2, val);
+    else if (name == "eg2_release")
+        SetEgReleaseTimeMs(2, val);
 
     else if (name == "filter")
         SetFilterType(val);

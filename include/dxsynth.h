@@ -32,7 +32,7 @@ typedef struct dxsynthsettings
 {
     char m_settings_name[256];
 
-    // LFO1     // lfo/hi/def
+    // LFO1     // lo/hi/def
     double m_lfo1_intensity; // 0/1/0
     double m_lfo1_rate;      // 0.02 / 20 / 0.5
     unsigned int m_lfo1_waveform;
@@ -115,6 +115,7 @@ class DXSynth : public SoundGenerator
     double GetParam(std::string name) override;
     void Load(std::string preset_name) override;
     void Save(std::string preset_name) override;
+    void ListPresets() override;
 
   public:
     std::array<std::shared_ptr<DXSynthVoice>, MAX_VOICES> voices_;

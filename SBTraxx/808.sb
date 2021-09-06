@@ -21,6 +21,7 @@ let blah_gen = gen()
     let btz = [3, 3, 3, 5, 3, 3, 2];
     let bx = 0;
     let pp = 3840 / 8;
+    let hcount = 0;
   }
   run()
   {
@@ -41,15 +42,18 @@ let blah_gen = gen()
     }
 
     if (count % 3 == 0) {
-      fast(dx, down(mel,2), rtz[rx], dur = tmz[tz]);
+      fast(dx, down(mel,4), rtz[rx], dur = tmz[tz]);
       rx = incr(rx, 0, len(rtz));
     }
 
     for (i = 0; i < 8; ++i) {
       if (mel[i] > 0) {
         note_on_at(bd, mel[i]-20, i * pp);
-        note_on_at(dx, mel[i]-32, i * pp, dur = tmz[tz]);
         tz = incr(tz, 0, len(tmz));
+        if (hcount % 3 == 0) {
+          note_on_at(dx, notes_in_chord(mel[i]-12, 0, true), i*pp, dur =tmz[tz] );
+        }
+        ++hcount;
       }
     }
   }

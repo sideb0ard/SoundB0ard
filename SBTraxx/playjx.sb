@@ -1,0 +1,58 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let kz = [20, 20, 27, 20, 28, 20, 20];
+    let kx = 0;
+    let beat = rand_beat();
+    let rotz = [ 3, 4, 0, 7];
+    let rx = 0;
+
+    let numz = [240, 480, 360, 120];
+    let nx = 0;
+
+    let drz = [400, 300, 200, 70, 90];
+    let drzx = 0;
+
+    let hitcount = 0;
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      beat = rand_beat();
+    }
+
+    if (count % 3 == 0) {
+      beat = rotate(beat, rotz[rx]);
+      rx = incr(rx, 0, len(rotz));
+    }
+
+    if (count % 4 == 0 ) {
+      let melly = combinor(beat, kz);
+      fast(dx2, melly, 0.33, dur=drz[drzx]);
+    }
+
+    for (i = 0; i < 16; ++i) {
+      if (beat[i] == 1 ){
+
+        note_on_at(dx, kz[kx], i*pp, dur=drz[drzx]);
+        note_on_at(dx2, kz[kx], i*pp + numz[nx], dur=drz[drzx]);
+
+        nx = incr(nx, 0, len(numz));
+        kx = incr(kx, 0, len(kz));
+
+        if (hitcount % 4 == 0) {
+          note_on_at(dx, notes_in_chord(kz[kx], 0, true), i * pp, dur = drz[drzx]);
+          if (hitcount % 3 == 0) {
+            note_on_at(dx2, notes_in_chord(kz[kx]+24, 0, true), i * pp + numz[nx], dur = drz[drzx]);
+          }
+        }
+
+        ++hitcount;
+      }
+    }
+    drzx = incr(drzx, 0, len(drz));
+  }
+}
+

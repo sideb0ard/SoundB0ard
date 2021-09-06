@@ -11,9 +11,6 @@
 #include <utils.h>
 
 extern Mixer *mixr;
-extern const wchar_t *sparkchars;
-extern const char *s_source_enum_to_name[];
-extern const char *s_dest_enum_to_name[];
 
 static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
                                         "dx_dest_vibrato"};
@@ -441,6 +438,7 @@ void DXSynth::Update()
     // DCA
     global_synth_params.dca_params.amplitude_db = m_settings.m_volume_db;
 
+    // LFO1 DEST_1_
     if (m_settings.m_lfo1_mod_dest1 == DX_LFO_DEST_NONE)
     {
         modmatrix.EnableMatrixRow(SOURCE_LFO1, DEST_OSC1_OUTPUT_AMP, false);
@@ -1166,9 +1164,9 @@ void DXSynth::SetOpWaveform(unsigned int op, unsigned int val)
 
 void DXSynth::SetOpRatio(unsigned int op, double val)
 {
-    if (val < 0.01 || val > 10)
+    if (val < 0.01 || val > 26)
     {
-        printf("val has to be [0.01-10]\n");
+        printf("val has to be [0.01-26]\n");
         return;
     }
     switch (op)
@@ -1524,3 +1522,9 @@ void DXSynth::SetParam(std::string name, double val)
     Update();
 }
 double DXSynth::GetParam(std::string name) { return 0; }
+
+void DXSynth::ListPresets()
+{
+    // TODO - implement this properly!
+    sequence_engine_list_presets(DXSYNTH_TYPE);
+}
