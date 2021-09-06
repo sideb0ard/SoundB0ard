@@ -107,8 +107,8 @@ void Voice::PrepareForPlay()
     // m_eg4.m_mod_source_sustain_override = DEST_EG4_SUSTAIN_OVERRIDE;
 
     m_dca.modmatrix = &modmatrix;
-    m_dca.m_mod_source_eg = DEST_DCA_EG; // enabled in minisynth
-    // m_dca.m_mod_source_eg = DEST_NONE;
+    // m_dca.m_mod_source_eg = DEST_DCA_EG; // enabled in minisynth
+    m_dca.m_mod_source_eg = DEST_NONE;
     m_dca.m_mod_source_amp_db = DEST_DCA_AMP;
     m_dca.m_mod_source_velocity = DEST_DCA_VELOCITY;
     m_dca.m_mod_source_pan = DEST_DCA_PAN;

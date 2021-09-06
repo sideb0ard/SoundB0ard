@@ -19,8 +19,6 @@ Filter::Filter()
     m_nlp = 0;
     m_saturation = 1.0;
 
-    modmatrix = NULL;
-
     m_mod_source_fc = DEST_NONE;
     m_mod_source_fc_control = DEST_NONE;
 
@@ -55,8 +53,7 @@ void Filter::SetType(unsigned int type)
 
 void Filter::SetQControl(double val)
 {
-    m_q_control = val;
-    Update();
+    // do nothing. Needs override
 }
 
 void Filter::Update()
@@ -73,21 +70,30 @@ void Filter::Update()
 
     if (modmatrix)
     {
+        std::cout << "moDMATRX!\n";
         m_fc_mod = modmatrix->destinations[m_mod_source_fc];
+        std::cout << "FC MOD, YO" << m_fc_mod << std::endl;
         if (modmatrix->destinations[m_mod_source_fc_control] > 0)
         {
             m_fc_control = modmatrix->destinations[m_mod_source_fc_control];
+            std::cout << "FC CONTROL, YO" << m_fc_mod << std::endl;
         }
     }
+
+    SetQControl(m_q_control);
 
     m_fc = m_fc_control * pitch_shift_multiplier(m_fc_mod);
 
     if (m_fc > FILTER_FC_MAX)
+    {
+        std::cout << "OOh, capping it at MAX\n";
         m_fc = FILTER_FC_MAX;
+    }
     if (m_fc < FILTER_FC_MIN)
+    {
+        std::cout << "OOh, capping it at MIN\n";
         m_fc = FILTER_FC_MIN;
-
-    m_q = m_q_control;
+    }
 }
 
 void Filter::Reset() {}

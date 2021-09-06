@@ -36,6 +36,7 @@ MiniSynth::MiniSynth()
 {
     type = MINISYNTH_TYPE;
     std::cout << "Added, MiniMoog, yo!\n";
+    PrepareForPlay();
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -50,7 +51,7 @@ MiniSynth::MiniSynth()
         v->SetModMatrixCore(modmatrix.GetModMatrixCore());
 
     LoadDefaults();
-    PrepareForPlay();
+    Update();
 
     active = true;
 }
@@ -169,9 +170,9 @@ std::string MiniSynth::Info()
        << " l1rate:" << m_settings.m_lfo1_rate
        << " l1amp:" << m_settings.m_lfo1_amplitude
        << "\nl1_filter_en:" << m_settings.m_lfo1_filter_fc_enabled
-       << " 1_filter_int:" << m_settings.m_lfo1_filter_fc_intensity
+       << " l1_filter_int:" << m_settings.m_lfo1_filter_fc_intensity
        << "\nl1_filterq_en:" << m_settings.m_lfo1_filter_q_enabled
-       << " 1_filterq_int:" << m_settings.m_lfo1_filter_q_intensity
+       << " l1_filterq_int:" << m_settings.m_lfo1_filter_q_intensity
        << "\nl1_osc_en:" << m_settings.m_lfo1_osc_pitch_enabled
        << " l1_osc_int:" << m_settings.m_lfo1_osc_pitch_intensity
        << "\nl1_pan_en:" << m_settings.m_lfo1_pan_enabled
@@ -229,10 +230,10 @@ std::string MiniSynth::Info()
        << COOL_COLOR_ORANGE
        << "filter:" << s_filter_type_names[m_settings.m_filter_type]
        << m_settings.m_filter_type << " fc:" << m_settings.m_fc_control
-       << " fq:"
-       << m_settings.m_q_control
-       //   aux:%0.2f
-       << " sat:" << m_settings.m_filter_saturation;
+       << " fq:" << m_settings.m_q_control
+       << " kt_int:" << m_settings.m_filter_keytrack_intensity
+       << " sat:" << m_settings.m_filter_saturation
+       << " nlp:" << m_settings.m_nlp;
 
     return ss.str();
 }
@@ -2386,6 +2387,10 @@ void MiniSynth::SetParam(std::string name, double val)
         SetFilterFq(val);
     else if (name == "sat")
         SetFilterSaturation(val);
+    else if (name == "kt_int")
+        SetKeytrackInt(val);
+    else if (name == "nlp")
+        SetFilterNlp(val);
 
     Update();
 }
