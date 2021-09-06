@@ -127,7 +127,6 @@ void MoogLadder::Reset()
 
 double MoogLadder::DoFilter(double xn)
 {
-    std::cout << "M_FC:" << m_fc << std::endl;
     if (m_filter_type == BSF2 || m_filter_type == LPF1 || m_filter_type == HPF1)
         return xn;
 

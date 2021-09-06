@@ -258,11 +258,13 @@ bool MiniSynthVoice::DoVoice(double *left_output, double *right_output)
 
     ////// update layer 1 modulators
     m_eg1.Update();
+    m_eg2.Update();
     m_lfo1.Update();
     m_lfo2.Update();
 
     ////// gen next val layer 1 mods
     m_eg1.DoEnvelope(NULL);
+    m_eg2.DoEnvelope(NULL);
     m_lfo1.DoOscillate(NULL);
     m_lfo2.DoOscillate(NULL);
 
