@@ -170,9 +170,7 @@ void EnvelopeGenerator::Update()
         }
 
         if (m_attack_time_msec != global_eg_params->attack_time_msec)
-        {
             SetAttackTimeMsec(global_eg_params->attack_time_msec);
-        }
 
         if (m_decay_time_msec != global_eg_params->decay_time_msec)
             SetDecayTimeMsec(global_eg_params->attack_time_msec);
@@ -317,7 +315,6 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
 
     if (modmatrix)
     {
-        /// std::cout << "MODMATRIX!\n";
         modmatrix->sources[m_mod_dest_eg_output] = m_envelope_output;
         modmatrix->sources[m_mod_dest_eg_biased_output] =
             m_envelope_output - m_sustain_level;
@@ -326,7 +323,6 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output)
     if (p_biased_output)
         *p_biased_output = m_envelope_output - m_sustain_level;
 
-    // std::cout << "ENV OUTPUT:" << m_envelope_output << std::endl;
     return m_envelope_output;
 }
 

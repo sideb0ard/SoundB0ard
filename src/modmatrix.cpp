@@ -156,6 +156,7 @@ void ModulationMatrix::DoModMatrix(unsigned layer)
             continue;
 
         double src = sources[mr->source_index];
+        // std::cout << "SRC VAL:" << src << std::endl;
 
         switch (mr->source_transform)
         {
@@ -194,6 +195,20 @@ void ModulationMatrix::DoModMatrix(unsigned layer)
         // destination += source*intensity*range
         double modval = src * (*mr->mod_intensity) * (*mr->mod_range);
 
+        // if (mr->source_index == 5)
+        //{
+        //    std::cout << "DO MOD MATRIX: src:" << mr->source_index
+        //              << " Dest:" << mr->destination_index << " val:" <<
+        //              modval
+        //              << std ::endl;
+        //}
+        // if (mr->destination_index == DEST_DCA_EG)
+        //{
+        //    std::cout << "DEST OTPUT  : src:" << mr->source_index
+        //              << " DEST:" << mr->destination_index << " val:" <<
+        //              modval
+        //              << std ::endl;
+        //}
         switch (mr->destination_index)
         {
         case DEST_ALL_OSC_FO:

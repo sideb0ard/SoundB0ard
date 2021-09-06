@@ -42,11 +42,11 @@ void DCA::Update()
 
     if (modmatrix)
     {
-        // printf("Yup yup, got modmatrix\n");
         if (m_mod_source_eg != DEST_NONE)
         {
             m_eg_mod = modmatrix->destinations[m_mod_source_eg];
         }
+
         if (m_mod_source_amp_db != DEST_NONE)
             m_amp_mod_db = modmatrix->destinations[m_mod_source_amp_db];
 
