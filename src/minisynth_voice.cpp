@@ -120,6 +120,26 @@ void MiniSynthVoice::InitializeModMatrix(ModulationMatrix *matrix)
                           &m_global_voice_params->osc_fo_mod_range,
                           TRANSFORM_NONE, true);
     matrix->AddMatrixRow(row);
+
+    // EG2 -> FILTER1 FC
+    row = CreateMatrixRow(SOURCE_BIASED_EG2, DEST_ALL_FILTER_FC,
+                          &m_global_voice_params->eg2_filter1_mod_intensity,
+                          &m_global_voice_params->filter_mod_range,
+                          TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
+
+    // EG2 -> DCA EG
+    row = CreateMatrixRow(SOURCE_EG2, DEST_DCA_EG,
+                          &m_global_voice_params->eg2_dca_amp_mod_intensity,
+                          &m_default_mod_range, TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
+
+    // EG2 -> ALL OSC
+    row = CreateMatrixRow(SOURCE_BIASED_EG2, DEST_ALL_OSC_FO,
+                          &m_global_voice_params->eg2_osc_mod_intensity,
+                          &m_global_voice_params->osc_fo_mod_range,
+                          TRANSFORM_NONE, true);
+    matrix->AddMatrixRow(row);
 }
 
 void MiniSynthVoice::InitGlobalParameters(GlobalSynthParams *sp)
