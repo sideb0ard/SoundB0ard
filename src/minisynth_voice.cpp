@@ -50,6 +50,13 @@ void MiniSynthVoice::InitializeModMatrix(ModulationMatrix *matrix)
                           TRANSFORM_NONE, true);
     matrix->AddMatrixRow(row);
 
+    // LFO1 -> FILTER1 Q
+    row = CreateMatrixRow(SOURCE_LFO1, DEST_ALL_FILTER_Q,
+                          &m_global_voice_params->lfo1_filter1_q_mod_intensity,
+                          &m_global_voice_params->filter_q_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
+
     // LFO1 (-1 -> +1) -> DCA Amp Mod (0->1)
     row = CreateMatrixRow(SOURCE_LFO1, DEST_DCA_AMP,
                           &m_global_voice_params->lfo1_dca_amp_mod_intensity,
@@ -80,6 +87,13 @@ void MiniSynthVoice::InitializeModMatrix(ModulationMatrix *matrix)
     row = CreateMatrixRow(SOURCE_LFO2, DEST_ALL_FILTER_FC,
                           &m_global_voice_params->lfo2_filter1_mod_intensity,
                           &m_global_voice_params->filter_mod_range,
+                          TRANSFORM_NONE, false);
+    matrix->AddMatrixRow(row);
+
+    // LFO2 -> FILTER1 Q
+    row = CreateMatrixRow(SOURCE_LFO2, DEST_ALL_FILTER_Q,
+                          &m_global_voice_params->lfo2_filter1_q_mod_intensity,
+                          &m_global_voice_params->filter_q_mod_range,
                           TRANSFORM_NONE, false);
     matrix->AddMatrixRow(row);
 

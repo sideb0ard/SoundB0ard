@@ -1,25 +1,21 @@
-let notz = [55, 54, 51, 50, 48, 47, 55];
+let notz = [36, 43, 48, 51, 43, 44];
 
 
 let blah_gen = gen()
 {
   setup()
   {
-    let lenz = [3, 5, 7];
-    let lx = 0;
-    let beat = bjork(3,8);
+    let next_trigger = 0;
+    let nx = 0;
   }
   run()
   {
-    let mel = combinor(beat, notz);
-    notz = rotate(notz, lenz[lx]);
-    #print("MEL:", mel);
 
-    play_array(mo, mel, dur=60);
-
-    if (count % 4 == 0) {
-      lx = incr(lx, 0, len(lenz));
-      beat = bjork(lenz[lx], 8);
+    if (count == next_trigger || count > next_trigger) {
+      note_on(mo, notes_in_chord(notz[nx], 0, 3), dur = midi_len);
+      let midi_len = 3840 * 2 - 1000;
+      next_trigger = count + 2;
+      nx = incr(nx, 0, len(notz));
     }
   }
 }

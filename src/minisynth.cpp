@@ -167,16 +167,18 @@ std::string MiniSynth::Info()
        << " l1mode:" << s_lfo_mode_names[m_settings.m_lfo1_mode] << "("
        << m_settings.m_lfo1_mode << ")"
        << " l1rate:" << m_settings.m_lfo1_rate
-       << " l1amp:" << m_settings.m_lfo1_amplitude << "\n"
-       << "l1_filter_en:" << m_settings.m_lfo1_filter_fc_enabled
-       << " l1_osc_en:" << m_settings.m_lfo1_osc_pitch_enabled
-       << " l1_pan_en:" << m_settings.m_lfo1_pan_enabled
-       << " l1_amp_en:" << m_settings.m_lfo1_amp_enabled
-       << " l1_pw_en:" << m_settings.m_lfo1_pulsewidth_enabled
-       << "\nl1_filter_int:" << m_settings.m_lfo1_filter_fc_intensity
+       << " l1amp:" << m_settings.m_lfo1_amplitude
+       << "\nl1_filter_en:" << m_settings.m_lfo1_filter_fc_enabled
+       << " 1_filter_int:" << m_settings.m_lfo1_filter_fc_intensity
+       << "\nl1_filterq_en:" << m_settings.m_lfo1_filter_q_enabled
+       << " 1_filterq_int:" << m_settings.m_lfo1_filter_q_intensity
+       << "\nl1_osc_en:" << m_settings.m_lfo1_osc_pitch_enabled
        << " l1_osc_int:" << m_settings.m_lfo1_osc_pitch_intensity
+       << "\nl1_pan_en:" << m_settings.m_lfo1_pan_enabled
        << " l1_pan_int:" << m_settings.m_lfo1_pan_intensity
+       << "\nl1_amp_en:" << m_settings.m_lfo1_amp_enabled
        << " l1_amp_int:" << m_settings.m_lfo1_amp_intensity
+       << "\nl1_pw_en:" << m_settings.m_lfo1_pulsewidth_enabled
        << " l1_pw_int:" << m_settings.m_lfo1_pulsewidth_intensity << "\n"
 
        << COOL_COLOR_PINK
@@ -185,16 +187,18 @@ std::string MiniSynth::Info()
        << " l2mode:" << s_lfo_mode_names[m_settings.m_lfo2_mode] << "("
        << m_settings.m_lfo2_mode << ")"
        << " l2rate:" << m_settings.m_lfo2_rate
-       << " l2amp:" << m_settings.m_lfo2_amplitude << "\n"
-       << "l2_filter_en:" << m_settings.m_lfo2_filter_fc_enabled
-       << " l2_osc_en:" << m_settings.m_lfo2_osc_pitch_enabled
-       << "l2_pan_en:" << m_settings.m_lfo2_pan_enabled
-       << " l2_amp_en:" << m_settings.m_lfo2_amp_enabled
-       << " l2_pw_en:" << m_settings.m_lfo2_pulsewidth_enabled << "\n"
-       << "l2_filter_int:" << m_settings.m_lfo2_filter_fc_intensity
+       << " l2amp:" << m_settings.m_lfo2_amplitude
+       << "\nl2_filter_en:" << m_settings.m_lfo2_filter_fc_enabled
+       << " l2_filter_int:" << m_settings.m_lfo2_filter_fc_intensity
+       << "\nl2_filterq_en:" << m_settings.m_lfo2_filter_q_enabled
+       << " l2_filterq_int:" << m_settings.m_lfo2_filter_q_intensity
+       << "\nl2_osc_en:" << m_settings.m_lfo2_osc_pitch_enabled
        << " l2_osc_int:" << m_settings.m_lfo2_osc_pitch_intensity
+       << "\nl2_pan_en:" << m_settings.m_lfo2_pan_enabled
        << " l2_pan_int:" << m_settings.m_lfo2_pan_intensity
+       << "\nl2_amp_en:" << m_settings.m_lfo2_amp_enabled
        << " l2_amp_int:" << m_settings.m_lfo2_amp_intensity
+       << "\nl2_pw_en:" << m_settings.m_lfo2_pulsewidth_enabled
        << " l2_pw_int:" << m_settings.m_lfo2_pulsewidth_intensity << "\n"
 
        << COOL_COLOR_ORANGE
@@ -289,6 +293,9 @@ void MiniSynth::LoadDefaults()
     m_settings.m_lfo1_filter_fc_intensity = 0.7;
     m_settings.m_lfo1_filter_fc_enabled = false;
 
+    m_settings.m_lfo1_filter_q_intensity = 0.7;
+    m_settings.m_lfo1_filter_q_enabled = false;
+
     m_settings.m_lfo1_amp_intensity = 0.7;
     m_settings.m_lfo1_amp_enabled = false;
 
@@ -309,6 +316,9 @@ void MiniSynth::LoadDefaults()
 
     m_settings.m_lfo2_filter_fc_intensity = 0.7;
     m_settings.m_lfo2_filter_fc_enabled = false;
+
+    m_settings.m_lfo2_filter_q_intensity = 0.7;
+    m_settings.m_lfo2_filter_q_enabled = false;
 
     m_settings.m_lfo2_amp_intensity = 0.7;
     m_settings.m_lfo2_amp_enabled = false;
@@ -566,6 +576,8 @@ void MiniSynth::Update()
 
     m_global_synth_params.voice_params.lfo1_filter1_mod_intensity =
         m_settings.m_lfo1_filter_fc_intensity;
+    m_global_synth_params.voice_params.lfo1_filter1_q_mod_intensity =
+        m_settings.m_lfo1_filter_q_intensity;
     m_global_synth_params.voice_params.lfo1_osc_mod_intensity =
         m_settings.m_lfo1_osc_pitch_intensity;
     m_global_synth_params.voice_params.lfo1_dca_amp_mod_intensity =
@@ -575,6 +587,8 @@ void MiniSynth::Update()
 
     m_global_synth_params.voice_params.lfo2_filter1_mod_intensity =
         m_settings.m_lfo2_filter_fc_intensity;
+    m_global_synth_params.voice_params.lfo2_filter1_q_mod_intensity =
+        m_settings.m_lfo2_filter_q_intensity;
     m_global_synth_params.voice_params.lfo2_osc_mod_intensity =
         m_settings.m_lfo2_osc_pitch_intensity;
     m_global_synth_params.voice_params.lfo2_dca_amp_mod_intensity =
@@ -689,6 +703,12 @@ void MiniSynth::Update()
     else
         modmatrix.EnableMatrixRow(SOURCE_LFO1, DEST_ALL_FILTER_FC, false);
 
+    if (m_settings.m_lfo1_filter_q_enabled == 1)
+        modmatrix.EnableMatrixRow(SOURCE_LFO1, DEST_ALL_FILTER_Q,
+                                  true); // enable
+    else
+        modmatrix.EnableMatrixRow(SOURCE_LFO1, DEST_ALL_FILTER_Q, false);
+
     if (m_settings.m_lfo1_amp_enabled == 1)
         modmatrix.EnableMatrixRow(SOURCE_LFO1, DEST_DCA_AMP,
                                   true); // enable
@@ -719,6 +739,12 @@ void MiniSynth::Update()
                                   true); // enable
     else
         modmatrix.EnableMatrixRow(SOURCE_LFO2, DEST_ALL_FILTER_FC, false);
+
+    if (m_settings.m_lfo2_filter_q_enabled == 1)
+        modmatrix.EnableMatrixRow(SOURCE_LFO2, DEST_ALL_FILTER_Q,
+                                  true); // enable
+    else
+        modmatrix.EnableMatrixRow(SOURCE_LFO2, DEST_ALL_FILTER_Q, false);
 
     if (m_settings.m_lfo2_amp_enabled == 1)
         modmatrix.EnableMatrixRow(SOURCE_LFO2, DEST_DCA_AMP,

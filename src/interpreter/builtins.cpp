@@ -861,7 +861,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      return evaluator::NULLL;
 
                  std::vector<int> notez =
-                     GetMidiNotesInChord(object_val[0], 0, true);
+                     GetMidiNotesInChord(object_val[0], 0, 2);
 
                  int vel = 128;
                  int dur = 240;
@@ -909,7 +909,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      return evaluator::NULLL;
 
                  std::vector<int> notez =
-                     GetMidiNotesInChord(object_val[0], 0, true);
+                     GetMidiNotesInChord(object_val[0], 0, 2);
 
                  auto num_obj =
                      std::dynamic_pointer_cast<object::Number>(args[2]);
@@ -1620,12 +1620,21 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  auto return_array = std::make_shared<object::Array>(
                      std::vector<std::shared_ptr<object::Object>>());
 
-                 bool seventh = false;
+                 int modification = 0;
                  if (args_size == 3)
-                     seventh = true;
+                 {
+                     auto chord_mod =
+                         std::dynamic_pointer_cast<object::Number>(args[2]);
+                     if (!chord_mod)
+                     {
+                         std::cerr << "Extra ARG thats not a number?";
+                         return evaluator::NULLL;
+                     }
+                     modification = chord_mod->value_;
+                 }
 
                  std::vector<int> notez = GetMidiNotesInChord(
-                     root_note_value, chord_type->value_, seventh);
+                     root_note_value, chord_type->value_, modification);
 
                  for (int i = 0; i < (int)notez.size(); i++)
                  {

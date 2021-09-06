@@ -224,7 +224,8 @@ int get_chord_type(unsigned int scale_degree)
 }
 
 std::vector<int> GetMidiNotesInChord(unsigned int root_note,
-                                     unsigned int chord_type, bool seventh)
+                                     unsigned int chord_type,
+                                     unsigned int modification)
 {
     std::vector<int> notes_in_chord{};
     notes_in_chord.push_back(root_note);
@@ -239,12 +240,22 @@ std::vector<int> GetMidiNotesInChord(unsigned int root_note,
     else
         notes_in_chord.push_back(root_note + 7);
 
-    if (seventh)
+    switch (modification)
     {
-        if (chord_type == DIMINISHED_CHORD)
-            notes_in_chord.push_back(root_note + 10);
-        else
-            notes_in_chord.push_back(root_note + 11);
+    case (1): // diminished seventh
+        notes_in_chord.push_back(root_note + 10);
+        break;
+    case (2): // major seventh
+        notes_in_chord.push_back(root_note + 11);
+        break;
+    case (3): // augmentation
+        notes_in_chord.push_back(root_note + 11);
+        notes_in_chord.push_back(root_note - 12);
+        break;
+    case (4): // augmentation
+        notes_in_chord.push_back(root_note + 11);
+        notes_in_chord.push_back(root_note - 24);
+        break;
     }
 
     return notes_in_chord;

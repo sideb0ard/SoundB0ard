@@ -173,6 +173,7 @@ void Voice::InitGlobalParameters(GlobalSynthParams *sp)
     m_global_voice_params->osc_fo_mod_range = OSC_FO_MOD_RANGE;
     m_global_voice_params->osc_hard_sync_mod_range = OSC_HARD_SYNC_RATIO_RANGE;
     m_global_voice_params->filter_mod_range = FILTER_FC_MOD_RANGE;
+    m_global_voice_params->filter_q_mod_range = FILTER_Q_MOD_RANGE;
     m_global_voice_params->amp_mod_range = AMP_MOD_RANGE;
 
     // --- Intensity variables

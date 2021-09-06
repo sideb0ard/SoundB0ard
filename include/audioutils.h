@@ -23,7 +23,7 @@ int GetMidNumFromNote(std::string note);
 std::string GetNoteFromMidiNum(int midi_num);
 std::vector<int> GetMidiNotesInChord(unsigned int root_note,
                                      unsigned int chord_type,
-                                     bool seventh = false);
+                                     unsigned int modification = 0);
 int GetThird(int midi_note, char key);
 int GetFifth(int midi_note, char key);
 int GetNthDegree(int midi_note, int degree, char key);

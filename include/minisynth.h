@@ -59,9 +59,13 @@ typedef struct synthsettings
     double m_lfo1_osc_pitch_intensity{0};
     bool m_lfo1_osc_pitch_enabled{0};
 
-    // LFO1 -> FILTER
+    // LFO1 -> FILTER CUTOFF
     double m_lfo1_filter_fc_intensity{0};
     bool m_lfo1_filter_fc_enabled{0};
+
+    // LFO1 -> FILTER Q
+    double m_lfo1_filter_q_intensity{0};
+    bool m_lfo1_filter_q_enabled{0};
 
     // LFO1 -> DCA
     double m_lfo1_amp_intensity{0};
@@ -83,9 +87,13 @@ typedef struct synthsettings
     double m_lfo2_osc_pitch_intensity{0};
     bool m_lfo2_osc_pitch_enabled{0};
 
-    // LFO2 -> FILTER
+    // LFO2 -> FILTER CUTOFF
     double m_lfo2_filter_fc_intensity{0};
     bool m_lfo2_filter_fc_enabled{0};
+
+    // LFO1 -> FILTER Q
+    double m_lfo2_filter_q_intensity{0};
+    bool m_lfo2_filter_q_enabled{0};
 
     // LFO2 -> DCA
     double m_lfo2_amp_intensity{0};

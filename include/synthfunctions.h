@@ -58,6 +58,7 @@ struct GlobalVoiceParams
     double osc_fo_mod_range;
     double osc_hard_sync_mod_range;
     double filter_mod_range;
+    double filter_q_mod_range;
     double amp_mod_range;
 
     double filter_keytrack_intensity;
@@ -65,14 +66,18 @@ struct GlobalVoiceParams
     double lfo1_osc_mod_intensity;
     double lfo1_hs_mod_intensity;
     double lfo1_filter1_mod_intensity;
+    double lfo1_filter1_q_mod_intensity;
     double lfo1_filter2_mod_intensity;
+    double lfo1_filter2_q_mod_intensity;
     double lfo1_dca_amp_mod_intensity;
     double lfo1_dca_pan_mod_intensity;
 
     double lfo2_osc_mod_intensity;
     double lfo2_hs_mod_intensity;
     double lfo2_filter1_mod_intensity;
+    double lfo2_filter1_q_mod_intensity;
     double lfo2_filter2_mod_intensity;
+    double lfo2_filter2_q_mod_intensity;
     double lfo2_dca_amp_mod_intensity;
     double lfo2_dca_pan_mod_intensity;
 
