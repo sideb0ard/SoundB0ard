@@ -51,6 +51,10 @@ MiniSynth::MiniSynth()
 
     PrepareForPlay();
     LoadDefaults();
+
+    for (auto v : voices_)
+        v->m_dca.m_mod_source_eg = DEST_DCA_EG;
+
     Update();
 
     active = true;
@@ -555,7 +559,7 @@ bool MiniSynth::PrepareForPlay()
             voices_[i]->PrepareForPlay();
     }
 
-    Update();
+    // Update();
     m_last_note_frequency = -1.0;
 
     return true;

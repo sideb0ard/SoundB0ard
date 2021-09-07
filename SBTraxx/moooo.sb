@@ -1,4 +1,4 @@
-let notz = [36, 43, 48, 51, 43, 44];
+let notz = [53, 55, 48, 50];
 
 
 let blah_gen = gen()
