@@ -36,7 +36,6 @@ MiniSynth::MiniSynth()
 {
     type = MINISYNTH_TYPE;
     std::cout << "Added, MiniMoog, yo!\n";
-    PrepareForPlay();
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -50,6 +49,7 @@ MiniSynth::MiniSynth()
     for (auto v : voices_)
         v->SetModMatrixCore(modmatrix.GetModMatrixCore());
 
+    PrepareForPlay();
     LoadDefaults();
     Update();
 

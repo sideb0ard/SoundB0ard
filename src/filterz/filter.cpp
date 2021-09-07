@@ -30,7 +30,6 @@ void Filter::SetFcControl(double val)
     if (val >= FILTER_FC_MIN && val <= FILTER_FC_MAX)
     {
         m_fc_control = val;
-        std::cout << "SET FCCCCC!:" << val << std::endl;
         Update();
     }
     else
@@ -70,30 +69,18 @@ void Filter::Update()
 
     if (modmatrix)
     {
-        std::cout << "moDMATRX!\n";
         m_fc_mod = modmatrix->destinations[m_mod_source_fc];
-        std::cout << "FC MOD, YO" << m_fc_mod << std::endl;
         if (modmatrix->destinations[m_mod_source_fc_control] > 0)
-        {
             m_fc_control = modmatrix->destinations[m_mod_source_fc_control];
-            std::cout << "FC CONTROL, YO" << m_fc_mod << std::endl;
-        }
     }
-
     SetQControl(m_q_control);
 
     m_fc = m_fc_control * pitch_shift_multiplier(m_fc_mod);
 
     if (m_fc > FILTER_FC_MAX)
-    {
-        std::cout << "OOh, capping it at MAX\n";
         m_fc = FILTER_FC_MAX;
-    }
     if (m_fc < FILTER_FC_MIN)
-    {
-        std::cout << "OOh, capping it at MIN\n";
         m_fc = FILTER_FC_MIN;
-    }
 }
 
 void Filter::Reset() {}
