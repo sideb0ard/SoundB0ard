@@ -115,16 +115,11 @@ std::string MiniSynth::Info()
     std::stringstream ss;
     ss << std::setprecision(2) << std::fixed;
 
-    ss << COOL_COLOR_YELLOW << "\nMoog(" << m_settings.m_settings_name << ")"
-       << " vol:" << volume << " pan:" << pan
-       << " voice:" << S_VOICES[m_settings.m_voice_mode] << "("
-       << m_settings.m_voice_mode << ")\nmono:" << m_settings.m_monophonic
-       << " hard_sync:" << m_settings.hard_sync
-       << " detune:" << m_settings.m_detune_cents
-       << " legato:" << m_settings.m_legato_mode
-       << " kt:" << m_settings.m_filter_keytrack
-       << " ndscale:" << m_settings.m_note_number_to_decay_scaling << "\n"
-
+    ss << COOL_COLOR_GREEN << "\nMOOG(" << ANSI_COLOR_WHITE
+       << m_settings.m_settings_name << COOL_COLOR_GREEN << ")"
+       << " vol:" << volume << " pan:" << pan << "\n"
+       << COOL_COLOR_YELLOW << "voice:" << S_VOICES[m_settings.m_voice_mode]
+       << "(" << m_settings.m_voice_mode << ")\n"
        << "osc1:"
        << s_waveform_names[m_global_synth_params.osc1_params.waveform] << "("
        << m_global_synth_params.osc1_params.waveform << ")"
@@ -156,6 +151,13 @@ std::string MiniSynth::Info()
        << " o4oct:" << m_global_synth_params.osc4_params.octave
        << " o4semi:" << m_global_synth_params.osc4_params.semitones
        << " o4cents:" << m_global_synth_params.osc4_params.cents << "\n"
+
+       << ANSI_COLOR_DEEP_RED << "mono:" << m_settings.m_monophonic
+       << " hard_sync:" << m_settings.hard_sync
+       << " detune:" << m_settings.m_detune_cents
+       << " legato:" << m_settings.m_legato_mode
+       << " kt:" << m_settings.m_filter_keytrack
+       << " ndscale:" << m_settings.m_note_number_to_decay_scaling << "\n"
 
        << "noisedb:" << m_settings.m_noise_osc_db
        << " octave:" << m_settings.m_octave

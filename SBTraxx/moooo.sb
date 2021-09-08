@@ -7,13 +7,16 @@ let blah_gen = gen()
   {
     let next_trigger = 0;
     let nx = 0;
+    let midi_len = 3840 * 2 - 1000;
   }
   run()
   {
+    if (count % 4 == 0) {
+      #print("NOW");
+    }
 
     if (count == next_trigger || count > next_trigger) {
-      note_on(mo, notes_in_chord(notz[nx], 0, 3), dur = midi_len);
-      let midi_len = 3840 * 2 - 1000;
+      note_on(mo, notes_in_chord(notz[nx], 0, 2), dur = midi_len);
       next_trigger = count + 2;
       nx = incr(nx, 0, len(notz));
     }

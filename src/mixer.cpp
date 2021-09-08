@@ -112,6 +112,7 @@ std::string Mixer::StatusMixr()
     << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
     << ":::::::::: vol:" << ANSI_COLOR_WHITE << volume << COOL_COLOR_GREEN
     << " bpm:" << ANSI_COLOR_WHITE <<data.tempo << COOL_COLOR_GREEN
+    << " looplen:" << ANSI_COLOR_WHITE << 3840 << COOL_COLOR_GREEN
     << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
     << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat << COOL_COLOR_GREEN
     << " phase:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.phase << COOL_COLOR_GREEN
@@ -262,11 +263,8 @@ void Mixer::Help()
            << " // show Program Status i.e. vars, bpm, key etc.\n";
         ss << COOL_COLOR_MAUVE << "ls" << ANSI_COLOR_RESET
            << " // list sample directory\n";
-        ss << COOL_COLOR_MAUVE << "midi_info();" << ANSI_COLOR_RESET
-           << " // tells you how many midi ticks in a loop, and pitchs -> midi "
-              "ref\n";
-        ss << COOL_COLOR_MAUVE << "timing_info();" << ANSI_COLOR_RESET
-           << " // tells you various timing data\n";
+        ss << COOL_COLOR_MAUVE << "midi_ref();" << ANSI_COLOR_RESET
+           << " // note -> midi reference\n";
         ss << COOL_COLOR_MAUVE << "let x = 4;" << ANSI_COLOR_RESET
            << " // create a var named 'x' with val 1\n";
         ss << COOL_COLOR_MAUVE << "let add1 = fn(val) { return val + 1; };";
@@ -650,22 +648,10 @@ void Mixer::PrintTimingInfo()
     printf("TIME of next MIDI tick:%f\n", info->time_of_next_midi_tick);
     printf("SIXTEENTH NOTE tick:%d\n", info->sixteenth_note_tick);
     printf("MIDI tick:%d\n", info->midi_tick);
-    printf("LOOP beat:%d\n", info->loop_beat);
-    printf("LOOP Started:%d\n", info->loop_started);
     printf("CUR SAMPLE:%d\n", info->cur_sample);
-    printf("Loop_len_in_frames:%d\n", info->loop_len_in_frames);
     printf("Loop_len_in_ticks:%d\n", info->loop_len_in_ticks);
-    printf("Size of 1/32 note:%d\n", info->size_of_thirtysecond_note);
-    printf("Size of 1/16 note:%d\n", info->size_of_sixteenth_note);
-    printf("Size of 1/8 note:%d\n", info->size_of_eighth_note);
-    printf("Size of 1/4 note:%d\n", info->size_of_quarter_note);
-
     printf("Has_started:%d\n", info->has_started);
     printf("Start of loop:%d\n", info->is_start_of_loop);
-    printf("Is 1/32:%d\n", info->is_thirtysecond);
-    printf("Is 1/16:%d\n", info->is_sixteenth);
-    printf("Is 1/8:%d\n", info->is_eighth);
-    printf("Is 1/4:%d\n", info->is_quarter);
     printf("Is midi_tick:%d\n", info->is_midi_tick);
 }
 

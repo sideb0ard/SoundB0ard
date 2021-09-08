@@ -555,13 +555,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                      return evaluator::NULLL;
                  })},
-    {"midi_info", std::make_shared<object::BuiltIn>(
-                      [](std::vector<std::shared_ptr<object::Object>> args)
-                          -> std::shared_ptr<object::Object>
-                      {
-                          mixr->PrintMidiInfo();
-                          return evaluator::NULLL;
-                      })},
+    {"midi_ref", std::make_shared<object::BuiltIn>(
+                     [](std::vector<std::shared_ptr<object::Object>> args)
+                         -> std::shared_ptr<object::Object>
+                     {
+                         mixr->PrintMidiInfo();
+                         return evaluator::NULLL;
+                     })},
     {"push", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> input)
                      -> std::shared_ptr<object::Object>

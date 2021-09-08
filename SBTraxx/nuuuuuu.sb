@@ -1,0 +1,35 @@
+# REPL based Music Making application and live programming language.
+# REPL - is an interactive program - you type a command, the program executes your command and returns to you
+# Music Making - it has various instruments - synthesizers, sample players, fx
+# and you can control them via commands
+
+# WHY? Before becoming a programmer, i was a sysadmin for 15 years, which involved managing fleets of computers, which was all managed and scripted via the shell. Its quite the hacker aesthtic, and the utility and speed which you can get with command line is great.
+# In order to teach myself C/C++ I was looking for a project. I have a background in music, I've ran record labels, and made and collaborated on lots of music over the years. When I was in London I worked at a place called state51, alongside a friend named Alex McLean. He was doing perl live coding back in 2002, and I watched his projects grow over the years, with his current language TidalCycles being one of the most widely used live coding languages. Becoming an afternoon's dabbling, i wasn't particularly familiar with Tidal, but the idea of it was the inspiration for Soundb0ard.
+
+# show interface
+# help screen
+# normal programming - ie variables and addition / multiplication
+# show synth
+# show midi ref - explain working with midi numbers and show reference
+# show arrays/lists
+# notes_in_key()
+# notes_in_chord()notes_in_chorddef
+
+
+#1. create a sequence - look up something on internet or use riff()
+#2. walk length of sequence with pp multi
+#3. add swing to sequence
+#4. forward / back
+#5. step size
+#6. sequence count length
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+
