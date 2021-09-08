@@ -82,24 +82,6 @@ const std::string kStartupConfigFile = "startup.sb";
 #define COOL_COLOR_ORANGE "\x1b[38;5;202m"
 #define COOL_COLOR_YELLOW_MELLOW "\x1b[38;5;190m"
 
-#define WANSI_COLOR_BLUE L"\x1b[34m"
-#define WANSI_COLOR_CYAN L"\x1b[36m"
-#define WANSI_COLOR_GREEN L"\x1b[32m"
-#define WANSI_COLOR_GREEN_TOO L"\x1b[38;5;34m"
-#define WANSI_COLOR_MAGENTA L"\x1b[35m"
-#define WANSI_COLOR_PINK L"\x1b[38;5;13m"
-#define WANSI_COLOR_RED L"\x1b[31m"
-#define WANSI_COLOR_DEEP_RED L"\x1b[38;5;124m"
-#define WANSI_COLOR_RESET L"\x1b[0m"
-#define WANSI_COLOR_WHITE L"\x1b[37m"
-#define WANSI_COLOR_YELLOW L"\x1b[33m"
-#define WCOOL_COLOR_GREEN L"\x1b[38;5;47m"
-#define WCOOL_COLOR_YELLOW L"\x1b[38;5;226m"
-#define WCOOL_COLOR_YELLOW_MELLOW L"\x1b[38;5;190m"
-#define WCOOL_COLOR_PINK L"\x1b[38;5;200m"
-#define WCOOL_COLOR_MAUVE L"\x1b[38;5;135m"
-#define WCOOL_COLOR_ORANGE L"\x1b[38;5;202m"
-
 #define NADA -999
 
 #define MAX_LENGTH_VAR_VALUE 128

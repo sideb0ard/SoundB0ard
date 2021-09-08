@@ -43,26 +43,6 @@ const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
 
 const char *chord_type_names[] = {"MAJOR", "MINOR", "DIMINISHED"};
 
-static const char *s_progressions[NUM_PROGRESSIONS] = {
-    "I-IV-V", "I-V-vi-IV", "I-vi-IV-V", "vi-ii-V-I"};
-
-const wchar_t *s_status_colors[] = {
-    WCOOL_COLOR_PINK,      // MINISYNTH_TYPE
-    WCOOL_COLOR_ORANGE,    // DIGISYNTH_TYPE
-    WCOOL_COLOR_MAUVE,     // LOOPER_TYPE
-    WCOOL_COLOR_YELLOW,    // BITWIZE_TYPE
-    WANSI_COLOR_DEEP_RED,  // LOOPER_TYPE
-    WANSI_COLOR_GREEN_TOO, // DRUMSAMPLER_TYPE
-    WANSI_COLOR_MAGENTA,   // DRUMSYNTH_TYPE
-    WANSI_COLOR_CYAN,      // ALGORITHM_TYPE
-    WANSI_COLOR_GREEN,     // CHAOSMONKEY_TYPE
-    WANSI_COLOR_BLUE       //
-};
-
-const char *s_midi_control_type_name[] = {"NONE", "SYNTH", "DRUMSYNTH"};
-
-const char *s_sg_names[] = {"MOOG", "DIGI", "DX", "LOOP", "STEP", "STEP"};
-
 Mixer::Mixer(double output_latency)
 {
     m_ableton_link = new_ableton_link(DEFAULT_BPM);
@@ -108,16 +88,15 @@ std::string Mixer::StatusMixr()
     LinkData data = link_get_timing_data_for_display(m_ableton_link);
     // clang-format off
     std::stringstream ss;
-    ss << COOL_COLOR_GREEN << "\n"
-    << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
-    << ":::::::::: vol:" << ANSI_COLOR_WHITE << volume << COOL_COLOR_GREEN
-    << " bpm:" << ANSI_COLOR_WHITE <<data.tempo << COOL_COLOR_GREEN
+    ss << COOL_COLOR_GREEN
+    << ":::::::::::::::: vol:" << ANSI_COLOR_WHITE << volume << COOL_COLOR_GREEN
+    << " bpm:" << ANSI_COLOR_WHITE << data.tempo << COOL_COLOR_GREEN
     << " looplen:" << ANSI_COLOR_WHITE << 3840 << COOL_COLOR_GREEN
-    << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
-    << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat << COOL_COLOR_GREEN
-    << " phase:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.phase << COOL_COLOR_GREEN
+    // << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
+    // << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat << COOL_COLOR_GREEN
+    // << " phase:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.phase << COOL_COLOR_GREEN
     << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
-    << "::::::::::\n";
+    << " ::::::::::::::::::::::\n";
     // clang-format on
 
     return ss.str();

@@ -168,70 +168,73 @@ std::string MiniSynth::Info()
        << " vascale:" << m_settings.m_velocity_to_attack_scaling
        << " zero:" << m_settings.m_reset_to_zero << "\n"
 
-       << COOL_COLOR_ORANGE
+       << COOL_COLOR_YELLOW
        << "l1wave:" << s_lfo_wave_names[m_settings.m_lfo1_waveform] << "("
        << m_settings.m_lfo1_waveform << ")"
        << " l1mode:" << s_lfo_mode_names[m_settings.m_lfo1_mode] << "("
        << m_settings.m_lfo1_mode << ")"
        << " l1rate:" << m_settings.m_lfo1_rate
-       << " l1amp:" << m_settings.m_lfo1_amplitude
+       << " l1amp:" << m_settings.m_lfo1_amplitude << COOL_COLOR_ORANGE
        << "\nl1_filter_en:" << m_settings.m_lfo1_filter_fc_enabled
-       << " l1_filter_int:" << m_settings.m_lfo1_filter_fc_intensity
+       << "       l1_filter_int:" << m_settings.m_lfo1_filter_fc_intensity
        << "\nl1_filterq_en:" << m_settings.m_lfo1_filter_q_enabled
-       << " l1_filterq_int:" << m_settings.m_lfo1_filter_q_intensity
+       << "      l1_filterq_int:" << m_settings.m_lfo1_filter_q_intensity
        << "\nl1_osc_en:" << m_settings.m_lfo1_osc_pitch_enabled
-       << " l1_osc_int:" << m_settings.m_lfo1_osc_pitch_intensity
+       << "          l1_osc_int:" << m_settings.m_lfo1_osc_pitch_intensity
        << "\nl1_pan_en:" << m_settings.m_lfo1_pan_enabled
-       << " l1_pan_int:" << m_settings.m_lfo1_pan_intensity
+       << "          l1_pan_int:" << m_settings.m_lfo1_pan_intensity
        << "\nl1_amp_en:" << m_settings.m_lfo1_amp_enabled
-       << " l1_amp_int:" << m_settings.m_lfo1_amp_intensity
+       << "          l1_amp_int:" << m_settings.m_lfo1_amp_intensity
        << "\nl1_pw_en:" << m_settings.m_lfo1_pulsewidth_enabled
-       << " l1_pw_int:" << m_settings.m_lfo1_pulsewidth_intensity << "\n"
+       << "           l1_pw_int:" << m_settings.m_lfo1_pulsewidth_intensity
+       << "\n"
 
-       << COOL_COLOR_PINK
+       << COOL_COLOR_YELLOW
        << "l2wave:" << s_lfo_wave_names[m_settings.m_lfo2_waveform] << "("
        << m_settings.m_lfo2_waveform << ")"
        << " l2mode:" << s_lfo_mode_names[m_settings.m_lfo2_mode] << "("
        << m_settings.m_lfo2_mode << ")"
        << " l2rate:" << m_settings.m_lfo2_rate
-       << " l2amp:" << m_settings.m_lfo2_amplitude
+       << " l2amp:" << m_settings.m_lfo2_amplitude << COOL_COLOR_PINK
        << "\nl2_filter_en:" << m_settings.m_lfo2_filter_fc_enabled
-       << " l2_filter_int:" << m_settings.m_lfo2_filter_fc_intensity
+       << "       l2_filter_int:" << m_settings.m_lfo2_filter_fc_intensity
        << "\nl2_filterq_en:" << m_settings.m_lfo2_filter_q_enabled
-       << " l2_filterq_int:" << m_settings.m_lfo2_filter_q_intensity
+       << "      l2_filterq_int:" << m_settings.m_lfo2_filter_q_intensity
        << "\nl2_osc_en:" << m_settings.m_lfo2_osc_pitch_enabled
-       << " l2_osc_int:" << m_settings.m_lfo2_osc_pitch_intensity
+       << "          l2_osc_int:" << m_settings.m_lfo2_osc_pitch_intensity
        << "\nl2_pan_en:" << m_settings.m_lfo2_pan_enabled
-       << " l2_pan_int:" << m_settings.m_lfo2_pan_intensity
+       << "          l2_pan_int:" << m_settings.m_lfo2_pan_intensity
        << "\nl2_amp_en:" << m_settings.m_lfo2_amp_enabled
-       << " l2_amp_int:" << m_settings.m_lfo2_amp_intensity
+       << "          l2_amp_int:" << m_settings.m_lfo2_amp_intensity
        << "\nl2_pw_en:" << m_settings.m_lfo2_pulsewidth_enabled
-       << " l2_pw_int:" << m_settings.m_lfo2_pulsewidth_intensity << "\n"
+       << "           l2_pw_int:" << m_settings.m_lfo2_pulsewidth_intensity
+       << "\n"
 
-       << COOL_COLOR_ORANGE
-       << "eg1_filter_en:" << m_settings.m_eg1_filter_enabled
-       << " eg1_osc_en:" << m_settings.m_eg1_osc_enabled
-       << " eg1_dca_en:" << m_settings.m_eg1_dca_enabled
-       << " eg1_sustain:" << m_settings.m_eg1_sustain_override
-       << "\neg1_filter_int:" << m_settings.m_eg1_filter_intensity
-       << " eg1_osc_int:" << m_settings.m_eg1_osc_intensity
-       << " eg1_dca_int:" << m_settings.m_eg1_dca_intensity
-       << " eg1_sustainlvl:" << m_settings.m_eg1_sustain_level << "\n"
+       << COOL_COLOR_YELLOW
        << "eg1_attack:" << m_settings.m_eg1_attack_time_msec
        << " eg1_decay:" << m_settings.m_eg1_decay_time_msec
-       << " eg1_release:" << m_settings.m_eg1_release_time_msec << "\n"
+       << " eg1_release:" << m_settings.m_eg1_release_time_msec
+       << " eg1_sus:" << m_settings.m_eg1_sustain_level << COOL_COLOR_ORANGE
+       << "\neg1_filter_en:" << m_settings.m_eg1_filter_enabled
+       << "      eg1_filter_int:" << m_settings.m_eg1_filter_intensity
+       << "\neg1_osc_en:" << m_settings.m_eg1_osc_enabled
+       << "         eg1_osc_int:" << m_settings.m_eg1_osc_intensity
+       << "\neg1_dca_en:" << m_settings.m_eg1_dca_enabled
+       << "         eg1_dca_int:" << m_settings.m_eg1_dca_intensity
+       << "\neg1_sustain_override:" << m_settings.m_eg1_sustain_override << "\n"
 
-       << COOL_COLOR_PINK << "eg2_filter_en:" << m_settings.m_eg2_filter_enabled
-       << " eg2_osc_en:" << m_settings.m_eg2_osc_enabled
-       << " eg2_dca_en:" << m_settings.m_eg2_dca_enabled
-       << " eg2_sustain:" << m_settings.m_eg2_sustain_override
-       << "\neg2_filter_int:" << m_settings.m_eg2_filter_intensity
-       << " eg2_osc_int:" << m_settings.m_eg2_osc_intensity
-       << " eg2_dca_int:" << m_settings.m_eg2_dca_intensity
-       << " eg2_sustainlvl:" << m_settings.m_eg2_sustain_level << "\n"
+       << COOL_COLOR_YELLOW
        << "eg2_attack:" << m_settings.m_eg2_attack_time_msec
        << " eg2_decay:" << m_settings.m_eg2_decay_time_msec
-       << " eg2_release:" << m_settings.m_eg2_release_time_msec << "\n"
+       << " eg2_release:" << m_settings.m_eg2_release_time_msec
+       << " eg2_sus:" << m_settings.m_eg2_sustain_level << "\n"
+       << COOL_COLOR_PINK << "eg2_filter_en:" << m_settings.m_eg2_filter_enabled
+       << "      eg2_filter_int:" << m_settings.m_eg2_filter_intensity
+       << "\neg2_osc_en:" << m_settings.m_eg2_osc_enabled
+       << "         eg2_osc_int:" << m_settings.m_eg2_osc_intensity
+       << "\neg2_dca_en:" << m_settings.m_eg2_dca_enabled
+       << "         eg2_dca_int:" << m_settings.m_eg2_dca_intensity
+       << "\neg2_sustain_override:" << m_settings.m_eg2_sustain_override << "\n"
 
        << COOL_COLOR_ORANGE
        << "filter:" << s_filter_type_names[m_settings.m_filter_type]
@@ -2353,7 +2356,7 @@ void MiniSynth::SetParam(std::string name, double val)
         SetEgOscInt(1, val);
     else if (name == "eg1_dca_int")
         SetEgDcaInt(1, val);
-    else if (name == "eg1_sustainlvl")
+    else if (name == "eg1_sus")
         SetEgSustain(1, val);
     else if (name == "eg1_attack")
         SetEgAttackTimeMs(1, val);
@@ -2376,7 +2379,7 @@ void MiniSynth::SetParam(std::string name, double val)
         SetEgOscInt(2, val);
     else if (name == "eg2_dca_int")
         SetEgDcaInt(2, val);
-    else if (name == "eg2_sustainlvl")
+    else if (name == "eg2_sus")
         SetEgSustain(2, val);
     else if (name == "eg2_attack")
         SetEgAttackTimeMs(2, val);
