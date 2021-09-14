@@ -1429,6 +1429,49 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
+    {"kit",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             std::string cmd =
+                 "let bd = sample(" + GetRandomSampleNameFromDir("bd") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let sd = sample(" + GetRandomSampleNameFromDir("sd") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let sd = sample(" + GetRandomSampleNameFromDir("sd") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let cp = sample(" + GetRandomSampleNameFromDir("cp") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let lt = sample(" + GetRandomSampleNameFromDir("lt") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let mt = sample(" + GetRandomSampleNameFromDir("mt") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let ht = sample(" + GetRandomSampleNameFromDir("ht") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let ch = sample(" + GetRandomSampleNameFromDir("ch") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let oh = sample(" + GetRandomSampleNameFromDir("oh") + ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let prc1 = sample(" + GetRandomSampleNameFromDir("perc") +
+                   ")";
+             eval_command_queue.push(cmd);
+
+             cmd = "let prc2 = sample(" + GetRandomSampleNameFromDir("perc") +
+                   ")";
+             eval_command_queue.push(cmd);
+
+             return evaluator::NULLL;
+         })},
     {"load_dir",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

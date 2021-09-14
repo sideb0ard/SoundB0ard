@@ -12,6 +12,7 @@
 
 #include <filesystem>
 #include <iostream>
+namespace fs = std::filesystem;
 
 #include "cmdloop.h"
 #include "defjams.h"
@@ -143,43 +144,18 @@ audio_buffer_details import_file_contents(double **buffer, char *filename)
     return deetz;
 }
 
-void get_random_sample_from_dir(char *dir, char *return_file_name)
+std::string GetRandomSampleNameFromDir(std::string sample_dir)
 {
-    char dirname[512] = "./wavs/";
-    strncat(dirname, dir, 128);
-    DIR *dp;
-    struct dirent *ep;
-    dp = opendir(dirname);
-    if (!dp)
+    std::vector<std::string> file_names;
+    std::string dir_prefix = "wavs/";
+    for (const auto &entry : fs::directory_iterator(dir_prefix + sample_dir))
     {
-        printf("Nae dir, mate, nae danger\n");
-        return;
+        auto fpath = entry.path();
+        if (fpath.compare(".DS_Store") != 0)
+            file_names.push_back(fpath);
     }
 
-    int count = 0;
-    while ((ep = readdir(dp)))
-        count++;
-
-    while (1 && count > 0)
-    {
-        rewinddir(dp);
-        int randy = rand() % count;
-        if (randy == 0)
-            randy = 1;
-        for (int i = 0; i < randy; ++i)
-        {
-            ep = readdir(dp);
-        }
-        if (!(strncmp(ep->d_name, ".", 1) == 0))
-            break;
-    }
-    // printf("Found %d files in %s -- gonna use %s\n", count, dir, ep->d_name);
-    // printf("STRLEN of dirname is %lu and file name is %lu\n",
-    // strlen(dirname),
-    //       strlen(ep->d_name));
-    strcat(return_file_name, dir);
-    strcat(return_file_name, "/");
-    strcat(return_file_name, ep->d_name);
+    return file_names[rand() % file_names.size()].substr(dir_prefix.length());
 }
 
 // static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
@@ -696,10 +672,10 @@ double do_pn_sequence(unsigned *pn_register)
         EXTRACT_BITS(*pn_register, 1, 1); // 1 = b0 is FIRST bit from right
     unsigned b1 =
         EXTRACT_BITS(*pn_register, 2, 1); // 1 = b1 is SECOND bit from right
-    unsigned b27 =
-        EXTRACT_BITS(*pn_register, 28, 1); // 28 = b27 is 28th bit from right
-    unsigned b28 =
-        EXTRACT_BITS(*pn_register, 29, 1); // 29 = b28 is 29th bit from right
+    unsigned b27 = EXTRACT_BITS(*pn_register, 28,
+                                1); // 28 = b27 is 28th bit from right
+    unsigned b28 = EXTRACT_BITS(*pn_register, 29,
+                                1); // 29 = b28 is 29th bit from right
 
     // form the XOR
     unsigned b31 = b0 ^ b1 ^ b27 ^ b28;
@@ -865,20 +841,16 @@ bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
 /*  //// FROM will pirkle book - http://www.willpirkle.com/
     Function:   lagrpol() implements n-order Lagrange Interpolation
 
-    Inputs:     double* x   Pointer to an array containing the x-coordinates of
-   the input values
-                double* y   Pointer to an array containing the y-coordinates of
-   the input values
-                int n       The order of the interpolator, this is also the
-   length of the x,y input arrays
-                double xbar The x-coorinates whose y-value we want to
-   interpolate
+    Inputs:     double* x   Pointer to an array containing the x-coordinates
+   of the input values double* y   Pointer to an array containing the
+   y-coordinates of the input values int n       The order of the
+   interpolator, this is also the length of the x,y input arrays double xbar
+   The x-coorinates whose y-value we want to interpolate
 
-    Returns     The interpolated value y at xbar. xbar ideally is between the
-   middle two values in the input array,
-                but can be anywhere within the limits, which is needed for
-   interpolating the first few or last few samples
-                in a table with a fixed size.
+    Returns     The interpolated value y at xbar. xbar ideally is between
+   the middle two values in the input array, but can be anywhere within the
+   limits, which is needed for interpolating the first few or last few
+   samples in a table with a fixed size.
 */
 double lagrpol(double *x, double *y, int n, double xbar)
 {

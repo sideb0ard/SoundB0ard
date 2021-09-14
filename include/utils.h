@@ -14,7 +14,7 @@ int notelookup(char *n);
 int input_key_to_char_note(int ch, int octave, char *keytext);
 int char_midi_lookup(char *char_midi);
 std::string list_sample_dir(std::string indir = "");
-void get_random_sample_from_dir(char *dir_name, char *random_file);
+std::string GetRandomSampleNameFromDir(std::string sample_dir);
 void strim(const char *input, char *result);
 void chordie(char *n);
 int conv_bitz(int num);
