@@ -932,6 +932,27 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
         auto rightie = std::dynamic_pointer_cast<object::Number>(right);
         return EvalStringInfixExpression(op, leftie, NumberToString(rightie));
     }
+    else if (left->Type() == object::ARRAY_OBJ &&
+             right->Type() == object::ARRAY_OBJ)
+    {
+        auto leftie = std::dynamic_pointer_cast<object::Array>(left);
+        auto rightie = std::dynamic_pointer_cast<object::Array>(right);
+        return EvalArrayInfixExpression(op, leftie, rightie);
+    }
+    else if (left->Type() == object::ARRAY_OBJ &&
+             right->Type() == object::NUMBER_OBJ)
+    {
+        auto leftie_array = std::dynamic_pointer_cast<object::Array>(left);
+        auto rightie_num = std::dynamic_pointer_cast<object::Number>(right);
+        return EvalMultiplyArrayExpression(op, leftie_array, rightie_num);
+    }
+    else if (left->Type() == object::NUMBER_OBJ &&
+             right->Type() == object::ARRAY_OBJ)
+    {
+        auto leftie_array = std::dynamic_pointer_cast<object::Array>(right);
+        auto rightie_num = std::dynamic_pointer_cast<object::Number>(left);
+        return EvalMultiplyArrayExpression(op, leftie_array, rightie_num);
+    }
     else if (left->Type() == object::NUMBER_OBJ &&
              right->Type() == object::STRING_OBJ)
     {
@@ -1013,6 +1034,39 @@ EvalStringInfixExpression(std::string op, std::shared_ptr<object::String> left,
     else if (op.compare("!=") == 0)
         return NativeBoolToBooleanObject(left->value_ != right->value_);
 
+    return NewError("unknown operator: %s %s %s", left->Type(), op,
+                    right->Type());
+}
+
+std::shared_ptr<object::Object>
+EvalArrayInfixExpression(std::string op, std::shared_ptr<object::Array> left,
+                         std::shared_ptr<object::Array> right)
+{
+    if (op.compare("+") == 0)
+    {
+        auto return_vec(left->elements_);
+        return_vec.insert(return_vec.end(), right->elements_.begin(),
+                          right->elements_.end());
+        return std::make_shared<object::Array>(return_vec);
+    }
+    return NewError("unknown operator: %s %s %s", left->Type(), op,
+                    right->Type());
+}
+
+std::shared_ptr<object::Object>
+EvalMultiplyArrayExpression(std::string op, std::shared_ptr<object::Array> left,
+                            std::shared_ptr<object::Number> right)
+{
+    if (op.compare("*") == 0)
+    {
+        auto return_vec(left->elements_);
+        for (int i = 1; i < right->value_; i++)
+        {
+            return_vec.insert(return_vec.end(), return_vec.begin(),
+                              return_vec.end());
+        }
+        return std::make_shared<object::Array>(return_vec);
+    }
     return NewError("unknown operator: %s %s %s", left->Type(), op,
                     right->Type());
 }

@@ -52,6 +52,14 @@ EvalStringInfixExpression(std::string op, std::shared_ptr<object::String> left,
                           std::shared_ptr<object::String> right);
 
 std::shared_ptr<object::Object>
+EvalArrayInfixExpression(std::string op, std::shared_ptr<object::Array> left,
+                         std::shared_ptr<object::Array> right);
+
+std::shared_ptr<object::Object>
+EvalMultiplyArrayExpression(std::string op, std::shared_ptr<object::Array> left,
+                            std::shared_ptr<object::Number> right);
+
+std::shared_ptr<object::Object>
 EvalBangOperatorExpression(std::shared_ptr<object::Object> right);
 
 std::shared_ptr<object::Object>
