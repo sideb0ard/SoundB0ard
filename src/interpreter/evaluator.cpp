@@ -876,6 +876,10 @@ EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
         {
             break;
         }
+        if (result->Type() == object::RETURN_VALUE_OBJ)
+        {
+            return result;
+        }
         auto new_iterator_val = Eval(for_loop->increment_, for_loop->env_);
         if (IsError(new_iterator_val))
         {
