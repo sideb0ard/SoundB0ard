@@ -48,27 +48,31 @@ bool IsError(std::shared_ptr<object::Object> obj)
 bool IsHashable(std::shared_ptr<object::Object> obj)
 {
     if (obj->Type() == object::BOOLEAN_OBJ ||
-        obj->Type() == object::NUMBER_OBJ || obj->Type() == object::STRING_OBJ)
+        obj->Type() == object::NUMBER_OBJ ||
+        obj->Type() == object::STRING_OBJ ||
+        object::IsSoundGenerator(obj->Type()))
         return true;
     return false;
 }
 
 object::HashKey MakeHashKey(std::shared_ptr<object::Object> hashkey)
 {
-    std::shared_ptr<object::Boolean> hash_key_bool =
-        std::dynamic_pointer_cast<object::Boolean>(hashkey);
+    auto hash_key_bool = std::dynamic_pointer_cast<object::Boolean>(hashkey);
     if (hash_key_bool)
         return hash_key_bool->HashKey();
 
-    std::shared_ptr<object::Number> hash_key_int =
-        std::dynamic_pointer_cast<object::Number>(hashkey);
+    auto hash_key_int = std::dynamic_pointer_cast<object::Number>(hashkey);
     if (hash_key_int)
         return hash_key_int->HashKey();
 
-    std::shared_ptr<object::String> hash_key_string =
-        std::dynamic_pointer_cast<object::String>(hashkey);
+    auto hash_key_string = std::dynamic_pointer_cast<object::String>(hashkey);
     if (hash_key_string)
         return hash_key_string->HashKey();
+
+    auto hash_key_soundgenerator =
+        std::dynamic_pointer_cast<object::SoundGenerator>(hashkey);
+    if (hash_key_soundgenerator)
+        return hash_key_soundgenerator->HashKey();
 
     return object::HashKey{};
 }

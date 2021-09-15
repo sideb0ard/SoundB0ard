@@ -322,6 +322,7 @@ class SoundGenerator : public Object
     ~SoundGenerator() = default;
     virtual ObjectType Type() = 0;
     virtual std::string Inspect() = 0;
+    HashKey HashKey();
 
   public:
     int soundgen_id_{-1};
@@ -400,5 +401,7 @@ class Hash : public Object
   public:
     std::map<HashKey, HashPair> pairs_;
 };
+
+bool IsSoundGenerator(object::ObjectType type);
 
 } // namespace object

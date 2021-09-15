@@ -1834,6 +1834,47 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
+    {"play_rhythm",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size < 1)
+             {
+                 std::cerr << "Need an Rhythm Map to play..\n";
+                 return evaluator::NULLL;
+             }
+
+             int vel = 128;
+             int dur = 240;
+
+             for (auto a : args)
+             {
+                 if (a->Type() == object::DURATION_OBJ)
+                 {
+                     auto dur_obj =
+                         std::dynamic_pointer_cast<object::Duration>(a);
+                     dur = dur_obj->value_;
+                 }
+                 else if (a->Type() == object::VELOCITY_OBJ)
+                 {
+                     auto vel_obj =
+                         std::dynamic_pointer_cast<object::Velocity>(a);
+                     vel = vel_obj->value_;
+                 }
+             }
+             auto rhythm_map = std::dynamic_pointer_cast<object::Hash>(args[0]);
+             if (rhythm_map)
+             {
+                 for (const auto &[_, value] : rhythm_map->pairs_)
+                 {
+                     play_array_on(value.key_, value.value_, 1, dur, vel);
+                 }
+             }
+
+             return evaluator::NULLL;
+         })},
     {"type", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> args)
                      -> std::shared_ptr<object::Object>

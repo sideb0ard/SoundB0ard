@@ -159,8 +159,29 @@ let map_to_array = fn(the_map, len_array)
       push(the_array, 0);
     }
   }
-
   return the_array;
+}
 
+let is_val_in_list = fn(the_list, the_val)
+{
+  for (i = 0; i < len(the_list); ++i) {
+    if (the_list[i] == the_val) {
+      return true;
+    }
+  }
+  return false;
+}
+
+let list_to_array = fn(the_list, len_array)
+{
+  let the_array = [];
+  for (i = 0; i < len_array; ++i) {
+    if (is_val_in_list(the_list, i)){
+      the_array = push(the_array, 1);
+    } else {
+      the_array = push(the_array, 0);
+    }
+  }
+  return the_array;
 }
 

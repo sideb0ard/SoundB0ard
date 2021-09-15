@@ -17,14 +17,6 @@ extern Tsqueue<int> audio_reply_queue;
 
 namespace
 {
-bool IsSoundGenerator(object::ObjectType type)
-{
-    if (type == object::SYNTH_OBJ || type == object::SAMPLE_OBJ ||
-        type == object::GRANULAR_OBJ)
-        return true;
-    return false;
-}
-
 int AddSoundGenerator(unsigned int type, std::string filepath = "",
                       bool loop_mode = false)
 {
@@ -46,6 +38,14 @@ int AddSoundGenerator(unsigned int type, std::string filepath = "",
 
 namespace object
 {
+
+bool IsSoundGenerator(object::ObjectType type)
+{
+    if (type == object::SYNTH_OBJ || type == object::SAMPLE_OBJ ||
+        type == object::GRANULAR_OBJ)
+        return true;
+    return false;
+}
 
 std::string Number::Inspect()
 {
@@ -109,6 +109,11 @@ ObjectType Null::Type() { return NULL_OBJ; }
 FMSynth::FMSynth() { soundgen_id_ = AddSoundGenerator(DXSYNTH_TYPE); }
 std::string FMSynth::Inspect() { return "FM synth."; }
 ObjectType FMSynth::Type() { return SYNTH_OBJ; }
+
+object::HashKey SoundGenerator::HashKey()
+{
+    return object::HashKey(Type(), (uint64_t)soundgen_id_);
+}
 
 MoogSynth::MoogSynth() { soundgen_id_ = AddSoundGenerator(MINISYNTH_TYPE); }
 std::string MoogSynth::Inspect() { return "Moog synth."; }
