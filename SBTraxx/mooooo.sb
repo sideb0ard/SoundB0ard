@@ -13,3 +13,58 @@ bd : list_to_array([ 0, 8, 14 ], 16),
      cp : list_to_array([ 3, 12 ], 16)
 };
 
+let break5 = {
+ht : list_to_array([12, 14, 15], 16),
+     mt : list_to_array([4, 5, 7], 16),
+     lt : list_to_array([8], 16),
+     cb : list_to_array([0, 2, 3, 10, 11], 16),
+}
+
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let velc = 120;
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      reverse(afrocub1[ch]);
+    }
+    if (count % 8 == 7) {
+      play_rhythm(break5, vel=velc);
+    } else {
+      if (count % 2 == 0) {
+        play_rhythm(afrocub1, vel=velc);
+      } else {
+        play_rhythm(afrocub2, vel=velc);
+      }
+    }
+
+    velc = velc + 10;
+    if (velc > 127) {
+      velc = 120;
+    }
+  }
+}
+
+let mblah_gen = gen()
+{
+  setup()
+  {
+    let progz = [chordI, chordIV, chordV];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      let pat = progz[px];
+      play_array(mo, pat);
+    }
+    if (count % 7 == 0) {
+      px = incr(px, 0, len(progz));
+    }
+  }
+}
+

@@ -52,6 +52,18 @@ let riff = fn(root)
   return beat;
 }
 
+let chord_riff = fn(notes)
+{
+  #print("VALLEYNOTES:", valid_notes);
+  let beat = bjork(rand(9) + 2, 16);
+  for ( i = 0; i < 16; ++i) {
+    if (beat[i] == 1) {
+      beat[i] = notes[rand(len(notes))];
+    }
+  }
+  return beat;
+}
+
 let map = fn(arrray, fooonction)
 {
   let mapduh = [];

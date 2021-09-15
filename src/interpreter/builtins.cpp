@@ -1470,6 +1470,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    ")";
              eval_command_queue.push(cmd);
 
+             cmd = "let cb = sample(perc/808cowbell.aiff)";
+             eval_command_queue.push(cmd);
+
              return evaluator::NULLL;
          })},
     {"load_dir",
