@@ -1,0 +1,15 @@
+let afrocub1 = {
+bd : list_to_array([ 0, 8, 10, 14 ], 16),
+     ch : list_to_array([ 0, 2, 3, 4, 6, 8, 10, 12, 14 ], 16),
+     cp : list_to_array([ 3, 6, 12 ], 16)
+};
+
+let afrocub2 = {
+bd : list_to_array([ 0, 8, 14 ], 16),
+     ch : list_to_array([ 0, 2, 3, 4, 6, 8, 10, 12, 14 ], 16),
+     ht : list_to_array([6], 16),
+     mt : list_to_array([10], 16),
+     lt : list_to_array([14], 16),
+     cp : list_to_array([ 3, 12 ], 16)
+};
+
