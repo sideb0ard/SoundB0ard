@@ -41,9 +41,23 @@ let distrhythms_string = gen()
 
 let riff = fn(root)
 {
+  #print("VALLEYNOTES:", valid_notes);
+  #let beat = bjork(rand(9) + 2, 16);
+  let beat = rand_array(16, 0, 1);
+  for ( i = 0; i < 16; ++i) {
+    if (beat[i] == 1) {
+      beat[i] = root;
+    }
+  }
+  return beat;
+}
+
+let key_riff = fn(root)
+{
   let valid_notes = notes_in_key(root);
   #print("VALLEYNOTES:", valid_notes);
-  let beat = bjork(rand(9) + 2, 16);
+  #let beat = bjork(rand(9) + 2, 16);
+  let beat = rand_array(16, 0, 1);
   for ( i = 0; i < 16; ++i) {
     if (beat[i] == 1) {
       beat[i] = valid_notes[rand(len(valid_notes))];
@@ -55,7 +69,8 @@ let riff = fn(root)
 let chord_riff = fn(notes)
 {
   #print("VALLEYNOTES:", valid_notes);
-  let beat = bjork(rand(9) + 2, 16);
+  #let beat = bjork(rand(9) + 2, 16);
+  let beat = rand_array(16, 0, 1);
   for ( i = 0; i < 16; ++i) {
     if (beat[i] == 1) {
       beat[i] = notes[rand(len(notes))];

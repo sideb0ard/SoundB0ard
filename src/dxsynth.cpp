@@ -15,6 +15,20 @@ extern Mixer *mixr;
 static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
                                         "dx_dest_vibrato"};
 
+static const float dx_ratios[] = {
+    0.5,   0.71,  0.78,  0.87,  1.0,   1.41,  1.57,  1.73,  2.,    2.82,  3.,
+    3.14,  3.46,  4.,    4.24,  4.71,  5.,    5.19,  5.65,  6.0,   6.28,  6.92,
+    7.,    7.07,  7.85,  8.0,   8.48,  8.65,  9.0,   9.42,  9.89,  10.,   10.38,
+    10.99, 11.0,  11.30, 12.0,  12.11, 12.56, 12.72, 13.0,  13.84, 14.0,  14.1,
+    14.13, 15.,   15.55, 15.37, 15.70, 16.96, 17.27, 17.30, 18.37, 18.84, 19.03,
+    19.78, 20.41, 20.76, 21.20, 21.98, 22.49, 23.53, 24.22, 25.95};
+static const int NUM_RATIOS = 64;
+
+namespace
+{
+float GetRandRatio() { return dx_ratios[rand() % NUM_RATIOS]; }
+} // namespace
+
 DXSynth::DXSynth()
 {
     type = DXSYNTH_TYPE;
@@ -578,7 +592,7 @@ void DXSynth::randomize()
     m_settings.m_lfo1_mod_dest4 = rand() % 3;
 
     m_settings.m_op1_waveform = rand() % MAX_OSC;
-    m_settings.m_op1_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    m_settings.m_op1_ratio = GetRandRatio();
     m_settings.m_op1_detune_cents = (rand() % 20) - 10;
     m_settings.m_eg1_attack_ms = rand() % 300;
     m_settings.m_eg1_decay_ms = rand() % 300;
@@ -587,7 +601,7 @@ void DXSynth::randomize()
     // m_settings.m_op1_output_lvl = (rand() % 55) + 35;
 
     m_settings.m_op2_waveform = rand() % MAX_OSC;
-    m_settings.m_op2_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    m_settings.m_op2_ratio = GetRandRatio();
     m_settings.m_op2_detune_cents = (rand() % 20) - 10;
     m_settings.m_eg2_attack_ms = rand() % 300;
     m_settings.m_eg2_decay_ms = rand() % 400;
@@ -596,7 +610,7 @@ void DXSynth::randomize()
     m_settings.m_op2_output_lvl = (rand() % 55) + 15;
 
     m_settings.m_op3_waveform = rand() % MAX_OSC;
-    m_settings.m_op3_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    m_settings.m_op3_ratio = GetRandRatio();
     m_settings.m_op3_detune_cents = (rand() % 20) - 10;
     m_settings.m_eg3_attack_ms = rand() % 300;
     m_settings.m_eg3_decay_ms = rand() % 400;
@@ -605,7 +619,7 @@ void DXSynth::randomize()
     m_settings.m_op3_output_lvl = (rand() % 55) + 15;
 
     m_settings.m_op4_waveform = rand() % MAX_OSC;
-    m_settings.m_op4_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    m_settings.m_op4_ratio = GetRandRatio();
     m_settings.m_op4_detune_cents = (rand() % 20) - 10;
     m_settings.m_eg4_attack_ms = rand() % 400;
     m_settings.m_eg4_decay_ms = rand() % 500;

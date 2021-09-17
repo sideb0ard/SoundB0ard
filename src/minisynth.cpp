@@ -350,7 +350,7 @@ void MiniSynth::LoadDefaults()
     m_settings.m_eg1_dca_intensity = 1.0;
     m_settings.m_eg1_dca_enabled = true;
 
-    m_settings.m_eg1_attack_time_msec = 300;
+    m_settings.m_eg1_attack_time_msec = 5;
     m_settings.m_eg1_decay_time_msec = 300;
     m_settings.m_eg1_release_time_msec = 300;
 

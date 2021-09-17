@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#define IMAX 8.0
+#define IMAX 4.0
 
 DXSynthVoice::DXSynthVoice()
 {
