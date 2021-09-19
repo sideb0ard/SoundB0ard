@@ -100,17 +100,40 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
     }
 }
 
-std::vector<int> GetNotesInKey(int root)
+std::vector<int> GetNotesInKey(int root, int scale_type)
 {
     std::vector<int> notes;
 
-    notes.push_back(root + 0);
-    notes.push_back(root + 2);
-    notes.push_back(root + 4);
-    notes.push_back(root + 5);
-    notes.push_back(root + 7);
-    notes.push_back(root + 9);
-    notes.push_back(root + 11);
+    switch (scale_type)
+    {
+    case (0): // MAJOR
+        notes.push_back(root + 0);
+        notes.push_back(root + 2);
+        notes.push_back(root + 4);
+        notes.push_back(root + 5);
+        notes.push_back(root + 7);
+        notes.push_back(root + 9);
+        notes.push_back(root + 11);
+        break;
+    case (1): // MINOR
+        notes.push_back(root + 0);
+        notes.push_back(root + 2);
+        notes.push_back(root + 3);
+        notes.push_back(root + 5);
+        notes.push_back(root + 7);
+        notes.push_back(root + 8);
+        notes.push_back(root + 10);
+        break;
+    case (2): // PHRYGIAN
+        notes.push_back(root + 0);
+        notes.push_back(root + 1);
+        notes.push_back(root + 3);
+        notes.push_back(root + 5);
+        notes.push_back(root + 7);
+        notes.push_back(root + 8);
+        notes.push_back(root + 10);
+        break;
+    }
 
     return notes;
 }

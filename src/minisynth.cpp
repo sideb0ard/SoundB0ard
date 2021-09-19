@@ -55,6 +55,7 @@ MiniSynth::MiniSynth()
     for (auto v : voices_)
         v->m_dca.m_mod_source_eg = DEST_DCA_EG;
 
+    volume = 1;
     Update();
 
     active = true;
@@ -264,7 +265,7 @@ void MiniSynth::LoadDefaults()
 
     m_settings.m_monophonic = false;
     m_settings.m_voice_mode = Sqr3;
-    m_settings.m_detune_cents = 0.0;
+    m_settings.m_detune_cents = 2.0;
 
     // OSC1
     m_settings.osc1_wave = SQUARE;

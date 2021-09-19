@@ -1604,7 +1604,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              -> std::shared_ptr<object::Object>
          {
              int args_size = args.size();
-             if (args_size == 1)
+             if (args_size > 0)
              {
                  auto num_obj =
                      std::dynamic_pointer_cast<object::Number>(args[0]);
@@ -1613,8 +1613,20 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      auto return_array = std::make_shared<object::Array>(
                          std::vector<std::shared_ptr<object::Object>>());
 
+                     int scale_type = 0; // MAJOR
+                     if (args_size == 2)
+                     {
+                         auto scale_type_obj =
+                             std::dynamic_pointer_cast<object::Number>(args[1]);
+
+                         if (scale_type_obj)
+                         {
+                             scale_type = scale_type_obj->value_;
+                         }
+                     }
                      std::vector<int> notez =
-                         interpreter_sound_cmds::GetNotesInKey(num_obj->value_);
+                         interpreter_sound_cmds::GetNotesInKey(num_obj->value_,
+                                                               scale_type);
 
                      for (unsigned long i = 0; i < notez.size(); i++)
                      {
@@ -1633,7 +1645,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              -> std::shared_ptr<object::Object>
          {
              int args_size = args.size();
-             if (args_size >= 2)
+             if (args_size > 0)
              {
                  float root_note_value = 0;
                  auto root_note =
@@ -1654,13 +1666,20 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      root_note_value = root_note->value_;
                  }
 
-                 // can be MAJOR (0), MINOR (1), DIMINISHED (2)
-                 auto chord_type =
-                     std::dynamic_pointer_cast<object::Number>(args[1]);
-                 if (!chord_type)
+                 // MAJOR (0), MINOR (1), DIMINISHED (2)
+                 int chord_type = 0;
+
+                 if (args_size > 1)
                  {
-                     std::cerr << "NAE CHORD TYPE! numpty!\n";
-                     return evaluator::NULLL;
+
+                     auto chord_type_obj =
+                         std::dynamic_pointer_cast<object::Number>(args[1]);
+                     if (!chord_type_obj)
+                     {
+                         std::cerr << "NAE CHORD TYPE! numpty!\n";
+                         return evaluator::NULLL;
+                     }
+                     chord_type = chord_type_obj->value_;
                  }
 
                  auto return_array = std::make_shared<object::Array>(
@@ -1680,7 +1699,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  }
 
                  std::vector<int> notez = GetMidiNotesInChord(
-                     root_note_value, chord_type->value_, modification);
+                     root_note_value, chord_type, modification);
 
                  for (int i = 0; i < (int)notez.size(); i++)
                  {

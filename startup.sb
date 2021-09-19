@@ -39,6 +39,20 @@ let distrhythms_string = gen()
   }
 }
 
+let briff = fn(root)
+{
+  #print("VALLEYNOTES:", valid_notes);
+  let beat = bjork(rand(9) + 2, 16);
+  #let beat = rand_array(16, 0, 1);
+  for ( i = 0; i < 16; ++i) {
+    if (beat[i] == 1) {
+      beat[i] = root;
+    }
+  }
+  return beat;
+}
+
+
 let riff = fn(root)
 {
   #print("VALLEYNOTES:", valid_notes);
