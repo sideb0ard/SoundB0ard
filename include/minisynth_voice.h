@@ -2,6 +2,9 @@
 
 #include <filter_ckthreefive.h>
 #include <filter_moogladder.h>
+#include <filter_onepole.h>
+#include <filter_sem.h>
+
 #include <qblimited_oscillator.h>
 #include <voice.h>
 #include <wt_oscillator.h>
@@ -31,7 +34,9 @@ struct MiniSynthVoice : Voice
     // WTOscillator m_op3;
     // WTOscillator m_op4;
 
-    MoogLadder m_filter;
+    // MoogLadder m_filter;
+    CKThreeFive m_filter;
+    // FilterSem m_filter;
 
     void InitGlobalParameters(GlobalSynthParams *sp) override;
     void InitializeModMatrix(ModulationMatrix *matrix) override;

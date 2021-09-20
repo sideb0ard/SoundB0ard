@@ -265,7 +265,7 @@ void MiniSynth::LoadDefaults()
 
     m_settings.m_monophonic = false;
     m_settings.m_voice_mode = Sqr3;
-    m_settings.m_detune_cents = 2.0;
+    m_settings.m_detune_cents = 0.0;
 
     // OSC1
     m_settings.osc1_wave = SQUARE;

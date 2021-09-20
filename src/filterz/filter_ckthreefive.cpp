@@ -18,6 +18,9 @@ CKThreeFive::CKThreeFive()
     m_filter_type = LPF2; // default
 
     m_k = 0.1;
+    m_alpha0 = 0;
+
+    Reset();
 }
 
 void CKThreeFive::SetQControl(double qcontrol)
@@ -46,12 +49,12 @@ void CKThreeFive::Update()
     if (m_filter_type == LPF2)
     {
         m_LPF2.m_beta = (m_k - m_k * G) / (1.0 + g);
-        m_LPF1.m_beta = -1.0 / (1.0 + g);
+        m_HPF1.m_beta = -1.0 / (1.0 + g);
     }
     else // HPF
     {
         m_HPF2.m_beta = -1.0 * G / (1.0 + g);
-        m_HPF1.m_beta = 1.0 / (1.0 + g);
+        m_LPF1.m_beta = 1.0 / (1.0 + g);
     }
 }
 
@@ -72,7 +75,9 @@ double CKThreeFive::DoFilter(double xn)
     if (m_filter_type == LPF2)
     {
         double y1 = m_LPF1.DoFilter(xn);
+
         double S35 = m_HPF1.GetFeedbackOutput() + m_LPF2.GetFeedbackOutput();
+
         double u = m_alpha0 * (y1 + S35);
 
         if (m_nlp)

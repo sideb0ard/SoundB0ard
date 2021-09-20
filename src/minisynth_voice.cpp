@@ -16,7 +16,7 @@ MiniSynthVoice::MiniSynthVoice()
     m_filter1 = &m_filter;
     m_filter2 = NULL;
 
-    m_filter.m_aux_control = 0.0;
+    m_filter.m_aux_control = 1.0;
 
     // voice mode 0
     m_osc1->m_waveform = SAW1;

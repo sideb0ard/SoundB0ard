@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "defjams.h"
-#include "filter.h"
 #include "filter_sem.h"
 
 FilterSem::FilterSem()

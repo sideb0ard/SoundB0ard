@@ -9,7 +9,7 @@
 #define FILTER_FC_MOD_RANGE 46.881879936465680
 #define FILTER_FC_MIN 80        // 80Hz
 #define FILTER_FC_MAX 18000     // 18 kHz
-#define FILTER_FC_DEFAULT 12000 // 10kHz
+#define FILTER_FC_DEFAULT 10000 // 10kHz
 #define FILTER_Q_DEFAULT 0.707  // butterworth (noidea!)
 #define FILTER_Q_MOD_RANGE 10   // dunno if this will work!
 #define FILTER_TYPE_DEFAULT LPF4
@@ -45,8 +45,8 @@ struct Filter
     double m_q_control;   // 'qualvity factor' 1-10
     double m_aux_control; // a spare control, used in SEM and ladder filters
 
-    unsigned m_nlp;      // Non Linear Processing on/off switch
-    double m_saturation; // used in NLP
+    unsigned m_nlp;           // Non Linear Processing on/off switch
+    double m_saturation{100}; // used in NLP
 
     unsigned m_filter_type;
 
