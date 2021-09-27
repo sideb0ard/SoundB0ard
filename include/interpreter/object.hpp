@@ -197,6 +197,7 @@ class Environment
     std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val,
                                 bool create = true);
     std::string Debug();
+    std::string ListFuncsAndGen();
     std::map<std::string, int> GetSoundGenerators();
 
   private:

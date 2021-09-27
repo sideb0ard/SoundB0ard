@@ -224,15 +224,53 @@ std::string Array::Inspect()
     return return_val.str();
 }
 
+std::string Environment::ListFuncsAndGen()
+{
+    std::stringstream ss;
+    for (const auto &it : store_)
+    {
+        if (it.second->Type() == "FUNCTION")
+        {
+            ss << ANSI_COLOR_WHITE << it.first << COOL_COLOR_PINK << " = fn()"
+               << std::endl;
+        }
+        else if (it.second->Type() == "GENERATOR")
+        {
+            ss << ANSI_COLOR_WHITE << it.first << COOL_COLOR_PINK << " = gen()"
+               << std::endl;
+        }
+    }
+    ss << ANSI_COLOR_RESET;
+    return ss.str();
+}
 std::string Environment::Debug()
 {
     std::stringstream ss;
     for (const auto &it : store_)
     {
-        if (!IsSoundGenerator(it.second->Type()))
-            ss << "Key: " << it.first << " // Val:" << it.second->Inspect()
-               << std::endl;
+        if (IsSoundGenerator(it.second->Type()))
+        {
+            // no-op - sg ps happens in mixer.
+        }
+        else if (it.second->Type() == "FUNCTION" ||
+                 it.second->Type() == "GENERATOR")
+        {
+            // no-op
+        }
+        else
+        {
+            if (it.first == "rhythms_int")
+            {
+                // ignore! too messy!
+            }
+            else
+            {
+                ss << ANSI_COLOR_WHITE << it.first << COOL_COLOR_GREEN << " = "
+                   << it.second->Inspect() << std::endl;
+            }
+        }
     }
+    ss << ANSI_COLOR_RESET;
     return ss.str();
 }
 

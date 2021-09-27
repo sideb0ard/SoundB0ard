@@ -1,18 +1,3 @@
-let rhythms_string = [
-  #shiko
-  "1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
-  #son
-  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
-  #rumba
-  "1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
-  #soukous
-  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
-  #gahu
-  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
-  #bossa-nova
-  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
-]
-
 let rhythms_int = [
   #shiko
   [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
@@ -27,17 +12,6 @@ let rhythms_int = [
   #bossa-nova
   [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0]
 ]
-
-let distrhythms_string = gen()
-{
-  setup() {}
-
-  run() {
-    let idx = rand(len(rhythms_string))
-      #puts("IDX is ", idx, " - pattern is: ", rhythms_string[idx])
-      return rhythms_string[idx]
-  }
-}
 
 let briff = fn(root)
 {
@@ -132,7 +106,7 @@ let countr = gen()
 p0 # countr ;
 
 # i.e. 3840 / 16 == 240 midi Pulses Per 16th
-let pp = 240;
+#let pp = 240;
 
 let up = fn(array_val, octaves)
 {

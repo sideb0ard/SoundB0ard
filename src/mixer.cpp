@@ -127,7 +127,7 @@ std::string Mixer::StatusEnv()
     ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Varz"
        << COOL_COLOR_GREEN << "]" << std::endl;
 
-    // ss << global_env->Debug();
+    ss << global_env->Debug();
 
     std::map<std::string, int> soundgens = global_env->GetSoundGenerators();
     for (auto &[var_name, sg_idx] : soundgens)
