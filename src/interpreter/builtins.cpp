@@ -606,6 +606,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                       return evaluator::NULLL;
                   })},
+    {"funcz", std::make_shared<object::BuiltIn>(
+                  [](std::vector<std::shared_ptr<object::Object>> args)
+                      -> std::shared_ptr<object::Object>
+                  {
+                      mixr->PrintFuncAndGenInfo();
+                      return evaluator::NULLL;
+                  })},
     {"timing_info", std::make_shared<object::BuiltIn>(
                         [](std::vector<std::shared_ptr<object::Object>> args)
                             -> std::shared_ptr<object::Object>

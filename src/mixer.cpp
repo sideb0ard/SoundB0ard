@@ -210,6 +210,14 @@ std::string Mixer::StatusSgz(bool all)
     return ss.str();
 }
 
+void Mixer::PrintFuncAndGenInfo()
+{
+
+    std::stringstream ss;
+    ss << global_env->ListFuncsAndGen();
+    repl_queue.push(ss.str());
+}
+
 void Mixer::Ps(bool all)
 {
     std::stringstream ss;

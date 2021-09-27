@@ -103,6 +103,7 @@ struct Mixer
 
     void PrintTimingInfo();
     void PrintMidiInfo();
+    void PrintFuncAndGenInfo();
 
     void AddMinisynth();
     void AddDxsynth();
