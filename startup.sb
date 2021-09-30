@@ -1,17 +1,11 @@
-let rhythms_int = [
-  #shiko
-  [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
-  #son
-  [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0],
-  #rumba
-  [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0],
-  #soukous
-  [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0],
-  #gahu
-  [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-  #bossa-nova
-  [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0]
-]
+let shiko = [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
+let son = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
+let rumba = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0];
+let soukous = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0];
+let gahu = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
+let bossa = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0];
+
+let rhythms_int = [ shiko, son, rumba, soukous, gahu, bossa ];
 
 let briff = fn(root)
 {
@@ -30,8 +24,8 @@ let briff = fn(root)
 let riff = fn(root)
 {
   #print("VALLEYNOTES:", valid_notes);
-  #let beat = bjork(rand(9) + 2, 16);
-  let beat = rand_array(16, 0, 1);
+  let beat = bjork(rand(9) + 2, 16);
+  #let beat = rand_array(16, 0, 1);
   for ( i = 0; i < 16; ++i) {
     if (beat[i] == 1) {
       beat[i] = root;
@@ -44,8 +38,8 @@ let key_riff = fn(root)
 {
   let valid_notes = notes_in_key(root);
   #print("VALLEYNOTES:", valid_notes);
-  #let beat = bjork(rand(9) + 2, 16);
-  let beat = rand_array(16, 0, 1);
+  let beat = bjork(rand(9) + 2, 16);
+  #let beat = rand_array(16, 0, 1);
   for ( i = 0; i < 16; ++i) {
     if (beat[i] == 1) {
       beat[i] = valid_notes[rand(len(valid_notes))];
@@ -57,8 +51,8 @@ let key_riff = fn(root)
 let chord_riff = fn(notes)
 {
   #print("VALLEYNOTES:", valid_notes);
-  #let beat = bjork(rand(9) + 2, 16);
-  let beat = rand_array(16, 0, 1);
+  let beat = bjork(rand(9) + 2, 16);
+  #let beat = rand_array(16, 0, 1);
   for ( i = 0; i < 16; ++i) {
     if (beat[i] == 1) {
       beat[i] = notes[rand(len(notes))];
@@ -106,7 +100,7 @@ let countr = gen()
 p0 # countr ;
 
 # i.e. 3840 / 16 == 240 midi Pulses Per 16th
-#let pp = 240;
+let pp = 240;
 
 let up = fn(array_val, octaves)
 {
@@ -117,6 +111,21 @@ let down = fn(array_val, octaves)
 {
   return map(array_val, fn(v) { if (v > 0) { return v - 12*octaves; } else { return v;}  });
 }
+
+let combinorCh = fn(rhythm, chord)
+{
+  let return_melody= [];
+  for (i=0; i < len(rhythm); ++i)
+  {
+    if (rhythm[i] > 0) {
+      return_melody = push(return_melody, chord);
+    } else {
+      return_melody = push(return_melody, 0);
+    }
+  }
+  return return_melody;
+}
+
 
 let combinor = fn(rhythm, melody)
 {
@@ -200,3 +209,28 @@ let list_to_array = fn(the_list, len_array)
   return the_array;
 }
 
+let double = fn(list)
+{
+  let return_valz = list_to_array([], 16);
+  if (len(list) == 16) {
+    for (i = 0; i < 16; ++i) {
+      if (list[i] > 0) {
+        return_valz[i/2] = list[i];
+        return_valz[8 + i/2] = list[i];
+      }
+    }
+  }
+  return return_valz;
+}
+
+let play_pattern = fn(sg, pat)
+{
+  let lenny = len(pat);
+  let pp = 3840 / lenny;
+
+  for (i = 0; i < lenny; ++i) {
+    if (type(pat[i]) == "ARRAY" || (type(pat[i]) == "NUMBER" && pat[i] > 0)) {
+      note_on_at(sg, pat[i], pp * i);
+    }
+  }
+}

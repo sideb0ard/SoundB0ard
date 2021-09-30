@@ -340,7 +340,7 @@ void MiniSynth::LoadDefaults()
     m_settings.m_lfo2_pulsewidth_intensity = 0.7;
     m_settings.m_lfo2_pulsewidth_enabled = false;
 
-    m_settings.m_fc_control = FILTER_FC_DEFAULT;
+    m_settings.m_fc_control = FILTER_FC_MAX;
     m_settings.m_q_control = FILTER_Q_DEFAULT;
 
     /// EG1 //////////////////////////////////////////

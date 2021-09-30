@@ -162,6 +162,7 @@ std::string Function::Inspect()
     std::stringstream return_val;
     return_val << "fn(" << params.str() << ") {\n";
     return_val << body_->String() << "\n)";
+    return_val << "}\n";
 
     return return_val.str();
 }
