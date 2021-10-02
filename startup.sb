@@ -117,10 +117,15 @@ let combinorCh = fn(rhythm, chord)
   let return_melody= [];
   for (i=0; i < len(rhythm); ++i)
   {
-    if (rhythm[i] > 0) {
-      return_melody = push(return_melody, chord);
-    } else {
-      return_melody = push(return_melody, 0);
+    if (type(rhythm[i]) == "ARRAY") {
+      return_melody = push(return_melody, combinorCh(rhythm[i], melody));
+    }
+    else {
+      if (rhythm[i] > 0) {
+        return_melody = push(return_melody, chord);
+      } else {
+        return_melody = push(return_melody, 0);
+      }
     }
   }
   return return_melody;
@@ -133,11 +138,16 @@ let combinor = fn(rhythm, melody)
   let mel_idx = 0;
   for (i=0; i < len(rhythm); ++i)
   {
-    if (rhythm[i] > 0) {
-      return_melody = push(return_melody, melody[mel_idx]);
-      mel_idx = incr(mel_idx, 0, len(melody));
-    } else {
-      return_melody = push(return_melody, 0);
+    if (type(rhythm[i]) == "ARRAY") {
+      return_melody = push(return_melody, combinor(rhythm[i], melody));
+    }
+    else {
+      if (rhythm[i] > 0) {
+        return_melody = push(return_melody, melody[mel_idx]);
+        mel_idx = incr(mel_idx, 0, len(melody));
+      } else {
+        return_melody = push(return_melody, 0);
+      }
     }
   }
   return return_melody;
@@ -233,4 +243,23 @@ let play_pattern = fn(sg, pat)
       note_on_at(sg, pat[i], pp * i);
     }
   }
+}
+
+let gen_beat = fn()
+{
+  let beat = bjork(rand(5)+2, 16);
+
+  for (i = 4; i < 16; ++i) {
+    if (beat[i] == 1 && rand(100) > 60) {
+      beat[i] = bjork(rand(3)+1, 8);
+    }
+  }
+
+  for (i = 8; i < 16; ++i) {
+    if (beat[i] == 1 && rand(100) > 80) {
+      beat[i] = bjork(rand(4)+1, 8);
+    }
+  }
+
+  return beat;
 }

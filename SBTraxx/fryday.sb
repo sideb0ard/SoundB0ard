@@ -1,0 +1,51 @@
+
+let runtime_pattern = list_to_array({}, 16);
+
+let blah_fn = fn(instr, low, high, dest_pattern)
+{
+  let mid = (low + high) / 2;
+
+  if (runtime_pattern[low] == 0) {
+    runtime_pattern[low] = instr["name"];
+    dest_pattern[low] = 1;
+  }
+
+  if (rand(100) < instr["density"] && ((high - low) > instr["res"]))
+  {
+    blah_fn(instr, low, mid, dest_pattern);
+    blah_fn(instr, mid, high, dest_pattern);
+  }
+
+  return dest_pattern;
+}
+
+let play_pattern = fn(sg, instr)
+{
+  let pp = blah_fn(instr, 0, 16, list_to_array({}, 16));
+  play_array(sg, pp, vel=instr["vel"]);
+
+}
+
+let bdpattern = { "density":75, "res":2, "vel":96, "name":"bd"};
+let sdpattern = { "density":75, "res":4, "vel":96, "name":"sd"};
+let chpattern = { "density":50, "res":8, "vel":120, "name":"ch"};
+let ohpattern = { "density":50, "res":16, "vel":80, "name":"oh"};
+let cppattern = { "density":70, "res":8, "vel":64, "name":"cp"};
+let tom1pattern = { "density":70, "res":8, "vel":64, "name":"cp"};
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    runtime_pattern = list_to_array({}, 16);
+    play_pattern(bd, bdpattern);
+    play_pattern(sd, sdpattern);
+    play_pattern(ch, chpattern);
+    play_pattern(cp, cppattern);
+    play_pattern(oh, ohpattern);
+  }
+}
+

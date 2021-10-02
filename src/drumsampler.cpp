@@ -21,13 +21,20 @@ DrumSampler::DrumSampler(char *filename)
 {
     drumsampler_import_file(this, filename);
 
-    envelope_enabled = false;
     glitch_mode = false;
     glitch_rand_factor = 20;
 
     type = DRUMSAMPLER_TYPE;
 
-    eg.m_sustain_level = 0;
+    eg.SetEgMode(ANALOG);
+    eg.SetAttackTimeMsec(0);
+    eg.SetDecayTimeMsec(300);
+    eg.SetSustainLevel(0);
+    eg.SetReleaseTimeMsec(3000);
+    eg.m_output_eg = true;
+    eg.ramp_mode = true;
+    eg.m_reset_to_zero = true;
+    envelope_enabled = true;
 
     active = true;
     started = false;
@@ -60,16 +67,6 @@ stereo_val DrumSampler::genNext()
             else
                 right_val = left_val;
 
-            if (glitch_mode)
-            {
-                if (sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos >
-                        (bufsize / 2) &&
-                    rand() % 100 > glitch_rand_factor)
-                {
-                    continue;
-                }
-            }
-
             sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
                 sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos +
                 (channels * (buffer_pitch));
@@ -84,8 +81,6 @@ stereo_val DrumSampler::genNext()
     }
 
     double amp_env = eg.DoEnvelope(NULL);
-    if (eg.m_state == SUSTAIN)
-        eg.NoteOff();
 
     double amp = volume;
     if (envelope_enabled)
@@ -126,9 +121,9 @@ std::string DrumSampler::Info()
     ss << ANSI_COLOR_BLUE << "\nSample ";
     ss << ANSI_COLOR_WHITE << filename << ANSI_COLOR_BLUE;
     ss << "\nvol:" << volume << " pan:" << pan << " pitch:" << buffer_pitch;
-    ss << "eg:" << envelope_enabled << " attack_ms:" << eg.m_attack_time_msec;
+    ss << " eg:" << envelope_enabled << " attack_ms:" << eg.m_attack_time_msec;
     ss << " decay_ms:" << eg.m_decay_time_msec
-       << " sustain: " << eg.m_sustain_level;
+       << " release_ms: " << eg.m_release_time_msec;
     return ss.str();
 }
 
@@ -144,7 +139,12 @@ void DrumSampler::start()
 void DrumSampler::noteOn(midi_event ev)
 {
     int idx = mixr->timing_info.midi_tick % PPBAR;
-    int seq_position = get_a_drumsampler_position(this);
+    int seq_position = 0;
+    if (one_shot)
+        sample_positions[idx].audiobuffer_cur_pos = 0;
+    else
+        seq_position = get_a_drumsampler_position(this);
+
     if (seq_position != -1)
     {
         samples_now_playing[seq_position] = idx;
@@ -247,5 +247,13 @@ void DrumSampler::SetParam(std::string name, double val)
 {
     if (name == "pitch")
         drumsampler_set_pitch(this, val);
+    else if (name == "eg")
+        drumsampler_enable_envelope_generator(this, val);
+    else if (name == "attack_ms")
+        drumsampler_set_attack_time(this, val);
+    else if (name == "decay_ms")
+        drumsampler_set_decay_time(this, val);
+    else if (name == "release_ms")
+        drumsampler_set_release_time(this, val);
 }
 double DrumSampler::GetParam(std::string name) { return 0; }

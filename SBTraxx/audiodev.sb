@@ -1,0 +1,63 @@
+let hhz = bjork(11, 16);
+let bdz = up(bjork(7, 16), 4);
+let snz = bjork(3, 16);
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let pidx = 2;
+    let notz = [20, 32, 32];
+    let nx = 0;
+    let durz = [3840, 1000, 700, 500, 100];
+    let drx = 0;
+    let octz = [1, 2, 3];
+    let ox  =0;
+
+    let swing = [48, 96, 144];
+    let sx = 0;
+
+  }
+
+  run()
+  {
+
+    let localidx = 0;
+
+    if (count % 2 == 0) {
+      drx = incr(drx, 0, len(durz));
+      pidx = incr(pidx, 1, 16);
+    }
+    if (count % 4 == 0) {
+      ox = incr(ox, 0, len(octz));
+      nx = incr(nx, 0, len(notz))
+    }
+
+    let rbeat = rand_beat();
+
+    for (i = 0; i < 16; ++i) {
+      if (hhz[localidx] == 1) {
+        let mswing = 0;
+        if (i % 2 == 1) {
+          mswing = swing[sx];
+        }
+        note_on_at(ch, 1, i * pp + mswing);
+      }
+      if (bdz[localidx] > 0) {
+        note_on_at(bd, bdz[localidx], i * pp);
+        if (count % 3 == 2) {
+          note_on_at(prc2, 1, i * pp);
+          note_on_at(dx, notz[nx], i*pp, dur=durz[drx]);
+        }
+      }
+      if (snz[localidx] == 1) {
+        note_on_at(sd, 1, i * pp);
+        note_on_at(cp, 1, i * pp);
+      }
+      localidx = incr(localidx, 0, pidx);
+    }
+    sx = incr(sx, 0, len(swing));
+
+  }
+}
+

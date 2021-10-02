@@ -1,0 +1,56 @@
+# DX narf
+# DX2 ZApzz
+
+let hhah = bjork(11,16);
+let beat = bjork(7,16);
+
+let durz = [35, 50, 100, 500, 700];
+let drx = 0;
+
+let pat1 = [43, 0, 0, 0, 43, 0, 0, 43, 0, 0, 43, 0, 0, 43, 0, 0];
+let pat2 = [47, 0, 47, 0, 47, 0, 47, 0, 47, 0, 47, 0, 47, 0, 47, 0];
+
+let blah_fn = fn(sg, arraay, read_idx, play_idx)
+{
+  read_idx = read_idx % len(arraay);
+  if (arraay[read_idx] > 0) {
+    note_on_at(sg, arraay[read_idx], play_idx * pp, dur = durz[drx]);
+  }
+}
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let myc = 0;
+    let mypat = pat1;
+
+    let len_max = 4;
+    let idx = 0;
+  }
+  run()
+  {
+    if (myc % 2 == 0) {
+      mypat = pat2;
+    } else {
+      mypat = pat1;
+    }
+
+    for (i = 0; i < 16; ++i) {
+      blah_fn(ch, hhah, idx, i);
+      blah_fn(bd, beat, idx, i);
+      blah_fn(dx, mypat, idx, i);
+      blah_fn(dx2, rotate(mypat, 3), idx + 2, i);
+      idx = incr(idx, 0, len_max);
+    }
+
+
+    if (count % 2 == 1) {
+      ++myc;
+      drx = incr(drx, 0, len(durz));
+    }
+
+    len_max = incr(len_max, 0, 16);
+  }
+}
+

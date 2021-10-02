@@ -1,0 +1,68 @@
+
+let bdr = bjork(7, 16);
+let chr = bjork(11, 16);
+let snrr = bjork(3, 16);
+
+
+
+let blah_fn = fn(idx, patrn, soundg, sixteenth)
+{
+  if (patrn[idx] == 1) {
+    note_on_at(soundg, 1, sixteenth * pp);
+  }
+}
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let ilen = 5;
+    let bidx = 0;
+    let cidx = 0;
+    let sidx = 0;
+
+    let pitz = [1, 2, 1.5, 1.23];
+    let px = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (count % 8 != 7) {
+        blah_fn(bidx, bdr, bd, i);
+      }
+      blah_fn(cidx, chr, ch, i);
+      blah_fn(sidx, snrr, sd, i);
+      blah_fn(sidx, snrr, cp, i);
+      bidx = incr(bidx, 0, ilen);
+      if (i % 2 == 0) {
+        sidx = incr(sidx, 0, ilen);
+      }
+      if (i % 3 == 0) {
+        cidx = incr(cidx, 0, ilen);
+      }
+      if (melly[bidx] == 4)
+      {
+        note_on_at(dx, 18, i * pp);
+      }
+      if (melly[bidx] == 3)
+      {
+        note_on_at(dx, 16, i * pp);
+      }
+    }
+
+    if (count % 8 == 7) {
+      set_pitch(bd, pitz[px]);
+      set_pitch(cp, pitz[px]);
+      px = incr(px, 0, len(pitz));
+
+      melly = rand_array(16, 0, 4);
+    }
+
+
+    ilen = incr(ilen, 2, 16);
+
+
+
+  }
+}
+
