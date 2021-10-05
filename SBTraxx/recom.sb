@@ -5,16 +5,31 @@ let blah_gen = gen()
     let percbeat = rand_beat();
     let kickbeat = gen_beat();
 
+    let maxy = 4;
+    let midx = 0;
+
     let durz = [100, 300, 750];
     let drx = 0;
+
+    let chz = [notes_in_chord(63, 1), notes_in_chord(56, 1), notes_in_chord(61), notes_in_chord(54)];
+    let chzx = 0;
   }
   run()
   {
     play_array(bd, kickbeat);
+    play_array(sn, rotate(kickbeat, 3));
     play_array(hh, percbeat);
 
 
-    play_array(dx, combinor(kickbeat, [44]), dur=durz[drx]);
+
+    let melyy = combinorCh(kickbeat, chz[chzx]);
+
+    for (i = 0; i < 16; ++i) {
+      if (type(melyy[i]) == "ARRAY" || (type(melyy[i]) == "NUMBER" && melyy[i] > 0))
+      {
+        note_on_at(dx, melyy, i*pp, dur=durz[drx]);
+      }
+    }
     drx = incr(drx, 0, len(durz));
 
     if (count % 3 == 0) {
@@ -22,6 +37,7 @@ let blah_gen = gen()
     }
     if (count % 4 == 0) {
       kickbeat = gen_beat();
+      chzx = incr(chzx, 0, len(chz));
     }
   }
 }

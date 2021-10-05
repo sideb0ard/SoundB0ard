@@ -248,6 +248,9 @@ let play_pattern = fn(sg, pat)
 let gen_beat = fn()
 {
   let beat = bjork(rand(5)+2, 16);
+  if (rand(100) > 70) {
+    beat = rand_beat();
+  }
 
   for (i = 4; i < 16; ++i) {
     if (beat[i] == 1 && rand(100) > 60) {

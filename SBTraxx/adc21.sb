@@ -1,48 +1,33 @@
 
-
-let pblah_fn = fn(sg, the_pattern, read_idx, play_idx)
-{
-  if (the_pattern[read_idx] > 0) {
-    note_on_at(sg, the_pattern[read_idx], i * pp);
-  }
-
-}
-
-
 let blah_gen = gen()
 {
   setup()
   {
-    let prog = [pat_I, pat_I, pat_IV, pat_V];
-    let px = 0;
+    let rotz = [0, 3, 2, 4];
+    let rx = 0;
 
+    let progz = [vi, ii, V, I];
+    let progx = 0;
 
-    let read_max = 2;
-    let read_idx = 0;
-
+    let durz = [50, 150, 400];
+    let drx = 0;
   }
+
   run()
   {
+    play_array(bd, beat);
+    play_array(hh, rotate(bossa, rotz[rx]));
+    rx = incr(rx, 0, len(rotz));
 
-    let mypat = prog[px];
-
-
-    if (count % 6 == 0) {
-      mypat = up(mypat, 2);
+    if (count % 1 == 0) {
+      play_array(dx, combinor(beat, progz[progx]), dur=durz[drx]);
+      progx = incr(progx, 0, len(progz));
+      drx = incr(drx, 0, len(durz));
     }
+
     if (count % 4 == 0) {
-      mypat = down(mypat, 2);
+      beat = gen_beat();
     }
-
-    for (i = 0; i < 16; ++i) {
-      read_idx = incr(read_idx, 0, read_max);
-    }
-
-    px = incr(px, 0, len(prog));
-
-    read_max = incr(read_max, 3, 16);
-
-
   }
 }
 
