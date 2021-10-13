@@ -25,15 +25,26 @@ stereo_val BitCrush::Process(stereo_val input)
     if (phasor_ >= 1)
     {
         phasor_ -= 1;
-        last_ = step_ * floor((input.left * inv_step_) + 0.5);
+        last_left_ = step_ * floor((input.left * inv_step_) + 0.5);
+        last_right_ = step_ * floor((input.left * inv_step_) + 0.5);
     }
 
-    input.left = last_;
-    input.right = last_;
+    input.left = last_left_;
+    input.right = last_right_;
     return input;
 }
 
-void BitCrush::SetParam(std::string name, double val) {}
+void BitCrush::SetParam(std::string name, double val)
+{
+
+    if (name == "bitdepth")
+        SetBitdepth(val);
+    else if (name == "bitrate")
+        SetBitrate(val);
+    else if (name == "sample_hold_freq")
+        SetSampleHoldFreq(val);
+    Update();
+}
 
 double BitCrush::GetParam(std::string name) { return 0; }
 
@@ -43,7 +54,8 @@ void BitCrush::Init()
     bitrate_ = 4096;
     sample_hold_freq_ = 1;
     phasor_ = 0;
-    last_ = 0;
+    last_left_ = 0;
+    last_right_ = 0;
     Update();
 }
 

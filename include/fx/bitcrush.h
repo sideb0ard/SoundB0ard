@@ -26,5 +26,6 @@ class BitCrush : Fx
     double step_;
     double inv_step_;
     double phasor_;
-    double last_;
+    double last_left_;
+    double last_right_;
 };
