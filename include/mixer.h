@@ -13,6 +13,9 @@
 #include <soundgenerator.h>
 #include <table.h>
 
+#include <ctime>
+#include <filesystem>
+
 typedef unsigned int compat_key_list[6];
 
 // struct AbletonLink AbletonLink;
@@ -33,7 +36,9 @@ void preview_buffer_import_file(preview_buffer *buffy, char *filename);
 struct file_monitor
 {
     std::string function_file_filepath;
-    std::time_t function_file_filepath_last_write_time{0};
+    //1std::time_t function_file_filepath_last_write_time{0};
+    std::filesystem::file_time_type function_file_filepath_last_write_time;
+
 };
 
 struct DelayedMidiEvent

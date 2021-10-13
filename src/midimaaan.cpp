@@ -1,6 +1,6 @@
 #include <math.h>
-#include <portmidi.h>
-#include <porttime.h>
+//#include <portmidi.h>
+//##include <porttime.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

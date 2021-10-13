@@ -657,7 +657,7 @@ double do_white_noise()
     float noise = 0.0;
 
     // fNoise is 0 -> ARC4RANDOMMAX
-    noise = (float)arc4random();
+    noise = (float)rand();
 
     // normalize and make bipolar
     noise = 2.0 * (noise / ARC4RANDOMMAX) - 1.0;

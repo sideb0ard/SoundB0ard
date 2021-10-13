@@ -1186,9 +1186,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              if (soundgen)
              {
 
-                 audio_action_queue_item action_req{.mixer_soundgen_idx =
-                                                        soundgen->soundgen_id_,
-                                                    .type = AudioAction::RAND};
+                 audio_action_queue_item action_req{
+                                                    .type = AudioAction::RAND,
+                                                    .mixer_soundgen_idx =
+                                                        soundgen->soundgen_id_
+                 };
                  audio_queue.push(action_req);
                  return evaluator::NULLL;
              }

@@ -1,6 +1,10 @@
 #include <iostream>
 
+#if __APPLE__
 #define LINK_PLATFORM_MACOSX 1
+#elif __linux__
+#define LINK_PLATFORM_LINUX 1
+#endif
 
 #include <ableton/Link.hpp>
 #include <ableton/link/HostTimeFilter.hpp>

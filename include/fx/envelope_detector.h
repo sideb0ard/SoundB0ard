@@ -10,12 +10,12 @@
 #define FLT_MIN_PLUS 1.175494351e-38   /* min positive value */
 #define FLT_MIN_MINUS -1.175494351e-38 /* min negative value */
 
-#ifndef max
-#define max(a, b) (((a) > (b)) ? (a) : (b))
-#endif
-#ifndef min
-#define min(a, b) (((a) < (b)) ? (a) : (b))
-#endif
+// #ifndef max
+// #define max(a, b) (((a) > (b)) ? (a) : (b))
+// #endif
+// #ifndef min
+// #define min(a, b) (((a) < (b)) ? (a) : (b))
+// #endif
 
 enum
 {

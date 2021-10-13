@@ -1,5 +1,9 @@
 #include "midi_freq_table.h"
 #include <drum_synth.h>
+
+#include <string.h>
+
+
 #include <iostream>
 #include <sstream>
 

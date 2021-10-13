@@ -270,8 +270,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             {
                 audio_action_queue_item action{
                     .type = AudioAction::INFO,
-                    .param_name = soundgen_var_name->value_,
-                    .mixer_soundgen_idx = soundgen->soundgen_id_};
+                    .mixer_soundgen_idx = soundgen->soundgen_id_,
+                    .param_name = soundgen_var_name->value_
+                };
 
                 audio_queue.push(action);
             }
