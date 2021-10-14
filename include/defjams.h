@@ -81,6 +81,8 @@ const std::string kStartupConfigFile = "startup.sb";
 #define COOL_COLOR_MAUVE "\x1b[38;5;135m"
 #define COOL_COLOR_ORANGE "\x1b[38;5;202m"
 #define COOL_COLOR_YELLOW_MELLOW "\x1b[38;5;190m"
+#define COOL_COLOR_BLUE "\x1b[38;5;45m"
+#define COOL_COLOR_PINK2 "\x1b[38;5;219m"
 
 #define NADA -999
 

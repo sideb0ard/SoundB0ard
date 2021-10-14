@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 #include <fx/decimate.h>
 #include <utils.h>
 
@@ -70,6 +72,11 @@ stereo_val Decimate::Process(stereo_val input)
     bit1 += destroy(quantize(bit1, bitres), destruct); // accumulating
     bit2 += destroy(quantize(bit2, bitres), destruct);
 
+    if (bit1 > 1 || bit2 > 1)
+    {
+        std::cout << "OVERLOAD!: b1:" << bit1 << " b2:" << bit2 << std::endl;
+        return input;
+    }
     output.left = bit1;
     output.right = bit2;
 

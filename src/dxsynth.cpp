@@ -24,6 +24,13 @@ static const float dx_ratios[] = {
     19.78, 20.41, 20.76, 21.20, 21.98, 22.49, 23.53, 24.22, 25.95};
 static const int NUM_RATIOS = 64;
 
+std::vector<std::string> waveform_names = {"SINE",  "SAW1",   "SAW2",
+                                           "SAW3",  "TRI",    "SQUARE",
+                                           "NOISE", "PNOISE", "MAX_OSC"};
+
+std::vector<std::string> lfo_wave_names = {"sine", "usaw", "dsaw", "tri ",
+                                           "squa", "expo", "rsh ", "qrsh"};
+
 namespace
 {
 float GetRandRatio() { return dx_ratios[rand() % NUM_RATIOS]; }
@@ -94,72 +101,99 @@ std::string DXSynth::Info()
     char *INSTRUMENT_COLOR_B = (char *)ANSI_COLOR_RESET;
     if (active)
     {
-        INSTRUMENT_COLOR_A = (char *)ANSI_COLOR_MAGENTA;
-        INSTRUMENT_COLOR_B = (char *)COOL_COLOR_PINK;
+        INSTRUMENT_COLOR_A = (char *)COOL_COLOR_BLUE;
+        INSTRUMENT_COLOR_B = (char *)COOL_COLOR_PINK2;
     }
 
-    ss << "\n" << ANSI_COLOR_WHITE << "FM (";
+    ss << "\n"
+       << ANSI_COLOR_WHITE << "## " << INSTRUMENT_COLOR_B
+       << "FM SZYNTHZZZZZZZizzzzer" << ANSI_COLOR_WHITE << " ("
+       << INSTRUMENT_COLOR_B << m_settings.m_settings_name << ANSI_COLOR_WHITE
+       << ") ####\n";
 
-    ss << m_settings.m_settings_name << ")";
-    ss << INSTRUMENT_COLOR_B;
-    ss << "\nalgo:" << m_settings.m_voice_mode << " vol:" << volume
+    ss << ANSI_COLOR_WHITE
+       << "## Voice Section ####################################\n";
+    ss << INSTRUMENT_COLOR_A;
+    ss << "   algo:" << m_settings.m_voice_mode << " vol:" << volume
        << " pan:" << pan << "\n";
 
-    ss << "midi_osc:" << active_midi_osc
+    ss << "   midi_osc:" << active_midi_osc
        << " porta:" << m_settings.m_portamento_time_ms
        << " pitchrange:" << m_settings.m_pitchbend_range
        << " op4fb:" << m_settings.m_op4_feedback << "\n";
 
-    ss << "vel2att:" << m_settings.m_velocity_to_attack_scaling
+    ss << "   vel2att:" << m_settings.m_velocity_to_attack_scaling
        << " note2dec:" << m_settings.m_note_number_to_decay_scaling
        << " reset2zero:" << m_settings.m_reset_to_zero
        << " legato:" << m_settings.m_legato_mode << "\n";
-
-    ss << INSTRUMENT_COLOR_A << "l1_wav:" << m_settings.m_lfo1_waveform
-       << " l1_int:" << m_settings.m_lfo1_intensity
-       << " l1_rate:" << m_settings.m_lfo1_rate << "\n";
-
-    ss << "l1_dest1:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest1] << "\n";
-    ss << "l1_dest2:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest2] << "\n";
-    ss << "l1_dest3:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest3] << "\n";
-    ss << "l1_dest4:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest4] << "\n";
-
-    ss << INSTRUMENT_COLOR_B << "o1wav: " << m_settings.m_op1_waveform
-       << " o1rat:" << m_settings.m_op1_ratio
-       << " o1det:" << m_settings.m_op1_detune_cents
-       << "\ne1att:" << m_settings.m_eg1_attack_ms
-       << " e1dec:" << m_settings.m_eg1_decay_ms
-       << " e1sus:" << m_settings.m_eg1_sustain_lvl
-       << " e1rel:" << m_settings.m_eg1_release_ms << "\n";
-
-    ss << INSTRUMENT_COLOR_A << "o2wav:" << m_settings.m_op2_waveform
-       << " o2rat:" << m_settings.m_op2_ratio
-       << " o2det:" << m_settings.m_op2_detune_cents
-       << "\ne2att:" << m_settings.m_eg2_attack_ms
-       << " e2dec:" << m_settings.m_eg2_decay_ms
-       << " e2sus:" << m_settings.m_eg2_sustain_lvl
-       << " e2rel:" << m_settings.m_eg2_release_ms << "\n";
-
-    ss << INSTRUMENT_COLOR_B << "o3wav:" << m_settings.m_op3_waveform
-       << " o3rat:" << m_settings.m_op3_ratio
-       << " o3det:" << m_settings.m_op3_detune_cents
-       << "\ne3att:" << m_settings.m_eg3_attack_ms
-       << " e3dec:" << m_settings.m_eg3_decay_ms
-       << " e3sus:" << m_settings.m_eg3_sustain_lvl
-       << " e3rel:" << m_settings.m_eg3_release_ms << "\n";
-
-    ss << INSTRUMENT_COLOR_A << "o4wav:" << m_settings.m_op4_waveform
-       << " o4rat:" << m_settings.m_op4_ratio
-       << " o4det:" << m_settings.m_op4_detune_cents
-       << "\ne4att:" << m_settings.m_eg4_attack_ms
-       << " e4dec:" << m_settings.m_eg4_decay_ms
-       << " e4sus:" << m_settings.m_eg4_sustain_lvl
-       << " e4rel:" << m_settings.m_eg4_release_ms << "\n";
-
-    ss << INSTRUMENT_COLOR_B << "op1out:" << m_settings.m_op1_output_lvl
+    ss << "   op1out:" << m_settings.m_op1_output_lvl
        << " op2out:" << m_settings.m_op2_output_lvl
        << " op3out:" << m_settings.m_op3_output_lvl
-       << " op4out:" << m_settings.m_op4_output_lvl << std::endl;
+       << " op4out:" << m_settings.m_op4_output_lvl << "\n\n";
+
+    ss << ANSI_COLOR_WHITE
+       << "## Operator 1 ####################################\n";
+    ss << INSTRUMENT_COLOR_B;
+    ss << "   o1wav: " << waveform_names[m_settings.m_op1_waveform] << "("
+       << m_settings.m_op1_waveform << ") "
+       << " o1rat:" << m_settings.m_op1_ratio
+       << " o1det:" << m_settings.m_op1_detune_cents
+       << "\n   e1att:" << m_settings.m_eg1_attack_ms
+       << " e1dec:" << m_settings.m_eg1_decay_ms
+       << " e1sus:" << m_settings.m_eg1_sustain_lvl
+       << " e1rel:" << m_settings.m_eg1_release_ms << "\n\n";
+
+    ss << ANSI_COLOR_WHITE
+       << "## Operator 2 ####################################\n";
+    ss << INSTRUMENT_COLOR_B;
+    ss << "   o2wav: " << waveform_names[m_settings.m_op2_waveform] << "("
+       << m_settings.m_op2_waveform << ") "
+       << " o2rat:" << m_settings.m_op2_ratio
+       << " o2det:" << m_settings.m_op2_detune_cents
+       << "\n   e2att:" << m_settings.m_eg2_attack_ms
+       << " e2dec:" << m_settings.m_eg2_decay_ms
+       << " e2sus:" << m_settings.m_eg2_sustain_lvl
+       << " e2rel:" << m_settings.m_eg2_release_ms << "\n\n";
+
+    ss << ANSI_COLOR_WHITE
+       << "## Operator 3 ####################################\n";
+    ss << INSTRUMENT_COLOR_B;
+    ss << "   o3wav: " << waveform_names[m_settings.m_op3_waveform] << "("
+       << m_settings.m_op3_waveform << ") "
+       << " o3rat:" << m_settings.m_op3_ratio
+       << " o3det:" << m_settings.m_op3_detune_cents
+       << "\n   e3att:" << m_settings.m_eg3_attack_ms
+       << " e3dec:" << m_settings.m_eg3_decay_ms
+       << " e3sus:" << m_settings.m_eg3_sustain_lvl
+       << " e3rel:" << m_settings.m_eg3_release_ms << "\n\n";
+
+    ss << ANSI_COLOR_WHITE
+       << "## Operator 4 ####################################\n";
+    ss << INSTRUMENT_COLOR_B;
+    ss << "   o4wav: " << waveform_names[m_settings.m_op4_waveform] << "("
+       << m_settings.m_op4_waveform << ") "
+       << " o4rat:" << m_settings.m_op4_ratio
+       << " o4det:" << m_settings.m_op4_detune_cents
+       << "\n   e4att:" << m_settings.m_eg4_attack_ms
+       << " e4dec:" << m_settings.m_eg4_decay_ms
+       << " e4sus:" << m_settings.m_eg4_sustain_lvl
+       << " e4rel:" << m_settings.m_eg4_release_ms << "\n\n";
+
+    ss << ANSI_COLOR_WHITE
+       << "## LFO Routing ####################################\n";
+    ss << INSTRUMENT_COLOR_A;
+    ss << "   l1_wav:" << lfo_wave_names[m_settings.m_lfo1_waveform] << "("
+       << m_settings.m_lfo1_waveform << ")"
+       << " l1_int:" << m_settings.m_lfo1_intensity
+       << " l1_rate:" << m_settings.m_lfo1_rate << "\n";
+    ss << "   l1_dest1:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest1]
+       << "\n";
+    ss << "   l1_dest2:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest2]
+       << "\n";
+    ss << "   l1_dest3:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest3]
+       << "\n";
+    ss << "   l1_dest4:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest4]
+       << std::endl;
 
     return ss.str();
 }
