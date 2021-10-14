@@ -9,7 +9,7 @@ typedef enum
     BASICFILTER,
     BITCRUSH,
     COMPRESSOR,
-    DECIMATOR,
+    DECIMATE,
     DELAY,
     ENVELOPE,
     MODDELAY,

@@ -6,6 +6,7 @@
 #include <defjams.h>
 #include <fx/basicfilterpass.h>
 #include <fx/bitcrush.h>
+#include <fx/decimate.h>
 #include <fx/distortion.h>
 #include <fx/dynamics_processor.h>
 #include <fx/fx.h>
@@ -175,6 +176,13 @@ int SoundGenerator::AddBitcrush()
     printf("BITCRUSH!\n");
     BitCrush *bc = new BitCrush();
     return AddFx((Fx *)bc);
+}
+
+int SoundGenerator::AddDecimate()
+{
+    printf("DECIMATE!!\n");
+    Decimate *dc = new Decimate();
+    return AddFx((Fx *)dc);
 }
 
 int SoundGenerator::AddCompressor()

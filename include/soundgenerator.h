@@ -73,6 +73,7 @@ class SoundGenerator
     int AddBitcrush();
     int AddCompressor();
     int AddDistortion();
+    int AddDecimate();
     int AddDelay();
     int AddEnvelope();
     int AddModdelay();

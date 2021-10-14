@@ -31,6 +31,8 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
                     sg->AddDelay();
                 else if (str_obj->value_ == "distort")
                     sg->AddDistortion();
+                else if (str_obj->value_ == "decimate")
+                    sg->AddDecimate();
                 else if (str_obj->value_ == "filter")
                     sg->AddBasicfilter();
                 else if (str_obj->value_ == "reverb")
