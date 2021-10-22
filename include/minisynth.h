@@ -8,7 +8,6 @@
 #include <dca.h>
 #include <envelope_generator.h>
 #include <filter.h>
-#include <keys.h>
 #include <midimaaan.h>
 #include <minisynth_voice.h>
 #include <modmatrix.h>

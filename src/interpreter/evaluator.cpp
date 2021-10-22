@@ -105,29 +105,22 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                      std::shared_ptr<object::Environment> env)
 {
     if (!node)
-    {
         return NULLL;
-    }
+
     std::shared_ptr<ast::Program> prog_node =
         std::dynamic_pointer_cast<ast::Program>(node);
     if (prog_node)
-    {
         return EvalProgram(prog_node->statements_, env);
-    }
 
     std::shared_ptr<ast::BreakStatement> break_statement_node =
         std::dynamic_pointer_cast<ast::BreakStatement>(node);
     if (break_statement_node)
-    {
         return std::make_shared<object::Break>();
-    }
 
     std::shared_ptr<ast::BlockStatement> block_statement_node =
         std::dynamic_pointer_cast<ast::BlockStatement>(node);
     if (block_statement_node)
-    {
         return EvalBlockStatement(block_statement_node, env);
-    }
 
     std::shared_ptr<ast::ExpressionStatement> expr_statement_node =
         std::dynamic_pointer_cast<ast::ExpressionStatement>(node);

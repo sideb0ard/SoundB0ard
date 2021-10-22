@@ -4,7 +4,6 @@
 #include <dxsynth_voice.h>
 #include <envelope_generator.h>
 #include <filter.h>
-#include <keys.h>
 #include <midimaaan.h>
 #include <modmatrix.h>
 #include <oscillator.h>

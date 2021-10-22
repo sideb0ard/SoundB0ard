@@ -247,11 +247,7 @@ std::string MiniSynth::Info()
 
     return ss.str();
 }
-void MiniSynth::start()
-{
-    active = true;
-    // engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
-}
+void MiniSynth::start() { active = true; }
 
 void MiniSynth::stop()
 {
@@ -1184,26 +1180,6 @@ void MiniSynth::Save(std::string new_preset_name)
     return;
 }
 
-bool minisynth_check_if_preset_exists(char *preset_to_find)
-{
-    FILE *presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
-    if (presetzzz == NULL)
-        return false;
-
-    char line[2048];
-    char const *sep = "::";
-    char *preset_name, *last_s;
-
-    while (fgets(line, sizeof(line), presetzzz))
-    {
-        preset_name = strtok_r(line, sep, &last_s);
-        if (strncmp(preset_to_find, preset_name, 255) == 0)
-            return true;
-    }
-
-    fclose(presetzzz);
-    return false;
-}
 // bool minisynth_load_settings( char *preset_to_load)
 //{
 //    void Save(std::string preset_name);

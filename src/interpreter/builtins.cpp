@@ -15,7 +15,6 @@
 #include <filesystem>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/sound_cmds.hpp>
-#include <keys.h>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <tsqueue.hpp>
@@ -290,6 +289,9 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
     if (!sg)
         return;
 
+    std::cout << "HERE -got SG, now casting pattern \n";
+    if (pattern)
+        std::cout << "YUP, GOT PATTERN?!!!\n";
     std::shared_ptr<object::Array> play_pattern;
     auto pat_obj = std::dynamic_pointer_cast<object::Pattern>(pattern);
     if (pat_obj)
@@ -299,6 +301,7 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
 
     if (play_pattern)
     {
+        std::cout << "AIIGHT, GOT PLAY PATTERN\n";
         std::array<std::vector<int>, PPBAR> live_pattern;
 
         if (play_pattern->elements_.size() >= PPBAR &&
@@ -1110,7 +1113,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  std::string filepath =
                      cwd.generic_string() + "/" + filename->value_;
 
-                 // mixr_add_file_to_monitor(mixr, filepath);
                  audio_action_queue_item action_req{
                      .type = AudioAction::MONITOR, .filepath = filepath};
                  audio_queue.push(action_req);
@@ -1808,7 +1810,16 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto sg =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
              if (sg)
-                 play_array_on(args[0], args[1], 1, dur, vel);
+             {
+                 if (args_size > 1)
+                 {
+                     play_array_on(args[0], args[1], 1, dur, vel);
+                 }
+                 else
+                 {
+                     std::cerr << "OOFT, NEED AN ARRAY TAE PLAY!\n";
+                 }
+             }
              else
                  play_array(args[0], 1, dur, vel);
 

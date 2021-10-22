@@ -805,43 +805,6 @@ void DXSynth::Save(std::string preset)
     printf("Wrote %d settings\n", settings_count++);
 }
 
-bool dxsynth_list_presets()
-{
-    FILE *presetzzz = fopen(DX_PRESET_FILENAME, "r+");
-    if (presetzzz == NULL)
-        return false;
-
-    char line[256];
-    while (fgets(line, sizeof(line), presetzzz))
-    {
-        printf("%s\n", line);
-    }
-
-    fclose(presetzzz);
-
-    return true;
-}
-
-bool dxsynth_check_if_preset_exists(char *preset_to_find)
-{
-    FILE *presetzzz = fopen(DX_PRESET_FILENAME, "r+");
-    if (presetzzz == NULL)
-        return false;
-
-    char line[2048];
-    char const *sep = "::";
-    char *preset_name, *last_s;
-
-    while (fgets(line, sizeof(line), presetzzz))
-    {
-        preset_name = strtok_r(line, sep, &last_s);
-        if (strncmp(preset_to_find, preset_name, 255) == 0)
-            return true;
-    }
-
-    fclose(presetzzz);
-    return false;
-}
 void DXSynth::Load(std::string preset_name)
 {
     if (preset_name.empty())
