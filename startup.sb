@@ -102,14 +102,14 @@ p0 # countr ;
 # i.e. 3840 / 16 == 240 midi Pulses Per 16th
 let pp = 240;
 
-let up = fn(array_val, octaves)
+let up = fn(array_val, halfstep)
 {
-  return map(array_val, fn(v) { if (v > 0) { return v + 12*octaves; } else { return v;}  });
+  return map(array_val, fn(v) { if (v > 0) { return v + halfstep; } else { return v;}  });
 }
 
-let down = fn(array_val, octaves)
+let down = fn(array_val, halfstep)
 {
-  return map(array_val, fn(v) { if (v > 0) { return v - 12*octaves; } else { return v;}  });
+  return map(array_val, fn(v) { if (v > 0) { return v - halfstep; } else { return v;}  });
 }
 
 let combinorCh = fn(rhythm, chord)

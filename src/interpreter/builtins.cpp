@@ -289,9 +289,6 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
     if (!sg)
         return;
 
-    std::cout << "HERE -got SG, now casting pattern \n";
-    if (pattern)
-        std::cout << "YUP, GOT PATTERN?!!!\n";
     std::shared_ptr<object::Array> play_pattern;
     auto pat_obj = std::dynamic_pointer_cast<object::Pattern>(pattern);
     if (pat_obj)
@@ -301,7 +298,6 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
 
     if (play_pattern)
     {
-        std::cout << "AIIGHT, GOT PLAY PATTERN\n";
         std::array<std::vector<int>, PPBAR> live_pattern;
 
         if (play_pattern->elements_.size() >= PPBAR &&

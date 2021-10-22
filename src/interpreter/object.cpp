@@ -27,9 +27,7 @@ int AddSoundGenerator(unsigned int type, std::string filepath = "",
     audio_queue.push(action_req);
     auto sg_index = audio_reply_queue.pop();
     if (sg_index)
-    {
         return sg_index.value();
-    }
     else
         return -1;
 }

@@ -64,9 +64,7 @@ struct Mixer
     std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_ = {};
     bool proc_initialized_{false};
 
-    std::shared_ptr<SoundGenerator>
-        sound_generators_[MAX_NUM_SOUND_GENERATORS] = {};
-    std::atomic_int soundgen_num{0}; // actual number of SGs
+    std::vector<std::shared_ptr<SoundGenerator>> sound_generators_ = {};
 
     std::vector<DelayedMidiEvent> _action_items = {};
 
