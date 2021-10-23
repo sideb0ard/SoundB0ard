@@ -1,8 +1,11 @@
+#include "filter_sem.h"
+
 #include <math.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 #include "defjams.h"
-#include "filter_sem.h"
 
 FilterSem::FilterSem()
 {
@@ -45,7 +48,10 @@ double FilterSem::DoFilter(double xn)
 {
     if (m_filter_type != LPF2 && m_filter_type != HPF2 &&
         m_filter_type != BPF2 && m_filter_type != BSF2)
+    {
+        std::cerr << "SORRY BUD, NOT SUPPORTED!\n";
         return xn;
+    }
 
     double hpf = m_alpha0 * (xn - m_rho * m_z11 - m_z12);
 

@@ -9,14 +9,14 @@ struct OnePole : public Filter
     OnePole();
     ~OnePole() = default;
 
-    double m_alpha;
-    double m_beta;
-    double m_z1;
-    double m_gamma;
-    double m_delta;
-    double m_epsilon;
-    double m_a0;
-    double m_feedback;
+    double m_alpha{1.0};
+    double m_beta{0.0};
+    double m_z1{0.0};
+    double m_gamma{1.0};
+    double m_delta{0.0};
+    double m_epsilon{0.0};
+    double m_a0{1.0};
+    double m_feedback{0.0};
 
     double DoFilter(double xn);
     void Update();

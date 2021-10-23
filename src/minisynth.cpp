@@ -43,7 +43,7 @@ MiniSynth::MiniSynth()
         voices_[i]->InitGlobalParameters(&m_global_synth_params);
     }
 
-    // use first voice to setup global
+    // use first voice to setup global.
     voices_[0]->InitializeModMatrix(&modmatrix);
 
     for (auto v : voices_)
@@ -70,7 +70,7 @@ stereo_val MiniSynth::genNext()
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    float mix = 1.0 / MAX_VOICES;
+    float mix = 0.25;
 
     double out_left = 0.0;
     double out_right = 0.0;
@@ -238,8 +238,8 @@ std::string MiniSynth::Info()
        << "\neg2_sustain_override:" << m_settings.m_eg2_sustain_override << "\n"
 
        << COOL_COLOR_ORANGE
-       << "filter:" << s_filter_type_names[m_settings.m_filter_type]
-       << m_settings.m_filter_type << " fc:" << m_settings.m_fc_control
+       << "filter:" << s_filter_type_names[m_settings.m_filter_type] << "("
+       << m_settings.m_filter_type << ") fc:" << m_settings.m_fc_control
        << " fq:" << m_settings.m_q_control
        << " kt_int:" << m_settings.m_filter_keytrack_intensity
        << " sat:" << m_settings.m_filter_saturation
@@ -2341,6 +2341,8 @@ void MiniSynth::SetParam(std::string name, double val)
         SetEgDecayTimeMs(1, val);
     else if (name == "eg1_release")
         SetEgReleaseTimeMs(1, val);
+    else if (name == "eg1_sustain_override")
+        SetEgSustainOverride(1, val);
 
     else if (name == "eg2_filter_en")
         SetEgFilterEnable(2, val);
@@ -2364,6 +2366,8 @@ void MiniSynth::SetParam(std::string name, double val)
         SetEgDecayTimeMs(2, val);
     else if (name == "eg2_release")
         SetEgReleaseTimeMs(2, val);
+    else if (name == "eg2_sustain_override")
+        SetEgSustainOverride(2, val);
 
     else if (name == "filter")
         SetFilterType(val);

@@ -94,4 +94,6 @@ void Filter::InitGlobalParameters(GlobalFilterParams *params)
     global_filter_params->saturation = m_saturation;
     global_filter_params->filter_type = m_filter_type;
     global_filter_params->nlp = m_nlp;
+    std::cout << "SETTING FILTER GP TO filter_type:" << m_filter_type
+              << std::endl;
 }

@@ -163,7 +163,7 @@ typedef struct synthsettings
     unsigned int m_reset_to_zero{0};
     unsigned int m_filter_keytrack{0};
     unsigned int m_filter_type{0};
-    double m_filter_saturation{100};
+    double m_filter_saturation{0};
 
     unsigned int m_nlp{0};
     unsigned int m_velocity_to_attack_scaling{0};

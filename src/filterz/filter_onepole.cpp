@@ -5,24 +5,11 @@
 #include "defjams.h"
 #include "filter_onepole.h"
 
-OnePole::OnePole()
-{
-    m_filter_type = LPF1;
-
-    m_alpha = 1.0;
-    m_beta = 0.0;
-    m_gamma = 1.0;
-    m_delta = 0.0;
-    m_epsilon = 0.0;
-    m_feedback = 0.0;
-    m_a0 = 1.0;
-    m_z1 = 0.0;
-}
+OnePole::OnePole() { m_filter_type = LPF1; }
 
 void OnePole::Update()
 {
     Filter::Update();
-
     double wd = 2.0 * M_PI * m_fc;
     double T = 1.0 / SAMPLE_RATE;
     double wa = (2.0 / T) * tan(wd * T / 2.0);
