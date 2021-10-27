@@ -1,0 +1,26 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let rf = [4, 0, 8, 4, 0, 11, 0, 4, 0, 4, 0, 11, 8, 0, 4, 0];
+    let orig_rf = [4, 0, 8, 4, 0, 11, 0, 4, 0, 4, 0, 11, 8, 0, 4, 0];
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      rf = rotate(rf, 3);
+    }
+
+    play_array(dx, rf);
+    if (count %3 == 0) {
+      play_array(dx, rotate(up(rf, 2), 2), dur=200);
+    }
+
+
+    if (count % 8 == 0) {
+      rf = orig_rf;
+    }
+  }
+}
+

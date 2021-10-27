@@ -1,0 +1,51 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let maxl = 3;
+    let cx = 0;
+
+    let maxl2 = 4;
+    let cx2 = 0;
+
+    let percz = {1:BLURP, 2:PXP2, 3:VSGLitch, 4:VSpitch};
+
+    let ptz = [0.7, 1.7, 0.7, 0.6];
+    let ptzx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      #stepper(dx, rf, cx, i);
+      #stepper(bd2, gahu, cx, i);
+      #stepper(bd, gahu, cx2, i);
+      #stepper(hh, soukous, cx2, i);
+      cx = incr(cx, 0, maxl);
+      cx2 = incr(cx2, 0, maxl2);
+    }
+
+    if (count % 3 == 2) {
+      set_pitch(cp, ptz[ptzx]);
+      ptzx = incr(ptzx, 0, len(ptz));
+      for (i = 0; i < 16; ++i) {
+        #stepper(cp, rumba, cx2, i);
+        cx2 = incr(cx2, 0, maxl2);
+        stepper(dx, rf, cx2, i);
+      }
+    }
+
+    maxl = incr(maxl, 3, 16);
+    maxl2 = incr(maxl2, 4, 16);
+
+    let pbeat = rand_array(16, 0, 4);
+    #print("PBEAT:", pbeat);
+    for (i = 0; i < 16; ++i) {
+      if (pbeat[i] > 0) {
+        #note_on_at(percz[pbeat[i]], 1, pp*i);
+      }
+    }
+
+  }
+}
+

@@ -1,0 +1,52 @@
+
+let mel4 = {0: 35};
+let mel3 = {0: 33, 6: 35, 7: 33, 10: 40};
+let mel2 = {0: 33, 6: 40, 8: 26};
+let mel1 = {0: 30, 7: 35, 8: 42, 9: 40, 10: 35, 12: 30};
+
+let melz = [mel1, mel2, mel3, mel4];
+
+let blah_fn = fn(sg, array, read_idx, play_idx)
+{
+  if (array[read_idx] > 0) {
+    note_on_at(sg, array[read_idx], play_idx * pp);
+  }
+}
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let mx = 0;
+
+    let maxb = 3;
+    let mbx = 0;
+
+    let btl = [3, 5, 7, 0];
+    let btlx = 0;
+  }
+  run()
+  {
+    let m = map_to_array(melz[mx], 16);
+    let bt = combinor(bjork(btl[btlx], 16), m);
+    btlx = incr(btlx, 0, len(btl));
+
+    if (count % 5 == 0)
+    {
+      m = up(m, 5);
+    }
+    if (count % 7 == 0)
+    {
+      m = up(m, 7);
+    }
+    mx = incr(mx, 0, len(melz));
+
+    for (i = 0; i < 16; ++i) {
+      #blah_fn(bd, bt, mbx, i);
+      blah_fn(dx, m, mbx, i);
+      mbx = incr(mbx, 0, maxb);
+    }
+    maxb = incr(maxb, 3, 16);
+  }
+}
+
