@@ -8,9 +8,6 @@
 
 #include <iostream>
 
-#include <lo/lo.h>
-#include <lo/lo_cpp.h>
-
 #include "PerlinNoise.hpp"
 
 #include "ableton_link_wrapper.h"
@@ -146,26 +143,6 @@ void *process_worker_thread()
         }
     }
     return nullptr;
-}
-
-/* catch any incoming messages and display them. returning 1 means that the
- * message has not been fully handled and the server should try other methods */
-int generic_handler(const char *path, const char *types, lo_arg **argv,
-                    int argc, lo_message data, void *user_data)
-{
-    int i;
-
-    printf("generic handler; path: <%s>\n", path);
-    for (i = 0; i < argc; i++)
-    {
-        printf("arg %d '%c' ", i, types[i]);
-        lo_arg_pp((lo_type)types[i], argv[i]);
-        printf("\n");
-    }
-    printf("\n");
-    fflush(stdout);
-
-    return 1;
 }
 
 int main()
