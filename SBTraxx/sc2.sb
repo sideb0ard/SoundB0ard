@@ -1,4 +1,12 @@
 
+# let dx = fm();
+
+let bd2 = sample(bd/gaborKick.aiff);
+let bd = sample(bd/dm02_909_kickdrum_004_drive.wav);
+let hh = sample(ch/LOUhat.aiff);
+let cp = sample(cp/djkhaledClap.aiff);
+load_dir("glitchz");
+
 let blah_gen = gen()
 {
   setup()
@@ -13,23 +21,28 @@ let blah_gen = gen()
 
     let ptz = [0.7, 1.7, 0.7, 0.6];
     let ptzx = 0;
+
+    let rotr = [2, 3, 4, 1];
+    let rx = 0;
   }
   run()
   {
     for (i = 0; i < 16; ++i) {
-      #stepper(dx, rf, cx, i);
-      #stepper(bd2, gahu, cx, i);
-      #stepper(bd, gahu, cx2, i);
-      #stepper(hh, soukous, cx2, i);
+      stepper(dx, rf, cx, i);
+      stepper(dx2, rotate(rf, rotr[rx]), cx, i);
+      stepper(bd2, gahu, cx, i);
+      stepper(bd, gahu, cx2, i);
+      stepper(hh, soukous, cx2, i);
       cx = incr(cx, 0, maxl);
       cx2 = incr(cx2, 0, maxl2);
     }
+    rx = incr(rx, 0, len(rotrz));
 
     if (count % 3 == 2) {
       set_pitch(cp, ptz[ptzx]);
       ptzx = incr(ptzx, 0, len(ptz));
       for (i = 0; i < 16; ++i) {
-        #stepper(cp, rumba, cx2, i);
+        stepper(cp, rumba, cx2, i);
         cx2 = incr(cx2, 0, maxl2);
         stepper(dx, rf, cx2, i);
       }
@@ -42,7 +55,7 @@ let blah_gen = gen()
     #print("PBEAT:", pbeat);
     for (i = 0; i < 16; ++i) {
       if (pbeat[i] > 0) {
-        #note_on_at(percz[pbeat[i]], 1, pp*i);
+        note_on_at(percz[pbeat[i]], 1, pp*i);
       }
     }
 
