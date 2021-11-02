@@ -1,11 +1,26 @@
 
-# let dx = fm();
+# let dx =  fm();
+# load_preset(dx, "fboom")
+# let dx2 = fm();
+# load_preset(dx2, "lowr")
+# p3 < osc 4 "45 90"  "set dx:op2out %"
 
 let bd2 = sample(bd/gaborKick.aiff);
 let bd = sample(bd/dm02_909_kickdrum_004_drive.wav);
 let hh = sample(ch/LOUhat.aiff);
 let cp = sample(cp/djkhaledClap.aiff);
 load_dir("glitchz");
+#
+vol BLURP 0.5;
+vol PXP2 0.5;
+vol VSGLitch 0.5;
+vol VSpitch 0.5;
+set BLURP:decay_ms 50;
+set PXP2:decay_ms 50;
+set VSGLitch:decay_ms 50;
+set VSpitch:decay_ms 50;
+
+let rf =  chord_riff([4, 7]);
 
 let blah_gen = gen()
 {
@@ -24,19 +39,28 @@ let blah_gen = gen()
 
     let rotr = [2, 3, 4, 1];
     let rx = 0;
+
+    let rfz = [ [16, 19], [4, 7] ];
+    let rfx = 0;
+
   }
   run()
   {
+    #print("RF:", rf);
+
     for (i = 0; i < 16; ++i) {
+      #print("rf[i]", rf[cx]);
       stepper(dx, rf, cx, i);
       stepper(dx2, rotate(rf, rotr[rx]), cx, i);
-      stepper(bd2, gahu, cx, i);
-      stepper(bd, gahu, cx2, i);
+      if (count % 8 < 7) {
+        stepper(bd2, gahu, cx, i);
+        stepper(bd, gahu, cx2, i);
+      }
       stepper(hh, soukous, cx2, i);
       cx = incr(cx, 0, maxl);
       cx2 = incr(cx2, 0, maxl2);
     }
-    rx = incr(rx, 0, len(rotrz));
+    rx = incr(rx, 0, len(rotr));
 
     if (count % 3 == 2) {
       set_pitch(cp, ptz[ptzx]);
@@ -46,6 +70,7 @@ let blah_gen = gen()
         cx2 = incr(cx2, 0, maxl2);
         stepper(dx, rf, cx2, i);
       }
+      set pbl:stutter 1
     }
 
     maxl = incr(maxl, 3, 16);
@@ -59,6 +84,10 @@ let blah_gen = gen()
       }
     }
 
+    if (count % 16 == 0) {
+      rfx = incr(rfx, 0, len(rfz));
+      rf = chord_riff(rfz[rfx]);
+    }
   }
 }
 
