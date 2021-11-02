@@ -1,10 +1,11 @@
+#include "obliquestrategies.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <sstream>
 
 #include "defjams.h"
-#include "obliquestrategies.h"
 
 constexpr char const *strategies[NUM_STATEGIES] = {
     "Abandon desire",
@@ -108,11 +109,10 @@ constexpr char const *strategies[NUM_STATEGIES] = {
     "Would anyone want it?",
     "Your mistake was a hidden intention"};
 
-std::string oblique_strategy()
-{
-    int rand_oblique = rand() % 100;
-    std::stringstream ss;
-    ss << COOL_COLOR_MAUVE << strategies[rand_oblique] << ANSI_COLOR_RESET
-       << "\n";
-    return ss.str();
+std::string oblique_strategy() {
+  int rand_oblique = rand() % 100;
+  std::stringstream ss;
+  ss << COOL_COLOR_MAUVE << strategies[rand_oblique] << ANSI_COLOR_RESET
+     << "\n";
+  return ss.str();
 }

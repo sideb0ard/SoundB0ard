@@ -120,76 +120,76 @@ class looper : public SoundGenerator
     double GetParam(std::string name) override;
 
   public:
-    bool started;
-    bool have_active_buffer;
+    bool started{false};
+    bool have_active_buffer{false};
 
     char filename[512];
     double *audio_buffer{nullptr};
-    int num_channels;
-    int audio_buffer_len;
-    int size_of_sixteenth;
-    double audio_buffer_read_idx;
-    double normalized_audio_buffer_read_idx;
-    int audio_buffer_write_idx;
-    int external_source_sg;            // XOR - external or file
-    unsigned int external_source_mode; // capture once or follow
-    bool recording;
-    bool record_pending; // wait for start of loop
+    int num_channels{0};
+    int audio_buffer_len{0};
+    int size_of_sixteenth{0};
+    double audio_buffer_read_idx{0};
+    double normalized_audio_buffer_read_idx{0};
+    int audio_buffer_write_idx{0};
+    int external_source_sg{-1};           // XOR - external or file
+    unsigned int external_source_mode{0}; // capture once or follow
+    bool recording{false};
+    bool record_pending{false}; // wait for start of loop
     pthread_mutex_t extsource_lock;
 
-    int num_active_grains;
-    int highest_grain_num;
-    int cur_grain_num;
-    sound_grain m_grains[MAX_CONCURRENT_GRAINS] = {};
+    int num_active_grains{0};
+    int highest_grain_num{0};
+    int cur_grain_num{0};
+    std::array<sound_grain, MAX_CONCURRENT_GRAINS> m_grains{};
 
-    int granular_spray_frames; // random off-set from starting idx
-    int quasi_grain_fudge;     // random variation from length of grain
-    int grain_duration_ms;
-    int grains_per_sec;
-    bool density_duration_sync; // keep duration and per_sec aligned
-    double fill_factor;         // used for density_duration_sync
-    double grain_pitch;
+    int granular_spray_frames{0}; // random off-set from starting idx
+    int quasi_grain_fudge{0};     // random variation from length of grain
+    int grain_duration_ms{0};
+    int grains_per_sec{0};
+    bool density_duration_sync{false}; // keep duration and per_sec aligned
+    double fill_factor{0};             // used for density_duration_sync
+    double grain_pitch{1};
 
-    int num_grains_per_looplen;
-    unsigned int selection_mode;
-    unsigned int envelope_mode;
-    double envelope_taper_ratio; // 0.0...1.0
-    bool reverse_mode;
+    int num_grains_per_looplen{0};
+    unsigned int selection_mode{0};
+    unsigned int envelope_mode{0};
+    double envelope_taper_ratio{0}; // 0.0...1.0
+    bool reverse_mode{false};
 
-    int last_grain_launched_sample_time;
-    int grain_attack_time_pct;
-    int grain_release_time_pct;
+    int last_grain_launched_sample_time{0};
+    int grain_attack_time_pct{0};
+    int grain_release_time_pct{0};
 
     EnvelopeGenerator m_eg1; // start/stop amp
     EnvelopeGenerator m_eg2; // unused so far
 
-    unsigned int loop_mode_;
-    double loop_len; // bars
-    int loop_counter;
+    unsigned int loop_mode_{0};
+    double loop_len{1}; // bars
+    int loop_counter{0};
 
-    bool scramble_pending;
-    bool scramble_mode;
-    int scramble_diff;
+    bool scramble_pending{false};
+    bool scramble_mode{false};
+    int scramble_diff{0};
 
-    bool stutter_pending;
-    bool stutter_mode;
-    int stutter_idx;
+    bool stutter_pending{false};
+    bool stutter_mode{false};
+    int stutter_idx{0};
 
-    bool step_mode;
-    int step_diff;
+    bool step_mode{false};
+    int step_diff{0};
 
-    bool stop_pending; // allow eg to stop
-    bool gate_mode;    // use midi to trigger env amp
+    bool stop_pending{false}; // allow eg to stop
+    bool gate_mode{false};    // use midi to trigger env amp
 
-    int degrade_by; // percent change to drop bits
+    int degrade_by{0}; // percent change to drop bits
 
-    int cur_sixteenth; // used to track scramble
+    int cur_sixteenth{0}; // used to track scramble
 
     // TODO - need a reset i would guess
     double incr_speed_{1};
     double cur_midi_idx_{0};
 
-    bool debug_pending;
+    bool debug_pending{false};
 };
 
 void looper_import_file(looper *g, char *filename);

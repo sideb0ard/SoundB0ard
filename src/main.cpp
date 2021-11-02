@@ -1,42 +1,38 @@
+#include <ableton_link_wrapper.h>
+#include <audio_action_queue.h>
+#include <audioutils.h>
+#include <cmdloop.h>
+#include <defjams.h>
+#include <event_queue.h>
+#include <midimaaan.h>
+#include <mixer.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/event.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <thread>
 
-#include <iostream>
-
-#include "PerlinNoise.hpp"
-
-#include "ableton_link_wrapper.h"
-#include "audioutils.h"
-#include "cmdloop.h"
-#include "defjams.h"
-#include "midimaaan.h"
-#include "mixer.h"
-
+#include <PerlinNoise.hpp>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/lexer.hpp>
 #include <interpreter/object.hpp>
 #include <interpreter/parser.hpp>
 #include <interpreter/token.hpp>
-
-#include <audio_action_queue.h>
-#include <event_queue.h>
+#include <iostream>
 #include <process.hpp>
+#include <thread>
 #include <tsqueue.hpp>
 
 extern Mixer *mixr;
 
 Tsqueue<audio_action_queue_item> audio_queue;
-Tsqueue<int> audio_reply_queue; // for reply from adding SoundGenerator
+Tsqueue<int> audio_reply_queue;  // for reply from adding SoundGenerator
 Tsqueue<std::string> eval_command_queue;
 Tsqueue<std::string> repl_queue;
 Tsqueue<event_queue_item> process_event_queue;
 
-siv::PerlinNoise perlinGenerator; // only for use by eval thread
+siv::PerlinNoise perlinGenerator;  // only for use by eval thread
 
 auto global_env = std::make_shared<object::Environment>();
 
@@ -48,157 +44,133 @@ extern char *chord_type_names[NUM_CHORD_TYPES];
 static int paCallback(const void *input_buffer, void *output_buffer,
                       unsigned long frames_per_buffer,
                       const PaStreamCallbackTimeInfo *time_info,
-                      PaStreamCallbackFlags status_flags, void *user_data)
-{
-    (void)input_buffer;
-    (void)time_info;
-    (void)status_flags;
+                      PaStreamCallbackFlags status_flags, void *user_data) {
+  (void)input_buffer;
+  (void)time_info;
+  (void)status_flags;
 
-    float *out = (float *)output_buffer;
-    Mixer *mixr = (Mixer *)user_data;
+  float *out = (float *)output_buffer;
+  Mixer *mixr = (Mixer *)user_data;
 
-    int ret = mixr->GenNext(out, frames_per_buffer);
+  int ret = mixr->GenNext(out, frames_per_buffer);
 
-    return ret;
+  return ret;
 }
 
-void Eval(char *line, std::shared_ptr<object::Environment> env)
-{
-    auto lex = std::make_shared<lexer::Lexer>();
-    lex->ReadInput(line);
-    auto parsley = std::make_unique<parser::Parser>(lex);
+void Eval(char *line, std::shared_ptr<object::Environment> env) {
+  auto lex = std::make_shared<lexer::Lexer>();
+  lex->ReadInput(line);
+  auto parsley = std::make_unique<parser::Parser>(lex);
 
-    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+  std::shared_ptr<ast::Program> program = parsley->ParseProgram();
 
-    auto evaluated = evaluator::Eval(program, env);
-    if (evaluated)
-    {
-        auto result = evaluated->Inspect();
-        if (result.compare("null") != 0)
-        {
-            std::cout << result << std::endl;
+  auto evaluated = evaluator::Eval(program, env);
+  if (evaluated) {
+    auto result = evaluated->Inspect();
+    if (result.compare("null") != 0) {
+      std::cout << result << std::endl;
+    }
+  }
+}
+
+void *eval_queue() {
+  while (auto cmd = eval_command_queue.pop()) {
+    if (cmd) {
+      Eval(cmd->data(), global_env);
+    }
+  }
+  return nullptr;
+}
+
+void *process_worker_thread() {
+  while (auto const event = process_event_queue.pop()) {
+    if (event) {
+      if (event->type == Event::TIMING_EVENT) {
+        auto timing_info = event->timing_info;
+
+        if (mixr->proc_initialized_) {
+          for (auto p : mixr->processes_) {
+            if (p->active_) p->EventNotify(timing_info);
+          }
         }
-    }
-}
+      } else if (event->type == Event::PROCESS_UPDATE_EVENT) {
+        if (event->target_process_id >= 0 &&
+            event->target_process_id < MAX_NUM_PROC) {
+          ProcessConfig config = {
 
-void *eval_queue()
-{
-    while (auto cmd = eval_command_queue.pop())
-    {
-        if (cmd)
-        {
-            Eval(cmd->data(), global_env);
+              .name = event->process_name,
+              .process_type = event->process_type,
+              .timer_type = event->timer_type,
+              .loop_len = event->loop_len,
+              .command = event->command,
+              .target_type = event->target_type,
+              .targets = event->targets,
+              .pattern_expression = event->pattern_expression,
+              .pattern = "",
+              .funcz = event->funcz,
+              .tinfo = event->timing_info};
+
+          mixr->processes_[event->target_process_id]->EnqueueUpdate(config);
+        } else {
+          std::cerr << "WAH! INVALID process id: " << event->target_process_id
+                    << std::endl;
         }
+      }
     }
-    return nullptr;
+  }
+  return nullptr;
 }
 
-void *process_worker_thread()
-{
-    while (auto const event = process_event_queue.pop())
-    {
-        if (event)
-        {
-            if (event->type == Event::TIMING_EVENT)
-            {
-                auto timing_info = event->timing_info;
+int main() {
+  srand(time(NULL));
+  signal(SIGINT, SIG_IGN);
 
-                if (mixr->proc_initialized_)
-                {
-                    for (auto p : mixr->processes_)
-                    {
-                        if (p->active_)
-                            p->EventNotify(timing_info);
-                    }
-                }
-            }
-            else if (event->type == Event::PROCESS_UPDATE_EVENT)
-            {
-                if (event->target_process_id >= 0 &&
-                    event->target_process_id < MAX_NUM_PROC)
-                {
-                    ProcessConfig config = {
+  double output_latency = pa_setup();
+  mixr = new Mixer(output_latency);
 
-                        .name = event->process_name,
-                        .process_type = event->process_type,
-                        .timer_type = event->timer_type,
-                        .loop_len = event->loop_len,
-                        .command = event->command,
-                        .target_type = event->target_type,
-                        .targets = event->targets,
-                        .pattern_expression = event->pattern_expression,
-                        .pattern = "",
-                        .funcz = event->funcz,
-                        .tinfo = event->timing_info};
+  PaStream *output_stream;
+  PaError err;
 
-                    mixr->processes_[event->target_process_id]->EnqueueUpdate(
-                        config);
-                }
-                else
-                {
-                    std::cerr << "WAH! INVALID process id: "
-                              << event->target_process_id << std::endl;
-                }
-            }
-        }
-    }
-    return nullptr;
-}
+  err = Pa_OpenDefaultStream(&output_stream,
+                             0,          // no input channels
+                             2,          // stereo output
+                             paFloat32,  // 32bit fp output
+                             SAMPLE_RATE, paFramesPerBufferUnspecified,
+                             paCallback, mixr);
 
-int main()
-{
+  if (err != paNoError) {
+    printf("Errrrr! couldn't open Portaudio default stream: %s\n",
+           Pa_GetErrorText(err));
+    exit(-1);
+  }
 
-    srand(time(NULL));
-    signal(SIGINT, SIG_IGN);
+  err = Pa_StartStream(output_stream);
+  if (err != paNoError) {
+    printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
+    exit(-1);
+  }
 
-    double output_latency = pa_setup();
-    mixr = new Mixer(output_latency);
+  // REPL
+  std::thread repl_thread(loopy);
 
-    PaStream *output_stream;
-    PaError err;
+  // Processes
+  std::thread worker_thread(process_worker_thread);
 
-    err = Pa_OpenDefaultStream(&output_stream,
-                               0,         // no input channels
-                               2,         // stereo output
-                               paFloat32, // 32bit fp output
-                               SAMPLE_RATE, paFramesPerBufferUnspecified,
-                               paCallback, mixr);
+  // Eval loop
+  std::thread eval_thread(eval_queue);
 
-    if (err != paNoError)
-    {
-        printf("Errrrr! couldn't open Portaudio default stream: %s\n",
-               Pa_GetErrorText(err));
-        exit(-1);
-    }
+  //////////////// shutdown
 
-    err = Pa_StartStream(output_stream);
-    if (err != paNoError)
-    {
-        printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
-        exit(-1);
-    }
+  repl_thread.join();
 
-    // REPL
-    std::thread repl_thread(loopy);
+  process_event_queue.close();
+  worker_thread.join();
 
-    // Processes
-    std::thread worker_thread(process_worker_thread);
+  eval_command_queue.close();
+  eval_thread.join();
 
-    // Eval loop
-    std::thread eval_thread(eval_queue);
+  // all done, time to go home
+  pa_teardown();
 
-    //////////////// shutdown
-
-    repl_thread.join();
-
-    process_event_queue.close();
-    worker_thread.join();
-
-    eval_command_queue.close();
-    eval_thread.join();
-
-    // all done, time to go home
-    pa_teardown();
-
-    return 0;
+  return 0;
 }

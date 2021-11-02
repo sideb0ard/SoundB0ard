@@ -1,6 +1,6 @@
-#include <stdio.h>
-
 #include "midi_freq_table.h"
+
+#include <stdio.h>
 // taken from http://www.willpirkle.com/synthbook/
 
 const float midi_freq_table[128] = {
@@ -48,10 +48,8 @@ const float midi_freq_table[128] = {
     9956.0634765625000000,  10548.0820312500000000, 11175.3037109375000000,
     11839.8212890625000000, 12543.8535156250000000};
 
-float get_midi_freq(int midinum)
-{
-    if (midinum < 0 || midinum > 127)
-        midinum = 0;
+float get_midi_freq(int midinum) {
+  if (midinum < 0 || midinum > 127) midinum = 0;
 
-    return midi_freq_table[midinum];
+  return midi_freq_table[midinum];
 }

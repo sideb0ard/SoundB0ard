@@ -1,11 +1,9 @@
+#include <interpreter/token.hpp>
 #include <iostream>
 #include <string>
 #include <unordered_map>
 
-#include <interpreter/token.hpp>
-
-namespace token
-{
+namespace token {
 const std::unordered_map<std::string, TokenType> keywords{
     {"break", SLANG_BREAK},       {"bpm", SLANG_BPM},
     {"digi", SLANG_DIGI_SYNTH},   {"drum", SLANG_DRUM_SYNTH},
@@ -28,22 +26,19 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"vel", SLANG_VELOCITY},      {"vol", SLANG_VOLUME},
 };
 
-TokenType LookupIdent(std::string ident)
-{
-    std::unordered_map<std::string, TokenType>::const_iterator got =
-        keywords.find(ident);
-    if (got != keywords.end())
-    {
-        return got->second;
-    }
+TokenType LookupIdent(std::string ident) {
+  std::unordered_map<std::string, TokenType>::const_iterator got =
+      keywords.find(ident);
+  if (got != keywords.end()) {
+    return got->second;
+  }
 
-    return SLANG_IDENT;
+  return SLANG_IDENT;
 }
 
-std::ostream &operator<<(std::ostream &out, const Token &tok)
-{
-    out << "{type:" << tok.type_ << " literal:" << tok.literal_ << "}";
-    return out;
+std::ostream &operator<<(std::ostream &out, const Token &tok) {
+  out << "{type:" << tok.type_ << " literal:" << tok.literal_ << "}";
+  return out;
 }
 
-} // namespace token
+}  // namespace token
