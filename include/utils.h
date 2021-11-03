@@ -1,14 +1,14 @@
 #pragma once
 
+#include <audioutils.h>
+#include <defjams.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <audioutils.h>
-#include <defjams.h>
-
 void get_full_filename(char *basename, char *destination_fullname);
 
-audio_buffer_details import_file_contents(double **buffer, char *filename);
+audio_buffer_details import_file_contents(double **buffer,
+                                          std::string filename);
 float freqval(char *n);
 int notelookup(char *n);
 int input_key_to_char_note(int ch, int octave, char *keytext);
@@ -81,7 +81,6 @@ bool IsBalanced(std::string &input);
 
 std::vector<int> GenerateBjork(int num_pulses, int seq_length);
 
-namespace utils
-{
+namespace utils {
 float LinTerp(float x1, float x2, float y1, float y2, float x);
 }

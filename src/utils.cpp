@@ -83,24 +83,21 @@ float LinTerp(float x1, float x2, float y1, float y2, float x) {
 }
 }  // namespace utils
 
-audio_buffer_details import_file_contents(double **buffer, char *filename) {
+audio_buffer_details import_file_contents(double **buffer,
+                                          std::string filename) {
   SNDFILE *snd_file;
   SF_INFO sf_info;
 
-  audio_buffer_details deetz = {"", 0, 0, 0};
+  audio_buffer_details deetz = {filename, 0, 0, 0};
 
-  char cwd[1024];
-  getcwd(cwd, 1024);
-  char full_filename[strlen(cwd) + 7 /* '/wavs/' is 6 and 1 for null */ +
-                     strlen(filename)];
-  strcpy(full_filename, cwd);
-  strcat(full_filename, "/wavs/");
-  strcat(full_filename, filename);
+  std::string full_filename = fs::current_path().string() + "/wavs/" + filename;
 
   sf_info.format = 0;
-  snd_file = sf_open(full_filename, SFM_READ, &sf_info);
+
+  snd_file = sf_open(full_filename.c_str(), SFM_READ, &sf_info);
   if (!snd_file) {
-    printf("Barfed opening %s : %d", full_filename, sf_error(snd_file));
+    std::cerr << "Barfed opening:" << full_filename << " due to "
+              << sf_error(snd_file);
     return deetz;
   }
 
@@ -120,7 +117,6 @@ audio_buffer_details import_file_contents(double **buffer, char *filename) {
   sf_readf_double(snd_file, *buffer, audio_buffer_len);
   sf_close(snd_file);
 
-  strcat(deetz.filename, filename);
   deetz.buffer_length = audio_buffer_len;
   deetz.sample_rate = sf_info.samplerate;
   deetz.num_channels = sf_info.channels;

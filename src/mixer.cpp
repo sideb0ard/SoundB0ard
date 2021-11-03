@@ -403,7 +403,7 @@ void Mixer::AddDxsynth() {
 }
 
 void Mixer::AddLooper(std::string filename, bool loop_mode) {
-  auto loopr = std::make_shared<looper>(filename.data(), loop_mode);
+  auto loopr = std::make_shared<Looper>(filename, loop_mode);
   AddSoundGenerator(loopr);
 }
 
