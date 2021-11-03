@@ -7,8 +7,7 @@
 
 void get_full_filename(char *basename, char *destination_fullname);
 
-audio_buffer_details import_file_contents(double **buffer,
-                                          std::string filename);
+AudioBufferDetails import_file_contents(double **buffer, std::string filename);
 float freqval(char *n);
 int notelookup(char *n);
 int input_key_to_char_note(int ch, int octave, char *keytext);

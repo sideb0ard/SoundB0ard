@@ -69,11 +69,6 @@ struct SoundGrain {
   EnvelopeGenerator eg;
 };
 
-enum GrainMode {
-  static_select,
-  random_select,
-};
-
 enum EnvMode {
   parabolic,
   trapezoidal,
@@ -91,7 +86,7 @@ enum LoopMode {
 
 class Looper : public SoundGenerator {
  public:
-  Looper(std::string filename, bool loop_mode);
+  Looper(std::string filename, unsigned int loop_mode);
   ~Looper();
   stereo_val genNext() override;
   std::string Status() override;
@@ -129,7 +124,6 @@ class Looper : public SoundGenerator {
   double grain_pitch{1};
 
   int num_grains_per_looplen{0};
-  unsigned int selection_mode{0};
   unsigned int envelope_mode{0};
   double envelope_taper_ratio{0};  // 0.0...1.0
   bool reverse_mode{false};

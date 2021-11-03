@@ -20,16 +20,13 @@ static char *s_loop_mode_names[] = {(char *)"LOOP", (char *)"STATIC",
                                     (char *)"SMUDGE"};
 static char *s_external_mode_names[] = {(char *)"FOLLOW", (char *)"CAPTURE"};
 
-Looper::Looper(std::string filename, bool loop_mode) {
+Looper::Looper(std::string filename, unsigned int loop_mode) {
   std::cout << "NEW LOOOOOPPPPPER " << loop_mode << std::endl;
   have_active_buffer = false;
 
   audio_buffer_read_idx = 0;
-  granular_spray_frames = 441;  // 10ms * (44100/1000)
   grain_attack_time_pct = 15;
   grain_release_time_pct = 15;
-  quasi_grain_fudge = 220;
-  selection_mode = GrainMode::static_select;
   envelope_mode = EnvMode::logarithmic_curve;
   envelope_taper_ratio = 0.5;
   reverse_mode = 0;  // bool
@@ -48,12 +45,7 @@ Looper::Looper(std::string filename, bool loop_mode) {
   degrade_by = 0;
   gate_mode = false;
 
-  if (loop_mode)
-    SetLoopMode(LoopMode::loop_mode);
-  else {
-    SetLoopMode(LoopMode::smudge_mode);
-    volume = 0.2;
-  }
+  SetLoopMode(loop_mode);
 
   start();
 }
@@ -160,8 +152,6 @@ stereo_val Looper::genNext() {
         duration += rand() % (int)(quasi_grain_fudge * 44.1);
 
       int grain_idx = audio_buffer_read_idx;
-      if (selection_mode == GrainMode::random_select)
-        grain_idx = rand() % (audio_buffer_len - (duration * num_channels));
 
       if (granular_spray_frames > 0)
         grain_idx += rand() % granular_spray_frames;
@@ -201,8 +191,11 @@ stereo_val Looper::genNext() {
   double pan_right = 0.707;
   calculate_pan_values(pan, &pan_left, &pan_right);
 
-  val.left = val.left * volume * eg_amp * pan_left;
-  val.right = val.right * volume * eg_amp * pan_right;
+  // val.left = val.left * volume * eg_amp * pan_left;
+  // val.right = val.right * volume * eg_amp * pan_right;
+
+  val.left = val.left * volume * pan_left;
+  val.right = val.right * volume * pan_right;
 
   val = Effector(val);
 
@@ -382,7 +375,7 @@ stereo_val SoundGrain::Generate(double *audio_buffer, int audio_buffer_len) {
 //////////////////////////// end of grain stuff //////////////////////////
 
 void Looper::ImportFile(std::string filename) {
-  audio_buffer_details deetz = import_file_contents(&audio_buffer, filename);
+  AudioBufferDetails deetz = import_file_contents(&audio_buffer, filename);
   audio_buffer_len = deetz.buffer_length;
   num_channels = deetz.num_channels;
   have_active_buffer = true;
@@ -439,17 +432,17 @@ void Looper::SetQuasiGrainFudge(int fudgefactor) {
 void Looper::SetGrainPitch(double pitch) { grain_pitch = pitch; }
 void Looper::SetIncrSpeed(double speed) { incr_speed_ = speed; }
 
-void Looper::SetSelectionMode(unsigned int mode) { selection_mode = mode; }
-
 void Looper::SetEnvelopeMode(unsigned int mode) { envelope_mode = mode; }
 
 void Looper::SetReverseMode(bool b) { reverse_mode = b; }
 
 void Looper::SetLoopMode(unsigned int m) {
+  std::cout << "LOOP MODE IS:" << m << std::endl;
+  volume = 0.2;
   switch (m) {
     case (0):
       loop_mode_ = LoopMode::loop_mode;
-      selection_mode = GrainMode::static_select;
+      volume = 0.7;
       break;
     case (1):
       loop_mode_ = LoopMode::smudge_mode;
@@ -559,8 +552,6 @@ void Looper::SetParam(std::string name, double val) {
     SetFillFactor(val);
   else if (name == "grain_spray_ms")
     SetGranularSpray(val);
-  else if (name == "selection_mode")
-    SetSelectionMode(val);
   else if (name == "env_mode")
     SetEnvelopeMode(val);
 }

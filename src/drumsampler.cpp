@@ -145,7 +145,7 @@ void DrumSampler::pitchBend(midi_event ev) {
 }
 
 void DrumSampler::ImportFile(std::string filename) {
-  audio_buffer_details deetz = import_file_contents(&buffer, filename);
+  AudioBufferDetails deetz = import_file_contents(&buffer, filename);
   filename = deetz.filename;
   bufsize = deetz.buffer_length;
   buf_end_pos = bufsize;

@@ -7,12 +7,12 @@
 double pa_setup(void);
 void pa_teardown(void);
 
-typedef struct audio_buffer_details {
+struct AudioBufferDetails {
   std::string filename;
   int num_channels{0};
   int sample_rate{0};
   int buffer_length{0};
-} audio_buffer_details;
+};
 
 int get_chord_type(unsigned int scale_degree);
 void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,

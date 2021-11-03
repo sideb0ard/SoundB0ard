@@ -83,12 +83,11 @@ float LinTerp(float x1, float x2, float y1, float y2, float x) {
 }
 }  // namespace utils
 
-audio_buffer_details import_file_contents(double **buffer,
-                                          std::string filename) {
+AudioBufferDetails import_file_contents(double **buffer, std::string filename) {
   SNDFILE *snd_file;
   SF_INFO sf_info;
 
-  audio_buffer_details deetz = {filename, 0, 0, 0};
+  AudioBufferDetails deetz = {filename, 0, 0, 0};
 
   std::string full_filename = fs::current_path().string() + "/wavs/" + filename;
 
