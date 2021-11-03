@@ -15,11 +15,10 @@
 #include "mixer.h"
 #include "utils.h"
 
-extern wchar_t *sparkchars;
 extern Mixer *mixr;
 
-DrumSampler::DrumSampler(char *filename) {
-  drumsampler_import_file(this, filename);
+DrumSampler::DrumSampler(std::string filename) {
+  ImportFile(filename);
 
   glitch_mode = false;
   glitch_rand_factor = 20;
@@ -145,15 +144,15 @@ void DrumSampler::pitchBend(midi_event ev) {
   drumsampler_set_pitch(this, pitch_val);
 }
 
-void drumsampler_import_file(DrumSampler *ds, char *filename) {
-  audio_buffer_details deetz = import_file_contents(&ds->buffer, filename);
-  strcpy(ds->filename, deetz.filename);
-  ds->bufsize = deetz.buffer_length;
-  ds->buf_end_pos = ds->bufsize;
-  ds->buffer_pitch = 1.0;
-  ds->samplerate = deetz.sample_rate;
-  ds->channels = deetz.num_channels;
-  drumsampler_reset_samples(ds);
+void DrumSampler::ImportFile(std::string filename) {
+  AudioBufferDetails deetz = import_file_contents(&buffer, filename);
+  filename = deetz.filename;
+  bufsize = deetz.buffer_length;
+  buf_end_pos = bufsize;
+  buffer_pitch = 1.0;
+  samplerate = deetz.sample_rate;
+  channels = deetz.num_channels;
+  drumsampler_reset_samples(this);
 }
 
 void drumsampler_reset_samples(DrumSampler *ds) {

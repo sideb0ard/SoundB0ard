@@ -403,7 +403,7 @@ void Mixer::AddDxsynth() {
 }
 
 void Mixer::AddLooper(std::string filename, bool loop_mode) {
-  auto loopr = std::make_shared<looper>(filename.data(), loop_mode);
+  auto loopr = std::make_shared<Looper>(filename, loop_mode);
   AddSoundGenerator(loopr);
 }
 
@@ -602,7 +602,7 @@ void Mixer::PreviewAudio(char *filename) {
 
 void preview_buffer_import_file(preview_buffer *buffy, char *filename) {
   strncpy(buffy->filename, filename, 512);
-  audio_buffer_details deetz =
+  AudioBufferDetails deetz =
       import_file_contents(&buffy->audio_buffer, filename);
   buffy->audio_buffer_len = deetz.buffer_length;
   buffy->num_channels = deetz.num_channels;

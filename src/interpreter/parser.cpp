@@ -733,7 +733,9 @@ std::shared_ptr<ast::Expression> Parser::ParseGranularExpression() {
   auto granular = std::make_shared<ast::GranularExpression>(cur_token_);
   if (cur_token_.type_ == token::SLANG_LOOP) {
     std::cout << "GOT LOOP TOKEN\n";
-    granular->loop_mode_ = true;
+    granular->loop_mode_ = 0;
+  } else if (cur_token_.type_ == token::SLANG_GRAIN) {
+    granular->loop_mode_ = 1;
   }
   std::cout << "__ LOOP MODE SET TO " << granular->loop_mode_ << "\n";
 
