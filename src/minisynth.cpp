@@ -58,7 +58,8 @@ MiniSynth::MiniSynth() {
   active = true;
 }
 
-stereo_val MiniSynth::genNext() {
+stereo_val MiniSynth::genNext(mixer_timing_info tinfo) {
+  (void)tinfo;
   if (!active) return (stereo_val){0, 0};
 
   double accum_out_left = 0.0;

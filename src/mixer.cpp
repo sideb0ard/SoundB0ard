@@ -483,7 +483,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer) {
 
     int count = 0;
     for (auto sg : sound_generators_) {
-      soundgen_cur_val[count] = sg->genNext();
+      soundgen_cur_val[count] = sg->genNext(timing_info);
       output_left += soundgen_cur_val[count].left;
       output_right += soundgen_cur_val[count].right;
       count++;

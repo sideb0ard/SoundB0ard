@@ -44,7 +44,8 @@ DrumSampler::~DrumSampler() {
   free(buffer);
 }
 
-stereo_val DrumSampler::genNext() {
+stereo_val DrumSampler::genNext(mixer_timing_info tinfo) {
+  (void)tinfo;
   double left_val = 0;
   double right_val = 0;
 

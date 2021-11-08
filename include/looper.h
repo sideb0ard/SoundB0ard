@@ -88,7 +88,7 @@ class Looper : public SoundGenerator {
  public:
   Looper(std::string filename, unsigned int loop_mode);
   ~Looper();
-  stereo_val genNext() override;
+  stereo_val genNext(mixer_timing_info tinfo) override;
   std::string Status() override;
   std::string Info() override;
   void start() override;
@@ -101,7 +101,6 @@ class Looper : public SoundGenerator {
 
  public:
   bool started{false};
-  bool have_active_buffer{false};
 
   std::string filename;
   double *audio_buffer{nullptr};
@@ -128,7 +127,7 @@ class Looper : public SoundGenerator {
   double envelope_taper_ratio{0};  // 0.0...1.0
   bool reverse_mode{false};
 
-  int last_grain_launched_sample_time{0};
+  int next_grain_launch_sample_time{0};
   int grain_attack_time_pct{0};
   int grain_release_time_pct{0};
 
@@ -157,13 +156,15 @@ class Looper : public SoundGenerator {
   double incr_speed_{1};
   double cur_midi_idx_{0};
 
+  double grain_spacing{0};
+
   bool debug_pending{false};
 
  public:
   void ImportFile(std::string filename);
   void SetGateMode(bool b);
 
-  int CalculateGrainSpacing();
+  int CalculateGrainSpacing(mixer_timing_info tinfo);
   void SetGrainPitch(double pitch);
   void SetIncrSpeed(double speed);
   void SetGrainDuration(int dur);
@@ -183,6 +184,7 @@ class Looper : public SoundGenerator {
 
   int GetAvailableGrainNum();
   int CountActiveGrains();
+  void LaunchGrain(mixer_timing_info tinfo);
 
   void SetFillFactor(double fill_factor);
   void SetDensityDurationSync(bool b);

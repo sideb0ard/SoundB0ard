@@ -30,7 +30,7 @@ class DrumSampler : public SoundGenerator {
   ~DrumSampler();
   std::string Info() override;
   std::string Status() override;
-  stereo_val genNext() override;
+  stereo_val genNext(mixer_timing_info tinfo) override;
   void start() override;
   void noteOn(midi_event ev) override;
   void SetParam(std::string name, double val) override;
