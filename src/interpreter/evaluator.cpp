@@ -465,9 +465,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       std::dynamic_pointer_cast<ast::SynthPresetExpression>(node);
   if (synth_preset) {
     if (synth_preset->token_.type_ == token::SLANG_MOOG_SYNTH) {
-      sequence_engine_list_presets(MINISYNTH_TYPE);
+      synth_list_presets(MINISYNTH_TYPE);
     } else if (synth_preset->token_.type_ == token::SLANG_FM_SYNTH) {
-      sequence_engine_list_presets(DXSYNTH_TYPE);
+      synth_list_presets(DXSYNTH_TYPE);
     } else
       std::cerr << "NOT A SYNTH TYPE!\n";
   }

@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#define MAX_CONCURRENT_GRAINS 1000
+constexpr int kMaxConcurrentGrains = 1000;
 
 struct SoundGrainParams {
   int dur{0};
@@ -112,7 +112,7 @@ class Looper : public SoundGenerator {
   int num_active_grains{0};
   int highest_grain_num{0};
   int cur_grain_num{0};
-  std::array<SoundGrain, MAX_CONCURRENT_GRAINS> m_grains{};
+  std::array<SoundGrain, kMaxConcurrentGrains> m_grains{};
 
   int granular_spray_frames{0};  // random off-set from starting idx
   int quasi_grain_fudge{0};      // random variation from length of grain

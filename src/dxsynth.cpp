@@ -62,10 +62,7 @@ DXSynth::DXSynth() {
   active = true;
 }
 
-void DXSynth::start() {
-  active = true;
-  engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
-}
+void DXSynth::start() { active = true; }
 
 void DXSynth::stop() {
   active = false;
@@ -1320,5 +1317,5 @@ double DXSynth::GetParam(std::string name) { return 0; }
 
 void DXSynth::ListPresets() {
   // TODO - implement this properly!
-  sequence_engine_list_presets(DXSYNTH_TYPE);
+  synth_list_presets(DXSYNTH_TYPE);
 }

@@ -83,3 +83,5 @@ std::vector<int> GenerateBjork(int num_pulses, int seq_length);
 namespace utils {
 float LinTerp(float x1, float x2, float y1, float y2, float x);
 }
+
+bool synth_list_presets(unsigned int synthtype);

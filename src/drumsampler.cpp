@@ -122,7 +122,6 @@ void DrumSampler::start() {
   if (active) return;  // no-op
   drumsampler_reset_samples(this);
   active = true;
-  engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void DrumSampler::noteOn(midi_event ev) {

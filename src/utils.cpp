@@ -919,3 +919,41 @@ std::vector<int> GenerateBjork(int num_pulses, int seq_length) {
 
   return bjorks;
 }
+
+bool synth_list_presets(unsigned int synthtype) {
+  std::cout << "IT ME!\n";
+
+  FILE *presetzzz = NULL;
+  switch (synthtype) {
+    case (MINISYNTH_TYPE):
+      presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
+      break;
+    case (DXSYNTH_TYPE):
+      presetzzz = fopen(DX_PRESET_FILENAME, "r+");
+      break;
+  }
+
+  if (presetzzz == NULL) return false;
+
+  char line[256];
+  char setting_key[512];
+  char setting_val[512];
+
+  char *tok, *last_tok;
+  char const *sep = "::";
+
+  while (fgets(line, sizeof(line), presetzzz)) {
+    for (tok = strtok_r(line, sep, &last_tok); tok;
+         tok = strtok_r(NULL, sep, &last_tok)) {
+      sscanf(tok, "%[^=]=%s", setting_key, setting_val);
+      if (strcmp(setting_key, "name") == 0) {
+        printf("%s\n", setting_val);
+        break;
+      }
+    }
+  }
+
+  fclose(presetzzz);
+
+  return true;
+}

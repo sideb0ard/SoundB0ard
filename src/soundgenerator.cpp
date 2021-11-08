@@ -66,37 +66,11 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo) {
       std::cout << "HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS! "
                 << ev << std::endl;
   }
-
-  if (ev.delete_after_use) {
-    midi_event_clear(&ev);
-  }
 }
 
 void SoundGenerator::eventNotify(broadcast_event event,
                                  mixer_timing_info tinfo) {
   (void)event;
-
-  if (!active) return;
-
-  if (tinfo.is_start_of_loop) engine.started = true;
-
-  if (engine.started) {
-    int idx = ((int)(engine.cur_step * PPSIXTEENTH) +
-               (tinfo.midi_tick % PPSIXTEENTH)) %
-              PPBAR;
-
-    if (idx < 0 || idx >= PPBAR) printf("YOUHC! idx out of bounds: %d\n", idx);
-
-    if (engine.pattern[idx].event_type) {
-      midi_event ev = engine.pattern[idx];
-      parseMidiEvent(ev, tinfo);
-    }
-
-    if (tinfo.is_sixteenth) {
-      engine.cur_step++;
-      if (engine.cur_step == 16) engine.cur_step = 0;
-    }
-  }
 }
 
 double SoundGenerator::GetPan() { return pan; }

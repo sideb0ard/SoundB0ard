@@ -445,7 +445,7 @@ void Looper::SetLoopLen(double bars) {
 
 int Looper::GetAvailableGrainNum() {
   int idx = 0;
-  while (idx < MAX_CONCURRENT_GRAINS) {
+  while (idx < kMaxConcurrentGrains) {
     if (!m_grains[idx].active) {
       if (idx > highest_grain_num) highest_grain_num = idx;
       return idx;
