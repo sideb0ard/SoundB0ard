@@ -90,26 +90,28 @@ void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
 
     audio_buffer_read_idx = new_read_idx;
 
+    int rel_pos_within_a_sixteenth =
+        new_read_idx - ((tinfo.midi_tick % PPBAR) * size_of_sixteenth);
     if (scramble_mode) {
       audio_buffer_read_idx =
-          new_read_idx + (scramble_diff * size_of_sixteenth);
+          (scramble_idx * size_of_sixteenth) + rel_pos_within_a_sixteenth;
     } else if (stutter_mode) {
-      audio_buffer_read_idx = (stutter_idx * size_of_sixteenth);
+      audio_buffer_read_idx =
+          (stutter_idx * size_of_sixteenth) + rel_pos_within_a_sixteenth;
     }
   }
 
   if (tinfo.is_sixteenth) {
     if (scramble_mode) {
-      scramble_diff = 0;
-      int cur_sixteenth = tinfo.sixteenth_note_tick % 16;
-      if (cur_sixteenth % 2 != 0) {
+      scramble_idx = tinfo.sixteenth_note_tick % 16;
+      if (scramble_idx % 2 != 0) {
         int randy = rand() % 100;
         if (randy < 25)  // repeat the third 16th
-          scramble_diff = 3 - cur_sixteenth;
+          scramble_idx = 3;
         else if (randy > 25 && randy < 50)  // repeat the 4th sixteenth
-          scramble_diff = 4 - cur_sixteenth;
+          scramble_idx = 4;
         else if (randy > 50 && randy < 75)  // repeat the 7th sixteenth
-          scramble_diff = 7 - cur_sixteenth;
+          scramble_idx = 7;
       }
     }
     if (stutter_mode) {
@@ -511,7 +513,7 @@ void Looper::SetParam(std::string name, double val) {
     }
   } else if (name == "len")
     SetLoopLen(val);
-  else if (name == "scamble")
+  else if (name == "scramble")
     SetScramblePending();
   else if (name == "stutter")
     SetStutterPending();

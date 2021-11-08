@@ -139,7 +139,7 @@ class Looper : public SoundGenerator {
 
   bool scramble_pending{false};
   bool scramble_mode{false};
-  int scramble_diff{0};
+  int scramble_idx{0};
 
   bool stutter_pending{false};
   bool stutter_mode{false};
