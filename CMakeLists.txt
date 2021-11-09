@@ -4,7 +4,10 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  add_definitions(-Wall -Wextra)
+endif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
