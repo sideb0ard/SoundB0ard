@@ -273,3 +273,105 @@ let stepper = fn(sg, pat, read_idx, play_idx)
     note_on_at(sg, pat[read_idx], play_idx * pp);
   }
 }
+
+let is_valid_string_mask = fn(input_mask) {
+  let val_items = ["0", "1", "2", "3", "4", "5", "6", "7",
+      "8", "9", "a", "b", "c", "d", "e", "f"];
+
+  let lcmask = lowercase(input_mask);
+  for (i = 0; i < len(lcmask); ++i) {
+    if (!is_val_in_list(val_items, lcmask[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+let string_to_hex = fn(char) {
+  if (char == "0") {
+    return [0, 0, 0, 0];
+  }
+  if (char == "1") {
+    return [0, 0, 0, 1];
+  }
+  if (char == "2") {
+    return [0, 0, 1, 0];
+  }
+  if (char == "3") {
+    return [0, 0, 1, 1];
+  }
+  if (char == "4") {
+    return [0, 1, 0, 0];
+  }
+  if (char == "5") {
+    return [0, 1, 0, 1];
+  }
+  if (char == "6") {
+    return [0, 1, 1, 0];
+  }
+  if (char == "7") {
+    return [0, 1, 1, 1];
+  }
+  if (char == "8") {
+    return [1, 0, 0, 0];
+  }
+  if (char == "9") {
+    return [1, 0, 0, 1];
+  }
+  if (char == "a") {
+    return [1, 0, 1, 0];
+  }
+  if (char == "b") {
+    return [1, 0, 1, 1];
+  }
+  if (char == "c") {
+    return [1, 1, 0, 0];
+  }
+  if (char == "d") {
+    return [1, 1, 0, 1];
+  }
+  if (char == "e") {
+    return [1, 1, 1, 0];
+  }
+  if (char == "f") {
+    return [1, 1, 1, 1];
+  }
+  return [0, 0, 0, 0];
+}
+
+
+let string_to_mask = fn(string_mask) {
+  let ret_mask = [];
+  if (!is_valid_string_mask(string_mask)) {
+    return ret_mask;
+  }
+
+  let lcmask = lowercase(string_mask);
+  for (i = 0; i < len(string_mask); ++i) {
+    let hx = string_to_hex(string_mask[i]);
+    for (j = 0; j < 4; ++j) {
+      push(ret_mask, hx[j]);
+    }
+  }
+}
+
+let mask = fn(original_pattern, mask_pattern)
+{
+  let return_pattern = [];
+
+  let maskr = mask_pattern;
+  if (type(mask_pattern) == "STRING") {
+    maskr = string_to_mask(mask_pattern);
+  }
+
+  for (i = 0; i < min(len(original_pattern), len(maskr)); ++i) {
+    if (maskr[i] > 0) {
+      push(return_pattern, 0);
+    } else {
+      push(return_pattern, original_pattern[i]);
+    }
+  }
+
+  return return_pattern;
+
+}

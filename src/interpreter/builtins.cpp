@@ -466,6 +466,86 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                    return evaluator::NULLL;
                  })},
+    {"lowercase",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() != 1)
+             return evaluator::NewError(
+                 "Too many arguments for `lowercase` - can only "
+                 "accept one");
+
+           auto string_obj =
+               std::dynamic_pointer_cast<object::String>(input[0]);
+           if (!string_obj) {
+             return evaluator::NewError(
+                 "argument to `lowercase` must be a string - got %s",
+                 input[0]->Type());
+           }
+
+           std::string lcstring = string_obj->value_;
+           std::transform(lcstring.begin(), lcstring.end(), lcstring.begin(),
+                          [](unsigned char c) { return std::tolower(c); });
+
+           return std::make_shared<object::String>(lcstring);
+         })},
+    {"uppercase",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() != 1)
+             return evaluator::NewError(
+                 "Too many arguments for `uppercase` - can only "
+                 "accept one");
+
+           auto string_obj =
+               std::dynamic_pointer_cast<object::String>(input[0]);
+           if (!string_obj) {
+             return evaluator::NewError(
+                 "argument to `uppercase` must be a string - got %s",
+                 input[0]->Type());
+           }
+
+           std::string ucstring = string_obj->value_;
+           std::transform(ucstring.begin(), ucstring.end(), ucstring.begin(),
+                          [](unsigned char c) { return std::toupper(c); });
+
+           return std::make_shared<object::String>(ucstring);
+         })},
+    {"max",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() != 2)
+             return evaluator::NewError("Need 2 args for 'max' function");
+
+           auto first_num = std::dynamic_pointer_cast<object::Number>(input[0]);
+           auto second_num =
+               std::dynamic_pointer_cast<object::Number>(input[1]);
+           if (!first_num || !second_num) {
+             return evaluator::NewError(
+                 "argument to `max` must be two numbers.");
+           }
+           return std::make_shared<object::Number>(
+               std::max(first_num->value_, second_num->value_));
+         })},
+    {"min",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() != 2)
+             return evaluator::NewError("Need 2 args for 'min' function");
+
+           auto first_num = std::dynamic_pointer_cast<object::Number>(input[0]);
+           auto second_num =
+               std::dynamic_pointer_cast<object::Number>(input[1]);
+           if (!first_num || !second_num) {
+             return evaluator::NewError(
+                 "argument to `min` must be two numbers.");
+           }
+           return std::make_shared<object::Number>(
+               std::min(first_num->value_, second_num->value_));
+         })},
     {"midi_ref", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
