@@ -794,7 +794,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    }
                    return evaluator::NULLL;
                  })},
-    {"chord_on",
+    {"chord_on",  // TODO - think i should delete these chord funcs
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {

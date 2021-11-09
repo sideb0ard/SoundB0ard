@@ -176,11 +176,11 @@ stereo_val Looper::genNext(mixer_timing_info tinfo) {
   double pan_right = 0.707;
   calculate_pan_values(pan, &pan_left, &pan_right);
 
-  // val.left = val.left * volume * eg_amp * pan_left;
-  // val.right = val.right * volume * eg_amp * pan_right;
+  val.left = val.left * volume * eg_amp * pan_left;
+  val.right = val.right * volume * eg_amp * pan_right;
 
-  val.left = val.left * volume * pan_left;
-  val.right = val.right * volume * pan_right;
+  // val.left = val.left * volume * pan_left;
+  // val.right = val.right * volume * pan_right;
 
   val = Effector(val);
 

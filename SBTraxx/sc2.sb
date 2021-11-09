@@ -53,6 +53,7 @@ let blah_gen = gen()
     let rx = 0;
 
     let rfz = [ [16, 19], [4, 7] ];
+    #let rfz = [ [4, 7], [ 28, 31] ];
     let rfx = 0;
 
   }
@@ -63,22 +64,23 @@ let blah_gen = gen()
     for (i = 0; i < 16; ++i) {
       #print("rf[i]", rf[cx]);
       stepper(dx, rf, cx, i);
-      stepper(dx2, rotate(rf, rotr[rx]), cx, i);
+      #stepper(dx2, rotate(rf, rotr[rx]), cx, i);
       if (count % 8 < 7) {
         stepper(bd2, gahu, cx, i);
         stepper(bd, gahu, cx2, i);
       }
-      stepper(hh, soukous, cx2, i);
+      #stepper(hh, soukous, cx2, i);
       cx = incr(cx, 0, maxl);
       cx2 = incr(cx2, 0, maxl2);
     }
     rx = incr(rx, 0, len(rotr));
+    play_array(dx2, mask(rotate(rf, rotr[rx]), gahu));
 
     if (count % 3 == 2) {
       set_pitch(cp, ptz[ptzx]);
       ptzx = incr(ptzx, 0, len(ptz));
       for (i = 0; i < 16; ++i) {
-        stepper(cp, rumba, cx2, i);
+        #stepper(cp, rumba, cx2, i);
         cx2 = incr(cx2, 0, maxl2);
         stepper(dx, rf, cx2, i);
       }
@@ -92,7 +94,7 @@ let blah_gen = gen()
     #print("PBEAT:", pbeat);
     for (i = 0; i < 16; ++i) {
       if (pbeat[i] > 0) {
-        note_on_at(percz[pbeat[i]], 1, pp*i);
+        #note_on_at(percz[pbeat[i]], 1, pp*i);
       }
     }
 
