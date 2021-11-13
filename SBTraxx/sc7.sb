@@ -1,0 +1,98 @@
+
+#let autl = loop(aesamples/SHISTASample06PP.WAV);
+# let rf = riff(19);
+
+#let stl = loop(loops/stutterhead.aiff);
+# set stl:pitch 2
+
+#  let sd = sample(sd/draGG.aiff);
+# distort bitcrush
+
+
+# let pc = sample(perc/2stepPERC.aiff)
+# let aut = loop(aesamples/SHISTASample06PP.WAV)
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [3, 5, 7];
+    let lx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      play_array(mo, rf);
+    }
+    if (count % 3 == 0) {
+      play_array(mo, rotate(rf, lenz[lx]));
+    }
+    play_array(bd2, bjork(lenz[lx],16));
+    #play_array(sc2, rotate(bjork(lenz[lx],16), 2));
+    #play_array(cp, rumba);
+    #play_array(pc, rotate(son, 5));
+    #play_array(aut, rotate(son, 3), dur = pp*8);
+
+    if (count % 4 == 0) {
+      lx = incr(lx, 0, len(lenz));
+    }
+
+  }
+}
+
+let drum_gen = gen()
+{
+  setup()
+  {
+    let beat = gen_beat();
+    let idxr = 3;
+    let idx = 0;
+  }
+  run()
+  {
+    play_array(bd, beat);
+
+    if (count % 3 == 0) {
+      beat = gen_beat();
+      set sdl:stutter 1;
+
+      play_array(lt, rumba);
+      play_array(mt, mask(soukous,rumba));
+    }
+    # let rf = riff(23);
+    # dx = DxSynth(beleep) vol:0.70 pan:0.00 algo:5
+    if (count % 2 == 0) {
+
+      for (i = 0; i < 16; ++i) {
+        stepper(mo, rf, idx, i);
+        if (count % 4 == 0) {
+          stepper(dx, up(rotate(rf, idx), idx), idx, i);
+          stepper(dx, rotate(rf, idx), idx, i);
+        }
+        idx = incr(idx, 0, idxr);
+      }
+      idxr = incr(idxr, 0, 16);
+    }
+
+  }
+}
+
+let hhgen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+
+# hh*16
+
+# p12 < every 2 "<0.1 2 2.5>" "set dx:o1rat %"
+# p13 < osc 23 "1 100" "set dx:e1att %"
+
+# play voices/getIntoTheMusic.aiff
+
+# let skz = grain(skrslazrs/SHØCK01.wav)
+# p16 < osc 11 "0 100" "set skz:idx %"

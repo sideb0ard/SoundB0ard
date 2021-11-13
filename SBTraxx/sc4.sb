@@ -1,0 +1,21 @@
+
+let rf =  chord_riff([44, 47]);
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let maxl = 3;
+    let cx = 0;
+  }
+  run()
+  {
+    print("RF:", rf);
+    for (i = 0; i < 16; ++i) {
+      print("rf[i]", i, " ", rf[cx]);
+      stepper(dx, rf, cx, i);
+      cx = incr(cx, 0, maxl);
+    }
+  }
+}
+
