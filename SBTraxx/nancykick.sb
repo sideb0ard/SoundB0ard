@@ -61,7 +61,7 @@ let blah_gen = gen()
       fast(dx100, mel, 0.25);
     }
 
-    note_on(mo, notes_in_chord(notz[dnx], 0, true), dur=note_durz[ndx]);
+    #note_on(mo, notes_in_chord(notz[dnx], 0, true),  dur=note_durz[ndx]);
 
   }
 }

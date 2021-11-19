@@ -109,17 +109,18 @@ let dblah_gen = gen()
 
     if (count % 2 == 0) {
       let beatnum = 0;
+      let pp = 3840 / 8;
       for (i = 0; i < 8; ++i) {
         if (beat[i] == 1) {
           ++beatnum;
         }
         if (beat[i] == 1 && beatnum == plz) {
-          note_on_at(mo, notes_in_chord(notz[nx], 0, true), i * (3840/8), dur=drz[dx]);
+          note_on_at(mo, notes_in_chord(notz[nx], 0, 2), i * (3840/8), dur=drz[dx]);
           plz  = incr(plz, 1, 5);
           dx  = incr(dx, 0, len(drz));
           note_on_at(mo2, notes_in_chord(notz[nx], 0), (i+nx) * (3840/8), dur=drz[dx]);
           nx = incr(nx, 0, len(notz));
-          #break;
+          break;
         }
       }
     }
@@ -128,8 +129,6 @@ let dblah_gen = gen()
     sx = incr(sx, 0, 2);
     nx = incr(nx, 0, len(notz));
     rx = incr(rx, 0, len(rotz));
-
-
   }
 }
 

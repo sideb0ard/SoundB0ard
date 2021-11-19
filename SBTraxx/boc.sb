@@ -3,7 +3,7 @@ let mel4 = {0: 35};
 let mel3 = {0: 33, 6: 35, 7: 33, 10: 40};
 let mel2 = {0: 33, 6: 40, 8: 26};
 let mel1 = {0: 30, 7: 35, 8: 42, 9: 40, 10: 35, 12: 30};
-
+#
 let melz = [mel1, mel2, mel3, mel4];
 
 let blah_fn = fn(sg, array, read_idx, play_idx)
@@ -12,6 +12,9 @@ let blah_fn = fn(sg, array, read_idx, play_idx)
     note_on_at(sg, array[read_idx], play_idx * pp);
   }
 }
+
+
+# load_preset(dx, "otherwurld")
 
 let blah_gen = gen()
 {
@@ -42,11 +45,95 @@ let blah_gen = gen()
     mx = incr(mx, 0, len(melz));
 
     for (i = 0; i < 16; ++i) {
-      #blah_fn(bd, bt, mbx, i);
+      # blah_fn(bd, bt, mbx, i);
       blah_fn(dx, m, mbx, i);
+      # load_preset(mo, "SQuinrrr3");
+      if (count % 4 == 0) {
+        # blah_fn(mo, down(rotate(m, btl[btlx]), 2), mbx, i);
+        blah_fn(mo, m, mbx, i);
+      }
       mbx = incr(mbx, 0, maxb);
     }
     maxb = incr(maxb, 3, 16);
   }
 }
 
+let bd = sample(bd/808Kkick.wav);
+let cp = sample(cp/chezClap.aiff);
+let sn = sample(sd/AbraSnare.aiff);
+# 4*4!!;
+
+
+let beatblah_gen = gen()
+{
+  setup()
+  {
+    let bprob = {0:90, 3:10, 8:90, 10:80, 13:10};
+    let beat = map_to_array(bprob, 16);
+    let sprob = {4:90, 12:90, 15:10};
+    let sbeat = map_to_array(sprob, 16);
+  }
+  run()
+  {
+    if (rand(100) > 70) {
+      play_array(bd, [1, 1, 1, 1]);
+      play_array(sn, [0, 1, 0, 1]);
+    } else {
+      for (i = 0; i < 16; ++i) {
+        let swing = 0;
+        if (rand(100) < beat[i]) {
+          if (i % 4 != 0) {
+            swing =  rand(pp / 4);
+            #print("SWING", swing);
+          }
+          note_on_at(bd, 1, (i * pp) - swing);
+        }
+        if (rand(100) < sbeat[i]) {
+          swing =  rand(pp / 4);
+          note_on_at(sn, 1, (i * pp) + swing);
+        }
+        if (rand(100) < sbeat[i]) {
+          swing =  rand(pp / 4);
+          note_on_at(cp, 1, (i * pp) + swing);
+        }
+      }
+    }
+
+  }
+}
+
+let swinghatz = gen()
+{
+  setup()
+  {
+    let swing = rand(pp / 2);
+  }
+  run()
+  {
+    let sswing = rand(pp / 2);
+    for (i = 0; i < 16; ++i) {
+      let v = 127;
+      #let swing = 0;
+      swing = 0;
+      if (i % 2 == 1) {
+        v = rand(50) + 77;
+        swing = sswing;
+      }
+      note_on_at(hh, 1, i*pp + swing, vel=v);
+    }
+
+  }
+}
+
+
+
+let oh = sample(oh/hhopen7.aif);
+let ch = sample(ch/hes23chh.aif);
+# p4 $ "[~ oh]*4";
+# p5 $ "ch*16";
+
+# let rbs = loop(loops/raveBass.aiff); vol rbs 0;
+# set rbs:len 2;
+# p6 < every 2 "1" "set rbs:stutter %";
+
+# p3 $ "[ <bd ~> [~ ~ <bd ~> ~] [~ ~ ~ <~ bd>]  [<bd ~> ~ ~ <~ ~ bd>]]"

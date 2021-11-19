@@ -1,11 +1,11 @@
-
+#
 #let dx =  fm();
-#load_preset(dx, "scarlet")
+#load_preset(dx, "scarlet");
 #let dx2 = fm();
-#load_preset(dx2, "lowr")
+#load_preset(dx2, "lowr");
 #let mo = moog();
 #load_preset(mo, "twitchrrr");
-# p3 < osc 4 "45 76"  "set dx:op2out %"
+#p3 < osc 4 "45 64"  "set dx:op2out %";
 
 let bd2 = sample(bd/gaborKick.aiff);
 let bd = sample(bd/dm02_909_kickdrum_004_drive.wav);
@@ -20,10 +20,10 @@ let VSpitch = sample(glitchz/VSpitch.aiff);
 let pxp = sample(glitchz/pxp.aiff);
 
 #
-vol BLURP 0.7;
-vol PXP2 0.7;
-vol VSGLitch 0.7;
-vol VSpitch 0.7;
+vol BLURP 0.4;
+vol PXP2 0.4;
+vol VSGLitch 0.4;
+vol VSpitch 0.4;
 set BLURP:decay_ms 120;
 set PXP2:decay_ms 90;
 set VSGLitch:decay_ms 70;
@@ -31,12 +31,6 @@ set VSpitch:decay_ms 90;
 # p? < osc 17 "50 190" "set BLURP:decay_ms %"
 
 let rf =  chord_riff([4, 7]);
-#let rf =  chord_riff([13, 11]);
-#let rf =  chord_riff([5, 6, 11]);
-
-
-# load_dir("TT-ROYALHOUSE/");
-
 let blah_gen = gen()
 {
   setup()
@@ -67,18 +61,19 @@ let blah_gen = gen()
     for (i = 0; i < 16; ++i) {
       #print("rf[i]", rf[cx]);
       ##
-      #stepper(dx2, rotate(rf, rotr[rx]), cx, i);
       if (count % 8 < 7) {
         stepper(bd2, gahu, cx, i);
         stepper(bd, gahu, cx2, i);
       }
       ##
-      stepper(hh, rotate(soukous, rotr[rx]), cx2, i);
+      #stepper(hh, rotate(soukous, rotr[rx]), cx2, i);
       cx = incr(cx, 0, maxl);
       cx2 = incr(cx2, 0, maxl2);
     }
     rx = incr(rx, 0, len(rotr));
-    play_array(dx2, mask(rotate(rf, rotr[rx]), gahu));
+    if (count % 3 == 0) {
+      play_array(dx2, mask(rotate(rf, rotr[rx]), gahu));
+    }
 
     if (count % 7 == 2) {
       set_pitch(cp, ptz[ptzx]);
@@ -96,12 +91,14 @@ let blah_gen = gen()
     maxl = incr(maxl, 3, 16);
     maxl2 = incr(maxl2, 4, 16);
 
-    let pbeat = rand_array(16, 0, 4);
-    #print("PBEAT:", pbeat);
-    for (i = 0; i < 16; ++i) {
-      if (pbeat[i] > 0) {
-        ##
-        # note_on_at(percz[pbeat[i]], 1, pp*i);
+    if (count % 3 < 2) {
+      let pbeat = rand_array(16, 0, 4);
+      #print("PBEAT:", pbeat);
+      for (i = 0; i < 16; ++i) {
+        if (pbeat[i] > 0) {
+          ##
+          #note_on_at(percz[pbeat[i]], 1, pp*i);
+        }
       }
     }
 
@@ -114,8 +111,11 @@ let blah_gen = gen()
 
 #let gras = grain(skrslazrs/SHØCK13.wav);
 # p13 < osc 12 "0 100"  "set gras:idx %"
-#p14 < osc 13 "0 400"  "set gras:fx0:delayms %"
-#p15 < osc 12 "0 78"  "set gras:fx0:fb %"
+## add_fx(gras, "delay")
+# p14 < osc 13 "0 400"  "set gras:fx0:delayms %"
+# p15 < osc 12 "0 78"  "set gras:fx0:fb %"
+
+# add_fx(gras, "sidechain", bd2)
 
 let space_between_beats = fn(abeat)
 {
@@ -139,7 +139,7 @@ let string_gen = gen()
     let lx = 0;
     let bjeat = rand_beat();
     let spd = [2, 4, 3];
-    let spx = 0;
+    lp7 < osc 24 "0 100" "set zzz:idx %"et spx = 0;
     let upperz = [13, 27, 38, 47];
     let ux = 0;
   }
@@ -171,24 +171,26 @@ let string_gen = gen()
 }
 
 #let zzz = grain(legowelt/Synth-ZeemeeuwHotel.wav);
+# p7 < osc 24 "0 100" "set zzz:idx %"
 
 let che = sample(TT-ROYALHOUSE/che.wav);
 let chewit = sample(TT-ROYALHOUSE/che.wav);
 let youv = sample(TT-ROYALHOUSE/youv.wav);
 let whft = sample(TT-ROYALHOUSE/whft.wav);
+let blt = sample(TT-LIMELIFE-RIGHTONTIME/bass1-2.wav);
 
 let todd_gen = gen()
 {
   setup()
   {
-    let percz = {1:che, 2:chewit, 3:youv, 4:whft};
+    let percz = {1:che, 2:chewit, 3:youv, 4:whft, 5:blt};
     let lenz = [16, 12, 24];
     let lx = 0;
   }
   run()
   {
     if (count % 8 == 0) {
-      let pbeat = rand_array(lenz[lx], 0, 4);
+      let pbeat = rand_array(lenz[lx], 0, 5);
       let pp = 3840 / lenz[lx];
 
       for (i = 0; i < len(pbeat); ++i) {
@@ -202,9 +204,19 @@ let todd_gen = gen()
   }
 }
 
-# let dzl = loop(dloops/dizzeebeat1barloop.aiff)
+#p18 < osc 13 "0 120" "set BLURP:decay_ms %"
+#p19 < osc 12 "0 120" "set VSpitch:decay_ms %"
+
+# p4 $ todd_gen; p1 $ blah2_gen
+
+# let dzl = loop(dloops/dizzeebeat1barloop.aiff) ; vol dzl 0
 # set dzl:pitch 2
 # p5 < every 2 "1" "set dzl:stutter %";
+# add_fx(dzl, "sidechain", bd2);
+
+
+# load_preset(dx2, "notrd");
+# new dx melody - masked with fff0
 
 let blah2_gen = gen()
 {
@@ -212,11 +224,22 @@ let blah2_gen = gen()
   {
     let beat = bjork(5, 16);
     let sdbeat = gahu;
+
+    let dxm = up(rand_array(16,0, 2), 13);
+    let ratz = [7, 3.5, 7, 14];
+    let rx = 0;
   }
   run()
   {
     play_array(bd2, beat);
     play_array(hh, sdbeat);
+    let mel = mask(dxm, "fff0");
+    play_array(dx2, mel);
+    if (count % 4 == 0) {
+      dxm = up(rand_array(16,0, 2), 13);
+      set dx2:o1rat ratz[rx];
+      rx = incr(rx, 0, len(ratz));
+    }
   }
 }
 
