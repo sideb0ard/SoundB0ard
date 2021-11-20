@@ -1,5 +1,5 @@
-#include <afx/lpfcombfilter.h>
 #include <defjams.h>
+#include <fx/lpfcombfilter.h>
 
 void lpf_comb_filter_set_comb_g(lpf_comb_filter *l, double comb_g) {
   l->m_comb_g = comb_g;

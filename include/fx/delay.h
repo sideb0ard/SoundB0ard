@@ -3,18 +3,17 @@
 #include <math.h>
 #include <stdbool.h>
 
-struct delay
-{
-    double m_delay_in_samples;
-    double m_output_attenuation;
-    double *m_buffer{nullptr};
+struct delay {
+  double m_delay_in_samples;
+  double m_output_attenuation;
+  std::vector<double> m_buffer;
 
-    int m_read_index;
-    int m_write_index;
-    int m_buffer_size;
+  int m_read_index;
+  int m_write_index;
+  int m_buffer_size;
 
-    double m_delay_ms;
-    double m_output_attenuation_db;
+  double m_delay_ms;
+  double m_output_attenuation_db;
 };
 
 void delay_init(delay *d, int delay_len);

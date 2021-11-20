@@ -24,10 +24,6 @@ extern Mixer *mixr;
 extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
 
-extern char *key_names[NUM_KEYS];
-
-extern wtable *wave_tables[5];
-
 #define READLINE_SAFE_MAGENTA "\001\x1b[35m\002"
 #define READLINE_SAFE_RESET "\001\x1b[0m\002"
 #define MAXLINE 128

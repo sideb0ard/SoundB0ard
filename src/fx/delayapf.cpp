@@ -1,5 +1,5 @@
-#include <afx/delayapf.h>
 #include <defjams.h>
+#include <fx/delayapf.h>
 
 void delay_apf_init(delay_apf *d, int delay_len) {
   delay_init(&d->m_delay, delay_len);

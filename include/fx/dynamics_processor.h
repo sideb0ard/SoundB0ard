@@ -1,73 +1,66 @@
 #pragma once
 
-#include <afx/delay.h>
-#include <afx/delayapf.h>
-#include <afx/lpfcombfilter.h>
-#include <afx/onepolelpf.h>
-
 #include <defjams.h>
-#include <fx/envelope_detector.h>
-#include <fx/fx.h>
 
-enum
-{
-    COMP,
-    LIMIT,
-    EXPAND,
-    GATE
-};
+#include "delay.h"
+#include "delayapf.h"
+#include "envelope_detector.h"
+#include "fx.h"
+#include "lpfcombfilter.h"
+#include "onepolelpf.h"
 
-class DynamicsProcessor : Fx
-{
-  public:
-    DynamicsProcessor();
-    void Status(char *string) override;
-    stereo_val Process(stereo_val input) override;
-    void SetParam(std::string name, double val) override;
-    double GetParam(std::string name) override;
+enum { COMP, LIMIT, EXPAND, GATE };
 
-    void SetExternalSource(unsigned int val);
-    void SetDefaultSidechainParams();
+class DynamicsProcessor : Fx {
+ public:
+  DynamicsProcessor();
+  void Status(char *string) override;
+  stereo_val Process(stereo_val input) override;
+  void SetParam(std::string name, double val) override;
+  double GetParam(std::string name) override;
 
-  private:
-    void Init();
+  void SetExternalSource(unsigned int val);
+  void SetDefaultSidechainParams();
 
-    double CalcCompressionGain(double detector_val, double threshold,
-                               double rratio, double kneewidth, bool limit);
+ private:
+  void Init();
 
-    double CalcDownwardExpanderGain(double detector_val, double threshold,
-                                    double rratio, double kneewidth, bool gate);
+  double CalcCompressionGain(double detector_val, double threshold,
+                             double rratio, double kneewidth, bool limit);
 
-    void SetInputGainDb(double val);
-    void SetThreshold(double val);
-    void SetAttackMs(double val);
-    void SetReleaseMs(double val);
-    void SetRatio(double val);
-    void SetOutputGainDb(double val);
-    void SetKneeWidth(double val);
-    void SetLookaheadDelayMs(double val);
-    void SetStereoLink(unsigned int val);
-    void SetProcessorType(unsigned int val);
-    void SetTimeConstant(unsigned int val);
+  double CalcDownwardExpanderGain(double detector_val, double threshold,
+                                  double rratio, double kneewidth, bool gate);
 
-  private:
-    envelope_detector m_left_detector_;
-    envelope_detector m_right_detector_;
+  void SetInputGainDb(double val);
+  void SetThreshold(double val);
+  void SetAttackMs(double val);
+  void SetReleaseMs(double val);
+  void SetRatio(double val);
+  void SetOutputGainDb(double val);
+  void SetKneeWidth(double val);
+  void SetLookaheadDelayMs(double val);
+  void SetStereoLink(unsigned int val);
+  void SetProcessorType(unsigned int val);
+  void SetTimeConstant(unsigned int val);
 
-    delay m_left_delay_;
-    delay m_right_delay_;
+ private:
+  envelope_detector m_left_detector_;
+  envelope_detector m_right_detector_;
 
-    double m_inputgain_db_;
-    double m_threshold_;
-    double m_attack_ms_;
-    double m_release_ms_;
-    double m_ratio_;
-    double m_outputgain_db_;
-    double m_knee_width_;
-    double m_lookahead_delay_ms_;
-    unsigned int m_stereo_link_;    // on, off
-    unsigned int m_processor_type_; // comp, limit, expand, gate
-    unsigned int m_time_constant_;  // digital, analog
-    int m_external_source_; // a sound_generator id that will correspond to
-                            // mixer input cache
+  delay m_left_delay_;
+  delay m_right_delay_;
+
+  double m_inputgain_db_;
+  double m_threshold_;
+  double m_attack_ms_;
+  double m_release_ms_;
+  double m_ratio_;
+  double m_outputgain_db_;
+  double m_knee_width_;
+  double m_lookahead_delay_ms_;
+  unsigned int m_stereo_link_;     // on, off
+  unsigned int m_processor_type_;  // comp, limit, expand, gate
+  unsigned int m_time_constant_;   // digital, analog
+  int m_external_source_;  // a sound_generator id that will correspond to
+                           // mixer input cache
 };

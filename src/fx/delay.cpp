@@ -1,11 +1,10 @@
-#include <afx/delay.h>
 #include <defjams.h>
+#include <fx/delay.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <utils.h>
 
 void delay_init(delay *d, int delay_length) {
-  d->m_buffer = NULL;
   d->m_output_attenuation_db = 0;
   d->m_delay_ms = 0.0;
   d->m_output_attenuation = 0.0;
@@ -15,11 +14,13 @@ void delay_init(delay *d, int delay_length) {
   d->m_read_index = 0;
 
   d->m_buffer_size = delay_length;
-  d->m_buffer = (double *)calloc(d->m_buffer_size, sizeof(double));
+  d->m_buffer.clear();
+  d->m_buffer.reserve(delay_length);
 }
 
 void delay_reset_delay(delay *d) {
-  if (d->m_buffer) memset(d->m_buffer, 0, d->m_buffer_size * sizeof(double));
+  d->m_buffer.clear();
+  d->m_buffer.reserve(d->m_buffer_size);
   d->m_write_index = 0;
   d->m_read_index = 0;
   delay_cook_variables(d);

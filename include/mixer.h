@@ -9,7 +9,6 @@
 #include <portaudio.h>
 #include <pthread.h>
 #include <soundgenerator.h>
-#include <table.h>
 
 #include <process.hpp>
 
