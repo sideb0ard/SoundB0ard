@@ -25,7 +25,7 @@ struct SoundGrain {
   SoundGrain() = default;
   ~SoundGrain() = default;
 
-  stereo_val Generate(double *audio_buffer, int buffer_len);
+  stereo_val Generate(std::vector<double> &audio_buffer, int buffer_len);
   void Initialize(SoundGrainParams);
 
   int grain_len_frames{0};
@@ -103,7 +103,7 @@ class Looper : public SoundGenerator {
   bool started{false};
 
   std::string filename;
-  double *audio_buffer{nullptr};
+  std::vector<double> audio_buffer{};
   int num_channels{0};
   int audio_buffer_len{0};
   int size_of_sixteenth{0};

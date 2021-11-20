@@ -474,7 +474,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer) {
     timing_info.cur_sample++;
 
     if (preview.enabled) {
-      stereo_val preview_audio = preview_buffer_generate(&preview);
+      stereo_val preview_audio = preview.Generate();
       output_left += preview_audio.left * 0.6;
       output_right += preview_audio.right * 0.6;
     }
@@ -593,37 +593,36 @@ int Mixer::GetTicksPerCycleUnit(unsigned int event_type) {
   return ticks;
 }
 
-void Mixer::PreviewAudio(char *filename) {
-  if (is_valid_file(filename)) {
+void Mixer::PreviewAudio(std::string filename) {
+  if (IsValidFile(filename)) {
     preview.enabled = false;
-    preview_buffer_import_file(&preview, filename);
+    preview.ImportFile(filename);
   }
 }
 
-void preview_buffer_import_file(preview_buffer *buffy, char *filename) {
-  strncpy(buffy->filename, filename, 512);
-  AudioBufferDetails deetz =
-      import_file_contents(&buffy->audio_buffer, filename);
-  buffy->audio_buffer_len = deetz.buffer_length;
-  buffy->num_channels = deetz.num_channels;
-  buffy->audio_buffer_read_idx = 0;
-  buffy->enabled = true;
+void PreviewBuffer::ImportFile(std::string fname) {
+  filename = fname;
+  AudioBufferDetails deetz = ImportFileContents(audio_buffer, filename);
+  audio_buffer_len = deetz.buffer_length;
+  num_channels = deetz.num_channels;
+  audio_buffer_read_idx = 0;
+  enabled = true;
 }
 
-stereo_val preview_buffer_generate(preview_buffer *buffy) {
+stereo_val PreviewBuffer::Generate() {
   stereo_val ret = {.0, .0};
-  if (!buffy->enabled || !buffy->audio_buffer) return ret;
+  if (!enabled) return ret;
 
-  ret.left = buffy->audio_buffer[buffy->audio_buffer_read_idx];
-  if (buffy->num_channels == 1)
+  ret.left = audio_buffer[audio_buffer_read_idx];
+  if (num_channels == 1)
     ret.right = ret.left;
   else
-    ret.right = buffy->audio_buffer[buffy->audio_buffer_read_idx + 1];
+    ret.right = audio_buffer[audio_buffer_read_idx + 1];
 
-  buffy->audio_buffer_read_idx += buffy->num_channels;
-  if (buffy->audio_buffer_read_idx >= buffy->audio_buffer_len) {
-    buffy->audio_buffer_read_idx = 0;
-    buffy->enabled = false;
+  audio_buffer_read_idx += num_channels;
+  if (audio_buffer_read_idx >= audio_buffer_len) {
+    audio_buffer_read_idx = 0;
+    enabled = false;
   }
 
   return ret;

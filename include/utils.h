@@ -7,7 +7,8 @@
 
 void get_full_filename(char *basename, char *destination_fullname);
 
-AudioBufferDetails import_file_contents(double **buffer, std::string filename);
+AudioBufferDetails ImportFileContents(std::vector<double> &buffer,
+                                      std::string filename);
 float freqval(char *n);
 int notelookup(char *n);
 int input_key_to_char_note(int ch, int octave, char *keytext);
@@ -17,8 +18,7 @@ std::string GetRandomSampleNameFromDir(std::string sample_dir);
 void strim(const char *input, char *result);
 void chordie(char *n);
 int conv_bitz(int num);
-int is_valid_osc(char *string);
-bool is_valid_file(char *filename);
+bool IsValidFile(std::string filename);
 void related_notes(char root_note[4], double *second_note, double *third_note);
 double pitch_shift_multiplier(double pitch_shift_semitones);
 double fast_pow(double a, double b);

@@ -83,7 +83,8 @@ float LinTerp(float x1, float x2, float y1, float y2, float x) {
 }
 }  // namespace utils
 
-AudioBufferDetails import_file_contents(double **buffer, std::string filename) {
+AudioBufferDetails ImportFileContents(std::vector<double> &buffer,
+                                      std::string filename) {
   SNDFILE *snd_file;
   SF_INFO sf_info;
 
@@ -101,19 +102,10 @@ AudioBufferDetails import_file_contents(double **buffer, std::string filename) {
   }
 
   int audio_buffer_len = sf_info.channels * sf_info.frames;
+  buffer.clear();
+  buffer.reserve(audio_buffer_len);
 
-  double *audio_buffer = (double *)calloc(audio_buffer_len, sizeof(double));
-  if (audio_buffer == NULL) {
-    perror("deid!\n");
-    sf_close(snd_file);
-    return deetz;
-  }
-  if (*buffer)  // already have old contents
-    free(*buffer);
-
-  *buffer = audio_buffer;
-
-  sf_readf_double(snd_file, *buffer, audio_buffer_len);
+  sf_readf_double(snd_file, buffer.data(), audio_buffer_len);
   sf_close(snd_file);
 
   deetz.buffer_length = audio_buffer_len;
@@ -397,37 +389,8 @@ int conv_bitz(int num) {
   return -1;
 }
 
-int is_valid_osc(char *string) {
-  if (strncmp(string, "square", 9) == 0) {
-    return 1;
-  } else if (strncmp(string, "saw_d", 9) == 0) {
-    return 1;
-  } else if (strncmp(string, "saw_u", 9) == 0) {
-    return 1;
-  } else if (strncmp(string, "tri", 9) == 0) {
-    return 1;
-  } else if (strncmp(string, "sine", 9) == 0) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
-bool is_valid_file(char *filename) {
-  if (strlen(filename) == 0) {
-    printf("That ain't no valid file where i come from..\n");
-    return false;
-  }
-  char cwd[1024];
-  getcwd(cwd, 1024);
-  int flen = strlen(cwd) + strlen(filename) + strlen(SAMPLE_DIR) + 1;
-  char full_filename[flen];
-  strncpy(full_filename, cwd, flen - 1);
-  strncat(full_filename, SAMPLE_DIR, flen - 1 - strlen(full_filename));
-  strncat(full_filename, filename, flen - 1 - strlen(full_filename));
-
-  struct stat buffer;
-  return (stat(full_filename, &buffer) == 0);
+bool IsValidFile(std::string filename) {
+  return fs::exists(fs::current_path().string() + "/wavs/" + filename);
 }
 
 // from

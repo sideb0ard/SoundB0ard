@@ -8,10 +8,10 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#define DEFAULT_AMP 0.7
-#define MAX_CONCURRENT_SAMPLES 10  // arbitrary
+constexpr double kDefaultAmp = 0.7;
+constexpr int kMaxConcurrentSamples = 10;  // arbitrary
 
-typedef struct sample_pos {
+struct SamplePos {
   int position{0};
   int playing{0};
   int played{0};
@@ -22,12 +22,12 @@ typedef struct sample_pos {
   double speed{0};
   double start_pos_pct{0};
   double end_pos_pct{0};
-} sample_pos;
+};
 
 class DrumSampler : public SoundGenerator {
  public:
   DrumSampler(std::string filename);
-  ~DrumSampler();
+  ~DrumSampler() = default;
   std::string Info() override;
   std::string Status() override;
   stereo_val genNext(mixer_timing_info tinfo) override;
@@ -43,10 +43,11 @@ class DrumSampler : public SoundGenerator {
   bool glitch_mode;
   int glitch_rand_factor;
 
-  sample_pos sample_positions[PPBAR];
-  int samples_now_playing[MAX_CONCURRENT_SAMPLES];  // contains midi tick of
-                                                    // current samples
-  int velocity_now_playing[MAX_CONCURRENT_SAMPLES];
+  std::array<SamplePos, PPBAR> sample_positions{};
+  std::array<int, kMaxConcurrentSamples>
+      samples_now_playing{};  // contains midi tick of
+                              // current samples
+  std::array<int, kMaxConcurrentSamples> velocity_now_playing{};
 
   std::string filename;
   int samplerate;
@@ -57,7 +58,7 @@ class DrumSampler : public SoundGenerator {
 
   bool one_shot{true};
 
-  double *buffer{nullptr};
+  std::vector<double> buffer{};
   int bufsize;
   int buf_end_pos;  // this will always be shorter than bufsize for cutting off
                     // sample earlier

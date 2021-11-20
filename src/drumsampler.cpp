@@ -39,17 +39,12 @@ DrumSampler::DrumSampler(std::string filename) {
   started = false;
 }
 
-DrumSampler::~DrumSampler() {
-  printf("Deleting sample buffer\n");
-  free(buffer);
-}
-
 stereo_val DrumSampler::genNext(mixer_timing_info tinfo) {
   (void)tinfo;
   double left_val = 0;
   double right_val = 0;
 
-  for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
+  for (int i = 0; i < kMaxConcurrentSamples; i++) {
     if (samples_now_playing[i] != -1) {
       int cur_sample_midi_tick = samples_now_playing[i];
       int velocity = velocity_now_playing[i];
@@ -145,7 +140,7 @@ void DrumSampler::pitchBend(midi_event ev) {
 }
 
 void DrumSampler::ImportFile(std::string filename) {
-  AudioBufferDetails deetz = import_file_contents(&buffer, filename);
+  AudioBufferDetails deetz = ImportFileContents(buffer, filename);
   filename = deetz.filename;
   bufsize = deetz.buffer_length;
   buf_end_pos = bufsize;
@@ -156,7 +151,7 @@ void DrumSampler::ImportFile(std::string filename) {
 }
 
 void drumsampler_reset_samples(DrumSampler *ds) {
-  for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
+  for (int i = 0; i < kMaxConcurrentSamples; i++) {
     ds->samples_now_playing[i] = -1;
   }
   for (int i = 0; i < PPBAR; i++) {
@@ -171,7 +166,7 @@ void drumsampler_reset_samples(DrumSampler *ds) {
 }
 
 int get_a_drumsampler_position(DrumSampler *ds) {
-  for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+  for (int i = 0; i < kMaxConcurrentSamples; i++)
     if (ds->samples_now_playing[i] == -1) return i;
   return -1;
 }

@@ -296,7 +296,8 @@ static inline void sound_grain_check_idx(int *index, int buffer_len) {
   while (*index >= buffer_len) *index -= buffer_len;
 }
 
-stereo_val SoundGrain::Generate(double *audio_buffer, int audio_buffer_len) {
+stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer,
+                                int audio_buffer_len) {
   stereo_val out = {0., 0.};
   if (!active) return out;
 
@@ -356,7 +357,7 @@ stereo_val SoundGrain::Generate(double *audio_buffer, int audio_buffer_len) {
 //////////////////////////// end of grain stuff //////////////////////////
 
 void Looper::ImportFile(std::string filename) {
-  AudioBufferDetails deetz = import_file_contents(&audio_buffer, filename);
+  AudioBufferDetails deetz = ImportFileContents(audio_buffer, filename);
   audio_buffer_len = deetz.buffer_length;
   num_channels = deetz.num_channels;
   SetLoopLen(1);
