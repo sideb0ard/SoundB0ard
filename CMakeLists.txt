@@ -15,6 +15,8 @@ set(CMAKE_CXX_STANDARD 20 CACHE STRING "The C++ standard to use")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+## MODIFY THESE TO YOUR PATHS
+
 set (AbletonLinkPath "/Users/sideboard/Code/link/")
 set (HomebrewIncDir "/Users/sideboard/homebrew/include")
 set (ReadlineIncDir "/Users/sideboard/homebrew/opt/readline/include")
