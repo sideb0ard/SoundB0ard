@@ -25,7 +25,7 @@ http://ctags.sourceforge.net/
 https://github.com/Reputeless/PerlinNoise
 
 I still need to do some more work to make it portable. For the moment I've only been developing on OSX.
-I've recently moved the project to CMake and using c++20. Edit the CMakeslist.txt and adjust any paths required.
+I've recently moved the project to CMake and using c++20. Edit the CMakeLists.txt and adjust any paths required.
 To build:
 `mkdir build`
 `cd build`
