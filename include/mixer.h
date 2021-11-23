@@ -14,11 +14,12 @@
 
 struct PreviewBuffer {
   std::string filename{};
-  std::vector<double> audio_buffer;
-  int num_channels;
-  int audio_buffer_len;
-  int audio_buffer_read_idx;
-  bool enabled;
+  std::vector<double> audio_buffer{};
+  int num_channels{};
+  int audio_buffer_len{};
+  int audio_buffer_read_idx{};
+  bool enabled{};
+
   stereo_val Generate();
   void ImportFile(std::string filename);
 };

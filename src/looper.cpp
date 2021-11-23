@@ -82,8 +82,8 @@ void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
 
     int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx_;
     double decimal_percent_of_loop = relative_midi_idx / (PPBAR * loop_len);
-    double new_read_idx = decimal_percent_of_loop * audio_buffer_len;
-    if (reverse_mode) new_read_idx = (audio_buffer_len - 1) - new_read_idx;
+    double new_read_idx = decimal_percent_of_loop * audio_buffer.size();
+    if (reverse_mode) new_read_idx = (audio_buffer.size() - 1) - new_read_idx;
 
     // this ensures new_read_idx is even
     if (num_channels == 2) new_read_idx -= ((int)new_read_idx & 1);
@@ -161,7 +161,7 @@ stereo_val Looper::genNext(mixer_timing_info tinfo) {
     LaunchGrain(tinfo);
 
   for (int i = 0; i < highest_grain_num; i++) {
-    stereo_val tmp = m_grains[i].Generate(audio_buffer, audio_buffer_len);
+    stereo_val tmp = m_grains[i].Generate(audio_buffer);
 
     val.left += tmp.left;
     val.right += tmp.right;
@@ -195,7 +195,7 @@ std::string Looper::Status() {
     ss << ANSI_COLOR_RED;
   ss << filename << " vol:" << volume << " pan:" << pan
      << " pitch:" << grain_pitch
-     << " idx:" << (int)(100. / audio_buffer_len * audio_buffer_read_idx)
+     << " idx:" << (int)(100. / audio_buffer.size() * audio_buffer_read_idx)
      << " mode:" << kLoopModeNames[loop_mode_] << "(" << loop_mode_ << ")"
      << " len:" << loop_len << ANSI_COLOR_RESET;
 
@@ -296,8 +296,7 @@ static inline void sound_grain_check_idx(int *index, int buffer_len) {
   while (*index >= buffer_len) *index -= buffer_len;
 }
 
-stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer,
-                                int audio_buffer_len) {
+stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
   stereo_val out = {0., 0.};
   if (!active) return out;
 
@@ -309,26 +308,26 @@ stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer,
 
   int read_idx = (int)audiobuffer_cur_pos;
   double frac = audiobuffer_cur_pos - read_idx;
-  sound_grain_check_idx(&read_idx, audio_buffer_len);
+  sound_grain_check_idx(&read_idx, audio_buffer.size());
 
   if (num_channels == 1) {
     int read_next_idx = read_idx + 1;
-    sound_grain_check_idx(&read_next_idx, audio_buffer_len);
+    sound_grain_check_idx(&read_next_idx, audio_buffer.size());
     out.left = utils::LinTerp(0, 1, audio_buffer[read_idx],
                               audio_buffer[read_next_idx], frac);
     out.left *= amp;
     out.right = out.left;
   } else if (num_channels == 2) {
     int read_next_idx = read_idx + 2;
-    sound_grain_check_idx(&read_next_idx, audio_buffer_len);
+    sound_grain_check_idx(&read_next_idx, audio_buffer.size());
     out.left = utils::LinTerp(0, 1, audio_buffer[read_idx],
                               audio_buffer[read_next_idx], frac);
     out.left *= amp;
 
     int read_idx_right = read_idx + 1;
-    sound_grain_check_idx(&read_idx_right, audio_buffer_len);
+    sound_grain_check_idx(&read_idx_right, audio_buffer.size());
     int read_next_idx_right = read_idx_right + 2;
-    sound_grain_check_idx(&read_next_idx_right, audio_buffer_len);
+    sound_grain_check_idx(&read_next_idx_right, audio_buffer.size());
     out.right = utils::LinTerp(0, 1, audio_buffer[read_idx_right],
                                audio_buffer[read_next_idx_right], frac);
     out.right *= amp;
@@ -358,7 +357,6 @@ stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer,
 
 void Looper::ImportFile(std::string filename) {
   AudioBufferDetails deetz = ImportFileContents(audio_buffer, filename);
-  audio_buffer_len = deetz.buffer_length;
   num_channels = deetz.num_channels;
   SetLoopLen(1);
 }
@@ -394,7 +392,7 @@ void Looper::SetGrainReleaseSizePct(int release_pct) {
 }
 
 void Looper::SetAudioBufferReadIdx(int pos) {
-  if (pos < 0 || pos >= audio_buffer_len) {
+  if (pos < 0 || pos >= audio_buffer.size()) {
     return;
   }
   audio_buffer_read_idx = pos;
@@ -442,7 +440,7 @@ void Looper::SetStutterPending() { stutter_pending = true; }
 void Looper::SetLoopLen(double bars) {
   if (bars != 0) {
     loop_len = bars;
-    size_of_sixteenth = audio_buffer_len / 16 * bars;
+    size_of_sixteenth = audio_buffer.size() / 16 * bars;
   }
 }
 
@@ -509,7 +507,7 @@ void Looper::SetParam(std::string name, double val) {
     SetGateMode(val);
   else if (name == "idx") {
     if (val <= 100) {
-      double pos = audio_buffer_len / 100 * val;
+      double pos = audio_buffer.size() / 100 * val;
       SetAudioBufferReadIdx(pos);
     }
   } else if (name == "len")

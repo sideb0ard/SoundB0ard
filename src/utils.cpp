@@ -29,6 +29,8 @@ static char const *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
 
 const double blep_table_center = 4096 / 2.0 - 1;
 
+constexpr int kLocalBufferLen = 1024;
+
 #define CONVEX_LIMIT 0.00398107
 #define CONCAVE_LIMIT 0.99601893
 #define ARC4RANDOMMAX 4294967295  // (2^32 - 1)
@@ -105,7 +107,12 @@ AudioBufferDetails ImportFileContents(std::vector<double> &buffer,
   buffer.clear();
   buffer.reserve(audio_buffer_len);
 
-  sf_readf_double(snd_file, buffer.data(), audio_buffer_len);
+  double local_buffer[kLocalBufferLen]{};
+  sf_count_t count;
+  while ((count = sf_read_double(snd_file, local_buffer, kLocalBufferLen)) >
+         0) {
+    for (int i = 0; i < count; i++) buffer.push_back(local_buffer[i]);
+  }
   sf_close(snd_file);
 
   deetz.buffer_length = audio_buffer_len;

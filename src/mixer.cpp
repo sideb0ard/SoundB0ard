@@ -613,16 +613,18 @@ stereo_val PreviewBuffer::Generate() {
   stereo_val ret = {.0, .0};
   if (!enabled) return ret;
 
-  ret.left = audio_buffer[audio_buffer_read_idx];
-  if (num_channels == 1)
-    ret.right = ret.left;
-  else
-    ret.right = audio_buffer[audio_buffer_read_idx + 1];
+  if (audio_buffer_read_idx < audio_buffer.size()) {
+    ret.left = audio_buffer[audio_buffer_read_idx];
+    if (num_channels == 1)
+      ret.right = ret.left;
+    else
+      ret.right = audio_buffer[audio_buffer_read_idx + 1];
 
-  audio_buffer_read_idx += num_channels;
-  if (audio_buffer_read_idx >= audio_buffer_len) {
-    audio_buffer_read_idx = 0;
-    enabled = false;
+    audio_buffer_read_idx += num_channels;
+    if (audio_buffer_read_idx >= audio_buffer_len) {
+      audio_buffer_read_idx = 0;
+      enabled = false;
+    }
   }
 
   return ret;
