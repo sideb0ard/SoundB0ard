@@ -393,6 +393,36 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                   })},
+    {"takeN",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() != 2)
+             return evaluator::NewError(
+                 "`takeN` requires two args - an array "
+                 "plus a number of values to return.");
+
+           auto number = std::dynamic_pointer_cast<object::Number>(input[1]);
+
+           std::shared_ptr<object::Array> array_obj =
+               std::dynamic_pointer_cast<object::Array>(input[0]);
+           if (array_obj && number) {
+             auto num_to_take =
+                 std::min(static_cast<unsigned long>(number->value_),
+                          array_obj->elements_.size());
+
+             auto return_array = std::make_shared<object::Array>(
+                 std::vector<std::shared_ptr<object::Object>>());
+
+             for (int i = 0; i < num_to_take; i++) {
+               return_array->elements_.push_back(array_obj->elements_[i]);
+             }
+
+             return return_array;
+           }
+
+           return evaluator::NULLL;
+         })},
     {"incr",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
