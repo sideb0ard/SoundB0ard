@@ -22,14 +22,14 @@ struct MiniSynthVoice : Voice {
   MiniSynthVoice();
   ~MiniSynthVoice() = default;
 
-  QBLimitedOscillator m_op1;
-  QBLimitedOscillator m_op2;
-  QBLimitedOscillator m_op3;
-  QBLimitedOscillator m_op4;
-  // WTOscillator m_op1;
-  // WTOscillator m_op2;
-  // WTOscillator m_op3;
-  // WTOscillator m_op4;
+  // QBLimitedOscillator m_op1;
+  // QBLimitedOscillator m_op2;
+  // QBLimitedOscillator m_op3;
+  // QBLimitedOscillator m_op4;
+  WTOscillator m_op1;
+  WTOscillator m_op2;
+  WTOscillator m_op3;
+  WTOscillator m_op4;
 
   MoogLadder m_filter;
   // CKThreeFive m_filter;

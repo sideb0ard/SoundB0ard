@@ -519,7 +519,6 @@ bool MiniSynth::PrepareForPlay() {
     if (voices_[i]) voices_[i]->PrepareForPlay();
   }
 
-  // Update();
   m_last_note_frequency = -1.0;
 
   return true;
