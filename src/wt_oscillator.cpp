@@ -5,17 +5,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
+
 #include "defjams.h"
 #include "utils.h"
 
 WTOscillator::WTOscillator() {
+  memset(m_saw_tables, 0, kNumTables * sizeof(double));
+  memset(m_tri_tables, 0, kNumTables * sizeof(double));
+
   m_read_idx = 0;
   m_wt_inc = 0;
   m_read_idx2 = 0;
   m_wt_inc2 = 0;
   m_current_table_idx = 0;
 
-  m_current_table = m_sine_table;
+  m_current_table = &m_sine_table[0];
 
   m_square_corr_factor[0] = 0.5;
   m_square_corr_factor[1] = 0.5;
@@ -28,6 +33,7 @@ WTOscillator::WTOscillator() {
   m_square_corr_factor[8] = 0.25;
 
   CreateWaveTables();
+  std::cout << "WAVE TABLES CREATED\n";
 }
 
 void WTOscillator::Reset() {
@@ -143,16 +149,16 @@ int WTOscillator::GetTableIndex() {
   return -1;
 }
 
-constexpr void WTOscillator::CreateWaveTables() {
-  auto fill_sin = [i = std::size_t(0)]() mutable {
-    return sin((double)i / kWavetableLength) * (TWO_PI);
-  };
-  std::generate(m_sine_table.begin(), m_sine_table.end(), fill_sin);
+void WTOscillator::CreateWaveTables() {
+  for (int i = 0; i < kWavetableLength; i++)
+    m_sine_table[i] = sin((static_cast<double>(i) / kWavetableLength) * TWO_PI);
 
   double seed_freq = 27.5;  // A0
   for (int i = 0; i < kNumTables; ++i) {
-    std::array<double, kWavetableLength> &saw_table = m_saw_tables[i];
-    std::array<double, kWavetableLength> &tri_table = m_tri_tables[i];
+    double *saw_table = new double[kWavetableLength];
+    memset(saw_table, 0, kWavetableLength * sizeof(double));
+    double *tri_table = new double[kWavetableLength];
+    memset(tri_table, 0, kWavetableLength * sizeof(double));
 
     int harms = (int)((SAMPLE_RATE / 2.0 / seed_freq) - 1.0);
     int half_harms = (int)((float)harms / 2.0);
@@ -190,6 +196,8 @@ constexpr void WTOscillator::CreateWaveTables() {
       tri_table[j] /= max_tri;
     }
 
+    m_saw_tables[i] = saw_table;
+    m_tri_tables[i] = tri_table;
     seed_freq *= 2.0;
   }
 }

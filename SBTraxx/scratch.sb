@@ -1,52 +1,44 @@
-
-let step_fn = fn(sg, pat, read_idx, play_idx)
-{
-  #print("RWDIDX:", read_idx);
-  if (pat[read_idx] > 0) {
-    note_on_at(sg, pat[read_idx], play_idx * pp);
-  }
-}
-
 let blah_gen = gen()
 {
   setup()
   {
-    let beat = bjork(5, 16);
-    let percb = bossa;
+    let melz = [mel, mel2];
+    let mx = 0;
 
-    let max_len = 3;
-    let cur_i = 0;
+    let rfzn = [11, 13, 17, 19, 23, 29, 31, 37, 41];
+    let rfx = 0;
 
-    let step = 5;
-    let cur_idx = 0;
-
-    #let  mel = key_riff(23);
+    let plz = [3, 4, 6, 2, 8, 12, 16];
+    let plx = 0;
+    let cpx = 0;
   }
   run()
   {
-
+    let ml = melz[mx];
+    print("MEL:", ml);
     for (i = 0; i < 16; ++i) {
-      step_fn(bd, beat, cur_i, i);
-      step_fn(hh, percb, cur_i, i);
-      step_fn(prc, percb, cur_i, i);
-      step_fn(dx, mel, cur_i, i);
-      step_fn(dx, rotate(up(mel,24),3), cur_i, i);
-      cur_i = incr(cur_i, 0, max_len);
+      stepper(dx, ml, cpx, i);
+      if (i % 2 == 0) {
+        stepper(bd, ml, cpx, i);
+      }
+      cpx = incr(cpx, 0, plz[plx]);
     }
-    max_len = incr(max_len, 3, 16);
+    plx = incr(plx, 0, len(plz));
 
-    for (i = cur_idx; cur_idx < 16; ++i) {
-      #  #print("PLaying on:", cur_idx);
-      note_on_at(prc, 1, cur_idx * pp);
-      #note_on_at(dx, 11, cur_idx * pp / 2);
-      cur_idx = cur_idx + step;
+    if (count % 4 == 0) {
+      mx = incr(mx, 0, len(melz));
     }
-    cur_idx = cur_idx % 16;
 
-    #if (count % 8 == 0) {
-      #  mel = key_riff(23);
-      #}
-
+    if (count % 7 == 0) {
+      mel = riff(rfzn[rfx]);
+      rfx = incr(rfx, 0, len(rfzn));
+      print("NEW MEL!", mel);
+    }
+    if (count % 12 == 0) {
+      mel2 = riff(rfzn[rfx]);
+      rfx = incr(rfx, 0, len(rfzn));
+      print("NEW MEL2!", mel2);
+    }
   }
 }
 
