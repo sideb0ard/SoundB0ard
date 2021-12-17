@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sstream>
+
 extern Mixer *mixr;
 
 const char *s_eg_state[] = {"OFF",     "ATTACK",  "DECAY",
@@ -28,16 +30,20 @@ void Envelope::Reset() {
   debug_ = false;
 }
 
-void Envelope::Status(char *status_string) {
-  snprintf(status_string, MAX_STATIC_STRING_SZ,
-           "ENV state:%s len_bars:%.2f len_ticks:%d type:%s mode:%s\n"
-           " attack:%.2f decay:%.2f sustain:%.2f release:%.2f // "
-           "release_tick:%d\n"
-           "debug:%d",
-           s_eg_state[eg_.m_state], env_length_bars_, env_length_ticks_,
-           s_eg_type[eg_.m_eg_mode], s_eg_mode[env_mode_],
-           eg_.m_attack_time_msec, eg_.m_decay_time_msec, eg_.m_sustain_level,
-           eg_.m_release_time_msec, release_tick_, debug_);
+std::string Envelope::Status() {
+  std::stringstream ss;
+  ss << "ENV state:" << s_eg_state[eg_.m_state];
+  ss << " len_bars:" << env_length_bars_;
+  ss << " len_ticks:" << env_length_ticks_;
+  ss << " type:" << s_eg_type[eg_.m_eg_mode];
+  ss << " mode:" << s_eg_mode[env_mode_] << "\n";
+  ss << " attack:" << eg_.m_attack_time_msec;
+  ss << " decay:" << eg_.m_decay_time_msec;
+  ss << " sustain:" << eg_.m_sustain_level;
+  ss << " release:" << eg_.m_release_time_msec;
+  ss << " release_tick:" << release_tick_;
+  ss << " debug" << debug_;
+  return ss.str();
 }
 
 stereo_val Envelope::Process(stereo_val input) {

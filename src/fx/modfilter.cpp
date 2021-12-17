@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sstream>
+
 ModFilter::ModFilter() {
   Init();
 
@@ -132,11 +134,16 @@ stereo_val ModFilter::Process(stereo_val in) {
   return out;
 }
 
-void ModFilter::Status(char *status_string) {
-  snprintf(status_string, MAX_STATIC_STRING_SZ,
-           "depthfc:%.2f ratefc:%.2f depthq:%.2f rateq:%.2f lfo:%d phase:%d",
-           m_mod_depth_fc_, m_mod_rate_fc_, m_mod_depth_q_, m_mod_rate_q_,
-           m_lfo_waveform_, m_lfo_phase_);
+std::string ModFilter::Status() {
+  std::stringstream ss;
+  ss << "depthfc:" << m_mod_depth_fc_;
+  ss << " ratefc:" << m_mod_rate_fc_;
+  ss << " depthq:" << m_mod_depth_q_;
+  ss << " rateq:" << m_mod_rate_q_;
+  ss << " lfo:" << m_lfo_waveform_;
+  ss << " phase:" << m_lfo_phase_;
+
+  return ss.str();
 }
 
 void ModFilter::SetModDepthFc(double val) {

@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sstream>
+
 Reverb::Reverb() {
   m_pre_delay_msec = 40;
   m_pre_delay_atten_db = 0;
@@ -101,12 +103,13 @@ stereo_val Reverb::Process(stereo_val in) {
   return out;
 }
 
-void Reverb::Status(char *status_string) {
-  // clang-format off
-    snprintf(status_string, MAX_STATIC_STRING_SZ,
-             "predelayms:%.2f reverbtime:%.0f wetmx:%.1f",
-             m_pre_delay_msec, m_rt60, m_wet_pct);
-  // clang-format on
+std::string Reverb::Status() {
+  std::stringstream ss;
+  ss << "predelayms:" << m_pre_delay_msec;
+  ss << " reverbtime:" << m_rt60;
+  ss << " wetmx:" << m_wet_pct;
+
+  return ss.str();
 }
 
 void Reverb::SetParam(std::string name, double val) {

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <utils.h>
 
+#include <sstream>
+
 constexpr char const *mod_type_as_string[] = {"FLANGER", "VIBRATO", "CHORUS"};
 
 ModDelay::ModDelay() {
@@ -115,13 +117,16 @@ bool ModDelay::ProcessAudio(double *input_left, double *input_right,
   return true;
 }
 
-void ModDelay::Status(char *status_string) {
-  snprintf(status_string, MAX_STATIC_STRING_SZ,
-           "depth:%.2f rate:%.2f "
-           "fb:%.2f offset:%.2f "
-           "type:%s lfo:%s",
-           m_mod_depth_pct_, m_mod_freq_, m_feedback_percent_, m_chorus_offset_,
-           mod_type_as_string[m_mod_type_], m_lfo_type_ ? "SIN" : "TRI");
+std::string ModDelay::Status() {
+  std::stringstream ss;
+  ss << "depth:" << m_mod_depth_pct_;
+  ss << " rate:" << m_mod_freq_;
+  ss << " fb:" << m_feedback_percent_;
+  ss << " offset:" << m_chorus_offset_;
+  ss << " type:" << mod_type_as_string[m_mod_type_];
+  ss << " lfo:" << (m_lfo_type_ ? "SIN" : "TRI");
+
+  return ss.str();
 }
 
 stereo_val ModDelay::Process(stereo_val input) {

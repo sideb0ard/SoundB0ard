@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <utils.h>
 
+#include <sstream>
+
 const char *filtertype_to_name[] = {"LPF1", "HPF1", "LPF2", "HPF2", "BPF2",
                                     "BSF2", "LPF4", "HPF4", "BPF4"};
 
@@ -21,18 +23,20 @@ FilterPass ::FilterPass() {
   printf("LFO1 freq is %.2f\n", m_lfo1_.m_osc_fo);
 }
 
-void FilterPass::Status(char *status_string) {
-  // clang-format off
-    snprintf(status_string, MAX_STATIC_STRING_SZ,
-             "freq:%.2f q:%.2f type:%s lfo1_active:%d lfo1_type:%d lfo1_amp:%.2f\n"
-             "     lfo1_rate:%.2f lfo2_active:%d lfo2_type:%d lfo2_amp:%.2f lfo2_rate:%.2f",
-             m_filter_.m_fc_control, m_filter_.m_q_control,
-             filtertype_to_name[m_filter_.m_filter_type],
-             m_lfo1_active_, m_lfo1_.m_waveform,
-             m_lfo1_.m_amplitude, m_lfo1_.m_osc_fo,
-             m_lfo2_active_, m_lfo2_.m_waveform,
-             m_lfo2_.m_amplitude, m_lfo2_.m_osc_fo);
-  // clang-format on
+std::string FilterPass::Status() {
+  std::stringstream ss;
+  ss << "freq:" << m_filter_.m_fc_control;
+  ss << " q:" << m_filter_.m_q_control;
+  ss << " type:" << filtertype_to_name[m_filter_.m_filter_type];
+  ss << " lfo1_active:" << m_lfo1_active_;
+  ss << " lfo1_type:" << m_lfo1_.m_waveform;
+  ss << " lfo1_amp:" << m_lfo1_.m_amplitude << "\n";
+  ss << "     lfo1_rate:" << m_lfo1_.m_osc_fo;
+  ss << " lfo2_active:" << m_lfo2_active_;
+  ss << " lfo2_type:" << m_lfo2_.m_waveform;
+  ss << " lfo2_amp:" << m_lfo2_.m_amplitude;
+  ss << " lfo2_rate:" << m_lfo2_.m_osc_fo;
+  return ss.str();
 }
 
 stereo_val FilterPass::Process(stereo_val input) {

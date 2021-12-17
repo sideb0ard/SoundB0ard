@@ -14,7 +14,7 @@ enum { COMP, LIMIT, EXPAND, GATE };
 class DynamicsProcessor : Fx {
  public:
   DynamicsProcessor();
-  void Status(char *string) override;
+  std::string Status() override;
   stereo_val Process(stereo_val input) override;
   void SetParam(std::string name, double val) override;
   double GetParam(std::string name) override;

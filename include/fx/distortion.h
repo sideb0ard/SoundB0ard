@@ -3,20 +3,19 @@
 #include <defjams.h>
 #include <fx/fx.h>
 
-class Distortion : Fx
-{
-  public:
-    Distortion();
+class Distortion : Fx {
+ public:
+  Distortion();
 
-    void Status(char *string) override;
-    stereo_val Process(stereo_val input) override;
-    void SetParam(std::string name, double val) override;
-    double GetParam(std::string name) override;
+  std::string Status() override;
+  stereo_val Process(stereo_val input) override;
+  void SetParam(std::string name, double val) override;
+  double GetParam(std::string name) override;
 
-  private:
-    void Init();
-    void SetThreshold(double val);
+ private:
+  void Init();
+  void SetThreshold(double val);
 
-  private:
-    double m_threshold_;
+ private:
+  double m_threshold_;
 };

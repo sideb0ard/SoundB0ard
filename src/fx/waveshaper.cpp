@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sstream>
+
 WaveShaper::WaveShaper() {
   Init();
 
@@ -10,11 +12,14 @@ WaveShaper::WaveShaper() {
   enabled_ = true;
 }
 
-void WaveShaper::Status(char *status_string) {
-  snprintf(status_string, MAX_STATIC_STRING_SZ,
-           "k_pos:%.2f k_neg:%.2f"
-           "stages:%d invert:%d",
-           m_arc_tan_k_pos, m_arc_tan_k_neg, m_stages, m_invert_stages);
+std::string WaveShaper::Status() {
+  std::stringstream ss;
+  ss << "k_pos:" << m_arc_tan_k_pos;
+  ss << " k_neg:" << m_arc_tan_k_neg;
+  ss << " stages:" << m_stages;
+  ss << " invert:" << m_invert_stages;
+
+  return ss.str();
 }
 
 stereo_val WaveShaper::Process(stereo_val input) {

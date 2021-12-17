@@ -5,6 +5,7 @@
 #include <wchar.h>
 
 #include <iostream>
+#include <sstream>
 
 extern Mixer *mixr;
 
@@ -137,7 +138,7 @@ bool StereoDelay::ProcessAudio(double *input_left, double *input_right,
   return true;
 }
 
-void StereoDelay::Status(char *status_string) {
+std::string StereoDelay::Status() {
   std::string mode{};
   switch (m_mode_) {
     case DelayMode::norm:
@@ -166,11 +167,16 @@ void StereoDelay::Status(char *status_string) {
     case DelaySyncLen::SIXTEENTH:
       sync_len = "1/16";
   }
-  snprintf(status_string, MAX_STATIC_STRING_SZ,
-           "delayms:%.0f fb:%.2f ratio:%.2f "
-           "wetmx:%.2f mode:%s sync:%d sync_len:%s",
-           m_delay_time_ms_, m_feedback_percent_, m_delay_ratio_, m_wet_mix_,
-           mode.c_str(), sync_, sync_len.c_str());
+  std::stringstream ss;
+  ss << "delayms:" << m_delay_time_ms_;
+  ss << " fb:" << m_feedback_percent_;
+  ss << " ratio:" << m_delay_ratio_;
+  ss << " wetmx:" << m_wet_mix_;
+  ss << " mode:" << mode;
+  ss << " sync:" << sync_;
+  ss << " sync_len:" << sync_len;
+
+  return ss.str();
 }
 
 stereo_val StereoDelay::Process(stereo_val input) {

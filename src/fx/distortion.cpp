@@ -3,18 +3,18 @@
 #include <mixer.h>
 #include <stdlib.h>
 
-extern Mixer *mixr;
+#include <sstream>
 
 Distortion::Distortion() {
   type_ = DISTORTION;
   enabled_ = true;
-
   m_threshold_ = 0.707;
 }
 
-void Distortion::Status(char *status_string) {
-  snprintf(status_string, MAX_STATIC_STRING_SZ, "Distortion! threshold:%.2f",
-           m_threshold_);
+std::string Distortion::Status() {
+  std::stringstream ss;
+  ss << "Distortion! threshold:" << m_threshold_;
+  return ss.str();
 }
 
 stereo_val Distortion::Process(stereo_val input) {

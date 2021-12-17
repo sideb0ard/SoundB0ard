@@ -141,9 +141,8 @@ std::string Mixer::StatusEnv() {
           ss << COOL_COLOR_YELLOW;
         else
           ss << ANSI_COLOR_RESET;
-        char fx_status[512];
-        f->Status(fx_status);
-        ss << "fx" << i << " " << fx_status << std::endl;
+
+        ss << "fx" << i << " " << f->Status() << std::endl;
       }
       ss << ANSI_COLOR_RESET;
     }
@@ -172,9 +171,7 @@ std::string Mixer::StatusSgz(bool all) {
               ss << COOL_COLOR_YELLOW;
             else
               ss << ANSI_COLOR_RESET;
-            char fx_status[512];
-            f->Status(fx_status);
-            ss << "\n[fx " << i << ":" << j << fx_status << "]";
+            ss << "\n[fx " << i << ":" << j << f->Status() << "]";
           }
           ss << ANSI_COLOR_RESET;
         }

@@ -4,16 +4,21 @@
 #include <stdlib.h>
 #include <utils.h>
 
+#include <sstream>
+
 BitCrush::BitCrush() {
   Init();
   type_ = BITCRUSH;
   enabled_ = true;
 }
 
-void BitCrush::Status(char *status_string) {
-  snprintf(status_string, MAX_STATIC_STRING_SZ,
-           "bitdepth:%d bitrate:%d sample_hold_freq:%.2f", bitdepth_, bitrate_,
-           sample_hold_freq_);
+std::string BitCrush::Status() {
+  std::stringstream ss;
+  ss << "bitdepth:" << bitdepth_;
+  ss << " bitrate:" << bitrate_;
+  ss << " sample_hold_freq:" << sample_hold_freq_;
+
+  return ss.str();
 }
 
 stereo_val BitCrush::Process(stereo_val input) {

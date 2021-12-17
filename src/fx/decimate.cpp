@@ -5,6 +5,7 @@
 #include <utils.h>
 
 #include <iostream>
+#include <sstream>
 
 namespace {
 float quantize(float old, float q) {
@@ -37,10 +38,14 @@ Decimate::Decimate() {
   type_ = DECIMATE;
   enabled_ = true;
 }
-void Decimate::Status(char *status_string) {
-  snprintf(status_string, MAX_STATIC_STRING_SZ,
-           "bitres:%.2f destruct:%.2f sample_hold_freq:%.2f big_divisor:%.2f",
-           bitres, destruct, sample_hold_freq, big_divisor);
+
+std::string Decimate::Status() {
+  std::stringstream ss;
+  ss << "bitres:" << bitres;
+  ss << " destruct:" << destruct;
+  ss << " sample_hold_freq:" << sample_hold_freq;
+  ss << " big_divisor:" << big_divisor;
+  return ss.str();
 }
 
 stereo_val Decimate::Process(stereo_val input) {
