@@ -5,11 +5,22 @@
 
 #include <sstream>
 
-constexpr char const *mod_type_as_string[] = {"FLANGER", "VIBRATO", "CHORUS"};
+namespace {
+std::string GetAlgorithmName(ModDelayAlgorithm alg) {
+  switch (alg) {
+    case (ModDelayAlgorithm::kFlanger):
+      return "Flanger";
+    case (ModDelayAlgorithm::kChorus):
+      return "Chorus";
+    case (ModDelayAlgorithm::kVibrato):
+    default:
+      return "Vibrato";
+  }
+}
+}  // namespace
 
 ModDelay::ModDelay() {
   type_ = MODDELAY;
-  enabled_ = true;
 
   m_min_delay_msec_ = 0.0;
   m_max_delay_msec_ = 0.0;
@@ -22,14 +33,17 @@ ModDelay::ModDelay() {
   // m_lfo.mode = 0;
 
   // "gui"
-  m_mod_depth_pct_ = 50;    // percent
-  m_mod_freq_ = 0.18;       // range: 0.02 - 5
-  m_feedback_percent_ = 0;  //  range: -100 - 100
-  m_mod_type_ = FLANGER;    // FLANGER, VIBRATO, CHORUS
-  m_lfo_type_ = 0;          // TRI or SINE // these don't match other OSC enums
+  m_mod_depth_pct_ = 50;                      // percent
+  m_mod_freq_ = 0.18;                         // range: 0.02 - 5
+  m_feedback_percent_ = 0;                    //  range: -100 - 100
+  m_mod_type_ = ModDelayAlgorithm::kFlanger;  // FLANGER, VIBRATO,
+                                              // CHORUS
+  m_lfo_type_ = 0;  // TRI or SINE // these don't match other OSC enums
 
   Update();
   m_lfo_.StartOscillator();
+
+  enabled_ = true;
 }
 
 bool ModDelay::Update() {
@@ -41,21 +55,21 @@ bool ModDelay::Update() {
 
 void ModDelay::CookModType() {
   switch (m_mod_type_) {
-    case VIBRATO: {
+    case ModDelayAlgorithm::kVibrato: {
       m_min_delay_msec_ = 0;
       m_max_delay_msec_ = 7;
       m_ddl_.m_wet_level_pct = 100.0;
       m_ddl_.m_feedback_pct = 0.0;
       break;
     }
-    case CHORUS: {
+    case ModDelayAlgorithm::kChorus: {
       m_min_delay_msec_ = 5;
       m_max_delay_msec_ = 30;
       m_ddl_.m_wet_level_pct = 50.0;
       m_ddl_.m_feedback_pct = m_feedback_percent_;
       break;
     }
-    case FLANGER:
+    case ModDelayAlgorithm::kFlanger:
     default: {
       m_min_delay_msec_ = 0;
       m_max_delay_msec_ = 7;
@@ -74,16 +88,18 @@ void ModDelay::UpdateLfo() {
 }
 
 void ModDelay::UpdateDdl() {
-  if (m_mod_type_ != VIBRATO) m_ddl_.m_feedback_pct = m_feedback_percent_;
+  if (m_mod_type_ != ModDelayAlgorithm::kVibrato)
+    m_ddl_.m_feedback_pct = m_feedback_percent_;
   m_ddl_.Update();
 }
 
 double ModDelay::CalculateDelayOffset(double lfo_sample) {
-  if (m_mod_type_ == FLANGER || m_mod_type_ == VIBRATO) {
+  if (m_mod_type_ == ModDelayAlgorithm::kFlanger ||
+      m_mod_type_ == ModDelayAlgorithm::kVibrato) {
     return (m_mod_depth_pct_ / 100.0) *
                (lfo_sample * (m_max_delay_msec_ - m_min_delay_msec_)) +
            m_min_delay_msec_;
-  } else if (m_mod_type_ == CHORUS) {
+  } else if (m_mod_type_ == ModDelayAlgorithm::kChorus) {
     double start = m_min_delay_msec_ + m_chorus_offset_;
     return (m_mod_depth_pct_ / 100.0) *
                (lfo_sample * (m_max_delay_msec_ - m_min_delay_msec_)) +
@@ -92,11 +108,7 @@ double ModDelay::CalculateDelayOffset(double lfo_sample) {
   return 0.0;  // shouldn't happen
 }
 
-bool ModDelay::ProcessAudio(double *input_left, double *input_right,
-                            double *output_left, double *output_right) {
-  (void)input_right;
-  (void)output_right;
-
+stereo_val ModDelay::ProcessAudio(stereo_val input) {
   double yn = 0;
   double yqn = 0;
   yn = m_lfo_.DoOscillate(&yqn);
@@ -112,9 +124,11 @@ bool ModDelay::ProcessAudio(double *input_left, double *input_right,
   m_ddl_.m_delay_ms = delay;
   m_ddl_.Update();
 
-  m_ddl_.ProcessAudio(input_left, output_left);
+  stereo_val out;
+  m_ddl_.ProcessAudio(&input.left, &out.left);
+  m_ddl_.ProcessAudio(&input.right, &out.right);
 
-  return true;
+  return out;
 }
 
 std::string ModDelay::Status() {
@@ -123,17 +137,13 @@ std::string ModDelay::Status() {
   ss << " rate:" << m_mod_freq_;
   ss << " fb:" << m_feedback_percent_;
   ss << " offset:" << m_chorus_offset_;
-  ss << " type:" << mod_type_as_string[m_mod_type_];
+  ss << " type:" << GetAlgorithmName(m_mod_type_);
   ss << " lfo:" << (m_lfo_type_ ? "SIN" : "TRI");
 
   return ss.str();
 }
 
-stereo_val ModDelay::Process(stereo_val input) {
-  stereo_val out = {};
-  ProcessAudio(&input.left, &input.right, &out.left, &out.right);
-  return out;
-}
+stereo_val ModDelay::Process(stereo_val input) { return ProcessAudio(input); }
 
 void ModDelay::SetDepth(double val) {
   if (val >= 0 && val <= 100)
@@ -168,10 +178,28 @@ void ModDelay::SetChorusOffset(double val) {
 }
 
 void ModDelay::SetModType(unsigned int val) {
-  if (val < MAX_MOD_TYPE)
-    m_mod_type_ = val;
-  else
-    printf("Val has to be between 0 and %d\n", MAX_MOD_TYPE - 1);
+  switch (val) {
+    case (0):
+      m_mod_type_ = ModDelayAlgorithm::kFlanger;
+      m_min_delay_msec_ = 0;
+      m_max_delay_msec_ = 7;
+      m_ddl_.m_wet_level = 50;
+      m_ddl_.m_feedback = m_feedback_percent_;
+      break;
+    case (1):
+      m_mod_type_ = ModDelayAlgorithm::kChorus;
+      m_min_delay_msec_ = 5;
+      m_max_delay_msec_ = 30;
+      m_ddl_.m_wet_level = 50;
+      break;
+    case (2):
+      m_mod_type_ = ModDelayAlgorithm::kVibrato;
+      m_min_delay_msec_ = 0;
+      m_max_delay_msec_ = 7;
+      m_ddl_.m_wet_level = 100;
+      m_ddl_.m_feedback = 0.0;
+      break;
+  }
   Update();
 }
 

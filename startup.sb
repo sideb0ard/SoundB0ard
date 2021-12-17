@@ -206,6 +206,16 @@ let is_val_in_list = fn(the_list, the_val)
   return false;
 }
 
+let array_to_pattern = fn(in_array)
+{
+  if (len(in_array) == 0 || len(in_array) > 15) {
+    return in_array;
+  }
+
+  let rhythm = bjork(len(in_array), 16);
+  return combinor(rhythm, in_array);
+}
+
 let list_to_array = fn(the_list, len_array)
 {
   let the_array = [];
