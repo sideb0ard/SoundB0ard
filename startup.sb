@@ -206,7 +206,7 @@ let is_val_in_list = fn(the_list, the_val)
   return false;
 }
 
-let array_to_pattern = fn(in_array)
+let array_expand = fn(in_array)
 {
   if (len(in_array) == 0 || len(in_array) > 15) {
     return in_array;
@@ -264,13 +264,13 @@ let gen_beat = fn()
 
   for (i = 4; i < 16; ++i) {
     if (beat[i] == 1 && rand(100) > 60) {
-      beat[i] = bjork(rand(3)+1, 8);
+      beat[i] = bjork(rand(3)+3, 8);
     }
   }
 
   for (i = 8; i < 16; ++i) {
     if (beat[i] == 1 && rand(100) > 80) {
-      beat[i] = bjork(rand(4)+1, 8);
+      beat[i] = bjork(rand(4)+2, 8);
     }
   }
 

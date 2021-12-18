@@ -1,0 +1,111 @@
+
+let mel = down([50, 48, 55, 51, 55, 51], 24);
+#let mel = [20, 0, 20, 20, 0, 20, 0, 20, 0, 20, 0, 20, 20, 0, 20, 0];
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      play_array(mo, mel);
+    }
+
+    if (count % 3 == 0) {
+      play_array(dx, down(mel, -5));
+    }
+  }
+}
+
+let hh_gen = gen()
+{
+  setup()
+  {
+    let swing = 50;
+  }
+  run()
+  {
+    let pp = 3840 / 8;
+    for (i = 0; i < 8; ++i) {
+      let offset = 0;
+      #if (i % 2 == 1) {
+        #  offset = swing;
+        #}
+      let v = 70 + rand(28);
+      if (i % 4 == 0) {
+        v = 128;
+      }
+      if (i != 6 && rand(100) < 70) {
+        note_on_at(hh, 1, i * pp + offset, vel = v);
+      }
+    }
+    swing = swing + 10;
+    if (swing > 150) {
+      swing = 50;
+    }
+  }
+}
+
+let dbeat = gen()
+{
+  setup()
+  {
+    let probz = {0:90, 6:90, 11:50, 14:50};
+    let parray = map_to_array(probz, 16);
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (parray[i] > 0 && parray[i] > rand(100)) {
+        let v = 100 + rand(28);
+        if (i == 0 || i == 8) {
+          v = 128;
+        }
+        if (i > 12) {
+          v = 72;
+        }
+        let offset = 0;
+        if (i > 0) {
+          offset = rand(25);
+        }
+        note_on_at(bd, 1, i * pp + offset, vel = v);
+      }
+    }
+  }
+}
+
+let perc_gen = gen()
+{
+  setup()
+  {
+    let beat = gen_beat() * 2;
+    let percz = [rv, lp, cb];
+  }
+  run()
+  {
+    beat = gen_beat() * 2;
+    for (i = 0; i < 16; ++i) {
+      let v = rand(90) + 37;
+      if (type(beat[i]) == "ARRAY") {
+        let larr = beat[i];
+        let ppp = pp / len(larr);
+        for (j = 0; j < 16; ++j) {
+          if (larr[j] > 0) {
+            note_on_at(percz[rand(len(percz))], 1, i * pp + j * ppp, vel = v);
+          }
+        }
+      } else {
+        if (beat[i] > 0) {
+          note_on_at(percz[rand(len(percz))], 1, i * pp, vel = v);
+        }
+      }
+    }
+
+    if (count % 2 == 1) {
+      note_on(sd, 1);
+    }
+  }
+}
+
