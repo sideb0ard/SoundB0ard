@@ -19,7 +19,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <utils.h>
-#include <wchar.h>
 
 #include <filereader.hpp>
 #include <interpreter/object.hpp>

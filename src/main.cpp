@@ -36,7 +36,6 @@ siv::PerlinNoise perlinGenerator;  // only for use by eval thread
 
 auto global_env = std::make_shared<object::Environment>();
 
-extern const wchar_t *sparkchars;
 extern const char *key_names[NUM_KEYS];
 extern const char *prompt;
 extern char *chord_type_names[NUM_CHORD_TYPES];

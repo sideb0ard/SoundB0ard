@@ -14,10 +14,6 @@
 extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];
 
-// defined in minisynth_voice.h
-const wchar_t *s_voice_names[] = {L"saw3",    L"sqr3",    L"saw2sqr",
-                                  L"tri2saw", L"tri2sqr", L"sin2sqr"};
-
 const char *S_VOICES[] = {"SAW3",    "SQR3",    "SAW2SQR",
                           "TRI2SAW", "TRI2SQR", "SIN2SQR"};
 

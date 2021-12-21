@@ -2,7 +2,6 @@
 
 #include <defjams.h>
 #include <stdbool.h>
-#include <wchar.h>
 
 #include <array>
 #include <interpreter/ast.hpp>

@@ -4,7 +4,6 @@
 #include <envelope_generator.h>
 #include <soundgenerator.h>
 #include <stdbool.h>
-#include <wchar.h>
 
 constexpr int kMaxConcurrentGrains = 1000;
 

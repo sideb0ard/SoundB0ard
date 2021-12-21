@@ -4,7 +4,6 @@
 #include <fx/envelope.h>
 #include <fx/fx.h>
 #include <stdbool.h>
-#include <wchar.h>
 
 #include <atomic>
 

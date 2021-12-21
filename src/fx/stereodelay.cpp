@@ -2,7 +2,6 @@
 #include <mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
 
 #include <iostream>
 #include <sstream>

@@ -9,7 +9,6 @@
 #include <oscillator.h>
 #include <soundgenerator.h>
 #include <stdbool.h>
-#include <wchar.h>
 
 #include <array>
 

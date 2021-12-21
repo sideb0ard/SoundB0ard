@@ -6,7 +6,6 @@
 #include <sndfile.h>
 #include <soundgenerator.h>
 #include <stdbool.h>
-#include <wchar.h>
 
 constexpr double kDefaultAmp = 0.7;
 constexpr int kMaxConcurrentSamples = 10;  // arbitrary

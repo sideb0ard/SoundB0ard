@@ -71,9 +71,6 @@ bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
 unsigned int get_next_compat_note(unsigned int cur_key);
 std::string get_string_logo(void);
 
-void mask_to_string(uint16_t mask, wchar_t *patternstr);
-uint16_t mask_from_string(char *stringey_mask);
-
 bool IsDigit(char c);
 bool IsValidIdentifier(char c);
 bool IsBalanced(std::string &input);

@@ -21,7 +21,6 @@ namespace fs = std::filesystem;
 //#include "lookuptables.h"
 
 extern Mixer *mixr;
-extern const wchar_t *sparkchars;
 extern char *strategies[NUM_STATEGIES];
 
 static char const *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
@@ -784,20 +783,6 @@ std::string get_string_logo() {
         << ANSI_COLOR_RESET;
   // clang-format on
   return ss.str();
-}
-
-void mask_to_string(uint16_t mask,
-                    wchar_t *patternstr)  // patternstr is 33 chars long
-{
-  for (int i = 0; i < 16; i++) {
-    int pidx = i * 2;
-    patternstr[pidx] = sparkchars[0];
-    patternstr[pidx + 1] = sparkchars[0];
-    if (mask & 1 << (15 - i)) {
-      patternstr[pidx] = sparkchars[4];
-      patternstr[pidx + 1] = sparkchars[4];
-    }
-  }
 }
 
 uint16_t mask_from_string(char *stringey_mask) {
