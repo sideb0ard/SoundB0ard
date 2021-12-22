@@ -1,0 +1,20 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let mel = [50, 48, 55, 51, 55, 51];
+  }
+  run()
+  {
+
+    let m = mel;
+    if (count % 3 == 0) {
+      m = reverse(mel);
+    }
+
+    play_array(mo, m);
+
+  }
+}
+

@@ -1,0 +1,131 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    # d3# and g3#
+    let notez = [51, 56];
+    #let notez = [44, 46, 57];
+    let nx = 0;
+    let beat = [0, 3, 6, 9, 12, 14];
+    let beatp = list_to_array(beat, 16);
+    let durr = 30;
+
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (beatp[i] == 1) {
+        print(notes_in_chord(notez[nx], 1, 1));
+        note_on_at(mo, notes_in_chord(notez[nx], 0, 3), i* pp, dur = durr);
+        nx = incr(nx, 0, len(notez));
+      }
+      durr = durr + 10;
+      if (durr > 300) {
+        durr = 30;
+      }
+    }
+    if (count % 4 == 0) {
+      note_on_at(wc, 1, 3840/2);
+      #  nx = incr(nx, 0, len(notez));
+    }
+  }
+}
+
+let hh_gen = gen()
+{
+  setup()
+  {
+    let swing = 50;
+  }
+  run()
+  {
+    #let pp = 3840 / 8;
+    for (i = 0; i < 16; ++i) {
+      let offset = 0;
+      if (i % 2 == 1) {
+        offset = swing;
+      }
+      let v = 70 + rand(28);
+      if (i % 4 == 0) {
+        v = 128;
+      }
+      if (i != 6 && rand(100) < 70) {
+        note_on_at(hh, 1, i * pp + offset, vel = v);
+      }
+    }
+    swing = swing + 10;
+    if (swing > 100) {
+      swing = 50;
+    }
+
+    if (count % 4 == 0) {
+      note_on_at(mt, 1, 0);
+    }
+  }
+}
+
+let dbeat = gen()
+{
+  setup()
+  {
+    let probz = {0:90, 6:90, 11:50, 14:50};
+    let parray = map_to_array(probz, 16);
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (parray[i] > 0 && parray[i] > rand(100)) {
+        let v = 100 + rand(28);
+        if (i == 0 || i == 8) {
+          v = 128;
+        }
+        if (i > 12) {
+          v = 72;
+        }
+        let offset = 0;
+        if (i > 0) {
+          offset = rand(25);
+        }
+        note_on_at(bd, 1, i * pp + offset, vel = v);
+      }
+    }
+  }
+}
+
+let sh = sample(perc/chezShaker.aiff);
+let sh2 = sample(perc/tuffShaker.aiff);
+let tr = sample(perc/triangle.aiff);
+let perc_gen = gen()
+{
+  setup()
+  {
+    let beat = gen_beat() * 2;
+    let percz = [sh, sh2, tr];
+  }
+  run()
+  {
+    beat = gen_beat();
+    for (i = 0; i < 16; ++i) {
+      let v = rand(90) + 37;
+      if (type(beat[i]) == "ARRAY") {
+        let larr = beat[i];
+        let ppp = pp / len(larr);
+        for (j = 0; j < 16; ++j) {
+          if (larr[j] > 0) {
+            note_on_at(percz[rand(len(percz))], 1, i * pp + j * ppp, vel = v);
+          }
+        }
+      } else {
+        if (beat[i] > 0) {
+          note_on_at(percz[rand(len(percz))], 1, i * pp, vel = v);
+        }
+      }
+    }
+
+    if (count % 2 == 1) {
+      note_on(sd, 1);
+    }
+  }
+}
+

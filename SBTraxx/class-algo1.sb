@@ -1,0 +1,11 @@
+
+let rhythm_gen = fn(num_hits)
+{
+  if (num_hits > 16) {
+    return [];
+  }
+  let onsetz = [];
+
+  if (
+
+      }

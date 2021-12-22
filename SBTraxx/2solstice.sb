@@ -1,0 +1,89 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let notez= [51, 56];
+    let nx = 0;
+
+    let beat = [0, 3, 6, 9, 12, 14];
+    let beatp = list_to_array(beat, 16);
+
+    let durr = 100;
+
+  }
+  run()
+  {
+
+
+    if (count % 4 ==0) {
+      for (i = 0; i < 16; ++i) {
+        if (i % 2 == 1) {
+          note_on_at(mo, notez[nx] + 12, i * pp);
+        }
+      }
+    }
+
+    let mod = 2;
+    for (i = 0; i < 16; ++i) {
+      let mx = 0;
+      if (i > 3 && i < 12) {
+        mx = 1;
+      }
+      if (beatp[i] == 1) {
+        #note_on_at(mo, notez[mx], i * pp , dur = durr);
+        note_on_at(bd, notez[mx], i * pp , dur = durr);
+      }
+    }
+
+    durr = durr + 10;
+    if (durr > 300) {
+      durr = 50;
+    }
+
+    if (count % 4 == 0) {
+      note_on(mt, 1);
+      play_array(dx, combinor(beatp, notez));
+    }
+  }
+}
+
+let hh_gen = gen()
+{
+  setup()
+  {
+    let swing = 60;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if ( rand(100) < 80) {
+        let v = 128;
+        if (i % 2 ==1) {
+          v = 90 + rand(37);
+        }
+
+        let offset = 0;
+        if (i % 2 == 1) {
+          offset = swing;
+        }
+
+        note_on_at(hh, 1, i * pp + offset, vel = v);
+      }
+    }
+
+  }
+}
+
+
+let pgen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    let b = gen_beat();
+  }
+}
+

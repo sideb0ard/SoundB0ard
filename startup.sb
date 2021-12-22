@@ -206,7 +206,7 @@ let is_val_in_list = fn(the_list, the_val)
   return false;
 }
 
-let array_expand = fn(in_array)
+let expand = fn(in_array)
 {
   if (len(in_array) == 0 || len(in_array) > 15) {
     return in_array;
@@ -405,6 +405,46 @@ let perky = fn(beat_pattern, sample_array)
       if (beat_pattern[i] > 0) {
         note_on_at(sample_array[rand(len(sample_array))], 1, i * pp, vel = v);
       }
+    }
+  }
+}
+
+let cbeat = fn(cp)
+{
+  let probz = {4:90, 6:10, 12:90, 13:5, 15:10};
+  let parray = map_to_array(probz, 16);
+  for (i = 0; i < 16; ++i) {
+    if (parray[i] > 0 && parray[i] > rand(100)) {
+      let v = 127;
+      if (i > 12) {
+        v = 72;
+      }
+      let offset = 0;
+      if (i > 0) {
+        offset = rand(45);
+      }
+      note_on_at(cp, 1, i * pp - offset, vel = v);
+    }
+  }
+}
+let dbeat = fn(bd)
+{
+  let probz = {0:90, 6:90, 11:50, 14:50};
+  let parray = map_to_array(probz, 16);
+  for (i = 0; i < 16; ++i) {
+    if (parray[i] > 0 && parray[i] > rand(100)) {
+      let v = 100 + rand(28);
+      if (i == 0 || i == 8) {
+        v = 128;
+      }
+      if (i > 12) {
+        v = 72;
+      }
+      let offset = 0;
+      if (i > 0) {
+        offset = rand(25);
+      }
+      note_on_at(bd, 1, i * pp + offset, vel = v);
     }
   }
 }
