@@ -18,6 +18,7 @@ struct SoundGrainParams {
   int degrade_by{0};
   bool debug{false};
   unsigned int envelope_mode{0};
+  int dur_ms{0};
 };
 
 struct SoundGrain {
@@ -38,43 +39,13 @@ struct SoundGrain {
 
   int degrade_by{0};
 
-  int attack_time_pct{0};   // percent of grain_len_frames
-  int release_time_pct{0};  // percent of grain_len_frames
   bool active{false};
   double amp{0};
   bool reverse_mode{false};
   bool debug{false};
 
-  unsigned int envelope_mode{0};
-
-  // Parabolic Env vars
-  float slope{0};
-  float curve{0};
-
-  int attack_time_samples{0};
-  int release_time_samples{0};
-  int attack_to_sustain_boundary_sample_idx{0};
-  int sustain_to_decay_boundary_sample_idx{0};
-  float previous_amplitude{0};
-
-  // Trapezoidal Env vars
-  float amplitude_increment{0};
-
-  // Exponential / Logarithmic
-  float exp_min = 0.2;
-  float exp_mul = 0;
-  float exp_now = 0;
-
   EnvelopeGenerator eg;
-};
-
-enum EnvMode {
-  parabolic,
-  trapezoidal,
-  tukey_window,
-  generator,
-  exponential_curve,
-  logarithmic_curve,
+  int release_frame{0};  // when to set EG to release
 };
 
 enum LoopMode {

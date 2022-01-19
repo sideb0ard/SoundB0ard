@@ -20,7 +20,6 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   audio_buffer_read_idx = 0;
   grain_attack_time_pct = 15;
   grain_release_time_pct = 15;
-  envelope_mode = EnvMode::logarithmic_curve;
   envelope_taper_ratio = 0.5;
   reverse_mode = 0;  // bool
 
@@ -144,7 +143,8 @@ void Looper::LaunchGrain(mixer_timing_info tinfo) {
                              .pitch = grain_pitch,
                              .num_channels = num_channels,
                              .degrade_by = degrade_by,
-                             .envelope_mode = envelope_mode};
+                             .envelope_mode = envelope_mode,
+                             .dur_ms = grain_duration_ms};
 
   m_grains[cur_grain_num].Initialize(params);
   num_active_grains = CountActiveGrains();
@@ -244,14 +244,6 @@ void SoundGrain::Initialize(SoundGrainParams params) {
   grain_len_frames = params.dur;
   grain_counter_frames = 0;
 
-  attack_time_pct = params.attack_pct;
-  release_time_pct = params.release_pct;
-
-  attack_time_samples = params.dur / 100. * params.attack_pct;
-  attack_to_sustain_boundary_sample_idx = attack_time_samples;
-  release_time_samples = params.dur / 100. * params.release_pct;
-  sustain_to_decay_boundary_sample_idx = params.dur - release_time_samples;
-
   audiobuffer_num_channels = params.num_channels;
   degrade_by = params.degrade_by;
   debug = params.debug;
@@ -266,26 +258,18 @@ void SoundGrain::Initialize(SoundGrainParams params) {
     incr = params.pitch;
   }
 
-  // case (LOOPER_ENV_LOGARITHMIC_CURVE):
-  exp_mul = pow(exp_min / (exp_min + 1), 1.0 / attack_time_samples);
-  exp_now = exp_min + 1;
+  amp = 1;
 
-  amp = 0;
-  double rdur = 1.0 / params.dur;
-  double rdur2 = rdur * rdur;
-  slope = 4.0 * 1.0 * (rdur - rdur2);
-  curve = -8.0 * 1.0 * rdur2;
+  int attack_time_ms = params.dur_ms / 100. * params.attack_pct;
+  int release_time_ms = params.dur_ms / 100. * params.release_pct;
 
-  double loop_len_ms = 1000. * params.dur / SAMPLE_RATE;
-  double attack_time_ms = loop_len_ms / 100. * params.attack_pct;
-  double release_time_ms = loop_len_ms / 100. * params.release_pct;
-  // printf("ATTACKMS: %f RELEASEMS: %f\n", attack_time_ms,
-  // release_time_ms);
+  release_frame = params.dur / 100. * (100 - params.release_pct);
 
   eg.Reset();
   eg.SetAttackTimeMsec(attack_time_ms);
   eg.SetDecayTimeMsec(0);
   eg.SetReleaseTimeMsec(release_time_ms);
+  eg.SetSustainOverride(true);
   eg.StartEg();
 
   active = true;
@@ -334,20 +318,12 @@ stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
   }
   audiobuffer_cur_pos += (incr * num_channels);
 
-  if (grain_counter_frames < attack_to_sustain_boundary_sample_idx ||
-      grain_counter_frames > sustain_to_decay_boundary_sample_idx) {
-    exp_now *= exp_mul;
-    amp = (1 - (exp_now - exp_min));
-  } else if (grain_counter_frames == attack_to_sustain_boundary_sample_idx) {
-    amp = 1.;
-  } else if (grain_counter_frames == sustain_to_decay_boundary_sample_idx) {
-    exp_now = exp_min;
-    exp_mul = pow((exp_min + 1) / exp_min, 1 / release_time_samples);
-  }
-
   grain_counter_frames++;
   if (grain_counter_frames > grain_len_frames) {
     active = false;
+  }
+  if (grain_counter_frames > release_frame) {
+    eg.SetSustainOverride(false);
   }
 
   return out;
