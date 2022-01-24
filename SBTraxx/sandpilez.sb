@@ -1,0 +1,80 @@
+
+let percz = [af, deh, dink, dinkSweep, thee, picture];
+let percz2 = [ dosh, krushping, tth, uus, kk];
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let pilez = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    let next_pilez = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    pilez[2][2] = 10000;
+  }
+  run()
+  {
+    for (i = 0; i < 4; ++i) {
+      for (j = 0; j < 4; ++j) {
+        next_pilez[i][j] = pilez[i][j];
+      }
+    }
+
+    for (i = 0; i < 4; ++i) {
+      for (j = 0; j < 4; ++j) {
+        let num = pilez[i][j];
+
+        if (num > 3) {
+          next_pilez[i][j] = next_pilez[i][j] - 4;
+          if (i + 1 < 4) {
+            next_pilez[i + 1][j] = next_pilez[i + 1][j] + 1;
+          }
+          if (i - 1 > -1) {
+            next_pilez[i - 1][j] = next_pilez[i - 1][j] + 1;
+          }
+          if (j + 1 < 4) {
+            next_pilez[i][j + 1] = next_pilez[i][j + 1] + 1;
+          }
+          if (j - 1 > -1) {
+            next_pilez[i][j - 1] = next_pilez[i][j - 1] + 1;
+          }
+        }
+      }
+    }
+    let tmp = pilez;
+    pilez = next_pilez;
+    next_pilez = tmp;
+
+    if (pilez[2][2] < 4) {
+      pilez[2][2] = 10000;
+    }
+
+    let pos = 0;
+    for (i = 0; i < 4; ++i) {
+      for (j = 0; j < 4; ++j) {
+        let num = pilez[i][j];
+        if (num < 3) {
+          note_on_at(percz[num], 1, pp * pos);
+        }
+        ++pos;
+      }
+    }
+  }
+}
+
+let bd_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    play_array(pbd, b);
+
+    if (count % 7 == 0) {
+      percz = percz1;
+    }
+    if (count % 4 == 0) {
+      percz = percz2;
+    }
+  }
+}
+

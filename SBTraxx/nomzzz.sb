@@ -1,0 +1,64 @@
+
+
+let idx = 0;
+let max_idx = 3;
+
+
+let hhah_gen = gen()
+{
+  setup()
+  {
+
+    let swing = 70;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      let offset = 0;
+      if (i % 2 == 1) {
+        offset = swing;
+      }
+      note_on_at(hh, 1, i * pp + offset);
+    }
+
+    swing = swing + 5;
+    if (swing > 200) {
+      swing = 40;
+    }
+
+  }
+}
+
+let perc_gen = gen()
+{
+  setup()
+  {
+    let attak = 50;
+    let dout = 60;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(sd, bossa, idx, i);
+      stepper(dx, combinor(bossa, [4]), idx, i);
+      let idx = incr(idx, 0, max_idx);
+    }
+    max_idx = incr(max_idx, 0, len(bossa));
+
+    set dx:e1att attak;
+    attak = attak + 10;
+    if (attak > 200) {
+      attak = 60;
+    }
+    set dx:op2out dout;
+    dout = dout + 10;
+    if (dout > 80) {
+      dout = 60;
+    }
+
+    if (count % 4 == 0) {
+      set jbz:stutter 1;
+    }
+  }
+}
+

@@ -1,0 +1,36 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    #let notez = [7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+    let notez = [41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+    let nx = 0;
+
+    let b = rand_beat();
+  }
+  run()
+  {
+    if (count % 8 == 0) {
+      b = rand_beat();
+    }
+
+    let d = 50;
+
+    for (i = 0; i < 16; ++i) {
+      if (b[i] == 1) {
+        note_on_at(mo, notez[nx], i * pp, dur=d);
+        nx = incr(nx, 0, len(notez));
+
+        #note_on_at(dx, notes_in_chord(notez[nx]), i * pp, dur = 100);
+        note_on_at(dx, 60, i * pp);
+      }
+      d = d + 45;
+
+
+    }
+
+    play_array(chs, rumba);
+  }
+}
+
