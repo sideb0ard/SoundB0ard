@@ -2,6 +2,7 @@
 #define MIXER_H
 
 #include <ableton_link_wrapper.h>
+#include <audio_action_queue.h>
 #include <defjams.h>
 #include <dxsynth.h>
 #include <fx/fx.h>
@@ -53,7 +54,9 @@ struct Mixer {
 
   std::vector<std::shared_ptr<SoundGenerator>> sound_generators_ = {};
 
-  std::vector<DelayedMidiEvent> _action_items = {};
+  std::vector<DelayedMidiEvent> _action_items =
+      {};  // TODO get rid of this version
+  std::vector<audio_action_queue_item> _delayed_action_items = {};
 
   AbletonLink *m_ableton_link{nullptr};
 
@@ -113,6 +116,7 @@ struct Mixer {
   double GetHzPerTimingUnit(unsigned int timing_unit);
   int GetTicksPerCycleUnit(unsigned int event_type);
   void CheckForAudioActionQueueMessages();
+  void ProcessActionMessage(audio_action_queue_item action);
 
   void AddFileToMonitor(std::string filepath);
 };
