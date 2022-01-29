@@ -234,6 +234,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     }
     auto val = eval_val->Inspect();
 
+    int delayed_by = 0;
+    auto eval_when = Eval(set_stmt->when_, env);
+    if (eval_when->Type() == "AT") {
+      delayed_by = std::stoi(eval_when->Inspect());
+    }
+
     if (set_stmt->target_->token_.literal_ == ("mixer")) {
       audio_action_queue_item action{.type = AudioAction::MIXER_UPDATE,
                                      .param_name = set_stmt->param_,
@@ -249,6 +255,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
           .mixer_soundgen_idx = soundgen->soundgen_id_,
           .fx_id = set_stmt->fx_num_,
           .param_name = set_stmt->param_,
+          .delayed_by = delayed_by,
           .param_val = val};
       audio_queue.push(action);
     } else if (target->Type() == "ERROR") {
@@ -505,6 +512,16 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   std::shared_ptr<ast::ProcessStatement> proc =
       std::dynamic_pointer_cast<ast::ProcessStatement>(node);
   if (proc) return EvalProcessStatement(proc, env);
+
+  std::shared_ptr<ast::AtExpression> at_exp =
+      std::dynamic_pointer_cast<ast::AtExpression>(node);
+  if (at_exp) {
+    auto val = Eval(at_exp->midi_ticks_from_now, env);
+    auto int_obj = std::dynamic_pointer_cast<object::Number>(val);
+    if (int_obj) {
+      return std::make_shared<object::At>(int_obj->value_);
+    }
+  }
 
   std::shared_ptr<ast::DurationExpression> dur_exp =
       std::dynamic_pointer_cast<ast::DurationExpression>(node);

@@ -164,6 +164,13 @@ std::string Generator::Inspect() {
   return return_val.str();
 }
 
+std::string At::Inspect() {
+  std::stringstream val;
+  val << value_;
+  return val.str();
+}
+ObjectType At::Type() { return AT_OBJ; }
+
 std::string Duration::Inspect() {
   std::stringstream val;
   val << value_;

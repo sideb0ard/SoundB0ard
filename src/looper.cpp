@@ -209,13 +209,15 @@ std::string Looper::Info() {
   ss << ANSI_COLOR_WHITE << filename << INSTRUMENT_COLOR << " vol:" << volume
      << " pan:" << pan << " pitch:" << grain_pitch << " speed:" << incr_speed_
      << " mode:" << kLoopModeNames[loop_mode_]
-     << " env_mode:" << kEnvNames[envelope_mode] << "(" << envelope_mode << ") "
      << "\ngrain_dur_ms:" << grain_duration_ms
      << " grains_per_sec:" << grains_per_sec
      << " density_dur_sync:" << density_duration_sync
      << " quasi_grain_fudge:" << quasi_grain_fudge
      << " fill_factor:" << fill_factor
-     << "\ngrain_spray_ms:" << granular_spray_frames / 44.1 << "\n";
+     << "\ngrain_spray_ms:" << granular_spray_frames / 44.1
+     << " attack:" << m_eg1.m_attack_time_msec
+     << " decay:" << m_eg1.m_decay_time_msec
+     << " release:" << m_eg1.m_release_time_msec << "active:" << active << "\n";
 
   return ss.str();
 }
@@ -471,8 +473,8 @@ void Looper::noteOff(midi_event ev) {
 }
 
 void Looper::SetParam(std::string name, double val) {
-  if (name == "active") {
-    active = val;
+  if (name == "off") {
+    m_eg1.NoteOff();
   } else if (name == "pitch")
     SetGrainPitch(val);
   else if (name == "speed")
@@ -508,6 +510,12 @@ void Looper::SetParam(std::string name, double val) {
     SetGranularSpray(val);
   else if (name == "env_mode")
     SetEnvelopeMode(val);
+  else if (name == "attack")
+    m_eg1.SetAttackTimeMsec(val);
+  else if (name == "decay")
+    m_eg1.SetDecayTimeMsec(val);
+  else if (name == "release")
+    m_eg1.SetReleaseTimeMsec(val);
 }
 
 double Looper::GetParam(std::string name) { return 0; }

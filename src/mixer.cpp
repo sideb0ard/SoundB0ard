@@ -807,16 +807,16 @@ void Mixer::CheckForDelayedEvents() {
     } else {
       ++it;
     }
+  }
 
-    auto it = _delayed_action_items.begin();
-    while (it != _delayed_action_items.end()) {
-      if (it->start_at == timing_info.midi_tick) {
-        ProcessActionMessage(*it);
-        // `erase()` invalidates the iterator, use returned iterator
-        it = _delayed_action_items.erase(it);
-      } else {
-        ++it;
-      }
+  auto dit = _delayed_action_items.begin();
+  while (dit != _delayed_action_items.end()) {
+    if (dit->start_at == timing_info.midi_tick) {
+      ProcessActionMessage(*dit);
+      // `erase()` invalidates the iterator, use returned iterator
+      dit = _delayed_action_items.erase(dit);
+    } else {
+      ++dit;
     }
   }
 }

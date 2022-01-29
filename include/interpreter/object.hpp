@@ -2,17 +2,15 @@
 
 #include <array>
 #include <functional>
+#include <interpreter/ast.hpp>
 #include <map>
 #include <memory>
+#include <pattern_parser/ast.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#include <interpreter/ast.hpp>
-#include <pattern_parser/ast.hpp>
-
-namespace object
-{
+namespace object {
 
 constexpr char NULL_OBJ[] = "NULL";
 constexpr char ERROR_OBJ[] = "ERROR";
@@ -42,367 +40,348 @@ constexpr char SYNTH_OBJ[] = "SYNTH";
 constexpr char SAMPLE_OBJ[] = "SAMPLE";
 constexpr char GRANULAR_OBJ[] = "GRANULAR";
 
+constexpr char AT_OBJ[] = "AT";
 constexpr char DURATION_OBJ[] = "DURATION";
 constexpr char VELOCITY_OBJ[] = "VELOCITY";
 
 using ObjectType = std::string;
 
-class HashKey
-{
-  public:
-    HashKey() = default;
-    HashKey(ObjectType type, uint64_t value) : type_{type}, value_{value} {};
-    uint64_t Value() const { return value_; }
-    std::string Type() const { return type_; }
-    bool operator==(const HashKey &hk) const
-    {
-        return hk.type_ == type_ && hk.value_ == value_;
-    }
-    bool operator!=(const HashKey &hk) const
-    {
-        return hk.type_ != type_ || hk.value_ != value_;
-    }
+class HashKey {
+ public:
+  HashKey() = default;
+  HashKey(ObjectType type, uint64_t value) : type_{type}, value_{value} {};
+  uint64_t Value() const { return value_; }
+  std::string Type() const { return type_; }
+  bool operator==(const HashKey &hk) const {
+    return hk.type_ == type_ && hk.value_ == value_;
+  }
+  bool operator!=(const HashKey &hk) const {
+    return hk.type_ != type_ || hk.value_ != value_;
+  }
 
-  private:
-    ObjectType type_;
-    uint64_t value_;
+ private:
+  ObjectType type_;
+  uint64_t value_;
 };
 
 bool operator<(HashKey const &lhs, HashKey const &rhs);
 
-class Object
-{
-  public:
-    virtual ~Object() = default;
-    virtual ObjectType Type() = 0;
-    virtual std::string Inspect() = 0;
+class Object {
+ public:
+  virtual ~Object() = default;
+  virtual ObjectType Type() = 0;
+  virtual std::string Inspect() = 0;
 };
 
-class Break : public Object
-{
-  public:
-    Break() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class Break : public Object {
+ public:
+  Break() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 };
 
-class Number : public Object
-{
-  public:
-    explicit Number(double val) : value_{val} {};
-    ObjectType Type() override;
-    std::string Inspect() override;
-    HashKey HashKey();
+class Number : public Object {
+ public:
+  explicit Number(double val) : value_{val} {};
+  ObjectType Type() override;
+  std::string Inspect() override;
+  HashKey HashKey();
 
-  public:
-    double value_;
+ public:
+  double value_;
 };
 
-class Duration : public Object
-{
-  public:
-    explicit Duration(double val) : value_{val} {};
-    ObjectType Type() override;
-    std::string Inspect() override;
+class At : public Object {
+ public:
+  explicit At(double val) : value_{val} {};
+  ObjectType Type() override;
+  std::string Inspect() override;
 
-  public:
-    double value_;
+ public:
+  double value_;
 };
 
-class Velocity : public Object
-{
-  public:
-    explicit Velocity(double val) : value_{val} {};
-    ObjectType Type() override;
-    std::string Inspect() override;
+class Duration : public Object {
+ public:
+  explicit Duration(double val) : value_{val} {};
+  ObjectType Type() override;
+  std::string Inspect() override;
 
-  public:
-    double value_;
+ public:
+  double value_;
 };
 
-class Array : public Object
-{
-  public:
-    explicit Array(std::vector<std::shared_ptr<Object>> elements)
-        : elements_{elements} {};
-    ObjectType Type() override { return ARRAY_OBJ; }
-    std::string Inspect() override;
+class Velocity : public Object {
+ public:
+  explicit Velocity(double val) : value_{val} {};
+  ObjectType Type() override;
+  std::string Inspect() override;
 
-  public:
-    std::vector<std::shared_ptr<Object>> elements_;
+ public:
+  double value_;
 };
 
-class Boolean : public Object
-{
-  public:
-    explicit Boolean(bool val) : value_{val} {};
-    ObjectType Type() override;
-    std::string Inspect() override;
-    HashKey HashKey();
+class Array : public Object {
+ public:
+  explicit Array(std::vector<std::shared_ptr<Object>> elements)
+      : elements_{elements} {};
+  ObjectType Type() override { return ARRAY_OBJ; }
+  std::string Inspect() override;
 
-  public:
-    bool value_;
+ public:
+  std::vector<std::shared_ptr<Object>> elements_;
 };
 
-class String : public Object
-{
-  public:
-    explicit String(std::string val) : value_{val} {};
-    ObjectType Type() override { return STRING_OBJ; }
-    std::string Inspect() override { return value_; }
-    HashKey HashKey();
+class Boolean : public Object {
+ public:
+  explicit Boolean(bool val) : value_{val} {};
+  ObjectType Type() override;
+  std::string Inspect() override;
+  HashKey HashKey();
 
-  public:
-    std::string value_;
+ public:
+  bool value_;
 };
 
-class ReturnValue : public Object
-{
-  public:
-    explicit ReturnValue(std::shared_ptr<Object> val) : value_{val} {};
-    ObjectType Type() override;
-    std::string Inspect() override;
+class String : public Object {
+ public:
+  explicit String(std::string val) : value_{val} {};
+  ObjectType Type() override { return STRING_OBJ; }
+  std::string Inspect() override { return value_; }
+  HashKey HashKey();
 
-  public:
-    std::shared_ptr<Object> value_;
+ public:
+  std::string value_;
 };
 
-class Null : public Object
-{
-  public:
-    ObjectType Type() override;
-    std::string Inspect() override;
+class ReturnValue : public Object {
+ public:
+  explicit ReturnValue(std::shared_ptr<Object> val) : value_{val} {};
+  ObjectType Type() override;
+  std::string Inspect() override;
+
+ public:
+  std::shared_ptr<Object> value_;
 };
 
-class Error : public Object
-{
-  public:
-    std::string message_;
-
-  public:
-    Error() = default;
-    explicit Error(std::string err_msg);
-    ObjectType Type() override;
-    std::string Inspect() override;
+class Null : public Object {
+ public:
+  ObjectType Type() override;
+  std::string Inspect() override;
 };
 
-class Environment
-{
-  public:
-    Environment() = default;
-    explicit Environment(std::shared_ptr<Environment> outer_env)
-        : outer_env_{outer_env} {};
-    ~Environment() = default;
-    std::shared_ptr<Object> Get(std::string key);
-    std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val,
-                                bool create = true);
-    std::string Debug();
-    std::string ListFuncsAndGen();
-    std::map<std::string, int> GetSoundGenerators();
+class Error : public Object {
+ public:
+  std::string message_;
 
-  private:
-    std::unordered_map<std::string, std::shared_ptr<Object>> store_;
-    std::shared_ptr<Environment> outer_env_{nullptr};
+ public:
+  Error() = default;
+  explicit Error(std::string err_msg);
+  ObjectType Type() override;
+  std::string Inspect() override;
+};
+
+class Environment {
+ public:
+  Environment() = default;
+  explicit Environment(std::shared_ptr<Environment> outer_env)
+      : outer_env_{outer_env} {};
+  ~Environment() = default;
+  std::shared_ptr<Object> Get(std::string key);
+  std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val,
+                              bool create = true);
+  std::string Debug();
+  std::string ListFuncsAndGen();
+  std::map<std::string, int> GetSoundGenerators();
+
+ private:
+  std::unordered_map<std::string, std::shared_ptr<Object>> store_;
+  std::shared_ptr<Environment> outer_env_{nullptr};
 };
 
 /////////////////////////////////////////////////
 
-class Function : public Object
-{
-  public:
-    Function(std::vector<std::shared_ptr<ast::Identifier>> parameters,
-             std::shared_ptr<Environment> env,
-             std::shared_ptr<ast::BlockStatement> body)
-        : parameters_{parameters}, env_{env}, body_{body} {};
-    ~Function() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class Function : public Object {
+ public:
+  Function(std::vector<std::shared_ptr<ast::Identifier>> parameters,
+           std::shared_ptr<Environment> env,
+           std::shared_ptr<ast::BlockStatement> body)
+      : parameters_{parameters}, env_{env}, body_{body} {};
+  ~Function() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 
-  public:
-    std::vector<std::shared_ptr<ast::Identifier>> parameters_;
-    std::shared_ptr<Environment> env_;
-    std::shared_ptr<ast::BlockStatement> body_;
+ public:
+  std::vector<std::shared_ptr<ast::Identifier>> parameters_;
+  std::shared_ptr<Environment> env_;
+  std::shared_ptr<ast::BlockStatement> body_;
 };
 
-class Pattern : public Object
-{
-  public:
-    Pattern(std::string string_pattern);
-    ~Pattern() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class Pattern : public Object {
+ public:
+  Pattern(std::string string_pattern);
+  ~Pattern() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 
-  private:
-    int eval_counter{0};
-    std::string string_pattern{};
-    std::shared_ptr<pattern_parser::PatternNode> pattern_root{nullptr};
-    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
-        pattern_events;
+ private:
+  int eval_counter{0};
+  std::string string_pattern{};
+  std::shared_ptr<pattern_parser::PatternNode> pattern_root{nullptr};
+  std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> pattern_events;
 
-  public:
-    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Eval();
-    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Print();
-    // void RunPattern();
+ public:
+  std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Eval();
+  std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Print();
+  // void RunPattern();
 
-  private:
-    void ParseStringPattern();
+ private:
+  void ParseStringPattern();
 
-    void
-    EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
-                int target_start, int target_end);
+  void EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
+                   int target_start, int target_end);
 };
 
-class Generator : public Object
-{
-  public:
-    Generator(std::vector<std::shared_ptr<ast::Identifier>> parameters,
-              std::shared_ptr<Environment> env,
-              std::shared_ptr<ast::BlockStatement> setup,
-              std::shared_ptr<ast::BlockStatement> run)
-        : parameters_{parameters}, env_{env}, setup_{setup}, run_{run} {};
-    ~Generator() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class Generator : public Object {
+ public:
+  Generator(std::vector<std::shared_ptr<ast::Identifier>> parameters,
+            std::shared_ptr<Environment> env,
+            std::shared_ptr<ast::BlockStatement> setup,
+            std::shared_ptr<ast::BlockStatement> run)
+      : parameters_{parameters}, env_{env}, setup_{setup}, run_{run} {};
+  ~Generator() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 
-  public:
-    std::vector<std::shared_ptr<ast::Identifier>> parameters_;
-    std::shared_ptr<Environment> env_;
-    std::shared_ptr<ast::BlockStatement> setup_;
-    std::shared_ptr<ast::BlockStatement> run_;
+ public:
+  std::vector<std::shared_ptr<ast::Identifier>> parameters_;
+  std::shared_ptr<Environment> env_;
+  std::shared_ptr<ast::BlockStatement> setup_;
+  std::shared_ptr<ast::BlockStatement> run_;
 };
 
-class ForLoop : public Object
-{
-  public:
-    ForLoop(std::shared_ptr<Environment> env,
-            std::shared_ptr<ast::Identifier> it,
-            std::shared_ptr<ast::Expression> iterator_value,
-            std::shared_ptr<ast::Expression> termination_condition,
-            std::shared_ptr<ast::Expression> increment,
-            std::shared_ptr<ast::BlockStatement> body)
-        : env_{env}, iterator_{it}, iterator_value_{iterator_value},
-          termination_condition_{termination_condition},
-          increment_{increment}, body_{body} {};
-    ~ForLoop() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class ForLoop : public Object {
+ public:
+  ForLoop(std::shared_ptr<Environment> env, std::shared_ptr<ast::Identifier> it,
+          std::shared_ptr<ast::Expression> iterator_value,
+          std::shared_ptr<ast::Expression> termination_condition,
+          std::shared_ptr<ast::Expression> increment,
+          std::shared_ptr<ast::BlockStatement> body)
+      : env_{env},
+        iterator_{it},
+        iterator_value_{iterator_value},
+        termination_condition_{termination_condition},
+        increment_{increment},
+        body_{body} {};
+  ~ForLoop() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 
-  public:
-    std::shared_ptr<Environment> env_;
+ public:
+  std::shared_ptr<Environment> env_;
 
-    std::shared_ptr<ast::Identifier> iterator_{nullptr};
-    std::shared_ptr<ast::Expression> iterator_value_{nullptr};
+  std::shared_ptr<ast::Identifier> iterator_{nullptr};
+  std::shared_ptr<ast::Expression> iterator_value_{nullptr};
 
-    std::shared_ptr<ast::Expression> termination_condition_{nullptr};
+  std::shared_ptr<ast::Expression> termination_condition_{nullptr};
 
-    std::shared_ptr<ast::Expression> increment_{nullptr};
+  std::shared_ptr<ast::Expression> increment_{nullptr};
 
-    std::shared_ptr<ast::BlockStatement> body_;
+  std::shared_ptr<ast::BlockStatement> body_;
 };
 
 using BuiltInFunc = std::function<std::shared_ptr<object::Object>(
     std::vector<std::shared_ptr<object::Object>>)>;
 
-class BuiltIn : public Object
-{
-  public:
-    explicit BuiltIn(BuiltInFunc fn) : func_{fn} {}
-    ~BuiltIn() = default;
-    ObjectType Type() override { return BUILTIN_OBJ; }
-    std::string Inspect() override { return "builtin function"; }
+class BuiltIn : public Object {
+ public:
+  explicit BuiltIn(BuiltInFunc fn) : func_{fn} {}
+  ~BuiltIn() = default;
+  ObjectType Type() override { return BUILTIN_OBJ; }
+  std::string Inspect() override { return "builtin function"; }
 
-  public:
-    BuiltInFunc func_;
+ public:
+  BuiltInFunc func_;
 };
 
 /////////////////////////////////////////////////
-class SoundGenerator : public Object
-{
-  public:
-    SoundGenerator() = default;
-    ~SoundGenerator() = default;
-    virtual ObjectType Type() = 0;
-    virtual std::string Inspect() = 0;
-    HashKey HashKey();
+class SoundGenerator : public Object {
+ public:
+  SoundGenerator() = default;
+  ~SoundGenerator() = default;
+  virtual ObjectType Type() = 0;
+  virtual std::string Inspect() = 0;
+  HashKey HashKey();
 
-  public:
-    int soundgen_id_{-1};
+ public:
+  int soundgen_id_{-1};
 };
 
-class FMSynth : public SoundGenerator
-{
-  public:
-    FMSynth();
-    ~FMSynth() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class FMSynth : public SoundGenerator {
+ public:
+  FMSynth();
+  ~FMSynth() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 };
 
-class DrumSynth : public SoundGenerator
-{
-  public:
-    DrumSynth();
-    ~DrumSynth() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class DrumSynth : public SoundGenerator {
+ public:
+  DrumSynth();
+  ~DrumSynth() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 };
 
-class MoogSynth : public SoundGenerator
-{
-  public:
-    MoogSynth();
-    ~MoogSynth() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class MoogSynth : public SoundGenerator {
+ public:
+  MoogSynth();
+  ~MoogSynth() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 };
 
-class Sample : public SoundGenerator
-{
-  public:
-    Sample(std::string sample_path);
-    ~Sample() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
-    std::string sample_path_{};
+class Sample : public SoundGenerator {
+ public:
+  Sample(std::string sample_path);
+  ~Sample() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
+  std::string sample_path_{};
 };
 
-class Granular : public SoundGenerator
-{
-  public:
-    Granular(std::string Granular_path, bool loop_mode);
-    ~Granular() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
+class Granular : public SoundGenerator {
+ public:
+  Granular(std::string Granular_path, bool loop_mode);
+  ~Granular() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
 };
 
 /////////////////////////////////////////////////
 
-class HashPair
-{
-  public:
-    HashPair(std::shared_ptr<Object> key, std::shared_ptr<Object> value)
-        : key_{key}, value_{value}
-    {
-    }
+class HashPair {
+ public:
+  HashPair(std::shared_ptr<Object> key, std::shared_ptr<Object> value)
+      : key_{key}, value_{value} {}
 
-  public:
-    std::shared_ptr<Object> key_;
-    std::shared_ptr<Object> value_;
+ public:
+  std::shared_ptr<Object> key_;
+  std::shared_ptr<Object> value_;
 };
 
-class Hash : public Object
-{
-  public:
-    Hash() = default;
-    explicit Hash(std::map<HashKey, HashPair> pairs) : pairs_{pairs} {}
-    ~Hash() = default;
-    ObjectType Type() override { return HASH_OBJ; }
-    std::string Inspect() override;
+class Hash : public Object {
+ public:
+  Hash() = default;
+  explicit Hash(std::map<HashKey, HashPair> pairs) : pairs_{pairs} {}
+  ~Hash() = default;
+  ObjectType Type() override { return HASH_OBJ; }
+  std::string Inspect() override;
 
-  public:
-    std::map<HashKey, HashPair> pairs_;
+ public:
+  std::map<HashKey, HashPair> pairs_;
 };
 
 bool IsSoundGenerator(object::ObjectType type);
 
-} // namespace object
+}  // namespace object

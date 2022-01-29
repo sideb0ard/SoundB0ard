@@ -2,8 +2,7 @@
 
 #include <string>
 
-namespace token
-{
+namespace token {
 using TokenType = std::string;
 
 // General Programming Language constructs///////
@@ -63,6 +62,7 @@ const TokenType SLANG_OR = "||";
 // Soundb0ard specific //////////////////
 // /////////////////////////
 
+const TokenType SLANG_AT = "AT";
 const TokenType SLANG_BPM = "BPM";
 const TokenType SLANG_DURATION = "DURATION";
 const TokenType SLANG_EVERY = "EVERY";
@@ -94,25 +94,24 @@ const TokenType SLANG_DIGI_SYNTH = "DIGI_SYNTH";
 const TokenType SLANG_PROC = "PROC";
 const TokenType SLANG_PROC_ID = "PROC_ID";
 // Process pattern types
-const TokenType SLANG_DOLLAR = "$"; // environment vars in pattern
-const TokenType SLANG_HASH = "#";   // values in pattern, targets follow
+const TokenType SLANG_DOLLAR = "$";  // environment vars in pattern
+const TokenType SLANG_HASH = "#";    // values in pattern, targets follow
 
-const TokenType SLANG_PIPE = "|"; // separtes pattern functions from pattern
+const TokenType SLANG_PIPE = "|";  // separtes pattern functions from pattern
 
-class Token
-{
-  public:
-    Token() {}
-    Token(TokenType type, std::string literal)
-        : type_{type}, literal_{literal} {};
+class Token {
+ public:
+  Token() {}
+  Token(TokenType type, std::string literal)
+      : type_{type}, literal_{literal} {};
 
-    friend std::ostream &operator<<(std::ostream &, const Token &);
+  friend std::ostream &operator<<(std::ostream &, const Token &);
 
-  public:
-    TokenType type_;
-    std::string literal_;
+ public:
+  TokenType type_;
+  std::string literal_;
 };
 
 TokenType LookupIdent(std::string ident);
 
-} // namespace token
+}  // namespace token

@@ -192,13 +192,11 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement() {
 
   NextToken();
   stmt->value_ = ParseExpression(Precedence::LOWEST);
-  // if (!ParseSetStatementValue(stmt->value_))
-  // {
-  //     std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_
-  //               << std::endl;
-  //     return nullptr;
-  // }
 
+  if (PeekTokenIs(token::SLANG_AT)) {
+    NextToken();
+    stmt->when_ = ParseAtExpression();
+  }
   if (PeekTokenIs(token::SLANG_SEMICOLON)) NextToken();
 
   return stmt;
@@ -575,6 +573,15 @@ std::shared_ptr<ast::Expression> Parser::ParseNumberLiteral() {
   double val = std::stod(cur_token_.literal_);
   literal->value_ = val;
   return literal;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseAtExpression() {
+  auto at = std::make_shared<ast::AtExpression>(cur_token_);
+  if (!ExpectPeek(token::SLANG_ASSIGN)) return nullptr;
+
+  NextToken();
+  at->midi_ticks_from_now = ParseExpression(Precedence::LOWEST);
+  return at;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseDurationExpression() {

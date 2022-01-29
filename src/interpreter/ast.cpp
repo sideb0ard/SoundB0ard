@@ -39,6 +39,15 @@ std::string VelocityExpression::String() const {
   return ss.str();
 }
 
+std::string AtExpression::String() const {
+  std::stringstream ss;
+
+  if (midi_ticks_from_now) ss << midi_ticks_from_now->String();
+  ss << ";";
+
+  return ss.str();
+}
+
 std::string DurationExpression::String() const {
   std::stringstream ss;
 

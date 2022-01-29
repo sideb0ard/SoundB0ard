@@ -26,7 +26,7 @@ DrumSampler::DrumSampler(std::string filename) {
 
   eg.SetEgMode(ANALOG);
   eg.SetAttackTimeMsec(0);
-  eg.SetDecayTimeMsec(300);
+  eg.SetDecayTimeMsec(3000);
   eg.SetSustainLevel(0);
   eg.SetReleaseTimeMsec(3000);
   eg.m_output_eg = true;
