@@ -217,7 +217,9 @@ std::string Looper::Info() {
      << "\ngrain_spray_ms:" << granular_spray_frames / 44.1
      << " attack:" << m_eg1.m_attack_time_msec
      << " decay:" << m_eg1.m_decay_time_msec
-     << " release:" << m_eg1.m_release_time_msec << "active:" << active << "\n";
+     << " release:" << m_eg1.m_release_time_msec
+     << " grain_att_pct:" << grain_attack_time_pct
+     << " grain_rel_pct:" << grain_release_time_pct << "\n";
 
   return ss.str();
 }
@@ -516,6 +518,10 @@ void Looper::SetParam(std::string name, double val) {
     m_eg1.SetDecayTimeMsec(val);
   else if (name == "release")
     m_eg1.SetReleaseTimeMsec(val);
+  else if (name == "grain_att_pct")
+    SetGrainAttackSizePct(val);
+  else if (name == "grain_rel_pct")
+    SetGrainReleaseSizePct(val);
 }
 
 double Looper::GetParam(std::string name) { return 0; }
