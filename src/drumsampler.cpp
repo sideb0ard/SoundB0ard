@@ -17,7 +17,11 @@
 extern Mixer *mixr;
 
 DrumSampler::DrumSampler(std::string filename) {
-  ImportFile(filename);
+  if (!ImportFile(filename)) {
+    // ugh!
+    active = false;
+    return;
+  }
 
   glitch_mode = false;
   glitch_rand_factor = 20;
@@ -51,10 +55,21 @@ stereo_val DrumSampler::genNext(mixer_timing_info tinfo) {
   else
     right_val = left_val;
 
-  play_idx += channels * playback_speed;
+  if (!glitch_mode || glitch_rand_factor > (rand() % 100)) {
+    if (reverse_mode)
+      play_idx -= channels * buffer_pitch;
+    else
+      play_idx += channels * buffer_pitch;
+    // this ensures play_idx is even
+    if (channels == 2) play_idx -= ((int)play_idx & 1);
 
-  if (play_idx >= buf_end_pos) {
-    is_playing = false;
+    if (play_idx >= buf_end_pos) {
+      is_playing = false;
+    }
+    if (play_idx < 0) {
+      is_playing = false;
+      reverse_mode = false;
+    }
   }
 
   double amp_env = eg.DoEnvelope(NULL);
@@ -96,7 +111,9 @@ std::string DrumSampler::Info() {
   ss << "\nvol:" << volume << " pan:" << pan << " pitch:" << buffer_pitch;
   ss << " attack_ms:" << eg.m_attack_time_msec;
   ss << " decay_ms:" << eg.m_decay_time_msec
-     << " release_ms: " << eg.m_release_time_msec;
+     << " release_ms:" << eg.m_release_time_msec;
+  ss << "\nreverse:" << reverse_mode << " glitch:" << glitch_mode
+     << " gpct:" << glitch_rand_factor;
   return ss.str();
 }
 
@@ -108,6 +125,7 @@ void DrumSampler::start() {
 void DrumSampler::noteOn(midi_event ev) {
   is_playing = true;
   play_idx = 0;
+  if (reverse_mode) play_idx = bufsize - 2;
   velocity = ev.data2;
   eg.StartEg();
 }
@@ -117,14 +135,17 @@ void DrumSampler::pitchBend(midi_event ev) {
   SetPitch(pitch_val);
 }
 
-void DrumSampler::ImportFile(std::string filename) {
-  AudioBufferDetails deetz = ImportFileContents(buffer, filename);
+bool DrumSampler::ImportFile(std::string fname) {
+  AudioBufferDetails deetz = ImportFileContents(buffer, fname);
+  if (deetz.buffer_length == 0) return false;
+
   filename = deetz.filename;
   bufsize = deetz.buffer_length;
   buf_end_pos = bufsize;
   buffer_pitch = 1.0;
   samplerate = deetz.sample_rate;
   channels = deetz.num_channels;
+  return true;
 }
 
 void DrumSampler::SetPitch(double v) {
@@ -153,5 +174,12 @@ void DrumSampler::SetParam(std::string name, double val) {
     SetDecayTime(val);
   else if (name == "release_ms")
     SetReleaseTime(val);
+  else if (name == "reverse")
+    reverse_mode = val;
+  else if (name == "glitch")
+    glitch_mode = val;
+  else if (name == "gpct") {
+    if (val >= 0 && val <= 100) glitch_rand_factor = val;
+  }
 }
 double DrumSampler::GetParam(std::string name) { return 0; }

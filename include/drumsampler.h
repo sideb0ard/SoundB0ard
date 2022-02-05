@@ -23,17 +23,16 @@ class DrumSampler : public SoundGenerator {
   void pitchBend(midi_event ev) override;
   double GetParam(std::string name) override;
 
-  void ImportFile(std::string filename);
+  bool ImportFile(std::string filename);
 
  public:
-  bool glitch_mode;
-  int glitch_rand_factor;
+  bool reverse_mode{false};
+  bool glitch_mode{false};
+  int glitch_rand_factor{20};
 
   bool is_playing{false};
   float play_idx{0};
   int velocity{127};
-  int reverse_mode{0};
-  float playback_speed{1};
 
   std::string filename;
   int samplerate;
@@ -46,7 +45,6 @@ class DrumSampler : public SoundGenerator {
   int buf_end_pos;  // this will always be shorter than bufsize for cutting off
                     // sample earlier
   double buffer_pitch;
-  // int buf_num_channels;
 
  private:
   void SetPitch(double v);
