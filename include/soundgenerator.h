@@ -48,8 +48,8 @@ class SoundGenerator {
  public:
   sound_generator_type type;
 
-  int mixer_idx;
-  //  int num_patterns;
+  int soundgen_id_{-1};
+
   bool active;
 
   double volume{0.7};  // between 0 and 1.0

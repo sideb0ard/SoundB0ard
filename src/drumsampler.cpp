@@ -114,7 +114,7 @@ std::string DrumSampler::Info() {
 
 void DrumSampler::start() {
   if (active) return;  // no-op
-  drumsampler_reset_samples(this);
+  ResetSamples();
   active = true;
 }
 
@@ -124,7 +124,7 @@ void DrumSampler::noteOn(midi_event ev) {
   if (one_shot)
     sample_positions[idx].audiobuffer_cur_pos = 0;
   else
-    seq_position = get_a_drumsampler_position(this);
+    seq_position = GetNextPosition();
 
   if (seq_position != -1) {
     samples_now_playing[seq_position] = idx;
@@ -135,7 +135,7 @@ void DrumSampler::noteOn(midi_event ev) {
 
 void DrumSampler::pitchBend(midi_event ev) {
   float pitch_val = ev.data1 / 10.;
-  drumsampler_set_pitch(this, pitch_val);
+  SetPitch(pitch_val);
 }
 
 void DrumSampler::ImportFile(std::string filename) {
@@ -146,33 +146,33 @@ void DrumSampler::ImportFile(std::string filename) {
   buffer_pitch = 1.0;
   samplerate = deetz.sample_rate;
   channels = deetz.num_channels;
-  drumsampler_reset_samples(this);
+  ResetSamples();
 }
 
-void drumsampler_reset_samples(DrumSampler *ds) {
+void DrumSampler::ResetSamples() {
   for (int i = 0; i < kMaxConcurrentSamples; i++) {
-    ds->samples_now_playing[i] = -1;
+    samples_now_playing[i] = -1;
   }
   for (int i = 0; i < PPBAR; i++) {
-    ds->sample_positions[i].position = 0;
-    ds->sample_positions[i].audiobuffer_cur_pos = 0.;
-    ds->sample_positions[i].audiobuffer_inc = 1.0;
-    ds->sample_positions[i].playing = 0;
-    ds->sample_positions[i].played = 0;
-    ds->sample_positions[i].amp = 0;
-    ds->sample_positions[i].speed = 1;
+    sample_positions[i].position = 0;
+    sample_positions[i].audiobuffer_cur_pos = 0.;
+    sample_positions[i].audiobuffer_inc = 1.0;
+    sample_positions[i].playing = 0;
+    sample_positions[i].played = 0;
+    sample_positions[i].amp = 0;
+    sample_positions[i].speed = 1;
   }
 }
 
-int get_a_drumsampler_position(DrumSampler *ds) {
+int DrumSampler::GetNextPosition() {
   for (int i = 0; i < kMaxConcurrentSamples; i++)
-    if (ds->samples_now_playing[i] == -1) return i;
+    if (samples_now_playing[i] == -1) return i;
   return -1;
 }
 
-void drumsampler_set_pitch(DrumSampler *ds, double v) {
+void DrumSampler::SetPitch(double v) {
   if (v >= 0. && v <= 2.0)
-    ds->buffer_pitch = v;
+    buffer_pitch = v;
   else
     printf("Must be in the range of 0.0 .. 2.0\n");
 }
@@ -182,39 +182,27 @@ void drumsampler_set_cutoff_percent(DrumSampler *ds, unsigned int percent) {
   ds->buf_end_pos = ds->bufsize / 100. * percent;
 }
 
-void drumsampler_enable_envelope_generator(DrumSampler *ds, bool b) {
-  ds->envelope_enabled = b;
-}
-void drumsampler_set_attack_time(DrumSampler *ds, double val) {
-  ds->eg.SetAttackTimeMsec(val);
-}
-void drumsampler_set_decay_time(DrumSampler *ds, double val) {
-  ds->eg.SetDecayTimeMsec(val);
-}
-void drumsampler_set_sustain_lvl(DrumSampler *ds, double val) {
-  ds->eg.SetSustainLevel(val);
-}
-void drumsampler_set_release_time(DrumSampler *ds, double val) {
-  ds->eg.SetReleaseTimeMsec(val);
-}
+void DrumSampler::EnableEnvelopeGenerator(bool b) { envelope_enabled = b; }
+void DrumSampler::SetAttackTime(double val) { eg.SetAttackTimeMsec(val); }
+void DrumSampler::SetDecayTime(double val) { eg.SetDecayTimeMsec(val); }
+void DrumSampler::SetSustainLvl(double val) { eg.SetSustainLevel(val); }
+void DrumSampler::SetReleaseTime(double val) { eg.SetReleaseTimeMsec(val); }
 
-void drumsampler_set_glitch_mode(DrumSampler *ds, bool b) {
-  ds->glitch_mode = b;
-}
+void DrumSampler::SetGlitchMode(bool b) { glitch_mode = b; }
 
-void drumsampler_set_glitch_rand_factor(DrumSampler *ds, int pct) {
-  if (pct >= 0 && pct <= 100) ds->glitch_rand_factor = pct;
+void DrumSampler::SetGlitchRandFactor(int pct) {
+  if (pct >= 0 && pct <= 100) glitch_rand_factor = pct;
 }
 void DrumSampler::SetParam(std::string name, double val) {
   if (name == "pitch")
-    drumsampler_set_pitch(this, val);
+    SetPitch(val);
   else if (name == "eg")
-    drumsampler_enable_envelope_generator(this, val);
+    EnableEnvelopeGenerator(val);
   else if (name == "attack_ms")
-    drumsampler_set_attack_time(this, val);
+    SetAttackTime(val);
   else if (name == "decay_ms")
-    drumsampler_set_decay_time(this, val);
+    SetDecayTime(val);
   else if (name == "release_ms")
-    drumsampler_set_release_time(this, val);
+    SetReleaseTime(val);
 }
 double DrumSampler::GetParam(std::string name) { return 0; }

@@ -373,8 +373,10 @@ void Mixer::PanChange(int sg, float val) {
 }
 
 void Mixer::AddSoundGenerator(std::shared_ptr<SoundGenerator> sg) {
+  int soundgen_id = sound_generators_.size();
+  sg->soundgen_id_ = soundgen_id;
   sound_generators_.push_back(sg);
-  audio_reply_queue.push(sound_generators_.size() - 1);
+  audio_reply_queue.push(soundgen_id);
 }
 
 void Mixer::AddDrumSynth() {
@@ -477,12 +479,14 @@ int Mixer::GenNext(float *out, int frames_per_buffer) {
 
     if (link_is_midi_tick(m_ableton_link, &timing_info, i)) MidiTick();
 
-    int count = 0;
+    int idx = 0;
     for (auto sg : sound_generators_) {
-      soundgen_cur_val[count] = sg->genNext(timing_info);
-      output_left += soundgen_cur_val[count].left;
-      output_right += soundgen_cur_val[count].right;
-      count++;
+      soundgen_cur_val[idx] = sg->genNext(timing_info);
+      if (soloed_sound_generator_idx < 0 || idx == soloed_sound_generator_idx) {
+        output_left += soundgen_cur_val[idx].left;
+        output_right += soundgen_cur_val[idx].right;
+      }
+      idx++;
     }
 
     out[j] = volume * (output_left / 1.53);
@@ -708,6 +712,12 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
         sg->ChordOn(chord_on);
       }
     }
+  } else if (action.type == AudioAction::SOLO) {
+    if (IsValidSoundgenNum(action.soundgen_num)) {
+      soloed_sound_generator_idx = action.soundgen_num;
+    }
+  } else if (action.type == AudioAction::UNSOLO) {
+    soloed_sound_generator_idx = -1;
   } else if (action.type == AudioAction::STOP) {
     if (IsValidSoundgenNum(action.soundgen_num)) {
       auto sg = sound_generators_[action.soundgen_num];

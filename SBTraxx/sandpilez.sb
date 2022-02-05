@@ -1,6 +1,6 @@
 
-let percz = [af, deh, dink, dinkSweep, thee, picture];
-let percz2 = [ dosh, krushping, tth, uus, kk];
+#let percz = [bl, crk, glot, gr];
+#let percz2 = [ dosh, krushping, tth, uus, kk];
 
 let blah_gen = gen()
 {
@@ -48,32 +48,85 @@ let blah_gen = gen()
     }
 
     let pos = 0;
-    for (i = 0; i < 4; ++i) {
-      for (j = 0; j < 4; ++j) {
-        let num = pilez[i][j];
-        if (num < 3) {
-          note_on_at(percz[num], 1, pp * pos);
+
+    if (count % 6 < 5) {
+      for (i = 0; i < 4; ++i) {
+        for (j = 0; j < 4; ++j) {
+          let num = pilez[i][j];
+          if (num < len(percz)) {
+            note_on_at(percz[num], 1, pp * pos);
+          }
+          ++pos;
         }
-        ++pos;
       }
     }
   }
 }
 
-let bd_gen = gen()
+let pgen = gen()
 {
   setup()
   {
+    let pz = [bd, oh];
+    let b = rand_array(16, 0, len(pz) + 2);
   }
   run()
   {
-    play_array(pbd, b);
 
-    if (count % 7 == 0) {
-      percz = percz1;
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        if (b[i] < len(pz)) {
+          note_on_at(pz[b[i]], 1, i * pp);
+        }
+      }
+    } else {
+      if (count % 8 < 7) {
+        dbeat(lbd);
+        dbeat(jdb);
+        # snare roll
+      }
     }
+
     if (count % 4 == 0) {
-      percz = percz2;
+      b = rand_array(16, 0, len(pz) + 2);
+    }
+  }
+}
+
+let dx_gen = gen()
+{
+  setup()
+  {
+    let notez = [4];
+    let mel = combinor(rand_array(16, 0, 1), notez);
+    let rx = 0;
+
+    let attz = [50, 110, 196, 277];
+    let ax = 0;
+
+    let dr = 100;
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      play_array(dx, mel, dur = dr);
+      dr = dr + 100;
+      if (dr > 1000) {
+        dr = 100;
+      }
+    }
+
+    set dx:e1att attz[ax];
+    ax = incr(ax, 0, len(attz));
+
+    if (count % 2 == 0) {
+      mel= combinor(rand_array(16, 0, 1), notez));
+      perky(rand_beat(), percz);
+      play_array(mo, rfz[rx], dur = dr);
+      rx = incr(rx, 0, len(rfz));
+    }
+    if (count % 8 < 6) {
+      dbeat(bd);
     }
   }
 }

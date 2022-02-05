@@ -27,7 +27,9 @@ enum AudioAction {
   RAND,
   SAVE_PRESET,
   STATUS,
+  SOLO,
   STOP,
+  UNSOLO,
   UPDATE,
 };
 

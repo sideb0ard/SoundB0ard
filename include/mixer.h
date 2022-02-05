@@ -63,6 +63,8 @@ struct Mixer {
   stereo_val soundgen_cur_val[MAX_NUM_SOUND_GENERATORS] = {};
   double soundgen_volume[MAX_NUM_SOUND_GENERATORS] = {};
 
+  int soloed_sound_generator_idx{-1};
+
   bool debug_mode{false};
 
   double bpm{140};

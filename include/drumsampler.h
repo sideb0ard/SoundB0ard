@@ -64,18 +64,18 @@ class DrumSampler : public SoundGenerator {
   double buffer_pitch;
   // int buf_num_channels;
 
-  int swing;
   bool started;  // to sync at top of loop
-};
 
-int get_a_drumsampler_position(DrumSampler *ss);
-void drumsampler_reset_samples(DrumSampler *seq);
-void drumsampler_set_pitch(DrumSampler *seq, double v);
-void drumsampler_set_cutoff_percent(DrumSampler *seq, unsigned int percent);
-void drumsampler_enable_envelope_generator(DrumSampler *ds, bool b);
-void drumsampler_set_attack_time(DrumSampler *ds, double val);
-void drumsampler_set_decay_time(DrumSampler *ds, double val);
-void drumsampler_set_sustain_lvl(DrumSampler *ds, double val);
-void drumsampler_set_release_time(DrumSampler *ds, double val);
-void drumsampler_set_glitch_mode(DrumSampler *ds, bool b);
-void drumsampler_set_glitch_rand_factor(DrumSampler *ds, int pct);
+ private:
+  int GetNextPosition();
+  void ResetSamples();
+  void SetPitch(double v);
+  void SetCutoffPercent(unsigned int percent);
+  void EnableEnvelopeGenerator(bool b);
+  void SetAttackTime(double val);
+  void SetDecayTime(double val);
+  void SetSustainLvl(double val);
+  void SetReleaseTime(double val);
+  void SetGlitchMode(bool b);
+  void SetGlitchRandFactor(int pct);
+};
