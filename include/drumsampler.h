@@ -10,19 +10,6 @@
 constexpr double kDefaultAmp = 0.7;
 constexpr int kMaxConcurrentSamples = 10;  // arbitrary
 
-struct SamplePos {
-  int position{0};
-  int playing{0};
-  int played{0};
-  double audiobuffer_cur_pos{0};
-  double audiobuffer_inc{0};
-  double audiobuffer_pitch{0};
-  double amp{0};
-  double speed{0};
-  double start_pos_pct{0};
-  double end_pos_pct{0};
-};
-
 class DrumSampler : public SoundGenerator {
  public:
   DrumSampler(std::string filename);
@@ -42,20 +29,17 @@ class DrumSampler : public SoundGenerator {
   bool glitch_mode;
   int glitch_rand_factor;
 
-  std::array<SamplePos, PPBAR> sample_positions{};
-  std::array<int, kMaxConcurrentSamples>
-      samples_now_playing{};  // contains midi tick of
-                              // current samples
-  std::array<int, kMaxConcurrentSamples> velocity_now_playing{};
+  bool is_playing{false};
+  float play_idx{0};
+  int velocity{127};
+  int reverse_mode{0};
+  float playback_speed{1};
 
   std::string filename;
   int samplerate;
   int channels;
 
   EnvelopeGenerator eg;
-  bool envelope_enabled;
-
-  bool one_shot{true};
 
   std::vector<double> buffer{};
   int bufsize;
@@ -64,14 +48,8 @@ class DrumSampler : public SoundGenerator {
   double buffer_pitch;
   // int buf_num_channels;
 
-  bool started;  // to sync at top of loop
-
  private:
-  int GetNextPosition();
-  void ResetSamples();
   void SetPitch(double v);
-  void SetCutoffPercent(unsigned int percent);
-  void EnableEnvelopeGenerator(bool b);
   void SetAttackTime(double val);
   void SetDecayTime(double val);
   void SetSustainLvl(double val);
