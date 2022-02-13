@@ -126,10 +126,12 @@ std::string DXSynth::Info() {
      << m_settings.m_op1_waveform << ") "
      << " o1rat:" << m_settings.m_op1_ratio
      << " o1det:" << m_settings.m_op1_detune_cents
+     << " o1sus:" << m_settings.m_op1_sustain_override
      << "\n   e1att:" << m_settings.m_eg1_attack_ms
      << " e1dec:" << m_settings.m_eg1_decay_ms
      << " e1sus:" << m_settings.m_eg1_sustain_lvl
-     << " e1rel:" << m_settings.m_eg1_release_ms << "\n\n";
+     << " e1rel:" << m_settings.m_eg1_release_ms << "\n";
+  ss << "   op1freq:" << voices_[0]->m_op1.m_osc_fo << "\n\n";
 
   ss << ANSI_COLOR_WHITE
      << "## Operator 2 ####################################\n";
@@ -138,10 +140,12 @@ std::string DXSynth::Info() {
      << m_settings.m_op2_waveform << ") "
      << " o2rat:" << m_settings.m_op2_ratio
      << " o2det:" << m_settings.m_op2_detune_cents
+     << " o2sus:" << m_settings.m_op2_sustain_override
      << "\n   e2att:" << m_settings.m_eg2_attack_ms
      << " e2dec:" << m_settings.m_eg2_decay_ms
      << " e2sus:" << m_settings.m_eg2_sustain_lvl
-     << " e2rel:" << m_settings.m_eg2_release_ms << "\n\n";
+     << " e2rel:" << m_settings.m_eg2_release_ms << "\n";
+  ss << "   op2freq:" << voices_[0]->m_op2.m_osc_fo << "\n\n";
 
   ss << ANSI_COLOR_WHITE
      << "## Operator 3 ####################################\n";
@@ -150,10 +154,12 @@ std::string DXSynth::Info() {
      << m_settings.m_op3_waveform << ") "
      << " o3rat:" << m_settings.m_op3_ratio
      << " o3det:" << m_settings.m_op3_detune_cents
+     << " o3sus:" << m_settings.m_op3_sustain_override
      << "\n   e3att:" << m_settings.m_eg3_attack_ms
      << " e3dec:" << m_settings.m_eg3_decay_ms
      << " e3sus:" << m_settings.m_eg3_sustain_lvl
-     << " e3rel:" << m_settings.m_eg3_release_ms << "\n\n";
+     << " e3rel:" << m_settings.m_eg3_release_ms << "\n";
+  ss << "   op3freq:" << voices_[0]->m_op3.m_osc_fo << "\n\n";
 
   ss << ANSI_COLOR_WHITE
      << "## Operator 4 ####################################\n";
@@ -162,10 +168,12 @@ std::string DXSynth::Info() {
      << m_settings.m_op4_waveform << ") "
      << " o4rat:" << m_settings.m_op4_ratio
      << " o4det:" << m_settings.m_op4_detune_cents
+     << " o4sus:" << m_settings.m_op4_sustain_override
      << "\n   e4att:" << m_settings.m_eg4_attack_ms
      << " e4dec:" << m_settings.m_eg4_decay_ms
      << " e4sus:" << m_settings.m_eg4_sustain_lvl
-     << " e4rel:" << m_settings.m_eg4_release_ms << "\n\n";
+     << " e4rel:" << m_settings.m_eg4_release_ms << "\n";
+  ss << "   op4freq:" << voices_[0]->m_op4.m_osc_fo << "\n\n";
 
   ss << ANSI_COLOR_WHITE
      << "## LFO Routing ####################################\n";
@@ -213,6 +221,26 @@ stereo_val DXSynth::genNext(mixer_timing_info tinfo) {
                     .right = accum_out_right * volume * pan_right};
   out = Effector(out);
   return out;
+}
+
+void DXSynth::SetOpFreq(unsigned int op, float val) {
+  for (auto v : voices_) {
+    switch (op) {
+      case 1:
+        if (v->m_osc1) v->m_osc1->m_osc_fo = val;
+        break;
+      case 2:
+        if (v->m_osc2) v->m_osc2->m_osc_fo = val;
+        break;
+      case 3:
+        if (v->m_osc3) v->m_osc3->m_osc_fo = val;
+        break;
+      case 4:
+        if (v->m_osc4) v->m_osc4->m_osc_fo = val;
+        break;
+    }
+  }
+  m_last_note_frequency = val;
 }
 
 void DXSynth::noteOn(midi_event ev) {
@@ -403,6 +431,8 @@ void DXSynth::Update() {
   global_synth_params.eg1_params.reset_to_zero =
       (bool)m_settings.m_reset_to_zero;
   global_synth_params.eg1_params.legato_mode = (bool)m_settings.m_legato_mode;
+  global_synth_params.eg1_params.sustain_override =
+      (bool)m_settings.m_op1_sustain_override;
 
   // EG2
   global_synth_params.eg2_params.attack_time_msec = m_settings.m_eg2_attack_ms;
@@ -413,6 +443,8 @@ void DXSynth::Update() {
   global_synth_params.eg2_params.reset_to_zero =
       (bool)m_settings.m_reset_to_zero;
   global_synth_params.eg2_params.legato_mode = (bool)m_settings.m_legato_mode;
+  global_synth_params.eg2_params.sustain_override =
+      (bool)m_settings.m_op2_sustain_override;
 
   // EG3
   global_synth_params.eg3_params.attack_time_msec = m_settings.m_eg3_attack_ms;
@@ -423,6 +455,8 @@ void DXSynth::Update() {
   global_synth_params.eg3_params.reset_to_zero =
       (bool)m_settings.m_reset_to_zero;
   global_synth_params.eg3_params.legato_mode = (bool)m_settings.m_legato_mode;
+  global_synth_params.eg3_params.sustain_override =
+      (bool)m_settings.m_op3_sustain_override;
 
   // EG4
   global_synth_params.eg4_params.attack_time_msec = m_settings.m_eg4_attack_ms;
@@ -433,6 +467,8 @@ void DXSynth::Update() {
   global_synth_params.eg4_params.reset_to_zero =
       (bool)m_settings.m_reset_to_zero;
   global_synth_params.eg4_params.legato_mode = (bool)m_settings.m_legato_mode;
+  global_synth_params.eg4_params.sustain_override =
+      (bool)m_settings.m_op4_sustain_override;
 
   // LFO1
   global_synth_params.lfo1_params.waveform = m_settings.m_lfo1_waveform;
@@ -1008,6 +1044,26 @@ void DXSynth::SetOpRatio(unsigned int op, double val) {
       printf("Huh?! Only got 4 operators, brah..\n");
   }
 }
+
+void DXSynth::SetOpSustain(unsigned int op, bool val) {
+  switch (op) {
+    case (1):
+      m_settings.m_op1_sustain_override = val;
+      break;
+    case (2):
+      m_settings.m_op2_sustain_override = val;
+      break;
+    case (3):
+      m_settings.m_op3_sustain_override = val;
+      break;
+    case (4):
+      m_settings.m_op4_sustain_override = val;
+      break;
+    default:
+      printf("Huh?! Only got 4 operators, brah..\n");
+  }
+}
+
 void DXSynth::SetOpDetune(unsigned int op, double val) {
   if (val < -100 || val > 100) {
     printf("val has to be [-100-100]\n");
@@ -1241,6 +1297,10 @@ void DXSynth::SetParam(std::string name, double val) {
     SetOpRatio(1, val);
   else if (name == "o1det")
     SetOpDetune(1, val);
+  else if (name == "o1sus")
+    SetOpSustain(1, val);
+  else if (name == "op1freq")
+    SetOpFreq(1, val);
 
   else if (name == "e1att")
     SetEGAttackMs(1, val);
@@ -1258,6 +1318,10 @@ void DXSynth::SetParam(std::string name, double val) {
     SetOpRatio(2, val);
   else if (name == "o2det")
     SetOpDetune(2, val);
+  else if (name == "o2sus")
+    SetOpSustain(2, val);
+  else if (name == "op2freq")
+    SetOpFreq(2, val);
 
   else if (name == "e2att")
     SetEGAttackMs(2, val);
@@ -1275,6 +1339,10 @@ void DXSynth::SetParam(std::string name, double val) {
     SetOpRatio(3, val);
   else if (name == "o3det")
     SetOpDetune(3, val);
+  else if (name == "o3sus")
+    SetOpSustain(3, val);
+  else if (name == "op3freq")
+    SetOpFreq(3, val);
 
   else if (name == "e3att")
     SetEGAttackMs(3, val);
@@ -1292,6 +1360,10 @@ void DXSynth::SetParam(std::string name, double val) {
     SetOpRatio(4, val);
   else if (name == "o4det")
     SetOpDetune(4, val);
+  else if (name == "o4sus")
+    SetOpSustain(4, val);
+  else if (name == "op4freq")
+    SetOpFreq(4, val);
 
   else if (name == "e4att")
     SetEGAttackMs(4, val);

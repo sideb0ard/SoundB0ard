@@ -167,9 +167,10 @@ typedef enum {
 } midi_control_type;
 
 typedef struct mixer_timing_info {
-  int frames_per_midi_tick{0};
+  double frames_per_midi_tick{0};
   double ms_per_midi_tick{0};
   double midi_ticks_per_ms{0};
+  float bpm{0};
 
   double time_of_next_midi_tick{0};
 
@@ -191,13 +192,13 @@ typedef struct mixer_timing_info {
   unsigned int quantize{0};
 
   // informational for other sound generators
-  unsigned int loop_len_in_frames{0};
-  unsigned int loop_len_in_ticks{0};
+  double loop_len_in_frames{0};
+  double loop_len_in_ticks{0};
   // these are in frames
-  unsigned int size_of_thirtysecond_note{0};
-  unsigned int size_of_sixteenth_note{0};
-  unsigned int size_of_eighth_note{0};
-  unsigned int size_of_quarter_note{0};
+  double size_of_thirtysecond_note{0};
+  double size_of_sixteenth_note{0};
+  double size_of_eighth_note{0};
+  double size_of_quarter_note{0};
 
   bool has_started{false};
   bool is_start_of_loop{false};  // true for one sample during loop time

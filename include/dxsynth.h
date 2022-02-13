@@ -37,6 +37,7 @@ typedef struct dxsynthsettings {
   double m_eg1_sustain_lvl;  // 0/1/0.707
   double m_eg1_release_ms;
   double m_op1_output_lvl;  // 0/99/75
+  bool m_op1_sustain_override{false};
 
   // OP2
   unsigned int m_op2_waveform;  // SINE, SAW, TRI, SQ
@@ -47,6 +48,7 @@ typedef struct dxsynthsettings {
   double m_eg2_sustain_lvl;
   double m_eg2_release_ms;
   double m_op2_output_lvl;
+  bool m_op2_sustain_override{false};
 
   // OP3
   unsigned int m_op3_waveform;  // SINE, SAW, TRI, SQ
@@ -57,6 +59,7 @@ typedef struct dxsynthsettings {
   double m_eg3_sustain_lvl;
   double m_eg3_release_ms;
   double m_op3_output_lvl;
+  bool m_op3_sustain_override{false};
 
   // OP4
   unsigned int m_op4_waveform;  // SINE, SAW, TRI, SQ
@@ -68,16 +71,17 @@ typedef struct dxsynthsettings {
   double m_eg4_release_ms;
   double m_op4_output_lvl;
   double m_op4_feedback;  // 0/70/0
+  bool m_op4_sustain_override{false};
 
   // VOICE
-  double m_portamento_time_ms;  // 0/5000/0
-  double m_volume_db;           // -96/20/0
-  int m_pitchbend_range;        // 0/12/1
-  unsigned int m_voice_mode;    // DX[1-8];
-  bool m_velocity_to_attack_scaling;
-  bool m_note_number_to_decay_scaling;
-  bool m_reset_to_zero;
-  bool m_legato_mode;
+  double m_portamento_time_ms{0};  // 0/5000/0
+  double m_volume_db{20};          // -96/20/0
+  int m_pitchbend_range{12};       // 0/12/1
+  unsigned int m_voice_mode{1};    // DX[1-8];
+  bool m_velocity_to_attack_scaling{false};
+  bool m_note_number_to_decay_scaling{false};
+  bool m_reset_to_zero{false};
+  bool m_legato_mode{false};
 
 } dxsynthsettings;
 
@@ -141,6 +145,7 @@ class DXSynth : public SoundGenerator {
   void SetLFO1Waveform(unsigned int val);
   void SetLFO1ModDest(unsigned int moddest, unsigned int dest);
 
+  void SetOpFreq(unsigned int op, float val);
   void SetOpWaveform(unsigned int op, unsigned int val);
   void SetOpRatio(unsigned int op, double val);
   void SetOpDetune(unsigned int op, double val);
@@ -149,6 +154,7 @@ class DXSynth : public SoundGenerator {
   void SetEGReleaseMs(unsigned int eg, double val);
   void SetEGSustainLevel(unsigned int eg, double val);
   void SetOpOutputLevel(unsigned int op, double val);
+  void SetOpSustain(unsigned int op, bool val);
   void SetOp4Feedback(double val);
 
   void SetPortamentoTimeMs(double val);

@@ -1,4 +1,3 @@
-#include <ableton_link_wrapper.h>
 #include <audio_action_queue.h>
 #include <audioutils.h>
 #include <cmdloop.h>
@@ -13,12 +12,14 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+#include <AudioPlatform.hpp>
 #include <PerlinNoise.hpp>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/lexer.hpp>
 #include <interpreter/object.hpp>
 #include <interpreter/parser.hpp>
 #include <interpreter/token.hpp>
+#include <iomanip>
 #include <iostream>
 #include <process.hpp>
 #include <thread>
@@ -36,25 +37,17 @@ siv::PerlinNoise perlinGenerator;  // only for use by eval thread
 
 auto global_env = std::make_shared<object::Environment>();
 
-extern const char *key_names[NUM_KEYS];
-extern const char *prompt;
-extern char *chord_type_names[NUM_CHORD_TYPES];
+namespace {
 
-static int paCallback(const void *input_buffer, void *output_buffer,
-                      unsigned long frames_per_buffer,
-                      const PaStreamCallbackTimeInfo *time_info,
-                      PaStreamCallbackFlags status_flags, void *user_data) {
-  (void)input_buffer;
-  (void)time_info;
-  (void)status_flags;
+struct State {
+  std::atomic<bool> running;
+  ableton::Link link;
+  ableton::linkaudio::AudioPlatform audioPlatform;
 
-  float *out = (float *)output_buffer;
-  Mixer *mixr = (Mixer *)user_data;
+  State(Mixer &mixer) : running(true), link(140.), audioPlatform(link, mixer) {}
+};
 
-  int ret = mixr->GenNext(out, frames_per_buffer);
-
-  return ret;
-}
+};  // namespace
 
 void Eval(char *line, std::shared_ptr<object::Environment> env) {
   auto lex = std::make_shared<lexer::Lexer>();
@@ -82,6 +75,7 @@ void *eval_queue() {
 }
 
 void *process_worker_thread() {
+  std::cout << "PROCESS WURKER THRED STARTED\n";
   while (auto const event = process_event_queue.pop()) {
     if (event) {
       if (event->type == Event::TIMING_EVENT) {
@@ -93,6 +87,7 @@ void *process_worker_thread() {
           }
         }
       } else if (event->type == Event::PROCESS_UPDATE_EVENT) {
+        std::cout << "PROCESS UPDATE EVENT\n";
         if (event->target_process_id >= 0 &&
             event->target_process_id < MAX_NUM_PROC) {
           ProcessConfig config = {
@@ -122,32 +117,11 @@ void *process_worker_thread() {
 
 int main() {
   srand(time(NULL));
-  signal(SIGINT, SIG_IGN);
+  // signal(SIGINT, SIG_IGN);
 
-  double output_latency = pa_setup();
-  mixr = new Mixer(output_latency);
+  mixr = new Mixer();
 
-  PaStream *output_stream;
-  PaError err;
-
-  err = Pa_OpenDefaultStream(&output_stream,
-                             0,          // no input channels
-                             2,          // stereo output
-                             paFloat32,  // 32bit fp output
-                             SAMPLE_RATE, paFramesPerBufferUnspecified,
-                             paCallback, mixr);
-
-  if (err != paNoError) {
-    printf("Errrrr! couldn't open Portaudio default stream: %s\n",
-           Pa_GetErrorText(err));
-    exit(-1);
-  }
-
-  err = Pa_StartStream(output_stream);
-  if (err != paNoError) {
-    printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
-    exit(-1);
-  }
+  State state(*mixr);
 
   // REPL
   std::thread repl_thread(loopy);
@@ -167,9 +141,6 @@ int main() {
 
   eval_command_queue.close();
   eval_thread.join();
-
-  // all done, time to go home
-  pa_teardown();
 
   return 0;
 }

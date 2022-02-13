@@ -58,6 +58,7 @@ void link_set_latency(AbletonLink *l, double latency) {
 }
 
 void link_update_from_main_callback(AbletonLink *l, int num_frames) {
+  // const auto time = l->m_link.clock().micros();
   const auto host_time =
       l->m_host_time_filter.sampleTimeToHostTime(l->m_sample_time);
   l->m_buffer_begin_at_output =

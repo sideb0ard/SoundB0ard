@@ -1,0 +1,18 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 5 == 0) {
+      set dloo:stutter 1;
+    }
+    if (count % 3 == 0) {
+      set dloo:scramble 1;
+    }
+
+  }
+}
+

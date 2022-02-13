@@ -1,0 +1,96 @@
+
+let uus = sample(perc/uus.wav);
+
+let blah_gen = gen()
+{
+  setup()
+  {
+
+    let beat = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
+
+    #let loopz = [mkw, nl, cnp, ttl, bbl];
+    let loopz = [mkw, frk];
+    let lx = 0;
+
+    let blen = 3;
+    let blx = 0;
+
+    let ptz = [0.6, 0.7, 1, 1.3, 2];
+    let px = 0;
+
+    let nlrel = 1050;
+
+    let npitchz = [0.8, 1.2, 1];
+    let npx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (count % 4 == 0 && blx > 8) {
+        set bd:reverse 1 at=i*pp;
+        set uus:reverse 1 at=i*pp;
+      }
+      if (count % 16 < 13) {
+        stepper(bd, beat, blx, i);
+        stepper(loopz[lx], beat, blx, i);
+        blx = incr(blx, 0, blen);
+        set loopz[lx]:release nlrel at = i*pp;
+        nlrel = nlrel + 10;
+        if (nlrel > 700) {
+          nlrel = 150;
+        }
+        lx = incr(lx, 0, len(loopz));
+      } else {
+        if (beat[i] == 1) {
+          note_on_at(bd, 1, i * pp);
+          set bd:pitch npitchz[npx];
+          set hh:pitch npitchz[npx];
+          npx = incr(npx, 0, len(npitchz));
+        }
+      }
+    }
+    blen = incr(blen, 2, len(beat));
+
+    if (count % 8 == 0) {
+      beat = rand_beat();
+
+      set nl:pitch npitchz[npx];
+      set loopz[lx]:pitch npitchz[npx];
+      npx = incr(npx, 0, len(npitchz));
+
+      let pat = mask(rand_array(16, 0, 1), "ff00");
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1) {
+          note_on_at(uus, 1, i * pp);
+        }
+      }
+    }
+  }
+}
+
+let hh_gen = gen()
+{
+  setup()
+  {
+    let swing = 50;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      let offset = 0;
+      if (i % 2 == 1) {
+        offset = swing;
+      }
+      if (rand(100) > 10) {
+        note_on_at(hh, 1, i*pp+offset);
+      }
+    }
+
+    swing = swing + 10;
+    if (swing > 70) {
+      swing = 40;
+    }
+
+  }
+}
+

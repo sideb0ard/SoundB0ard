@@ -1,0 +1,98 @@
+# let mow = loop(dloops/moWax90sSlink.aiff);
+#p4 < osc 15 "0 50"  "set cp:fx1:wetmx %"
+#p5 < osc 23 "0 77"  "set cp:fx0:fb %"
+#p6 < osc 4 "0 10"  "set bd:fx0:delayms %"
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let pitchz = [1, 2, 1.5];
+    let px = 0;
+    let dist_enable = 1;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      set mow:stutter 1;
+      set mow:pitch pitchz[px];
+      px = incr(px, 0, len(pitchz));
+      set mow:fx1:active dist_enable;
+      dist_enable = incr(dist_enable, 0, 2);
+    }
+    if (count % 5 == 0) {
+      set mow:fx1:active dist_enable;
+      dist_enable = incr(dist_enable, 0, 2);
+    }
+  }
+}
+
+# load_preset(dx, "ratz")
+let blah_gen = gen()
+{
+  setup()
+  {
+    let beat = rand_beat();
+    let msk = "00ff";
+    let swing = [0, pp/2, pp, pp*2];
+    let swx = 0;
+    let ptchz = [1, 1.5, 0.8, 2, 0.5, 1.7, 0.6];
+    let px = 0;
+    let dac = 1;
+
+    let notez = [47, 49];
+    let nx = 0;
+
+    let ratioz = [13, 21];
+    let rnx = 0;
+  }
+  run()
+  {
+
+    let b = beat;
+    if (count % 4 == 0) {
+      b = mask(b, msk);
+      msk = rotate(msk, 1);
+      #print("MSK:", msk);
+      set cp:fx1:active dac;
+      if (rand(100) > 50) {
+        nx = incr(nx, 0, len(notez));
+      }
+    }
+
+    for (i = 0; i < 16; ++i) {
+      let offset = swing[swx];
+      let v = 70 + rand(47);
+      if (i % 4 == 0) {
+        v = 127;
+      }
+      if (b[i] == 1) {
+        note_on_at(bd, 1, i * pp + offset, vel = v);
+        note_on_at(dx, notes_in_chord(notez[nx], 1, 1 + dac), i * pp + offset, vel = v, dur = ptchz[px] * pp);
+        note_on_at(cp, 1, i * pp * 2, vel = v);
+        set cp:pitch ptchz[px] at=i*pp;
+        px = incr(px, 0, len(ptchz));
+        set bd:pitch ptchz[px] at=i*pp;
+
+        set dx:o1rat ratioz[rnx] at=i*pp;
+        if (rand(100) > 70) {
+          rnx = incr(rnx, 0, len(ratioz));
+        }
+      }
+    }
+    if (count % 7 == 0) {
+      cbeat(cp);
+      set bd:fx0:active dac;
+      dac = incr(dac, 0, 2);
+    }
+    swx = incr(swx, 0, len(swing));
+
+    if (count % 16 == 0) {
+      set cp:fx0:active dac;
+      beat = rand_beat();
+      p2 < ramp 1 "0 0.7" "vol bd %";
+      p3 < ramp 3 "1 2" "set bd:pitch %";
+    }
+  }
+}
+

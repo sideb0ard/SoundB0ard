@@ -1,0 +1,22 @@
+
+let axf = sample(legowelt/FX-AcidPlanetStyle.wav);
+
+let start_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      note_on(axf,1 );
+    }
+    if (count % 3 == 0) {
+      set axf:reverse 1
+    }
+    if (count % 4 == 0) {
+      set axf:glitch 1
+    }
+  }
+}
+

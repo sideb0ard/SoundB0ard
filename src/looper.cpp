@@ -10,8 +10,6 @@
 
 #include <iostream>
 
-const std::array<std::string, 6> kEnvNames = {
-    "PARABOLIC", "TRAPEZOIDAL", "TUKEY", "GENERATOR", "EXP_CURVE", "LOG_CURVE"};
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 Looper::Looper(std::string filename, unsigned int loop_mode) {
@@ -20,8 +18,7 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   audio_buffer_read_idx = 0;
   grain_attack_time_pct = 15;
   grain_release_time_pct = 15;
-  envelope_taper_ratio = 0.5;
-  reverse_mode = 0;  // bool
+  reverse_mode = false;
 
   density_duration_sync = true;
   fill_factor = 3.;
@@ -30,6 +27,7 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   type = LOOPER_TYPE;
 
   ImportFile(filename);
+  number_of_frames = audio_buffer.size() / num_channels;
 
   m_eg1.m_attack_time_msec = 10;
   m_eg1.m_release_time_msec = 50;
@@ -45,17 +43,53 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
 void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
   SoundGenerator::eventNotify(event, tinfo);
 
+  double decimal_percent_of_loop = 0;
+
   if (tinfo.is_midi_tick) {
     grain_spacing = CalculateGrainSpacing(tinfo);
-    if (started) {
-      // increment for next step
-      cur_midi_idx_ = fmodf(cur_midi_idx_ + incr_speed_, PPBAR);
+    if (started)
+      cur_midi_idx_ = fmodf(cur_midi_idx_ + incr_speed_, PPBAR * loop_len);
+    // cur_frame_tick = (cur_frame_tick + 1) % number_of_frames;
+    // idx_incr = audio_buffer.size() / tinfo.loop_len_in_frames;
+    if (loop_mode_ == LoopMode::loop_mode) {
+      decimal_percent_of_loop = cur_midi_idx_ / (PPBAR * loop_len);
+      double new_read_idx = decimal_percent_of_loop * audio_buffer.size();
+      if (reverse_mode) new_read_idx = (audio_buffer.size() - 1) - new_read_idx;
+
+      // this ensures new_read_idx is even
+      if (num_channels == 2) new_read_idx -= ((int)new_read_idx & 1);
+
+      audio_buffer_read_idx = new_read_idx;
+      int rel_pos_within_a_sixteenth =
+          fmod(audio_buffer_read_idx, size_of_sixteenth);
+      if (scramble_mode) {
+        audio_buffer_read_idx =
+            (scramble_idx * size_of_sixteenth) + rel_pos_within_a_sixteenth;
+      } else if (stutter_mode) {
+        audio_buffer_read_idx =
+            (stutter_idx * size_of_sixteenth) + rel_pos_within_a_sixteenth;
+      }
     }
+    // std::cout << "MIDITICK:"
+    //           << "Decimal Position:" << decimal_percent_of_loop
+    //           << " READIDX:" << audio_buffer_read_idx
+    //           << " MIDITICK:" << (tinfo.midi_tick % PPBAR)
+    //           << " My MiIDITICK:" << cur_midi_idx_ << std::endl;
   }
 
   if (tinfo.is_start_of_loop) {
     started = true;
     loop_counter++;
+    std::cout << "TOP O LOOP\n";
+    std::cout << " READIDX:" << audio_buffer_read_idx
+              << " MIDITICK:" << (tinfo.midi_tick % PPBAR)
+              << " My MiIDITICK:" << cur_midi_idx_
+              << " my looplen in frames:" << tinfo.loop_len_in_frames * loop_len
+              << " buffer size:" << audio_buffer.size() << std::endl;
+
+    // if (loop_mode_ == LoopMode::loop_mode) {
+    //   cur_frame_tick = 0;
+    // }
 
     if (scramble_pending) {
       scramble_mode = true;
@@ -73,32 +107,6 @@ void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
   // used to track which 16th we're on if loop != 1 bar
   float loop_num = fmod(loop_counter, loop_len);
   if (loop_num < 0) loop_num = 0;
-
-  if (loop_mode_ == LoopMode::loop_mode) {
-    // used to track which 16th we're on if loop != 1 bar
-    float loop_num = fmod(loop_counter, loop_len);
-    if (loop_num < 0) loop_num = 0;
-
-    int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx_;
-    double decimal_percent_of_loop = relative_midi_idx / (PPBAR * loop_len);
-    double new_read_idx = decimal_percent_of_loop * audio_buffer.size();
-    if (reverse_mode) new_read_idx = (audio_buffer.size() - 1) - new_read_idx;
-
-    // this ensures new_read_idx is even
-    if (num_channels == 2) new_read_idx -= ((int)new_read_idx & 1);
-
-    audio_buffer_read_idx = new_read_idx;
-
-    int rel_pos_within_a_sixteenth =
-        new_read_idx - ((tinfo.midi_tick % PPBAR) * size_of_sixteenth);
-    if (scramble_mode) {
-      audio_buffer_read_idx =
-          (scramble_idx * size_of_sixteenth) + rel_pos_within_a_sixteenth;
-    } else if (stutter_mode) {
-      audio_buffer_read_idx =
-          (stutter_idx * size_of_sixteenth) + rel_pos_within_a_sixteenth;
-    }
-  }
 
   if (tinfo.is_sixteenth) {
     if (scramble_mode) {
@@ -152,10 +160,40 @@ void Looper::LaunchGrain(mixer_timing_info tinfo) {
 
 stereo_val Looper::genNext(mixer_timing_info tinfo) {
   stereo_val val = {0., 0.};
-
   if (!started || !active) return val;
 
   if (stop_pending && m_eg1.m_state == OFFF) active = false;
+
+  if (loop_mode_ == LoopMode::loop_mode) {
+    float loop_num = fmod(loop_counter, loop_len);
+    if (loop_num < 0) loop_num = 0;
+
+    // float percent_position =
+    //     cur_frame_tick / (tinfo.loop_len_in_frames * loop_len);
+
+    // std::cout << "PERVCENT POS:" << percent_position
+    //           << " ReadIDX:" << new_read_idx
+    //           << " BUFFER LEN:" << audio_buffer.size()
+    //           << " FRAMENUM:" << cur_frame_tick << std::endl;
+
+    //// audio_buffer_read_idx = decimal_percent_of_loop *
+    /// audio_buffer.size();
+
+    // if (reverse_mode)
+    //   audio_buffer_read_idx =
+    //       (audio_buffer.size() - 1) - audio_buffer_read_idx;
+
+    // double new_read_idx = audio_buffer_read_idx += idx_incr;
+    //// this ensures new_read_idx is even
+    // if (num_channels == 2) new_read_idx -= ((int)new_read_idx & 1);
+
+    // if (new_read_idx >= audio_buffer.size()) {
+    //   std::cout << "RESET READIDX:" << new_read_idx << std::endl;
+    //   new_read_idx -= audio_buffer.size();
+    // }
+
+    // audio_buffer_read_idx = new_read_idx;
+  }
 
   if (tinfo.cur_sample > next_grain_launch_sample_time)  // new grain time
     LaunchGrain(tinfo);
@@ -342,25 +380,17 @@ void Looper::ImportFile(std::string filename) {
 }
 
 int Looper::CalculateGrainSpacing(mixer_timing_info tinfo) {
-  int looplen_in_seconds = tinfo.loop_len_in_frames / (double)SAMPLE_RATE;
-  num_grains_per_looplen = looplen_in_seconds * grains_per_sec;
-  if (num_grains_per_looplen == 0) {
-    num_grains_per_looplen = 2;  // whoops! dn't wanna div by 0 below
-  }
-  int spacing = tinfo.loop_len_in_frames / num_grains_per_looplen;
-  return spacing;
+  return grain_duration_ms * 44.1 / fill_factor;
 }
 
 void Looper::SetGrainDuration(int dur) {
   grain_duration_ms = dur;
-  if (density_duration_sync)
-    grains_per_sec = 1000. / (grain_duration_ms / fill_factor);
+  if (density_duration_sync) grains_per_sec = 1000. / grain_duration_ms;
 }
 
 void Looper::SetGrainDensity(int gps) {
   grains_per_sec = gps;
-  if (density_duration_sync)
-    grain_duration_ms = 1000. / grains_per_sec * fill_factor;
+  if (density_duration_sync) grain_duration_ms = 1000. / grains_per_sec;
 }
 
 void Looper::SetGrainAttackSizePct(int attack_pct) {
@@ -433,7 +463,7 @@ int Looper::GetAvailableGrainNum() {
     }
     idx++;
   }
-  printf("WOW - NO GRAINS TO BE FOUND IN %d attempts\n", idx);
+  // printf("WOW - NO GRAINS TO BE FOUND IN %d attempts\n", idx);
   return 0;
 }
 
@@ -475,7 +505,9 @@ void Looper::noteOff(midi_event ev) {
 }
 
 void Looper::SetParam(std::string name, double val) {
-  if (name == "off") {
+  if (name == "on") {
+    m_eg1.StartEg();
+  } else if (name == "off") {
     m_eg1.NoteOff();
   } else if (name == "pitch")
     SetGrainPitch(val);

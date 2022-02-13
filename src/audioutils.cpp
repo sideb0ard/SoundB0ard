@@ -176,7 +176,7 @@ double pa_setup(void) {
   }
   double suggested_latency =
       Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency;
-  // printf("SUGGESTED LATENCY: %f\n", suggested_latency);
+  printf("SUGGESTED LATENCY: %f\n", suggested_latency);
   return suggested_latency;
 }
 

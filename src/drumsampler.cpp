@@ -43,6 +43,7 @@ DrumSampler::DrumSampler(std::string filename) {
 
 stereo_val DrumSampler::genNext(mixer_timing_info tinfo) {
   (void)tinfo;
+
   double left_val = 0;
   double right_val = 0;
   if (!is_playing) return {left_val, right_val};

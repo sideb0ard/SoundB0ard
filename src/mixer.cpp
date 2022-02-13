@@ -36,21 +36,28 @@ extern Tsqueue<audio_action_queue_item> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
 extern Tsqueue<std::string> eval_command_queue;
 
-const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
-                           "G", "G_SHARP", "A", "A_SHARP", "B"};
+const auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
 
-const char *chord_type_names[] = {"MAJOR", "MINOR", "DIMINISHED"};
-
-Mixer::Mixer(double output_latency) {
-  m_ableton_link = new_ableton_link(DEFAULT_BPM);
-  if (!m_ableton_link) {
-    printf(
-        "Something fucked up with yer Ableton link, mate."
-        " ye wanna get that seen tae\n");
-    return;
-  }
-  link_set_latency(m_ableton_link, output_latency);
-
+// namespace {
+// bool link_is_midi_tick(AbletonLink *l, mixer_timing_info *timing_info,
+//                        int frame_num) {
+//   timing_info->is_midi_tick = false;
+//
+//   const auto hostTime =
+//       l->m_buffer_begin_at_output +
+//       std::chrono::microseconds(llround(frame_num * MICROS_PER_SAMPLE));
+//
+//   auto beat_time = l->m_sessionstate.beatAtTime(hostTime, l->m_quantum);
+//   if (beat_time >= 0.) {
+//     if (beat_time > timing_info->time_of_next_midi_tick)
+//       link_inc_midi(l, timing_info, beat_time);
+//   }
+//
+//   return timing_info->is_midi_tick;
+// }
+//
+// };
+Mixer::Mixer() {
   volume = 0.7;
   UpdateBpm(DEFAULT_BPM);
 
@@ -76,23 +83,30 @@ Mixer::Mixer(double output_latency) {
   timing_info.is_quarter = true;
   timing_info.is_third = true;
 
+  std::cout << "MIXER CREATED YO!" << std::endl;
+
   std::string contents = ReadFileContents(kStartupConfigFile);
   eval_command_queue.push(contents);
 }
 
 std::string Mixer::StatusMixr() {
-  LinkData data = link_get_timing_data_for_display(m_ableton_link);
-  // clang-format off
-    std::stringstream ss;
-    ss << COOL_COLOR_GREEN
-    << ":::::::::::::::: vol:" << ANSI_COLOR_WHITE << volume << COOL_COLOR_GREEN
-    << " bpm:" << ANSI_COLOR_WHITE << data.tempo << COOL_COLOR_GREEN
-    << " looplen:" << ANSI_COLOR_WHITE << 3840 << COOL_COLOR_GREEN
-    // << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
-    // << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat << COOL_COLOR_GREEN
-    // << " phase:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.phase << COOL_COLOR_GREEN
-    << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
-    << " ::::::::::::::::::::::\n";
+  // LinkData data = link_get_timing_data_for_display(m_ableton_link);
+  //  clang-format off
+  std::stringstream ss;
+  ss << COOL_COLOR_GREEN << ":::::::::::::::: vol:" << ANSI_COLOR_WHITE
+     << volume
+     << COOL_COLOR_GREEN
+     //<< " bpm:" << ANSI_COLOR_WHITE << data.tempo << COOL_COLOR_GREEN
+     << " looplen:" << ANSI_COLOR_WHITE << 3840
+     << COOL_COLOR_GREEN
+     // << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
+     // << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat <<
+     // COOL_COLOR_GREEN
+     // << " phase:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.phase
+     // << COOL_COLOR_GREEN
+     //<< " num_peers:" << ANSI_COLOR_WHITE << data.num_peers <<
+     // COOL_COLOR_GREEN
+     << " ::::::::::::::::::::::\n";
   // clang-format on
 
   return ss.str();
@@ -150,7 +164,6 @@ std::string Mixer::StatusEnv() {
 }
 
 std::string Mixer::StatusSgz(bool all) {
-  std::cout << "MIXER STATUS SGZ!\n";
   std::stringstream ss;
   if (sound_generators_.size() > 0) {
     ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "sound generators"
@@ -300,17 +313,6 @@ void Mixer::Help() {
   repl_queue.push(reply);
 }
 
-// static void mixer_print_notes()
-//{
-//    printf("Current KEY is %s. Compat NOTEs are:",
-//           key_names[timing_info.key]);
-//    // for (int i = 0; i < 6; ++i)
-//    //{
-//    //    printf("%s ", key_names[compat_keys[key][i]]);
-//    //}
-//    printf("\n");
-//}
-
 void Mixer::EmitEvent(broadcast_event event) {
   event_queue_item ev;
   ev.type = Event::TIMING_EVENT;
@@ -332,8 +334,13 @@ void Mixer::EmitEvent(broadcast_event event) {
 
 void Mixer::UpdateBpm(int new_bpm) {
   bpm = new_bpm;
+  timing_info.bpm = bpm;
   timing_info.frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
+  std::cout << "FRAMERS PER MIDI TICK:" << timing_info.frames_per_midi_tick
+            << std::endl;
   timing_info.loop_len_in_frames = timing_info.frames_per_midi_tick * PPBAR;
+  std::cout << "LOOP LEN IN FRAMES :" << timing_info.loop_len_in_frames
+            << std::endl;
   timing_info.loop_len_in_ticks = PPBAR;
 
   timing_info.ms_per_midi_tick = 60000.0 / (bpm * PPQN);
@@ -347,7 +354,7 @@ void Mixer::UpdateBpm(int new_bpm) {
   timing_info.size_of_quarter_note = timing_info.size_of_eighth_note * 2;
 
   EmitEvent((broadcast_event){.type = TIME_BPM_CHANGE});
-  link_set_bpm(m_ableton_link, bpm);
+  // link_set_bpm(m_ableton_link, bpm);
 }
 
 void Mixer::VolChange(float vol) {
@@ -416,9 +423,11 @@ void Mixer::MidiTick() {
   timing_info.is_third = false;
   timing_info.is_start_of_loop = false;
 
+  if (timing_info.midi_tick % PPBAR == 0) {
+    std::cout << "TOP OF THE LOOP\n";
+    timing_info.is_start_of_loop = true;
+  }
   CheckForAudioActionQueueMessages();
-
-  if (timing_info.midi_tick % PPBAR == 0) timing_info.is_start_of_loop = true;
 
   if (timing_info.midi_tick % 120 == 0) {
     timing_info.is_thirtysecond = true;
@@ -435,20 +444,20 @@ void Mixer::MidiTick() {
     }
   }
 
-  // so far only used for ARP engines
-  if (timing_info.midi_tick % 160 == 0) {
-    timing_info.is_twentyfourth = true;
+  //// so far only used for ARP engines
+  // if (timing_info.midi_tick % 160 == 0) {
+  //   timing_info.is_twentyfourth = true;
 
-    if (timing_info.midi_tick % 320 == 0) {
-      timing_info.is_twelth = true;
+  //  if (timing_info.midi_tick % 320 == 0) {
+  //    timing_info.is_twelth = true;
 
-      if (timing_info.midi_tick % 640 == 0) {
-        timing_info.is_sixth = true;
+  //    if (timing_info.midi_tick % 640 == 0) {
+  //      timing_info.is_sixth = true;
 
-        if (timing_info.midi_tick % 1280 == 0) timing_info.is_third = true;
-      }
-    }
-  }
+  //      if (timing_info.midi_tick % 1280 == 0) timing_info.is_third = true;
+  //    }
+  //  }
+  //}
 
   // std::cout << "Mixer -- midi_tick:" << timing_info.midi_tick
   //          << " 16th:" << timing_info.sixteenth_note_tick
@@ -462,8 +471,11 @@ void Mixer::MidiTick() {
   CheckForDelayedEvents();
 }
 
-int Mixer::GenNext(float *out, int frames_per_buffer) {
-  link_update_from_main_callback(m_ableton_link, frames_per_buffer);
+int Mixer::GenNext(double *out, int frames_per_buffer,
+                   ableton::Link::SessionState sessionState,
+                   const double quantum,
+                   const std::chrono::microseconds beginHostTime) {
+  using namespace std::chrono;
 
   for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2) {
     double output_left = 0.0;
@@ -477,7 +489,24 @@ int Mixer::GenNext(float *out, int frames_per_buffer) {
       output_right += preview_audio.right * 0.6;
     }
 
-    if (link_is_midi_tick(m_ableton_link, &timing_info, i)) MidiTick();
+    // The number of microseconds that elapse between samples
+    const auto microsPerSample = 1e6 / SAMPLE_RATE;
+    const auto hostTime =
+        beginHostTime +
+        microseconds(llround(static_cast<double>(i) * microsPerSample));
+
+    timing_info.is_midi_tick = false;
+    auto beat_time = sessionState.beatAtTime(hostTime, quantum);
+    if (beat_time >= 0.) {
+      if (beat_time > timing_info.time_of_next_midi_tick) {
+        timing_info.time_of_next_midi_tick =
+            (double)((int)beat_time) +
+            ((timing_info.midi_tick % PPQN) * MIDI_TICK_FRAC_OF_BEAT);
+        timing_info.midi_tick++;
+        timing_info.is_midi_tick = true;
+        MidiTick();
+      }
+    }
 
     int idx = 0;
     for (auto sg : sound_generators_) {
@@ -535,13 +564,13 @@ void Mixer::PrintTimingInfo() {
   mixer_timing_info *info = &timing_info;
   printf("TIMING INFO!\n");
   printf("============\n");
-  printf("FRAMES per midi tick:%d\n", info->frames_per_midi_tick);
+  printf("FRAMES per midi tick:%f\n", info->frames_per_midi_tick);
   printf("MS per MIDI tick:%f\n", info->ms_per_midi_tick);
   printf("TIME of next MIDI tick:%f\n", info->time_of_next_midi_tick);
   printf("SIXTEENTH NOTE tick:%d\n", info->sixteenth_note_tick);
   printf("MIDI tick:%d\n", info->midi_tick);
   printf("CUR SAMPLE:%d\n", info->cur_sample);
-  printf("Loop_len_in_ticks:%d\n", info->loop_len_in_ticks);
+  printf("Loop_len_in_ticks:%f\n", info->loop_len_in_ticks);
   printf("Has_started:%d\n", info->has_started);
   printf("Start of loop:%d\n", info->is_start_of_loop);
   printf("Is midi_tick:%d\n", info->is_midi_tick);

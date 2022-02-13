@@ -1,7 +1,6 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-#include <ableton_link_wrapper.h>
 #include <audio_action_queue.h>
 #include <defjams.h>
 #include <dxsynth.h>
@@ -11,6 +10,7 @@
 #include <pthread.h>
 #include <soundgenerator.h>
 
+#include <ableton/Link.hpp>
 #include <process.hpp>
 
 struct PreviewBuffer {
@@ -42,7 +42,7 @@ struct DelayedMidiEvent {
 
 struct Mixer {
  public:
-  Mixer(double output_latency);
+  Mixer();
 
   PreviewBuffer preview;
 
@@ -58,7 +58,7 @@ struct Mixer {
       {};  // TODO get rid of this version
   std::vector<audio_action_queue_item> _delayed_action_items = {};
 
-  AbletonLink *m_ableton_link{nullptr};
+  // AbletonLink *m_ableton_link{nullptr};
 
   stereo_val soundgen_cur_val[MAX_NUM_SOUND_GENERATORS] = {};
   double soundgen_volume[MAX_NUM_SOUND_GENERATORS] = {};
@@ -108,7 +108,10 @@ struct Mixer {
   void PanChange(int sig, float vol);
 
   void UpdateTimingInfo(long long int frame_time);
-  int GenNext(float *out, int frames_per_buffer);
+  int GenNext(double *out, int frames_per_buffer,
+              const ableton::Link::SessionState sessionState,
+              const double quantum,
+              const std::chrono::microseconds beginHostTime);
 
   bool IsValidProcess(int proc_num);
   bool IsValidSoundgenNum(int soundgen_num);

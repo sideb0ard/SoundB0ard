@@ -527,3 +527,20 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
   return true;
 }
+
+void DXSynthVoice::SetSustainOverride(unsigned int op, bool b) {
+  switch (op) {
+    case 1:
+      m_eg1.SetSustainOverride(b);
+      break;
+    case 2:
+      m_eg2.SetSustainOverride(b);
+      break;
+    case 3:
+      m_eg3.SetSustainOverride(b);
+      break;
+    case 4:
+      m_eg4.SetSustainOverride(b);
+      break;
+  }
+}

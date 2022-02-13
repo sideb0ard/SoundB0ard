@@ -93,7 +93,6 @@ class Looper : public SoundGenerator {
 
   int num_grains_per_looplen{0};
   unsigned int envelope_mode{0};
-  double envelope_taper_ratio{0};  // 0.0...1.0
   bool reverse_mode{false};
 
   int next_grain_launch_sample_time{0};
@@ -121,9 +120,11 @@ class Looper : public SoundGenerator {
 
   int cur_sixteenth{0};  // used to track scramble
 
-  // TODO - need a reset i would guess
   double incr_speed_{1};
-  double cur_midi_idx_{0};
+  double cur_midi_idx_{-1};
+  int cur_frame_tick{-1};
+  int number_of_frames{0};
+  float idx_incr{0};
 
   double grain_spacing{0};
 
