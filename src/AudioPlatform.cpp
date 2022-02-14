@@ -56,11 +56,6 @@ int AudioPlatform::audioCallback(const void* /*inputBuffer*/,
 
   engine.audioCallback(bufferBeginAtOutput, buffer, inNumFrames);
 
-  /// for (unsigned long i = 0; i < inNumFrames; ++i) {
-  ///   buffer[i * 2] = static_cast<float>(engine.mBuffer[i]);
-  ///   buffer[i * 2 + 1] = static_cast<float>(engine.mBuffer[i]);
-  /// }
-
   return paContinue;
 }
 
@@ -118,6 +113,7 @@ void AudioPlatform::start() {
   if (result) {
     std::cerr << "Could not start Audio Stream. " << result << std::endl;
   }
+  mEngine.setStartStopSyncEnabled(true);
   mEngine.startPlaying();
 }
 

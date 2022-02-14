@@ -424,9 +424,9 @@ void Mixer::MidiTick() {
   timing_info.is_start_of_loop = false;
 
   if (timing_info.midi_tick % PPBAR == 0) {
-    std::cout << "TOP OF THE LOOP\n";
     timing_info.is_start_of_loop = true;
   }
+
   CheckForAudioActionQueueMessages();
 
   if (timing_info.midi_tick % 120 == 0) {
@@ -439,7 +439,9 @@ void Mixer::MidiTick() {
       if (timing_info.midi_tick % 480 == 0) {
         timing_info.is_eighth = true;
 
-        if (timing_info.midi_tick % PPQN == 0) timing_info.is_quarter = true;
+        if (timing_info.midi_tick % PPQN == 0) {
+          timing_info.is_quarter = true;
+        }
       }
     }
   }
@@ -494,6 +496,17 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     const auto hostTime =
         beginHostTime +
         microseconds(llround(static_cast<double>(i) * microsPerSample));
+    // const auto lastSampleHostTime =
+    //     hostTime - microseconds(llround(microsPerSample));
+
+    // if (sessionState.phaseAtTime(hostTime, 1) <
+    //     sessionState.phaseAtTime(lastSampleHostTime, 1)) {
+    //   std::cout << "THUD\n";
+    // }
+    // if (sessionState.phaseAtTime(hostTime, 4) <
+    //     sessionState.phaseAtTime(lastSampleHostTime, 4)) {
+    //   std::cout << "TOP OF LOOP\n";
+    // }
 
     timing_info.is_midi_tick = false;
     auto beat_time = sessionState.beatAtTime(hostTime, quantum);

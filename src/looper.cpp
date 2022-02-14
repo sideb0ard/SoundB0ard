@@ -44,6 +44,9 @@ void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
   SoundGenerator::eventNotify(event, tinfo);
 
   double decimal_percent_of_loop = 0;
+  if (tinfo.is_start_of_loop) {
+    started = true;
+  }
 
   if (tinfo.is_midi_tick) {
     grain_spacing = CalculateGrainSpacing(tinfo);
@@ -78,18 +81,7 @@ void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
   }
 
   if (tinfo.is_start_of_loop) {
-    started = true;
     loop_counter++;
-    std::cout << "TOP O LOOP\n";
-    std::cout << " READIDX:" << audio_buffer_read_idx
-              << " MIDITICK:" << (tinfo.midi_tick % PPBAR)
-              << " My MiIDITICK:" << cur_midi_idx_
-              << " my looplen in frames:" << tinfo.loop_len_in_frames * loop_len
-              << " buffer size:" << audio_buffer.size() << std::endl;
-
-    // if (loop_mode_ == LoopMode::loop_mode) {
-    //   cur_frame_tick = 0;
-    // }
 
     if (scramble_pending) {
       scramble_mode = true;
@@ -286,6 +278,13 @@ void SoundGrain::Initialize(SoundGrainParams params) {
   grain_len_frames = params.dur;
   grain_counter_frames = 0;
 
+  attack_samples = grain_len_frames / 100. * params.attack_pct;
+  start_sustain_frame = attack_samples;
+  release_frame = params.dur - attack_samples;
+
+  exp_mul = pow(exp_min / (exp_min + 1), 1 / attack_samples);
+  exp_now = exp_min + 1;
+
   audiobuffer_num_channels = params.num_channels;
   degrade_by = params.degrade_by;
   debug = params.debug;
@@ -301,18 +300,6 @@ void SoundGrain::Initialize(SoundGrainParams params) {
   }
 
   amp = 1;
-
-  int attack_time_ms = params.dur_ms / 100. * params.attack_pct;
-  int release_time_ms = params.dur_ms / 100. * params.release_pct;
-
-  release_frame = params.dur / 100. * (100 - params.release_pct);
-
-  eg.Reset();
-  eg.SetAttackTimeMsec(attack_time_ms);
-  eg.SetDecayTimeMsec(0);
-  eg.SetReleaseTimeMsec(release_time_ms);
-  eg.SetSustainOverride(true);
-  eg.StartEg();
 
   active = true;
 }
@@ -336,19 +323,29 @@ stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
   double frac = audiobuffer_cur_pos - read_idx;
   sound_grain_check_idx(&read_idx, audio_buffer.size());
 
+  float eg_amp = amp;
+  if (grain_counter_frames < start_sustain_frame ||
+      grain_counter_frames > release_frame) {
+    exp_now *= exp_mul;
+    eg_amp = (1 - (exp_now - exp_min));
+  } else if (grain_counter_frames == release_frame) {
+    exp_now = exp_min;
+    exp_mul = pow((exp_min + 1) / exp_min, 1 / attack_samples);
+  }
+
   if (num_channels == 1) {
     int read_next_idx = read_idx + 1;
     sound_grain_check_idx(&read_next_idx, audio_buffer.size());
     out.left = utils::LinTerp(0, 1, audio_buffer[read_idx],
                               audio_buffer[read_next_idx], frac);
-    out.left *= amp;
+    out.left *= eg_amp;
     out.right = out.left;
   } else if (num_channels == 2) {
     int read_next_idx = read_idx + 2;
     sound_grain_check_idx(&read_next_idx, audio_buffer.size());
     out.left = utils::LinTerp(0, 1, audio_buffer[read_idx],
                               audio_buffer[read_next_idx], frac);
-    out.left *= amp;
+    out.left *= eg_amp;
 
     int read_idx_right = read_idx + 1;
     sound_grain_check_idx(&read_idx_right, audio_buffer.size());
@@ -356,16 +353,13 @@ stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
     sound_grain_check_idx(&read_next_idx_right, audio_buffer.size());
     out.right = utils::LinTerp(0, 1, audio_buffer[read_idx_right],
                                audio_buffer[read_next_idx_right], frac);
-    out.right *= amp;
+    out.right *= eg_amp;
   }
   audiobuffer_cur_pos += (incr * num_channels);
 
   grain_counter_frames++;
   if (grain_counter_frames > grain_len_frames) {
     active = false;
-  }
-  if (grain_counter_frames > release_frame) {
-    eg.SetSustainOverride(false);
   }
 
   return out;

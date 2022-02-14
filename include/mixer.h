@@ -70,6 +70,7 @@ struct Mixer {
   double bpm{140};
 
   mixer_timing_info timing_info = {};
+  std::chrono::microseconds mTimeAtLastClick{0};
 
   double volume{0.7};
 

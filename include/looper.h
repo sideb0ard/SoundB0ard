@@ -44,8 +44,13 @@ struct SoundGrain {
   bool reverse_mode{false};
   bool debug{false};
 
-  EnvelopeGenerator eg;
-  int release_frame{0};  // when to set EG to release
+  // EnvelopeGenerator eg;
+  float attack_samples{0};
+  int start_sustain_frame{0};
+  int release_frame{0};
+  float exp_min = 0.2;
+  float exp_mul{0};
+  float exp_now{0};
 };
 
 enum LoopMode {
