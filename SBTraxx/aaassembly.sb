@@ -1,22 +1,79 @@
 
 let axf = sample(legowelt/FX-AcidPlanetStyle.wav);
+# let bsa = loop(loops/busitACID.aiff)
+# let sb = loop(dloops/scudBeat2.aiff)
 
 let start_gen = gen()
 {
   setup()
   {
+    let ptz = [1, 1.2, 0.7, 2];
+    let ptx = 0;
   }
   run()
   {
     if (count % 2 == 0) {
       note_on(axf,1 );
+      set bsa:pitch ptz[ptx];
+      ptx = incr(ptx, 0, len(ptz));
     }
     if (count % 3 == 0) {
-      set axf:reverse 1
+      set bsa:scramble 1;
+      set sb:scramble 1;
     }
     if (count % 4 == 0) {
-      set axf:glitch 1
+      set bsa:stutter 1;
     }
   }
 }
 
+let hhblah_gen = gen()
+{
+  setup()
+  {
+    let swing = 20;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      let offset = 0;
+      if (i % 2 == 1) {
+        offset = swing;
+      }
+      note_on_at(hh, 1, i*pp + offset);
+
+      if (i % 3 == 0) {
+        note_on_at(bsa, 1, i*pp);
+      }
+    }
+  }
+}
+
+let heya = sample(noises/2stepVOCalsnip.aiff);
+let stb=sample(noises/2stepSTAB.aiff);
+let uus = sample(perc/uus.wav);
+let hic = sample(perc/nord808_hic.aif);
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let sampz =[heya, stb, uus, hic];
+    let rhm = rand_array(16, 0, len(sampz) + 3);
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (rhm[i] < len(sampz)) {
+          note_on_at(sampz[rhm[i]], 1, i*pp);
+        }
+      }
+    }
+    if (count % 8 == 0) {
+      rhm = rand_array(16, 0, len(sampz) + 3);
+    }
+  }
+}
+
+# let snh = loop(loops/strongsNHats.aiff); set snh:len 8

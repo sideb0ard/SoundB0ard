@@ -94,10 +94,8 @@ std::string Mixer::StatusMixr() {
   //  clang-format off
   std::stringstream ss;
   ss << COOL_COLOR_GREEN << ":::::::::::::::: vol:" << ANSI_COLOR_WHITE
-     << volume
-     << COOL_COLOR_GREEN
-     //<< " bpm:" << ANSI_COLOR_WHITE << data.tempo << COOL_COLOR_GREEN
-     << " looplen:" << ANSI_COLOR_WHITE << 3840
+     << volume << COOL_COLOR_GREEN << " bpm:" << ANSI_COLOR_WHITE << bpm
+     << COOL_COLOR_GREEN << " looplen:" << ANSI_COLOR_WHITE << 3840
      << COOL_COLOR_GREEN
      // << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
      // << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat <<
@@ -334,6 +332,7 @@ void Mixer::EmitEvent(broadcast_event event) {
 
 void Mixer::UpdateBpm(int new_bpm) {
   bpm = new_bpm;
+  bpm_to_be_updated = new_bpm;
   timing_info.bpm = bpm;
   timing_info.frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
   std::cout << "FRAMERS PER MIDI TICK:" << timing_info.frames_per_midi_tick
@@ -354,6 +353,7 @@ void Mixer::UpdateBpm(int new_bpm) {
   timing_info.size_of_quarter_note = timing_info.size_of_eighth_note * 2;
 
   EmitEvent((broadcast_event){.type = TIME_BPM_CHANGE});
+
   // link_set_bpm(m_ableton_link, bpm);
 }
 
@@ -478,6 +478,11 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
                    const double quantum,
                    const std::chrono::microseconds beginHostTime) {
   using namespace std::chrono;
+
+  if (bpm_to_be_updated > 0) {
+    sessionState.setTempo(bpm_to_be_updated, beginHostTime);
+    bpm_to_be_updated = 0;
+  }
 
   for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2) {
     double output_left = 0.0;

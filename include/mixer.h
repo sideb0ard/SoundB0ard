@@ -68,6 +68,7 @@ struct Mixer {
   bool debug_mode{false};
 
   double bpm{140};
+  double bpm_to_be_updated{0};
 
   mixer_timing_info timing_info = {};
   std::chrono::microseconds mTimeAtLastClick{0};
