@@ -88,10 +88,6 @@ void AudioEngine::setStartStopSyncEnabled(const bool enabled) {
   mLink.enableStartStopSync(enabled);
 }
 
-void AudioEngine::setBufferSize(std::size_t size) {
-  mBuffer = std::vector<double>(size, 0.);
-}
-
 void AudioEngine::setSampleRate(double sampleRate) { mSampleRate = sampleRate; }
 
 AudioEngine::EngineData AudioEngine::pullEngineData() {
@@ -114,71 +110,10 @@ AudioEngine::EngineData AudioEngine::pullEngineData() {
   return engineData;
 }
 
-void AudioEngine::renderMetronomeIntoBuffer(
-    const Link::SessionState sessionState, const double quantum,
-    const std::chrono::microseconds beginHostTime,
-    const std::size_t numSamples) {
-  using namespace std::chrono;
-
-  // Metronome frequencies
-  static const double highTone = 1567.98;
-  static const double lowTone = 1108.73;
-  // 100ms click duration
-  static const auto clickDuration = duration<double>{0.1};
-
-  // The number of microseconds that elapse between samples
-  const auto microsPerSample = 1e6 / mSampleRate;
-
-  for (std::size_t i = 0; i < numSamples; ++i) {
-    double amplitude = 0.;
-    // Compute the host time for this sample and the last.
-    const auto hostTime =
-        beginHostTime +
-        microseconds(llround(static_cast<double>(i) * microsPerSample));
-    const auto lastSampleHostTime =
-        hostTime - microseconds(llround(microsPerSample));
-
-    // Only make sound for positive beat magnitudes. Negative beat
-    // magnitudes are count-in beats.
-    if (sessionState.beatAtTime(hostTime, quantum) >= 0.) {
-      // If the phase wraps around between the last sample and the
-      // current one with respect to a 1 beat quantum, then a click
-      // should occur.
-      if (sessionState.phaseAtTime(hostTime, 1) <
-          sessionState.phaseAtTime(lastSampleHostTime, 1)) {
-        mTimeAtLastClick = hostTime;
-      }
-
-      const auto secondsAfterClick =
-          duration_cast<duration<double>>(hostTime - mTimeAtLastClick);
-
-      // If we're within the click duration of the last beat, render
-      // the click tone into this sample
-      if (secondsAfterClick < clickDuration) {
-        // If the phase of the last beat with respect to the current
-        // quantum was zero, then it was at a quantum boundary and we
-        // want to use the high tone. For other beats within the
-        // quantum, use the low tone.
-        const auto freq =
-            floor(sessionState.phaseAtTime(hostTime, quantum)) == 0 ? highTone
-                                                                    : lowTone;
-
-        // Simple cosine synth
-        amplitude = cos(2 * M_PI * secondsAfterClick.count() * freq) *
-                    (1 - sin(5 * M_PI * secondsAfterClick.count()));
-      }
-    }
-    mBuffer[i] = amplitude;
-  }
-}
-
 void AudioEngine::audioCallback(const std::chrono::microseconds hostTime,
-                                const std::size_t numSamples) {
+                                float* buffer, const std::size_t numSamples) {
   const auto engineData = pullEngineData();
   auto sessionState = mLink.captureAudioSessionState();
-
-  // Clear the buffer
-  std::fill(mBuffer.begin(), mBuffer.end(), 0);
 
   if (engineData.requestStart) {
     sessionState.setIsPlaying(true, hostTime);
@@ -206,7 +141,7 @@ void AudioEngine::audioCallback(const std::chrono::microseconds hostTime,
   mLink.commitAudioSessionState(sessionState);
 
   if (mIsPlaying) {
-    mMixer.GenNext(&mBuffer[0], numSamples, sessionState, engineData.quantum,
+    mMixer.GenNext(buffer, numSamples, sessionState, engineData.quantum,
                    hostTime);
   }
 }

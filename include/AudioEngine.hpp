@@ -52,21 +52,19 @@ class AudioEngine {
     bool startStopSyncOn;
   };
 
-  void setBufferSize(std::size_t size);
   void setSampleRate(double sampleRate);
   EngineData pullEngineData();
   void renderMetronomeIntoBuffer(Link::SessionState sessionState,
                                  double quantum,
                                  std::chrono::microseconds beginHostTime,
                                  std::size_t numSamples);
-  void audioCallback(const std::chrono::microseconds hostTime,
+  void audioCallback(const std::chrono::microseconds hostTime, float* buffer,
                      std::size_t numSamples);
 
   Link& mLink;
   Mixer& mMixer;
   double mSampleRate;
   std::atomic<std::chrono::microseconds> mOutputLatency;
-  std::vector<double> mBuffer;
   EngineData mSharedEngineData;
   EngineData mLockfreeEngineData;
   std::chrono::microseconds mTimeAtLastClick;

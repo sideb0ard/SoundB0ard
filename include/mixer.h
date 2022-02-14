@@ -108,7 +108,7 @@ struct Mixer {
   void PanChange(int sig, float vol);
 
   void UpdateTimingInfo(long long int frame_time);
-  int GenNext(double *out, int frames_per_buffer,
+  int GenNext(float *out, int frames_per_buffer,
               const ableton::Link::SessionState sessionState,
               const double quantum,
               const std::chrono::microseconds beginHostTime);

@@ -28,7 +28,6 @@ namespace linkaudio {
 AudioPlatform::AudioPlatform(Link& link, Mixer& mixer)
     : mEngine(link, mixer), mSampleTime(0.) {
   mEngine.setSampleRate(44100.);
-  mEngine.setBufferSize(512);
   initialize();
   start();
 }
@@ -55,12 +54,12 @@ int AudioPlatform::audioCallback(const void* /*inputBuffer*/,
 
   const auto bufferBeginAtOutput = hostTime + engine.mOutputLatency.load();
 
-  engine.audioCallback(bufferBeginAtOutput, inNumFrames);
+  engine.audioCallback(bufferBeginAtOutput, buffer, inNumFrames);
 
-  for (unsigned long i = 0; i < inNumFrames; ++i) {
-    buffer[i * 2] = static_cast<float>(engine.mBuffer[i]);
-    buffer[i * 2 + 1] = static_cast<float>(engine.mBuffer[i]);
-  }
+  /// for (unsigned long i = 0; i < inNumFrames; ++i) {
+  ///   buffer[i * 2] = static_cast<float>(engine.mBuffer[i]);
+  ///   buffer[i * 2 + 1] = static_cast<float>(engine.mBuffer[i]);
+  /// }
 
   return paContinue;
 }
@@ -86,9 +85,9 @@ void AudioPlatform::initialize() {
   outputParameters.hostApiSpecificStreamInfo = nullptr;
   mEngine.mOutputLatency.store(std::chrono::microseconds(
       llround(outputParameters.suggestedLatency * 1.0e6)));
-  result =
-      Pa_OpenStream(&pStream, nullptr, &outputParameters, mEngine.mSampleRate,
-                    mEngine.mBuffer.size(), paClipOff, &audioCallback, this);
+  result = Pa_OpenStream(&pStream, nullptr, &outputParameters,
+                         mEngine.mSampleRate, paFramesPerBufferUnspecified,
+                         paClipOff, &audioCallback, this);
 
   if (result) {
     std::cerr << "Could not open stream. " << result << std::endl;

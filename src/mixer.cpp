@@ -471,7 +471,7 @@ void Mixer::MidiTick() {
   CheckForDelayedEvents();
 }
 
-int Mixer::GenNext(double *out, int frames_per_buffer,
+int Mixer::GenNext(float *out, int frames_per_buffer,
                    ableton::Link::SessionState sessionState,
                    const double quantum,
                    const std::chrono::microseconds beginHostTime) {

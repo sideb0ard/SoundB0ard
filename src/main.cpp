@@ -44,7 +44,9 @@ struct State {
   ableton::Link link;
   ableton::linkaudio::AudioPlatform audioPlatform;
 
-  State(Mixer &mixer) : running(true), link(140.), audioPlatform(link, mixer) {}
+  State(Mixer &mixer) : running(true), link(140.), audioPlatform(link, mixer) {
+    link.enable(true);
+  }
 };
 
 };  // namespace
