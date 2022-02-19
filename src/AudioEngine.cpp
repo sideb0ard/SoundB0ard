@@ -141,8 +141,9 @@ void AudioEngine::audioCallback(const std::chrono::microseconds hostTime,
   mLink.commitAudioSessionState(sessionState);
 
   if (mIsPlaying) {
-    mMixer.GenNext(buffer, numSamples, sessionState, engineData.quantum,
-                   hostTime);
+    auto new_bpm = mMixer.GenNext(buffer, numSamples, sessionState,
+                                  engineData.quantum, hostTime);
+    if (new_bpm > 0) setTempo(new_bpm);
   }
 }
 

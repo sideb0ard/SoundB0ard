@@ -22,7 +22,7 @@ struct PreviewBuffer {
   bool enabled{};
 
   stereo_val Generate();
-  void ImportFile(std::string filename);
+  // void ImportFile(std::string filename);
 };
 
 struct file_monitor {
@@ -91,7 +91,7 @@ struct Mixer {
   void EmitEvent(broadcast_event event);
   bool DelSoundgen(int soundgen_num);
 
-  void PreviewAudio(std::string filename);
+  void PreviewAudio(audio_action_queue_item action);
 
   void PrintTimingInfo();
   void PrintMidiInfo();
@@ -105,8 +105,7 @@ struct Mixer {
 
   void UpdateTimingInfo(long long int frame_time);
   int GenNext(float *out, int frames_per_buffer,
-              const ableton::Link::SessionState sessionState,
-              const double quantum,
+              ableton::Link::SessionState &sessionState, const double quantum,
               const std::chrono::microseconds beginHostTime);
 
   bool IsValidProcess(int proc_num);

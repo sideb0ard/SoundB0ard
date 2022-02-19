@@ -1,5 +1,6 @@
 #pragma once
 
+#include <audioutils.h>
 #include <soundgenerator.h>
 
 #include <interpreter/object.hpp>
@@ -37,6 +38,9 @@ struct audio_action_queue_item {
   AudioAction type;
   int mixer_soundgen_idx{-1};
   std::shared_ptr<SBAudio::SoundGenerator> sg;
+
+  std::vector<double> buffer;
+  AudioBufferDetails audio_buffer_details;
 
   int delayed_by{0};  // in midi ticks
   int start_at{0};    // in midi ticks

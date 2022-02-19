@@ -11,40 +11,55 @@ let start_gen = gen()
 {
   setup()
   {
-    #let ptz = [1, 1.2, 0.7, 2];
-    let ptz = [0.6, 0.8, 0.7, 1];
+    let ptz = [1, 1.2, 0.7, 2];
+    #let ptz = [0.6, 0.8, 0.7, 1];
     let ptx = 0;
+    let lenz = [1,2];
+    let lx = 0;
   }
   run()
   {
     set rhy:stutter 1;
+    set wh:stutter 1;
     if (count % 2 == 0) {
-      set poi:scramble 1;
-      note_on(axf,1 );
-      set hb:pitch ptz[ptx];
-      set axf:pitch ptz[ptx];
-      set yeahman:pitch ptz[ptx];
+      unsolo();
+      #note_on(axf,1 );
+      #set hb:pitch ptz[ptx];
+      #set axf:pitch ptz[ptx];
       ptx = incr(ptx, 0, len(ptz));
-      set yeahman:scramble 1;
+      #set yeahman:scramble 1;
+      #set rlf:scramble 1;
+      set hatz:len lenz[lx];
+      lx = incr(lx, 0, len(lenz));
     }
     if (count % 3 == 0) {
-      set poi:stutter 1;
-      set yeahman:stutter 1;
-      set hb:stutter 1;
-      ###set nloop:scramble 1;
-      set turnit:scramble 1;
-      #set bsa:scramble 1;
-      set gd:scramble 1;
-      set yoyo:stutter 1;
+      set dsc:scramble 1;
+      #set rf:stutter 1;
+      #set rbb:pitch ptz[ptx];
+      #set poi:stutter 1;
+      #set yeahman:stutter 1;
+      #set hb:stutter 1;
+      ####set nloop:scramble 1;
+      #set turnit:scramble 1;
+      ##set bsa:scramble 1;
+      #set gd:scramble 1;
+      #set yoyo:stutter 1;
+      #set rlf:stutter 1;
     }
     if (count % 4 == 0) {
-      set acid:scramble 1;
-      set gd:stutter 1;
-      set iget:stutter 1;
-      set sb:stutter 1;
-      set bsa:stutter 1;
-      set rhy:scramble 1;
-      set yoyo:pitch ptz[ptx];
+      #set acid:scramble 1;
+      set dsc:stutter 1;
+      set wh:scramble 1;
+      #set iget:stutter 1;
+      #set sb:stutter 1;
+      #set bsa:stutter 1;
+      #set rhy:scramble 1;
+      #set yoyo:pitch ptz[ptx];
+      #set rf:pitch ptz[ptx];
+      #set rlf:pitch ptz[ptx];
+    }
+    if (count % 7 == 0) {
+      #solo(rf);
     }
   }
 }

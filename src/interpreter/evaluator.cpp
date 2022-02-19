@@ -309,8 +309,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       std::dynamic_pointer_cast<ast::PlayStatement>(node);
   if (play_expr) {
     if (!play_expr->path_.empty()) {
+      //  import file and add decoded content
       audio_action_queue_item action{.type = AudioAction::PREVIEW,
                                      .preview_filename = play_expr->path_};
+      action.audio_buffer_details =
+          ImportFileContents(action.buffer, action.preview_filename);
       audio_queue.push(action);
     }
   }

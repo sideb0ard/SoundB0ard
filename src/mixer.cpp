@@ -38,25 +38,6 @@ extern Tsqueue<std::string> eval_command_queue;
 
 const auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
 
-// namespace {
-// bool link_is_midi_tick(AbletonLink *l, mixer_timing_info *timing_info,
-//                        int frame_num) {
-//   timing_info->is_midi_tick = false;
-//
-//   const auto hostTime =
-//       l->m_buffer_begin_at_output +
-//       std::chrono::microseconds(llround(frame_num * MICROS_PER_SAMPLE));
-//
-//   auto beat_time = l->m_sessionstate.beatAtTime(hostTime, l->m_quantum);
-//   if (beat_time >= 0.) {
-//     if (beat_time > timing_info->time_of_next_midi_tick)
-//       link_inc_midi(l, timing_info, beat_time);
-//   }
-//
-//   return timing_info->is_midi_tick;
-// }
-//
-// };
 Mixer::Mixer() {
   volume = 0.7;
   UpdateBpm(DEFAULT_BPM);
@@ -90,21 +71,12 @@ Mixer::Mixer() {
 }
 
 std::string Mixer::StatusMixr() {
-  // LinkData data = link_get_timing_data_for_display(m_ableton_link);
   //  clang-format off
   std::stringstream ss;
   ss << COOL_COLOR_GREEN << ":::::::::::::::: vol:" << ANSI_COLOR_WHITE
      << volume << COOL_COLOR_GREEN << " bpm:" << ANSI_COLOR_WHITE << bpm
      << COOL_COLOR_GREEN << " looplen:" << ANSI_COLOR_WHITE << 3840
-     << COOL_COLOR_GREEN
-     // << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
-     // << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat <<
-     // COOL_COLOR_GREEN
-     // << " phase:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.phase
-     // << COOL_COLOR_GREEN
-     //<< " num_peers:" << ANSI_COLOR_WHITE << data.num_peers <<
-     // COOL_COLOR_GREEN
-     << " ::::::::::::::::::::::\n";
+     << COOL_COLOR_GREEN << " ::::::::::::::::::::::\n";
   // clang-format on
 
   return ss.str();
@@ -448,13 +420,15 @@ void Mixer::MidiTick() {
 }
 
 int Mixer::GenNext(float *out, int frames_per_buffer,
-                   ableton::Link::SessionState sessionState,
+                   ableton::Link::SessionState &sessionState,
                    const double quantum,
                    const std::chrono::microseconds beginHostTime) {
   using namespace std::chrono;
 
+  int return_bpm = 0;
   if (bpm_to_be_updated > 0) {
-    sessionState.setTempo(bpm_to_be_updated, beginHostTime);
+    std::cout << "SETTING TEMPOT TO " << bpm_to_be_updated << std::endl;
+    return_bpm = bpm_to_be_updated;
     bpm_to_be_updated = 0;
   }
 
@@ -514,7 +488,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     out[j + 1] = volume * (output_right / 1.53);
   }
 
-  return 0;
+  return return_bpm;
 }
 
 bool Mixer::DelSoundgen(int soundgen_num) {
@@ -616,20 +590,15 @@ int Mixer::GetTicksPerCycleUnit(unsigned int event_type) {
   return ticks;
 }
 
-void Mixer::PreviewAudio(std::string filename) {
-  if (IsValidFile(filename)) {
-    preview.enabled = false;
-    preview.ImportFile(filename);
+void Mixer::PreviewAudio(audio_action_queue_item action) {
+  if (action.buffer.size() > 0) {
+    preview.filename = action.preview_filename;
+    preview.audio_buffer_len = action.audio_buffer_details.buffer_length;
+    preview.audio_buffer = action.buffer;
+    preview.num_channels = action.audio_buffer_details.num_channels;
+    preview.audio_buffer_read_idx = 0;
+    preview.enabled = true;
   }
-}
-
-void PreviewBuffer::ImportFile(std::string fname) {
-  filename = fname;
-  AudioBufferDetails deetz = ImportFileContents(audio_buffer, filename);
-  audio_buffer_len = deetz.buffer_length;
-  num_channels = deetz.num_channels;
-  audio_buffer_read_idx = 0;
-  enabled = true;
 }
 
 stereo_val PreviewBuffer::Generate() {
@@ -789,8 +758,7 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
   } else if (action.type == AudioAction::RAND) {
     sound_generators_[action.mixer_soundgen_idx]->randomize();
   } else if (action.type == AudioAction::PREVIEW) {
-    char *fname = action.preview_filename.data();
-    PreviewAudio(fname);
+    PreviewAudio(action);
   }
 }
 
