@@ -7,6 +7,7 @@
 
 #include <atomic>
 
+namespace SBAudio {
 class SoundGenerator {
  public:
   SoundGenerator();
@@ -81,3 +82,5 @@ class SoundGenerator {
   bool IsSynth();
   bool IsStepper();
 };
+
+};  // namespace SBAudio

@@ -12,6 +12,8 @@
 
 #include <array>
 
+namespace SBAudio {
+
 static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
 
 typedef struct synthsettings {
@@ -288,3 +290,5 @@ class MiniSynth : public SoundGenerator {
   void SetMonophonic(bool b);
   void SetHardSync(bool b);
 };
+
+};  // namespace SBAudio

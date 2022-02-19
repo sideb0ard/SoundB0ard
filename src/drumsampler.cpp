@@ -16,6 +16,8 @@
 
 extern Mixer *mixr;
 
+namespace SBAudio {
+
 DrumSampler::DrumSampler(std::string filename) {
   if (!ImportFile(filename)) {
     // ugh!
@@ -184,3 +186,5 @@ void DrumSampler::SetParam(std::string name, double val) {
   }
 }
 double DrumSampler::GetParam(std::string name) { return 0; }
+
+};  // namespace SBAudio

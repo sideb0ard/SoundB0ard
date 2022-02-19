@@ -1,5 +1,10 @@
 #include <audio_action_queue.h>
 #include <defjams.h>
+#include <drum_synth.h>
+#include <drumsampler.h>
+#include <dxsynth.h>
+#include <looper.h>
+#include <minisynth.h>
 #include <mixer.h>
 
 #include <interpreter/object.hpp>
@@ -17,8 +22,27 @@ extern Tsqueue<int> audio_reply_queue;
 namespace {
 int AddSoundGenerator(unsigned int type, std::string filepath = "",
                       bool loop_mode = false) {
+  std::shared_ptr<SBAudio::SoundGenerator> sg;
+  switch (type) {
+    case (MINISYNTH_TYPE):
+      sg = std::make_shared<SBAudio::MiniSynth>();
+      break;
+    case (DXSYNTH_TYPE):
+      sg = std::make_shared<SBAudio::DXSynth>();
+      break;
+    case (DRUMSYNTH_TYPE):
+      sg = std::make_shared<SBAudio::DrumSynth>();
+      break;
+    case (LOOPER_TYPE):
+      sg = std::make_shared<SBAudio::Looper>(filepath, loop_mode);
+      break;
+    case (DRUMSAMPLER_TYPE):
+      sg = std::make_shared<SBAudio::DrumSampler>(filepath);
+      break;
+  }
   audio_action_queue_item action_req{.type = AudioAction::ADD,
                                      .soundgenerator_type = type,
+                                     .sg = sg,
                                      .filepath = filepath,
                                      .loop_mode = loop_mode};
   audio_queue.push(action_req);

@@ -379,37 +379,11 @@ void Mixer::PanChange(int sg, float val) {
   sound_generators_[sg]->SetPan(val);
 }
 
-void Mixer::AddSoundGenerator(std::shared_ptr<SoundGenerator> sg) {
+void Mixer::AddSoundGenerator(std::shared_ptr<SBAudio::SoundGenerator> sg) {
   int soundgen_id = sound_generators_.size();
   sg->soundgen_id_ = soundgen_id;
   sound_generators_.push_back(sg);
   audio_reply_queue.push(soundgen_id);
-}
-
-void Mixer::AddDrumSynth() {
-  std::cout << "ADDING A DRUM SYNTH YO!\n";
-  auto ds = std::make_shared<DrumSynth>();
-  AddSoundGenerator(ds);
-}
-
-void Mixer::AddMinisynth() {
-  auto ms = std::make_shared<MiniSynth>();
-  AddSoundGenerator(ms);
-}
-
-void Mixer::AddSample(std::string sample_path) {
-  auto ds = std::make_shared<DrumSampler>(sample_path.data());
-  AddSoundGenerator(ds);
-}
-
-void Mixer::AddDxsynth() {
-  auto dx = std::make_shared<DXSynth>();
-  AddSoundGenerator(dx);
-}
-
-void Mixer::AddLooper(std::string filename, bool loop_mode) {
-  auto loopr = std::make_shared<Looper>(filename, loop_mode);
-  AddSoundGenerator(loopr);
 }
 
 void Mixer::MidiTick() {
@@ -546,7 +520,8 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
 bool Mixer::DelSoundgen(int soundgen_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
     printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
-    std::shared_ptr<SoundGenerator> sg = sound_generators_[soundgen_num];
+    std::shared_ptr<SBAudio::SoundGenerator> sg =
+        sound_generators_[soundgen_num];
 
     sound_generators_[soundgen_num] = nullptr;
   }
@@ -560,7 +535,8 @@ bool Mixer::IsValidSoundgenNum(int sg_num) {
 
 bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
-    std::shared_ptr<SoundGenerator> sg = sound_generators_[soundgen_num];
+    std::shared_ptr<SBAudio::SoundGenerator> sg =
+        sound_generators_[soundgen_num];
     if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects[fx_num])
       return true;
   }
@@ -685,22 +661,8 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
   else if (action.type == AudioAction::MONITOR) {
     AddFileToMonitor(action.filepath);
   } else if (action.type == AudioAction::ADD) {
-    switch (action.soundgenerator_type) {
-      case (MINISYNTH_TYPE):
-        AddMinisynth();
-        break;
-      case (DXSYNTH_TYPE):
-        AddDxsynth();
-        break;
-      case (DRUMSYNTH_TYPE):
-        AddDrumSynth();
-        break;
-      case (LOOPER_TYPE):
-        AddLooper(action.filepath, action.loop_mode);
-        break;
-      case (DRUMSAMPLER_TYPE):
-        AddSample(action.filepath);
-        break;
+    if (action.sg) {
+      AddSoundGenerator(action.sg);
     }
   } else if (action.type == AudioAction::ADD_FX)
     interpreter_sound_cmds::ParseFXCmd(action.args);

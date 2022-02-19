@@ -17,6 +17,8 @@
 
 #include <iostream>
 
+namespace SBAudio {
+
 SoundGenerator::SoundGenerator(){};
 
 double SoundGenerator::GetVolume() { return volume; }
@@ -186,3 +188,5 @@ bool SoundGenerator::IsStepper() {
   if (type == DRUMSAMPLER_TYPE) return true;
   return false;
 }
+
+};  // namespace SBAudio

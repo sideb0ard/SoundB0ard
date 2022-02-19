@@ -39,6 +39,8 @@ std::string GetOscType(int type) {
 }
 }  // namespace
 
+namespace SBAudio {
+
 DrumSynth::DrumSynth() {
   osc1.m_waveform = SINE;
   osc1_amp = 1;
@@ -370,3 +372,5 @@ void DrumSynth::ListPresets() {
 
   fclose(presetzzz);
 }
+
+};  // namespace SBAudio

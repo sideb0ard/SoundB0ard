@@ -6,6 +6,8 @@
 #include <qblimited_oscillator.h>
 #include <soundgenerator.h>
 
+namespace SBAudio {
+
 static const char DRUM_SYNTH_PATCHES[] = "settings/drumpresets.dat";
 
 class DrumSynth : public SoundGenerator {
@@ -51,3 +53,5 @@ class DrumSynth : public SoundGenerator {
 
   DCA m_dca;
 };
+
+};  // namespace SBAudio

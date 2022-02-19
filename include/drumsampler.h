@@ -7,6 +7,8 @@
 #include <soundgenerator.h>
 #include <stdbool.h>
 
+namespace SBAudio {
+
 constexpr double kDefaultAmp = 0.7;
 constexpr int kMaxConcurrentSamples = 10;  // arbitrary
 
@@ -55,3 +57,5 @@ class DrumSampler : public SoundGenerator {
   void SetGlitchMode(bool b);
   void SetGlitchRandFactor(int pct);
 };
+
+};  // namespace SBAudio

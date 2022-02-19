@@ -11,6 +11,8 @@
 
 extern Mixer *mixr;
 
+namespace SBAudio {
+
 static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
                                         "dx_dest_vibrato"};
 
@@ -1392,3 +1394,5 @@ void DXSynth::ListPresets() {
   // TODO - implement this properly!
   synth_list_presets(DXSYNTH_TYPE);
 }
+
+};  // namespace SBAudio

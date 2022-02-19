@@ -12,6 +12,8 @@
 
 #define MAX_DX_VOICES 16
 
+namespace SBAudio {
+
 enum { DX1, DX2, DX3, DX4, DX5, DX6, DX7, DX8, MAXDX };
 
 static const char DX_PRESET_FILENAME[] = "settings/dxpresets.dat";
@@ -167,3 +169,5 @@ class DXSynth : public SoundGenerator {
   void SetLegatoMode(bool b);
   void SetActiveMidiOsc(int oscnum);
 };
+
+};  // namespace SBAudio

@@ -40,7 +40,7 @@ let blah_gen = gen()
     let px = 0;
     let dac = 1;
 
-    let notez = [47, 49];
+    let notez = [23, 9];
     let nx = 0;
 
     let ratioz = [13, 21];

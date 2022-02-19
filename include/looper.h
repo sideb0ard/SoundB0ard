@@ -5,6 +5,8 @@
 #include <soundgenerator.h>
 #include <stdbool.h>
 
+namespace SBAudio {
+
 constexpr int kMaxConcurrentGrains = 1000;
 
 struct SoundGrainParams {
@@ -171,4 +173,5 @@ class Looper : public SoundGenerator {
   void SetTraceEnvelope();
 };
 
+};      // namespace SBAudio
 #endif  // LOOPER

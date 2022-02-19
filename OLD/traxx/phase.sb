@@ -115,10 +115,10 @@ let dblah_gen = gen()
           ++beatnum;
         }
         if (beat[i] == 1 && beatnum == plz) {
-          note_on_at(mo, notes_in_chord(notz[nx], 0, 2), i * (3840/8), dur=drz[dx]);
+          #note_on_at(mo, notes_in_chord(notz[nx], 0, 2), i * (3840/8), dur=drz[dx]);
           plz  = incr(plz, 1, 5);
           dx  = incr(dx, 0, len(drz));
-          note_on_at(mo2, notes_in_chord(notz[nx], 0), (i+nx) * (3840/8), dur=drz[dx]);
+          #note_on_at(mo2, notes_in_chord(notz[nx], 0), (i+nx) * (3840/8), dur=drz[dx]);
           nx = incr(nx, 0, len(notz));
           break;
         }

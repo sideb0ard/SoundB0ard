@@ -11,6 +11,8 @@
 #include "mixer.h"
 #include "utils.h"
 
+namespace SBAudio {
+
 extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];
 
@@ -2060,3 +2062,5 @@ void MiniSynth::SetParam(std::string name, double val) {
 }
 
 double MiniSynth::GetParam(std::string name) { return 0; }
+
+};  // namespace SBAudio

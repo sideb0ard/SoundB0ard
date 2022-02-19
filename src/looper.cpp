@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+namespace SBAudio {
+
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 Looper::Looper(std::string filename, unsigned int loop_mode) {
@@ -551,3 +553,5 @@ void Looper::SetParam(std::string name, double val) {
 }
 
 double Looper::GetParam(std::string name) { return 0; }
+
+};  // namespace SBAudio

@@ -33,11 +33,11 @@ struct file_monitor {
 struct DelayedMidiEvent {
   DelayedMidiEvent() = default;
   DelayedMidiEvent(int target_tick, midi_event event,
-                   std::shared_ptr<SoundGenerator> sg)
+                   std::shared_ptr<SBAudio::SoundGenerator> sg)
       : target_tick{target_tick}, event{event}, sg{sg} {}
   int target_tick{0};
   midi_event event{};
-  std::shared_ptr<SoundGenerator> sg{};
+  std::shared_ptr<SBAudio::SoundGenerator> sg{};
 };
 
 struct Mixer {
@@ -52,7 +52,7 @@ struct Mixer {
   std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_ = {};
   bool proc_initialized_{false};
 
-  std::vector<std::shared_ptr<SoundGenerator>> sound_generators_ = {};
+  std::vector<std::shared_ptr<SBAudio::SoundGenerator>> sound_generators_ = {};
 
   std::vector<DelayedMidiEvent> _action_items =
       {};  // TODO get rid of this version
@@ -97,13 +97,7 @@ struct Mixer {
   void PrintMidiInfo();
   void PrintFuncAndGenInfo();
 
-  void AddMinisynth();
-  void AddDxsynth();
-  void AddDrumSynth();
-  void AddSample(std::string sample_path);
-  void AddLooper(std::string filename, bool loop_mode);
-
-  void AddSoundGenerator(std::shared_ptr<SoundGenerator> sg);
+  void AddSoundGenerator(std::shared_ptr<SBAudio::SoundGenerator> sg);
 
   void VolChange(float vol);
   void VolChange(int sig, float vol);

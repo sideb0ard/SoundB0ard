@@ -1,6 +1,12 @@
 
-#let percz = [bl, crk, glot, gr];
-#let percz2 = [ dosh, krushping, tth, uus, kk];
+#let dosh = sample(perc/dosh.wav);
+#let krushping = sample(perc/krushping.wav);
+#let tth = sample(perc/tth.wav);
+#let uus = sample(perc/uus.wav);
+#let kk = sample(TTFUNKYG/kick.wav);
+#
+##let percz = [bl, crk, glot, gr];
+#let percz = [ dosh, krushping, tth, uus, kk];
 
 let blah_gen = gen()
 {

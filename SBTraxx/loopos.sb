@@ -1,3 +1,7 @@
+# let bd = sample(bd/808kick.aif);
+# let bb = loop(dloops/90sboombap2Bar.aiff);
+# let cb = loop(dloops/clapton2BeatLoop.aif);
+
 
 let naff_gen = gen()
 {
@@ -13,12 +17,14 @@ let naff_gen = gen()
     if (count % 3 == 0) {
       vol cb 0;
       set bb:stutter 1;
+      set cb:scramble 1;
       set bb:pitch pitchz[ptx];
       ptx = incr(ptx, 0, len(pitchz));
     }
     if (count % 4 == 0) {
       vol bb 0;
       set cb:stutter 1;
+      set bb:scramble 1;
       set cb:pitch pitchz[ptx];
       ptx = incr(ptx, 0, len(pitchz));
     }
@@ -32,11 +38,20 @@ let naff_gen = gen()
   }
 }
 
+# let cmon = loop(loops/raveStabsCmon.aiff);
+# let bed = loop(loops/mrfingersbassENDer.aiff); note_on(bed, 1)
+# let boo = loop(dloops/90sboombap2Bar.aiff); note_on(boo, 1)
+# let itl = loop(pads/italianDreamWithBirdz.aiff); note_on(itl, 1)
+#  let stu = loop(loops/stutterhead.aiff); note_on(stu, 1);
+# let b8 = sample(bd/mkKick.aiff);
+# let cp = sample(cp/mawClap.aiff);
+#  let cpp = sample(cp/gaborClap.aiff);
+
 let blah_gen = gen()
 {
   setup()
   {
-    let trx = [cmon, bed, boo,itl, stu];
+    let trx = [cmon, bb, cb, bed, boo,itl, stu];
     let idxlen = 3;
     let idx = 0;
     let rhym = rand_array(16, 0, len(trx));
