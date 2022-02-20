@@ -58,8 +58,6 @@ struct Mixer {
       {};  // TODO get rid of this version
   std::vector<audio_action_queue_item> _delayed_action_items = {};
 
-  // AbletonLink *m_ableton_link{nullptr};
-
   stereo_val soundgen_cur_val[MAX_NUM_SOUND_GENERATORS] = {};
   double soundgen_volume[MAX_NUM_SOUND_GENERATORS] = {};
 

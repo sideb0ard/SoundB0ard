@@ -1,4 +1,3 @@
-#include <ableton_link_wrapper.h>
 #include <audio_action_queue.h>
 #include <defjams.h>
 #include <drum_synth.h>
@@ -325,8 +324,6 @@ void Mixer::UpdateBpm(int new_bpm) {
   timing_info.size_of_quarter_note = timing_info.size_of_eighth_note * 2;
 
   EmitEvent((broadcast_event){.type = TIME_BPM_CHANGE});
-
-  // link_set_bpm(m_ableton_link, bpm);
 }
 
 void Mixer::VolChange(float vol) {
@@ -476,7 +473,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
 
     int idx = 0;
     for (auto sg : sound_generators_) {
-      soundgen_cur_val[idx] = sg->genNext(timing_info);
+      soundgen_cur_val[idx] = sg->GenNext(timing_info);
       if (soloed_sound_generator_idx < 0 || idx == soloed_sound_generator_idx) {
         output_left += soundgen_cur_val[idx].left;
         output_right += soundgen_cur_val[idx].right;

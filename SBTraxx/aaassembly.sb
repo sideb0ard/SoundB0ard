@@ -19,47 +19,49 @@ let start_gen = gen()
   }
   run()
   {
-    set rhy:stutter 1;
-    set wh:stutter 1;
+    #set rhy:stutter 1;
+    #set wh:stutter 1;
     if (count % 2 == 0) {
       unsolo();
-      #note_on(axf,1 );
-      #set hb:pitch ptz[ptx];
-      #set axf:pitch ptz[ptx];
+      note_on(axf,1 );
+      set hb:pitch ptz[ptx];
+      set axf:pitch ptz[ptx];
       ptx = incr(ptx, 0, len(ptz));
       #set yeahman:scramble 1;
       #set rlf:scramble 1;
-      set hatz:len lenz[lx];
-      lx = incr(lx, 0, len(lenz));
+      #set hatz:len lenz[lx];
+      #lx = incr(lx, 0, len(lenz));
     }
     if (count % 3 == 0) {
-      set dsc:scramble 1;
+      #set dsc:scramble 1;
       #set rf:stutter 1;
+      set sb:stutter 1;
       #set rbb:pitch ptz[ptx];
       #set poi:stutter 1;
       #set yeahman:stutter 1;
-      #set hb:stutter 1;
+      set hb:stutter 1;
       ####set nloop:scramble 1;
+      set acid:stutter 1;
       #set turnit:scramble 1;
-      ##set bsa:scramble 1;
+      set bsa:scramble 1;
       #set gd:scramble 1;
       #set yoyo:stutter 1;
       #set rlf:stutter 1;
     }
     if (count % 4 == 0) {
-      #set acid:scramble 1;
-      set dsc:stutter 1;
-      set wh:scramble 1;
+      set acid:scramble 1;
+      #set dsc:stutter 1;
+      #set wh:scramble 1;
       #set iget:stutter 1;
-      #set sb:stutter 1;
-      #set bsa:stutter 1;
+      set sb:scramble 1;
+      set bsa:stutter 1;
       #set rhy:scramble 1;
       #set yoyo:pitch ptz[ptx];
       #set rf:pitch ptz[ptx];
       #set rlf:pitch ptz[ptx];
     }
     if (count % 7 == 0) {
-      #solo(rf);
+      solo(hb);
     }
   }
 }
@@ -89,11 +91,13 @@ let hhblah_gen = gen()
   }
 }
 
-# let iget = loop(aaassembly/iegtMAD.wav) ; set iget:len 4
+# let iget = loop(aaassembly/iegtMAD.wav) ; set iget:len 4 ; solo(iget)
 
-# let yoyo = loop(aaassembly/yoyoredman.wav); set yoyo:len 2
+# let yoyo = loop(aaassembly/yoyoredman.wav); set yoyo:len 2; solo(yoyo);
 
 # vol sb 0;
+
+# let hb = loop(dloops/hausBreakBeat.aiff);
 
 # let joey = loop(aaassembly/NYhouseJOEY.wav)
 
@@ -129,3 +133,32 @@ let blah_gen = gen()
 }
 
 # let snh = loop(loops/strongsNHats.aiff); set snh:len 8
+
+let steppa = gen()
+{
+  setup()
+  {
+    let hatz = rand_array(16, 0, 1);
+    let db = rand_beat();
+    let cpz = rand_beat();
+
+    let idx = 0;
+    let plen = 3;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(bd, db, idx, i);
+      stepper(yoyo, db, idx, i);
+      stepper(cp, shiko, idx, i);
+      stepper(hh, hatz, idx, i);
+      idx = incr(idx, 0, plen);
+    }
+    plen = incr(plen, 1, 16);
+
+    if (count % 12 == 0) {
+      db = rand_beat();
+    }
+  }
+}
+

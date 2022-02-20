@@ -200,4 +200,3 @@ void ModFilter::SetLfoPhase(unsigned int val) {
   Update();
 }
 void ModFilter::SetParam(std::string name, double val) {}
-double ModFilter::GetParam(std::string name) { return 0; }

@@ -123,6 +123,7 @@ typedef enum {
   LOOPER_TYPE,
   DRUMSAMPLER_TYPE,
   DRUMSYNTH_TYPE,
+  SBSYNTH_TYPE,
   NUM_SOUNDGEN_TYPE
 } sound_generator_type;
 

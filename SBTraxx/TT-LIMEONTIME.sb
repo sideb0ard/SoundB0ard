@@ -1,0 +1,147 @@
+load_dir("TT-LIMELIFE-RIGHTONTIME/");
+
+let drums_on = true;
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let bdz = [bd, kdclean, coskd];
+    let bidx = 0;
+  }
+  run()
+  {
+    #print("YO", drums_on);
+    if (drums_on) {
+      if (rand(100) > 90) {
+        let beat = rand_beat();
+        for (i = 0; i < 16; ++i) {
+          if (beat[i] == 1) {
+            note_on_at(bdz[bidx], 1, pp* i);
+          }
+        }
+        vol bal 0;
+      } else {
+        #print("ELSE");
+        for (i = 0; i < 16; ++i) {
+          if (i % 4 == 0 && rand(100) > 20) {
+            note_on_at(bdz[bidx], 1, pp* i);
+            if (rand(100) > 70) {
+              bidx = incr(bidx, 0, len(bdz));
+            }
+          }
+        }
+        vol bal 1;
+      }
+    }
+  }
+}
+
+let hhah_gen = gen()
+{
+  setup()
+  {
+    #let hatz = [hh, hhstr, hhskuff, oh, orch];
+    #let hatz = [hh, hhskuff, oh, orch, hhstr, uppr];
+    let hatz = [hh, oh, orch, hhstr];
+    let hix = 0;
+    let hlen = 1;
+    let swing = 50;
+    let pitchz = [1, 1.5, 2, 1.8];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 7 == 0) {
+      setPitch(hatz[hix], pitchz[px]);
+      px = incr(px, 0, len(pitchz));
+      for (i = 0; i < 16; ++i) {
+        if (i % 2 == 1) {
+          note_on_at(hatz[hix], 1, pp*i + swing);
+          swing = incr(swing, 0, 100);
+        } else {
+          note_on_at(hatz[hix], 1, pp*i);
+        }
+      }
+      val bal 0;
+    } else {
+      for (i = 0; i < 16; ++i) {
+        if (i % 4 == 2) {
+          note_on_at(hatz[hix], 1, pp*i);
+          hix = incr(hix, 0, hlen);
+        }
+      }
+      hlen = incr(hlen, 1, len(hatz) + 1);
+    }
+  }
+}
+
+let perc_gen = gen()
+{
+  setup()
+  {
+    let pitchz = [1, 2, 0.7, 1.2, 1.2, 1.5];
+    let pitchx = 0;
+    let percz = [uhbass, uhstrlastbeat, hhmelod2, uhstring];
+    let pix = 0;
+    let beat = rand_beat();
+    let rot = 2;
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          note_on_at(percz[pix], 1, i * pp);
+        }
+      }
+      pix = incr(pix, 0, len(percz));
+    }
+    if (count % 8 == 0) {
+      beat = rand_beat();
+    }
+    if (count % 3 == 0) {
+      #puts("ROTATE:!");
+      beat = rotate(beat, rot);
+      rot = incr(rot, 2, 7);
+      set percz[pix]:pitch pitchz[pitchx];
+      pitchx = incr(pitchx, 0, len(pitchz));
+    }
+  }
+}
+
+let sn_gen = gen()
+{
+  setup()
+  {
+    let snz = [kksn, cpclean, hhorch, cym, snbl];
+    let sidx = 0;
+    let swing = 10;
+  }
+  run()
+  {
+    if (count % 6 == 0) {
+      drums_on = false;
+      for (i = 0; i < 16; ++i) {
+        if (i % 8 == 4) {
+          #puts("i:", i);
+          note_on_at(snz[sidx], 1, pp*i + swing);
+        }
+        sidx = incr(sidx, 0, len(snz));
+      }
+      if (rand(100) > 80) {
+        note_on_at(snz[sidx], 1, 3200 + swing);
+        note_on_at(snz[sidx], 1, 3520 + swing) ;
+      }
+      swing += 10;
+      if (swing > 100) {
+        swing = 0;
+      }
+
+
+    } else {
+      drums_on = true;
+    }
+  }
+}
+

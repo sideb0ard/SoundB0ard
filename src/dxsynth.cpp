@@ -193,7 +193,7 @@ std::string DXSynth::Info() {
   return ss.str();
 }
 
-stereo_val DXSynth::genNext(mixer_timing_info tinfo) {
+stereo_val DXSynth::GenNext(mixer_timing_info tinfo) {
   (void)tinfo;
   if (!active) return (stereo_val){0, 0};
 
@@ -1388,7 +1388,6 @@ void DXSynth::SetParam(std::string name, double val) {
 
   Update();
 }
-double DXSynth::GetParam(std::string name) { return 0; }
 
 void DXSynth::ListPresets() {
   // TODO - implement this properly!

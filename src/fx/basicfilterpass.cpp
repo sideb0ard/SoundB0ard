@@ -87,7 +87,6 @@ void FilterPass::SetParam(std::string name, double val) {
     SetLfoRate(2, val);
 }
 
-double FilterPass::GetParam(std::string name) { return 0; }
 
 void FilterPass::SetLfoType(int lfo_num, unsigned int type) {
   if (type >= MAX_LFO_OSC) {

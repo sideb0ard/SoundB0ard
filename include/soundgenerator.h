@@ -13,13 +13,12 @@ class SoundGenerator {
   SoundGenerator();
   virtual ~SoundGenerator() = default;
 
-  virtual stereo_val genNext(mixer_timing_info tinfo) = 0;
+  virtual stereo_val GenNext(mixer_timing_info tinfo) = 0;
 
   virtual std::string Info() = 0;
   virtual std::string Status() = 0;
 
   virtual void SetParam(std::string name, double val) = 0;
-  virtual double GetParam(std::string name) = 0;
 
   virtual void start();
   virtual void stop();

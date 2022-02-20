@@ -358,6 +358,14 @@ class Granular : public SoundGenerator {
   std::string Inspect() override;
 };
 
+class SBSynth : public SoundGenerator {
+ public:
+  SBSynth();
+  ~SBSynth() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
+};
+
 /////////////////////////////////////////////////
 
 class HashPair {

@@ -69,7 +69,7 @@ DrumSynth::DrumSynth() {
   active = true;
 }
 
-stereo_val DrumSynth::genNext(mixer_timing_info tinfo) {
+stereo_val DrumSynth::GenNext(mixer_timing_info tinfo) {
   stereo_val out = {.left = 0, .right = 0};
   if (!active) return out;
 
@@ -210,7 +210,6 @@ std::string DrumSynth::Info() {
   return ss.str();
 }
 
-double DrumSynth::GetParam(std::string name) { return 0; }
 
 void DrumSynth::start() {
   if (active) return;  // no-op

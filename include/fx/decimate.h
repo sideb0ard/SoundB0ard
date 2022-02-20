@@ -11,7 +11,6 @@ class Decimate : Fx {
   std::string Status() override;
   stereo_val Process(stereo_val input) override;
   void SetParam(std::string name, double val) override;
-  double GetParam(std::string name) override;
 
  private:
   void SetBitRes(float val);

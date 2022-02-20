@@ -87,6 +87,7 @@ const TokenType SLANG_GRANULAR = "GRANULAR";
 const TokenType SLANG_GRAIN = "GRAIN";
 const TokenType SLANG_LOOP = "LOOP";
 const TokenType SLANG_FM_SYNTH = "FM_SYNTH";
+const TokenType SLANG_SB_SYNTH = "SB_SYNTH";
 const TokenType SLANG_MOOG_SYNTH = "MOOG_SYNTH";
 const TokenType SLANG_DRUM_SYNTH = "DRUM_SYNTH";
 const TokenType SLANG_DIGI_SYNTH = "DIGI_SYNTH";

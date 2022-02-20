@@ -184,7 +184,6 @@ stereo_val StereoDelay::Process(stereo_val input) {
   return output;
 }
 
-double StereoDelay::GetParam(std::string name) { return 0; }
 void StereoDelay::SetParam(std::string name, double val) {
   if (name == "delayms")
     SetDelayTimeMs(val);

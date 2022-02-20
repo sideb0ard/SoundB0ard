@@ -152,7 +152,7 @@ void Looper::LaunchGrain(mixer_timing_info tinfo) {
   num_active_grains = CountActiveGrains();
 }
 
-stereo_val Looper::genNext(mixer_timing_info tinfo) {
+stereo_val Looper::GenNext(mixer_timing_info tinfo) {
   stereo_val val = {0., 0.};
   if (!started || !active) return val;
 
@@ -552,6 +552,5 @@ void Looper::SetParam(std::string name, double val) {
     SetGrainReleaseSizePct(val);
 }
 
-double Looper::GetParam(std::string name) { return 0; }
 
 };  // namespace SBAudio

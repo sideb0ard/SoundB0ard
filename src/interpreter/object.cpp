@@ -6,6 +6,7 @@
 #include <looper.h>
 #include <minisynth.h>
 #include <mixer.h>
+#include <sbsynth.h>
 
 #include <interpreter/object.hpp>
 #include <iostream>
@@ -38,6 +39,9 @@ int AddSoundGenerator(unsigned int type, std::string filepath = "",
       break;
     case (DRUMSAMPLER_TYPE):
       sg = std::make_shared<SBAudio::DrumSampler>(filepath);
+      break;
+    case (SBSYNTH_TYPE):
+      sg = std::make_shared<SBAudio::SBSynth>();
       break;
   }
   audio_action_queue_item action_req{.type = AudioAction::ADD,
@@ -122,6 +126,10 @@ ObjectType FMSynth::Type() { return SYNTH_OBJ; }
 object::HashKey SoundGenerator::HashKey() {
   return object::HashKey(Type(), (uint64_t)soundgen_id_);
 }
+
+SBSynth::SBSynth() { soundgen_id_ = AddSoundGenerator(SBSYNTH_TYPE); }
+std::string SBSynth::Inspect() { return "SB synth."; }
+ObjectType SBSynth::Type() { return SYNTH_OBJ; }
 
 MoogSynth::MoogSynth() { soundgen_id_ = AddSoundGenerator(MINISYNTH_TYPE); }
 std::string MoogSynth::Inspect() { return "Moog synth."; }

@@ -39,7 +39,6 @@ void Distortion::SetParam(std::string name, double val) {
   if (name == "threshold") SetThreshold(val);
 }
 
-double Distortion::GetParam(std::string name) { return 0; }
 
 void Distortion::SetThreshold(double val) {
   if (val >= 0.01 && val <= 1.0)

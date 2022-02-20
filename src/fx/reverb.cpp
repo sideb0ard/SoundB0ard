@@ -122,7 +122,6 @@ void Reverb::SetParam(std::string name, double val) {
   CookVariables();
 }
 
-double Reverb::GetParam(std::string name) { return 0; }
 
 void Reverb::Init() {
   delay_init(&m_pre_delay, 2.0 * SAMPLE_RATE);

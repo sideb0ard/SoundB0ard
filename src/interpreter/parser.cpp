@@ -511,6 +511,7 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
            cur_token_.type_ == token::SLANG_LOOP)
     return ParseGranularExpression();
   else if (cur_token_.type_ == token::SLANG_FM_SYNTH ||
+           cur_token_.type_ == token::SLANG_SB_SYNTH ||
            cur_token_.type_ == token::SLANG_MOOG_SYNTH ||
            cur_token_.type_ == token::SLANG_DIGI_SYNTH ||
            cur_token_.type_ == token::SLANG_DRUM_SYNTH)

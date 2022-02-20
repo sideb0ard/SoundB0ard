@@ -211,4 +211,3 @@ void ModDelay::SetLfoType(unsigned int val) {
   Update();
 }
 void ModDelay::SetParam(std::string name, double val) {}
-double ModDelay::GetParam(std::string name) { return 0; }

@@ -56,7 +56,7 @@ MiniSynth::MiniSynth() {
   active = true;
 }
 
-stereo_val MiniSynth::genNext(mixer_timing_info tinfo) {
+stereo_val MiniSynth::GenNext(mixer_timing_info tinfo) {
   (void)tinfo;
   if (!active) return (stereo_val){0, 0};
 
@@ -2061,6 +2061,5 @@ void MiniSynth::SetParam(std::string name, double val) {
   Update();
 }
 
-double MiniSynth::GetParam(std::string name) { return 0; }
 
 };  // namespace SBAudio

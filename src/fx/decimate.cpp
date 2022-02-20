@@ -84,7 +84,6 @@ void Decimate::SetParam(std::string name, double val) {
   Update();
 }
 
-double Decimate::GetParam(std::string name) { return 0; }
 
 void Decimate::Update() {}
 

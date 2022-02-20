@@ -41,7 +41,6 @@ void WaveShaper::SetParam(std::string name, double val) {
     SetInvertStages(val);
 }
 
-double WaveShaper::GetParam(std::string name) { return 0; }
 
 void WaveShaper::Init() {
   m_arc_tan_k_pos = 1;

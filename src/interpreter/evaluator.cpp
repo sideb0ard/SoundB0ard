@@ -467,6 +467,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       return std::make_shared<object::MoogSynth>();
     else if (synth->token_.type_ == token::SLANG_FM_SYNTH)
       return std::make_shared<object::FMSynth>();
+    else if (synth->token_.type_ == token::SLANG_SB_SYNTH)
+      return std::make_shared<object::SBSynth>();
     else if (synth->token_.type_ == token::SLANG_DRUM_SYNTH)
       return std::make_shared<object::DrumSynth>();
   }

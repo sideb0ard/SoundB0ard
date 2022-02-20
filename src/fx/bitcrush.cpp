@@ -44,7 +44,6 @@ void BitCrush::SetParam(std::string name, double val) {
   Update();
 }
 
-double BitCrush::GetParam(std::string name) { return 0; }
 
 void BitCrush::Init() {
   bitdepth_ = 6;

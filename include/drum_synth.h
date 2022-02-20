@@ -17,11 +17,10 @@ class DrumSynth : public SoundGenerator {
 
   std::string Info() override;
   std::string Status() override;
-  stereo_val genNext(mixer_timing_info tinfo) override;
+  stereo_val GenNext(mixer_timing_info tinfo) override;
   void start() override;
   void noteOn(midi_event ev) override;
   void SetParam(std::string name, double val) override;
-  double GetParam(std::string name) override;
   void Load(std::string name) override;
   void Save(std::string name) override;
   void ListPresets() override;

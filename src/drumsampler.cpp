@@ -43,7 +43,7 @@ DrumSampler::DrumSampler(std::string filename) {
   is_playing = false;
 }
 
-stereo_val DrumSampler::genNext(mixer_timing_info tinfo) {
+stereo_val DrumSampler::GenNext(mixer_timing_info tinfo) {
   (void)tinfo;
 
   double left_val = 0;
@@ -185,6 +185,5 @@ void DrumSampler::SetParam(std::string name, double val) {
     if (val >= 0 && val <= 100) glitch_rand_factor = val;
   }
 }
-double DrumSampler::GetParam(std::string name) { return 0; }
 
 };  // namespace SBAudio

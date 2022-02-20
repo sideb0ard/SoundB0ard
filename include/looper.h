@@ -65,7 +65,7 @@ class Looper : public SoundGenerator {
  public:
   Looper(std::string filename, unsigned int loop_mode);
   ~Looper();
-  stereo_val genNext(mixer_timing_info tinfo) override;
+  stereo_val GenNext(mixer_timing_info tinfo) override;
   std::string Status() override;
   std::string Info() override;
   void start() override;
@@ -74,7 +74,6 @@ class Looper : public SoundGenerator {
   void noteOn(midi_event ev) override;
   void noteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
-  double GetParam(std::string name) override;
 
  public:
   bool started{false};

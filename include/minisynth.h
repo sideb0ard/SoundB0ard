@@ -178,7 +178,7 @@ class MiniSynth : public SoundGenerator {
   MiniSynth();
   ~MiniSynth() = default;
 
-  stereo_val genNext(mixer_timing_info tinfo) override;
+  stereo_val GenNext(mixer_timing_info tinfo) override;
   std::string Info() override;
   std::string Status() override;
   void start() override;
@@ -191,7 +191,6 @@ class MiniSynth : public SoundGenerator {
   void pitchBend(midi_event ev) override;
   void randomize() override;
   void SetParam(std::string name, double val) override;
-  double GetParam(std::string name) override;
   void Save(std::string preset_name) override;
   void Load(std::string preset_name) override;
 

@@ -292,4 +292,3 @@ void DynamicsProcessor::SetParam(std::string name, double val) {
     SetExternalSource(val);
 }
 
-double DynamicsProcessor::GetParam(std::string name) { return 0; }
