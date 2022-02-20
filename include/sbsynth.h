@@ -35,6 +35,11 @@ class SBSynth : public SoundGenerator {
   QBLimitedOscillator m_osc1;
   QBLimitedOscillator m_osc2;
 
+  float m_osc1_amp{1};
+  float m_osc2_amp{1};
+
+  float cm_ratio{0.5};
+
   EnvelopeGenerator m_eg1;
   DCA m_dca;
 };

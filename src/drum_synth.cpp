@@ -210,7 +210,6 @@ std::string DrumSynth::Info() {
   return ss.str();
 }
 
-
 void DrumSynth::start() {
   if (active) return;  // no-op
   active = true;
