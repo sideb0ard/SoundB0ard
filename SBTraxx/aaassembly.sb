@@ -2,10 +2,10 @@ let axf = sample(legowelt/FX-AcidPlanetStyle.wav);
 #let bsa = loop(loops/busitACID.aiff);
 #let sb = loop(dloops/scudBeat2.aiff);
 
-
-# let rhy = loop(aaassembly/rhythmGUITAR.wav);
-
 # let acid = loop(aaassembly/hiphouseACID.wav)
+# let iget = loop(aaassembly/iegtMAD.wav) ; set iget:len 4 ; solo(iget)
+
+# let yoyo = loop(aaassembly/yoyoredman.wav); set yoyo:len 2; solo(yoyo);
 
 let start_gen = gen()
 {
@@ -19,52 +19,108 @@ let start_gen = gen()
   }
   run()
   {
-    #set rhy:stutter 1;
-    #set wh:stutter 1;
+    #set yoyo:stutter 1;
+    set iget:stutter 1;
+    #set turnit:stutter 1;
     if (count % 2 == 0) {
       unsolo();
       note_on(axf,1 );
-      set hb:pitch ptz[ptx];
-      set axf:pitch ptz[ptx];
-      ptx = incr(ptx, 0, len(ptz));
       #set yeahman:scramble 1;
       #set rlf:scramble 1;
-      #set hatz:len lenz[lx];
-      #lx = incr(lx, 0, len(lenz));
     }
     if (count % 3 == 0) {
-      #set dsc:scramble 1;
-      #set rf:stutter 1;
+      set dsc:scramble 1;
+      ###set rf:stutter 1;
       set sb:stutter 1;
-      #set rbb:pitch ptz[ptx];
-      #set poi:stutter 1;
+      set joey:scramble 1;
+      set iget:scramble 1;
       #set yeahman:stutter 1;
-      set hb:stutter 1;
-      ####set nloop:scramble 1;
       set acid:stutter 1;
-      #set turnit:scramble 1;
-      set bsa:scramble 1;
-      #set gd:scramble 1;
-      #set yoyo:stutter 1;
+      set turnit:scramble 1;
+      #set bsa:scramble 1;
+      set yoyo:stutter 1;
       #set rlf:stutter 1;
     }
     if (count % 4 == 0) {
       set acid:scramble 1;
-      #set dsc:stutter 1;
-      #set wh:scramble 1;
-      #set iget:stutter 1;
-      set sb:scramble 1;
-      set bsa:stutter 1;
-      #set rhy:scramble 1;
-      #set yoyo:pitch ptz[ptx];
-      #set rf:pitch ptz[ptx];
-      #set rlf:pitch ptz[ptx];
+      set turnit:stutter 1;
+      set dsc:stutter 1;
+      set iget:stutter 1;
+      ##set sb:scramble 1;
+      #set bsa:stutter 1;
+      ##set rhy:scramble 1;
     }
-    if (count % 7 == 0) {
-      solo(hb);
+    if (count % 8 == 0) {
+      #solo(sb);
     }
   }
 }
+
+# let dx = fm();
+
+let riff_gen = gen()
+{
+  setup()
+  {
+    let dn = 14;
+    let gn = 19;
+    let driff = briff(dn);
+    let griff = briff(gn);
+
+    let plx = 0;
+    let plen = 3;
+
+    let rfx = 0;
+  }
+  run()
+  {
+
+    let rf = driff;
+    if (rfx > 0) {
+      rf = griff;
+    }
+    for (i = 0; i < 16; ++i) {
+      stepper(dx, rf, plx, i);
+      stepper(acid, rf, plx, i);
+      plx = incr(plx, 0, plen);
+    }
+    plen = incr(plen, 1, 16);
+
+
+    if (count % 4 == 0) {
+      rfx = incr(rfx, 0, 2);
+    }
+
+    if (count % 2 == 0) {
+      dn = dn + 3;
+      if (count % 4 == 0) {
+        gn = gn + 3;
+      } else {
+        gn = gn + 4;
+      }
+
+      driff = briff(gn);
+      griff = briff(gn);
+      if (dn > 40) {
+        gn = 14;
+      }
+      if (gn > 50) {
+        gn = 19;
+      }
+    }
+  }
+}
+
+
+# vol sb 0;
+
+# let hb = loop(dloops/hausBreakBeat.aiff);
+
+# let joey = loop(aaassembly/NYhouseJOEY.wav)
+
+# let yeahman = loop(aaassembly/yeahMAN.wav); set yeahman:len 4
+
+# let rhy = loop(aaassembly/rhythmGUITAR.wav);
 
 let hhblah_gen = gen()
 {
@@ -85,36 +141,29 @@ let hhblah_gen = gen()
         note_on_at(bsa, 1, i*pp);
       }
       if (i % 4 == 0) {
-        set bsa:active 1;
+        #set bsa:active 1;
       }
     }
   }
 }
 
-# let iget = loop(aaassembly/iegtMAD.wav) ; set iget:len 4 ; solo(iget)
-
-# let yoyo = loop(aaassembly/yoyoredman.wav); set yoyo:len 2; solo(yoyo);
-
-# vol sb 0;
-
-# let hb = loop(dloops/hausBreakBeat.aiff);
-
-# let joey = loop(aaassembly/NYhouseJOEY.wav)
-
-# let yeahman = loop(aaassembly/yeahMAN.wav); set yeahman:len 4
+#  let lz = grain(legowelt/Synth-SplashZinderString.wav)
+# p4 < osc 16 "0 100" "set lz:idx %"
 
 let uus = sample(perc/uus.wav);
 let cons = sample(aaassembly/BDPconscious.wav);
-let kil = sample(aaassembly/killer.wav);
+let kil = sample(voices/uhUmf.aiff);
+let teh = sample(brandyvocalz/teh.wav);
+let aye = sample(brandyvocalz/aye.wav);
 
 # let turnit = loop(aaassembly/hiphouseTURNIOUT.wav);
 
 
-let blah_gen = gen()
+let sblah_gen = gen()
 {
   setup()
   {
-    let sampz =[cons, kil, uus];
+    let sampz =[cons, kil, uus, teh, aye];
     let rhm = rand_array(16, 0, len(sampz) + 3);
   }
   run()
@@ -132,7 +181,10 @@ let blah_gen = gen()
   }
 }
 
+# load_preset(dx, "puuurp")
+
 # let snh = loop(loops/strongsNHats.aiff); set snh:len 8
+
 
 let steppa = gen()
 {
@@ -144,6 +196,9 @@ let steppa = gen()
 
     let idx = 0;
     let plen = 3;
+
+    let ptzz = [1, 2, 0.7];
+    let ptxz = 0;
   }
   run()
   {
@@ -154,6 +209,8 @@ let steppa = gen()
       stepper(hh, hatz, idx, i);
       idx = incr(idx, 0, plen);
     }
+    set cp:pitch ptzz[ptxz];
+    ptxz = incr(ptxz, 0, len(ptzz));
     plen = incr(plen, 1, 16);
 
     if (count % 12 == 0) {

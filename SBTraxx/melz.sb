@@ -1,0 +1,70 @@
+# load_preset(dx, "rrrkan");
+
+
+let bbeatlah_fn = fn()
+{
+  let ran1 = rand(8);
+  let ran2 = rand(8);
+  let ran3 = 16 - (ran1 + ran2);
+  let beat = bjork(rand(ran1), ran1) + bjork(rand(ran2), ran2) + bjork(rand(ran3), ran3);
+
+  return beat;
+}
+
+let mblah_gen = gen()
+{
+  setup()
+  {
+    let beat = bbeatlah_fn();
+
+    #let notex = [ 53, 47, 62, 40];
+    #let notex = [ 14, 28, 27];
+    #let notex = [ 14, 19];
+    let notex = [ 51, 56];
+    #let notex = [ 63, 69];
+    #let notex = [ 4, 7];
+    let mel = rcombinor(beat, notex);
+    let idxr = 0;
+    let lnn = 3;
+
+  }
+  run()
+  {
+    if (count % 1 == 0) {
+      let melo = mel;
+      if (count % 16 < 14) {
+        #print("ME:", count % 16);
+        for (i = 0; i < 16; ++i) {
+          cstepper(dx, melo, idxr, i);
+          #stepper(bd, melo, idxr, i);
+          idxr = incr(idxr, 0, lnn);
+        }
+        lnn = incr(lnn, 0, 16);
+      } else {
+        for (i = 0; i < 16; ++i) {
+          if (melo[i] > 0) {
+            note_on_at(dx, notes_in_chord(melo[i], 1, 1), i * pp, dur = 150);
+            #note_on_at(bd, notes_in_chord(melo[i], 1, 1), i * pp, dur = 150);
+          }
+        }
+      }
+    }
+
+    if (count % 16 == 0) {
+      beat = bbeatlah_fn();
+      mel = rcombinor(beat, notex);
+      #set dx:o1rat rand(13)+1;
+    }
+
+    if (count % 3 == 0) {
+      #set kc:scramble 1;
+      #set kc2:stutter 1;
+    }
+
+    if (count % 7 == 0 ) {
+      #set kc:stutter 1;
+    }
+  }
+}
+
+# load_preset(dx, "rocktagon");

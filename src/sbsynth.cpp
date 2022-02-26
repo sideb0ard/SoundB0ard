@@ -42,8 +42,8 @@ std::string GetOscType(int type) {
 namespace SBAudio {
 
 SBSynth::SBSynth() {
-  m_osc1.m_waveform = SINE;
-  m_osc2.m_waveform = SQUARE;
+  m_car_osc.m_waveform = SQUARE;
+  m_mod_osc.m_waveform = SINE;
 
   m_eg1.SetEgMode(ANALOG);
   m_eg1.SetAttackTimeMsec(20);
@@ -59,18 +59,19 @@ stereo_val SBSynth::GenNext(mixer_timing_info tinfo) {
   stereo_val out = {.left = 0, .right = 0};
   if (!active) return out;
 
-  if (m_osc1.m_note_on) {
-    m_osc2.Update();
-    double mod_output = m_osc2.DoOscillate(nullptr);
-
-    m_osc1.SetFoModExp(m_osc2_amp * OSC_FO_MOD_RANGE * mod_output);
-    m_osc1.Update();
-
-    double car_out = m_osc1.DoOscillate(nullptr);  // * m_osc1_amp;
-
+  if (m_car_osc.m_note_on) {
     m_eg1.Update();
-    double amp_env_val = 0.0;
-    double eg_out = m_eg1.DoEnvelope(&amp_env_val);
+    double eg_out = m_eg1.DoEnvelope(nullptr);
+
+    m_mod_osc.Update();
+    double mod_out = m_mod_osc.DoOscillate(nullptr) * eg_out * m_mod_amp;
+
+    double freq_dev = 4 * m_car_osc.m_osc_fo;
+
+    m_car_osc.SetFoModExp(mod_out * freq_dev);
+
+    m_car_osc.Update();
+    double car_out = m_car_osc.DoOscillate(nullptr);
 
     m_dca.SetEgMod(eg_out);
     m_dca.Update();
@@ -84,8 +85,8 @@ stereo_val SBSynth::GenNext(mixer_timing_info tinfo) {
   }
 
   if (m_eg1.GetState() == OFFF) {
-    m_osc1.StopOscillator();
-    m_osc2.StopOscillator();
+    m_car_osc.StopOscillator();
+    m_mod_osc.StopOscillator();
     m_eg1.StopEg();
   }
 
@@ -93,13 +94,13 @@ stereo_val SBSynth::GenNext(mixer_timing_info tinfo) {
 }
 
 void SBSynth::SetParam(std::string name, double val) {
-  if (name == "osc1")
-    m_osc1.m_waveform = val;
-  else if (name == "osc2")
-    m_osc2.m_waveform = val;
-  if (name == "osc1_amp") m_osc1_amp = val;
-  if (name == "osc2_amp")
-    m_osc2_amp = val;
+  if (name == "car_osc")
+    m_car_osc.m_waveform = val;
+  else if (name == "mod_osc")
+    m_mod_osc.m_waveform = val;
+  if (name == "car_amp") m_car_amp = val;
+  if (name == "mod_amp")
+    m_mod_amp = val;
   else if (name == "attack")
     m_eg1.SetAttackTimeMsec(val);
   if (name == "decay") m_eg1.SetDecayTimeMsec(val);
@@ -114,11 +115,13 @@ std::string SBSynth::Status() {
     ss << ANSI_COLOR_RESET;
   else
     ss << ANSI_COLOR_CYAN;
-  ss << "SBSynth osc1:" << GetOscType(m_osc1.m_waveform)
-     << " osc2:" << GetOscType(m_osc2.m_waveform) << " osc1_amp:" << m_osc1_amp
-     << " osc2_amp:" << m_osc2_amp << " cm_ratio:" << cm_ratio << std::endl;
+  ss << "SBSynth car_osc:" << GetOscType(m_car_osc.m_waveform)
+     << " mod_osc:" << GetOscType(m_mod_osc.m_waveform)
+     << " car_amp:" << m_car_amp << " mod_amp:" << m_mod_amp
+     << " cm_ratio:" << cm_ratio << std::endl;
 
-  ss << "     attack:" << m_eg1.m_attack_time_msec
+  ss << "     cf:" << m_car_osc.m_osc_fo << " mf:" << m_mod_osc.m_osc_fo
+     << " attack:" << m_eg1.m_attack_time_msec
      << " decay:" << m_eg1.m_decay_time_msec
      << " sustain:" << m_eg1.m_sustain_level
      << " release:" << m_eg1.m_release_time_msec << std::endl;
@@ -147,13 +150,13 @@ void SBSynth::noteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
 
-  m_osc1.m_note_on = true;
-  m_osc1.m_osc_fo = get_midi_freq(midinote);
-  m_osc1.StartOscillator();
+  m_car_osc.m_note_on = true;
+  m_car_osc.m_osc_fo = get_midi_freq(midinote);
+  m_car_osc.StartOscillator();
 
-  m_osc2.m_note_on = true;
-  m_osc2.m_osc_fo = get_midi_freq(midinote) * cm_ratio;
-  m_osc2.StartOscillator();
+  m_mod_osc.m_note_on = true;
+  m_mod_osc.m_osc_fo = get_midi_freq(midinote) * cm_ratio;
+  m_mod_osc.StartOscillator();
 
   m_eg1.StartEg();
 }

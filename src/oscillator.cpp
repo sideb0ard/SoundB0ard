@@ -93,6 +93,7 @@ void Oscillator::Update() {
   m_fo = m_osc_fo * m_fo_ratio *
          pitch_shift_multiplier(m_fo_mod + m_pitch_bend_mod + m_octave * 12.0 +
                                 m_semitones + m_cents / 100.0);
+
   // --- apply linear FM (not used in book projects)
   m_fo += m_fo_mod_lin;
 

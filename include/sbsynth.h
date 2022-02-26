@@ -32,11 +32,11 @@ class SBSynth : public SoundGenerator {
   void noteOff(midi_event ev) override;
 
  private:
-  QBLimitedOscillator m_osc1;
-  QBLimitedOscillator m_osc2;
+  QBLimitedOscillator m_car_osc;
+  QBLimitedOscillator m_mod_osc;
 
-  float m_osc1_amp{1};
-  float m_osc2_amp{1};
+  float m_car_amp{1};
+  float m_mod_amp{1};
 
   float cm_ratio{0.5};
 

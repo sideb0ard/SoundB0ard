@@ -152,6 +152,24 @@ let combinor = fn(rhythm, melody)
   }
   return return_melody;
 }
+let rcombinor = fn(rhythm, melody)
+{
+  let return_melody= [];
+  for (i=0; i < len(rhythm); ++i)
+  {
+    if (type(rhythm[i]) == "ARRAY") {
+      return_melody = push(return_melody, rcombinor(rhythm[i], melody));
+    }
+    else {
+      if (rhythm[i] > 0) {
+        return_melody = push(return_melody, melody[rand(len(melody))]);
+      } else {
+        return_melody = push(return_melody, 0);
+      }
+    }
+  }
+  return return_melody;
+}
 
 let phasefn = fn(soundgen1, soundgen2, pat_array, sg2_px, carry, bars_to_phase_over, note_dur)
 {
@@ -284,6 +302,16 @@ let stepper = fn(sg, pat, read_idx, play_idx)
   } else {
     if (pat[read_idx] > 0) {
       note_on_at(sg, pat[read_idx], play_idx * pp);
+    }
+  }
+}
+let cstepper = fn(sg, pat, read_idx, play_idx)
+{
+  if (type(pat[read_idx]) == "ARRAY") {
+    note_on_at(sg, notes_in_chord(pat[read_idx][0], 1, 1), play_idx * pp);
+  } else {
+    if (pat[read_idx] > 0) {
+      note_on_at(sg, notes_in_chord(pat[read_idx], 1, 1), play_idx * pp);
     }
   }
 }
