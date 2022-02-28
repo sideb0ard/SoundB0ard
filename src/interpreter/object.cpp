@@ -119,7 +119,10 @@ ObjectType Break::Type() { return BREAK_OBJ; }
 std::string Null::Inspect() { return "null"; }
 ObjectType Null::Type() { return NULL_OBJ; }
 
-FMSynth::FMSynth() { soundgen_id_ = AddSoundGenerator(DXSYNTH_TYPE); }
+FMSynth::FMSynth() {
+  soundgen_id_ = AddSoundGenerator(DXSYNTH_TYPE);
+  soundgenerator_type = DXSYNTH_TYPE;
+}
 std::string FMSynth::Inspect() { return "FM synth."; }
 ObjectType FMSynth::Type() { return SYNTH_OBJ; }
 
@@ -127,21 +130,31 @@ object::HashKey SoundGenerator::HashKey() {
   return object::HashKey(Type(), (uint64_t)soundgen_id_);
 }
 
-SBSynth::SBSynth() { soundgen_id_ = AddSoundGenerator(SBSYNTH_TYPE); }
+SBSynth::SBSynth() {
+  soundgen_id_ = AddSoundGenerator(SBSYNTH_TYPE);
+  soundgenerator_type = SBSYNTH_TYPE;
+}
 std::string SBSynth::Inspect() { return "SB synth."; }
 ObjectType SBSynth::Type() { return SYNTH_OBJ; }
 
-MoogSynth::MoogSynth() { soundgen_id_ = AddSoundGenerator(MINISYNTH_TYPE); }
+MoogSynth::MoogSynth() {
+  soundgen_id_ = AddSoundGenerator(MINISYNTH_TYPE);
+  soundgenerator_type = MINISYNTH_TYPE;
+}
 std::string MoogSynth::Inspect() { return "Moog synth."; }
 ObjectType MoogSynth::Type() { return SYNTH_OBJ; }
 
-DrumSynth::DrumSynth() { soundgen_id_ = AddSoundGenerator(DRUMSYNTH_TYPE); }
+DrumSynth::DrumSynth() {
+  soundgen_id_ = AddSoundGenerator(DRUMSYNTH_TYPE);
+  soundgenerator_type = DRUMSYNTH_TYPE;
+}
 std::string DrumSynth::Inspect() { return "Drum synth."; }
 ObjectType DrumSynth::Type() { return SYNTH_OBJ; }
 
 Sample::Sample(std::string sample_path) {
   sample_path_ = sample_path;
   soundgen_id_ = AddSoundGenerator(DRUMSAMPLER_TYPE, sample_path);
+  soundgenerator_type = DRUMSAMPLER_TYPE;
 }
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
@@ -149,6 +162,7 @@ ObjectType Sample::Type() { return SAMPLE_OBJ; }
 Granular::Granular(std::string sample_path, bool loop_mode) {
   std::cout << "OBJECT! LOOPM ODE IS " << loop_mode << std::endl;
   soundgen_id_ = AddSoundGenerator(LOOPER_TYPE, sample_path, loop_mode);
+  soundgenerator_type = LOOPER_TYPE;
 }
 std::string Granular::Inspect() { return "Granular."; }
 ObjectType Granular::Type() { return GRANULAR_OBJ; }

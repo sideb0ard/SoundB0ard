@@ -1103,6 +1103,39 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                           }
                           return evaluator::NULLL;
                         })},
+    {"rand_preset",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size >= 1) {
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             auto sg_type = soundgen->soundgenerator_type;
+             if (sg_type < 2) {
+               auto preset_names = synth_return_presets(sg_type);
+               int randy_int = rand() % preset_names.size();
+               auto preset = preset_names[randy_int];
+               auto preset_name =
+                   std::make_shared<object::String>(preset_names[randy_int]);
+               args.push_back(preset_name);
+               std::cout << "RANDILY GOING FOR :" << preset_names[randy_int]
+                         << std::endl;
+               auto cmd_name = std::make_shared<object::String>("load");
+               args.push_back(cmd_name);
+               audio_action_queue_item action_req{
+                   .type = AudioAction::LOAD_PRESET, .args = args};
+               audio_queue.push(action_req);
+             }
+             //  auto cmd_name =
+             //      std::make_shared<object::String>("rand");
+             //  args.push_back(cmd_name);
+             //  audio_action_queue_item action_req{
+             //      .type = AudioAction::RAND_PRESET, .args = args};
+             //  audio_queue.push(action_req);
+           }
+           return evaluator::NULLL;
+         })},
     {"save_preset", std::make_shared<object::BuiltIn>(
                         [](std::vector<std::shared_ptr<object::Object>> args)
                             -> std::shared_ptr<object::Object> {
@@ -1315,7 +1348,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         int seq_length = seq_length_num->value_;
 
                         // not dealing with error, just return empty
-                        if (num_pulses >= seq_length) return return_array;
+                        if (num_pulses > seq_length) return return_array;
                         if (seq_length < 1) return return_array;
 
                         std::vector<int> bjork_num =

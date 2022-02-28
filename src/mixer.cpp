@@ -749,6 +749,7 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
       repl_queue.push(sg->Info());
     }
   } else if (action.type == AudioAction ::SAVE_PRESET ||
+             action.type == AudioAction ::RAND_PRESET ||
              action.type == AudioAction ::LIST_PRESETS ||
              action.type == AudioAction::LOAD_PRESET) {
     interpreter_sound_cmds::ParseSynthCmd(action.args);

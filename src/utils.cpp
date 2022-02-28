@@ -912,3 +912,42 @@ bool synth_list_presets(unsigned int synthtype) {
 
   return true;
 }
+
+std::vector<std::string> synth_return_presets(unsigned int synthtype) {
+  std::cout << "IT ME!\n";
+
+  FILE *presetzzz = NULL;
+  switch (synthtype) {
+    case (MINISYNTH_TYPE):
+      presetzzz = fopen(SBAudio::MOOG_PRESET_FILENAME, "r+");
+      break;
+    case (DXSYNTH_TYPE):
+      presetzzz = fopen(SBAudio::DX_PRESET_FILENAME, "r+");
+      break;
+  }
+
+  std::vector<std::string> preset_names{};
+  if (presetzzz == NULL) return preset_names;
+
+  char line[256];
+  char setting_key[512];
+  char setting_val[512];
+
+  char *tok, *last_tok;
+  char const *sep = "::";
+
+  while (fgets(line, sizeof(line), presetzzz)) {
+    for (tok = strtok_r(line, sep, &last_tok); tok;
+         tok = strtok_r(NULL, sep, &last_tok)) {
+      sscanf(tok, "%[^=]=%s", setting_key, setting_val);
+      if (strcmp(setting_key, "name") == 0) {
+        preset_names.push_back(setting_val);
+        break;
+      }
+    }
+  }
+
+  fclose(presetzzz);
+
+  return preset_names;
+}

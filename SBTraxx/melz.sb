@@ -1,5 +1,9 @@
 # load_preset(dx, "rrrkan");
 
+# load_preset(dx, "rocktagon");
+# siiiiney // purlp // beleep // rocktagon // basss (louder)
+# FLOOR // 2
+
 
 let bbeatlah_fn = fn()
 {
@@ -7,6 +11,7 @@ let bbeatlah_fn = fn()
   let ran2 = rand(8);
   let ran3 = 16 - (ran1 + ran2);
   let beat = bjork(rand(ran1), ran1) + bjork(rand(ran2), ran2) + bjork(rand(ran3), ran3);
+  beat[0] = 1;
 
   return beat;
 }
@@ -27,13 +32,15 @@ let mblah_gen = gen()
     let idxr = 0;
     let lnn = 3;
 
+    let mlen = [1, 2];
+    let mlx = 0;
+
   }
   run()
   {
-    if (count % 1 == 0) {
+    if (count % mlen[mlx] == 0) {
       let melo = mel;
       if (count % 16 < 14) {
-        #print("ME:", count % 16);
         for (i = 0; i < 16; ++i) {
           cstepper(dx, melo, idxr, i);
           #stepper(bd, melo, idxr, i);
@@ -54,6 +61,7 @@ let mblah_gen = gen()
       beat = bbeatlah_fn();
       mel = rcombinor(beat, notex);
       #set dx:o1rat rand(13)+1;
+      mlx = incr(mlx, 0, len(mlen));
     }
 
     if (count % 3 == 0) {
@@ -67,4 +75,3 @@ let mblah_gen = gen()
   }
 }
 
-# load_preset(dx, "rocktagon");

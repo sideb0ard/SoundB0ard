@@ -315,6 +315,7 @@ class SoundGenerator : public Object {
 
  public:
   int soundgen_id_{-1};
+  int soundgenerator_type{};
 };
 
 class FMSynth : public SoundGenerator {

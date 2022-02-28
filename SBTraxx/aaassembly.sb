@@ -1,5 +1,5 @@
 let axf = sample(legowelt/FX-AcidPlanetStyle.wav);
-#let bsa = loop(loops/busitACID.aiff);
+# let bsa = loop(loops/busitACID.aiff);
 #let sb = loop(dloops/scudBeat2.aiff);
 
 # let acid = loop(aaassembly/hiphouseACID.wav)
@@ -19,36 +19,36 @@ let start_gen = gen()
   }
   run()
   {
-    #set yoyo:stutter 1;
-    set iget:stutter 1;
+    set yoyo:stutter 1;
+    #set iget:stutter 1;
     #set turnit:stutter 1;
-    if (count % 2 == 0) {
+    #set acid:scramble 1;
+    if (count % 2) {
       unsolo();
       note_on(axf,1 );
       #set yeahman:scramble 1;
-      #set rlf:scramble 1;
+      set rhy:scramble 1;
     }
     if (count % 3 == 0) {
       set dsc:scramble 1;
-      ###set rf:stutter 1;
+      ####set rf:stutter 1;
       set sb:stutter 1;
       set joey:scramble 1;
       set iget:scramble 1;
-      #set yeahman:stutter 1;
+      ###set yeahman:stutter 1;
       set acid:stutter 1;
       set turnit:scramble 1;
-      #set bsa:scramble 1;
+      ##set bsa:scramble 1;
       set yoyo:stutter 1;
-      #set rlf:stutter 1;
     }
     if (count % 4 == 0) {
       set acid:scramble 1;
       set turnit:stutter 1;
       set dsc:stutter 1;
       set iget:stutter 1;
-      ##set sb:scramble 1;
-      #set bsa:stutter 1;
-      ##set rhy:scramble 1;
+      set sb:scramble 1;
+      ###set bsa:stutter 1;
+      set rhy:stutter 1;
     }
     if (count % 8 == 0) {
       #solo(sb);
@@ -56,7 +56,13 @@ let start_gen = gen()
   }
 }
 
-# let dx = fm();
+# stop p1
+
+# load_preset(dx, "rrrkan") // then riff_gen
+# UNDg // l0renzo4 // drm // detruit // lowx0r
+
+let presetz = ["UNDg", "l0renzo4", "drm", "lowx0r"];
+let prx = 0;
 
 let riff_gen = gen()
 {
@@ -75,20 +81,23 @@ let riff_gen = gen()
   run()
   {
 
+
     let rf = driff;
     if (rfx > 0) {
       rf = griff;
     }
     for (i = 0; i < 16; ++i) {
       stepper(dx, rf, plx, i);
-      stepper(acid, rf, plx, i);
       plx = incr(plx, 0, plen);
     }
     plen = incr(plen, 1, 16);
 
 
+
     if (count % 4 == 0) {
-      rfx = incr(rfx, 0, 2);
+      #rfx = incr(rfx, 0, 2);
+      #load_preset(dx, presetz[prx]);
+      prx = incr(prx, 0, len(presetz));
     }
 
     if (count % 2 == 0) {
@@ -181,7 +190,11 @@ let sblah_gen = gen()
   }
 }
 
+# riff_gen
 # load_preset(dx, "puuurp")
+
+# back to mblah_gen
+# load_preset(dx, "purlp")
 
 # let snh = loop(loops/strongsNHats.aiff); set snh:len 8
 
@@ -202,6 +215,7 @@ let steppa = gen()
   }
   run()
   {
+    set kb:scramble 1;
     for (i = 0; i < 16; ++i) {
       stepper(bd, db, idx, i);
       stepper(yoyo, db, idx, i);

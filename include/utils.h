@@ -5,6 +5,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <string>
+#include <vector>
+
 void get_full_filename(char *basename, char *destination_fullname);
 
 AudioBufferDetails ImportFileContents(std::vector<double> &buffer,
@@ -82,3 +85,4 @@ float LinTerp(float x1, float x2, float y1, float y2, float x);
 }
 
 bool synth_list_presets(unsigned int synthtype);
+std::vector<std::string> synth_return_presets(unsigned int synthtype);

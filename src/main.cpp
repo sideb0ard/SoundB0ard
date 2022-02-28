@@ -119,7 +119,7 @@ void *process_worker_thread() {
 
 int main() {
   srand(time(NULL));
-  // signal(SIGINT, SIG_IGN);
+  signal(SIGINT, SIG_IGN);
 
   mixr = new Mixer();
 

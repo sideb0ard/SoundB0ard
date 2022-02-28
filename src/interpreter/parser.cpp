@@ -690,6 +690,11 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression() {
       auto expr = std::make_shared<ast::SynthPresetExpression>(cur_token_);
       NextToken();
       return expr;
+    } else if (peek_token_.literal_ == "rand") {
+      std::cout << "RAND PRESET!\n";
+      auto expr = std::make_shared<ast::SynthPresetExpression>(cur_token_);
+      NextToken();
+      return expr;
     } else if (peek_token_.literal_ == "load" ||
                peek_token_.literal_ == "save") {
       NextToken();
