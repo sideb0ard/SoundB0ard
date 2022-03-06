@@ -1,11 +1,15 @@
 let axf = sample(legowelt/FX-AcidPlanetStyle.wav);
+let loon = sample(noises/loon-bird.aiff);
 # let bsa = loop(loops/busitACID.aiff);
 #let sb = loop(dloops/scudBeat2.aiff);
 
 # let acid = loop(aaassembly/hiphouseACID.wav)
-# let iget = loop(aaassembly/iegtMAD.wav) ; set iget:len 4 ; solo(iget)
+# let iget = loop(aaassembly/iegtMAD.wav) ; set iget:len 4 ;
 
-# let yoyo = loop(aaassembly/yoyoredman.wav); set yoyo:len 2; solo(yoyo);
+# let yoyo = loop(aaassembly/yoyoredman.wav); set yoyo:len 2;
+# let joey = loop(aaassembly/NYhouseJOEY.wav)
+# let turnit = loop(aaassembly/hiphouseTURNIOUT.wav); vol turnit 0.5;
+
 
 let start_gen = gen()
 {
@@ -19,36 +23,45 @@ let start_gen = gen()
   }
   run()
   {
-    set yoyo:stutter 1;
-    #set iget:stutter 1;
-    #set turnit:stutter 1;
-    #set acid:scramble 1;
+    #set yoyo:stutter 1;
+    set turnit:stutter 1;
+    set acid:scramble 1;
+    #set yoyo:scamble 1;
     if (count % 2) {
       unsolo();
       note_on(axf,1 );
       #set yeahman:scramble 1;
-      set rhy:scramble 1;
+      #set rhy:scramble 1;
     }
     if (count % 3 == 0) {
       set dsc:scramble 1;
-      ####set rf:stutter 1;
+      ##set jbz:scramble 1;
+      ######set rf:stutter 1;
       set sb:stutter 1;
-      set joey:scramble 1;
       set iget:scramble 1;
-      ###set yeahman:stutter 1;
+      set joey:scramble 1;
+      #set iget:scramble 1;
+      ########set yeahman:stutter 1;
       set acid:stutter 1;
       set turnit:scramble 1;
-      ##set bsa:scramble 1;
+      ######set bsa:scramble 1;
       set yoyo:stutter 1;
+      set esk:stutter 1;
+      set chj:scramble 1;
     }
     if (count % 4 == 0) {
+      ##set jbz:stutter 1;
+      set yoyo:scramble 1;
       set acid:scramble 1;
+      set joey:stutter 1;
       set turnit:stutter 1;
       set dsc:stutter 1;
       set iget:stutter 1;
       set sb:scramble 1;
-      ###set bsa:stutter 1;
-      set rhy:stutter 1;
+      set esk:scramble 1;
+      set chj:stutter 1;
+      #####set bsa:stutter 1;
+      ##set rhy:stutter 1;
     }
     if (count % 8 == 0) {
       #solo(sb);
@@ -56,13 +69,20 @@ let start_gen = gen()
   }
 }
 
+#let chj = loop(dloops/ChicJack.aiff);
 # stop p1
 
 # load_preset(dx, "rrrkan") // then riff_gen
 # UNDg // l0renzo4 // drm // detruit // lowx0r
 
-let presetz = ["UNDg", "l0renzo4", "drm", "lowx0r"];
+#let presetz = ["UNDg", "l0renzo4", "drm", "lowx0r"];
+let presetz = ["l0renzo4", "beleep"];
 let prx = 0;
+
+#let presetz2 = ["dalekkk", "wuurpr"];
+let presetz2 = ["dalekkk"];
+let prx2 = 0;
+
 
 let riff_gen = gen()
 {
@@ -77,27 +97,39 @@ let riff_gen = gen()
     let plen = 3;
 
     let rfx = 0;
+    let mymod = 1;
   }
   run()
   {
 
 
     let rf = driff;
+    #print("DRIFF:", driff);
     if (rfx > 0) {
       rf = griff;
     }
-    for (i = 0; i < 16; ++i) {
-      stepper(dx, rf, plx, i);
-      plx = incr(plx, 0, plen);
+
+    if (count % mymod == 0) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, rf, plx, i);
+        # dx2 // "wuurpr" // "dalekkk"
+        #stepper(dx2, rotate(rf, mymod), plx, i);
+        plx = incr(plx, 0, plen);
+      }
+      plen = incr(plen, 1, 16);
     }
-    plen = incr(plen, 1, 16);
 
 
 
     if (count % 4 == 0) {
-      #rfx = incr(rfx, 0, 2);
+      rfx = incr(rfx, 0, 2);
       #load_preset(dx, presetz[prx]);
       prx = incr(prx, 0, len(presetz));
+      mymod = incr(mymod, 1, 4);
+    }
+    if (count % 3 == 0) {
+      #load_preset(dx2, presetz2[prx2]);
+      prx2 = incr(prx2, 0, len(presetz2));
     }
 
     if (count % 2 == 0) {
@@ -110,10 +142,10 @@ let riff_gen = gen()
 
       driff = briff(gn);
       griff = briff(gn);
-      if (dn > 40) {
+      if (dn > 36) {
         gn = 14;
       }
-      if (gn > 50) {
+      if (gn > 28) {
         gn = 19;
       }
     }
@@ -125,11 +157,12 @@ let riff_gen = gen()
 
 # let hb = loop(dloops/hausBreakBeat.aiff);
 
-# let joey = loop(aaassembly/NYhouseJOEY.wav)
-
 # let yeahman = loop(aaassembly/yeahMAN.wav); set yeahman:len 4
 
 # let rhy = loop(aaassembly/rhythmGUITAR.wav);
+
+
+# let jbz = loop(dloops/jbsscratchbeat.aiff);
 
 let hhblah_gen = gen()
 {
@@ -146,15 +179,21 @@ let hhblah_gen = gen()
       }
       note_on_at(hh, 1, i*pp + offset);
 
-      if (i % 3 == 0) {
-        note_on_at(bsa, 1, i*pp);
-      }
+      #if (i % 3 == 0) {
+        #  note_on_at(bsa, 1, i*pp);
+        #}
       if (i % 4 == 0) {
         #set bsa:active 1;
+        #note_on(loon, 1);
       }
     }
   }
 }
+
+# let chj = loop(dloops/ChicJack.aiff);
+# let esk = loop(dloops/EKSIbeat.aiff);
+# mblah
+# beleep
 
 #  let lz = grain(legowelt/Synth-SplashZinderString.wav)
 # p4 < osc 16 "0 100" "set lz:idx %"
@@ -164,15 +203,18 @@ let cons = sample(aaassembly/BDPconscious.wav);
 let kil = sample(voices/uhUmf.aiff);
 let teh = sample(brandyvocalz/teh.wav);
 let aye = sample(brandyvocalz/aye.wav);
+let wut = sample(brandyvocalz/wut.wav);
+let gu = sample(brandyvocalz/gu.wav);
 
-# let turnit = loop(aaassembly/hiphouseTURNIOUT.wav);
+# let ab = loop(voices/about2wreck.wav); set ab:len 4
 
 
 let sblah_gen = gen()
 {
   setup()
   {
-    let sampz =[cons, kil, uus, teh, aye];
+    #let sampz =[cons, kil, uus, teh, aye];
+    let sampz =[uus, teh, aye, wut, gu];
     let rhm = rand_array(16, 0, len(sampz) + 3);
   }
   run()
@@ -186,6 +228,7 @@ let sblah_gen = gen()
     }
     if (count % 8 == 0) {
       rhm = rand_array(16, 0, len(sampz) + 3);
+      play noises/loon-bird.aiff;
     }
   }
 }
@@ -193,11 +236,17 @@ let sblah_gen = gen()
 # riff_gen
 # load_preset(dx, "puuurp")
 
-# back to mblah_gen
-# load_preset(dx, "purlp")
 
-# let snh = loop(loops/strongsNHats.aiff); set snh:len 8
 
+
+
+# just hihatz and ..
+
+# mblah
+## load_preset(dx, "basss"); vol dx 0.6;
+
+let bd = sample(bd/808kick.aif);
+let cp = sample(cp/front2WestClap.aiff);
 
 let steppa = gen()
 {
@@ -212,6 +261,9 @@ let steppa = gen()
 
     let ptzz = [1, 2, 0.7];
     let ptxz = 0;
+
+    let ratz = [17, 21, 19, 2];
+    let rx = 0;
   }
   run()
   {
@@ -229,6 +281,8 @@ let steppa = gen()
 
     if (count % 12 == 0) {
       db = rand_beat();
+      set dx:o1rat ratz[rx] at=i*pp;
+      rx = incr(rx, 0, len(ratz));
     }
   }
 }

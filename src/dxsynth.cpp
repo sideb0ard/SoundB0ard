@@ -40,7 +40,7 @@ DXSynth::DXSynth() {
   type = DXSYNTH_TYPE;
   std::cout << "Added, FM Synth, yo!\n";
   active_midi_osc = 1;
-  volume = 0.4;
+  volume = 0.3;
 
   Reset();
 
