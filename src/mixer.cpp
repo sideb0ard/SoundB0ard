@@ -500,7 +500,10 @@ bool Mixer::DelSoundgen(int soundgen_num) {
 }
 
 bool Mixer::IsValidSoundgenNum(int sg_num) {
-  if (sg_num < sound_generators_.size()) return true;
+  if (sg_num < sound_generators_.size() && sound_generators_[sg_num])
+    return true;
+
+  std::cerr << "Nah mate, tried to get an invalid Soundgenerator!\n";
   return false;
 }
 

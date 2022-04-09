@@ -950,6 +950,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
            if (soundgen) {
              int sgid = soundgen->soundgen_id_;
+             std::cout << "SGID is " << sgid << std::endl;
              std::vector<int> midi_nums = GetMidiNotes(args[1]);
              int vel = 128;
              int dur = 240;

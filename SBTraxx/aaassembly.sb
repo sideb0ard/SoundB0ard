@@ -23,9 +23,9 @@ let start_gen = gen()
   }
   run()
   {
-    #set yoyo:stutter 1;
+    set yoyo:stutter 1;
     #set turnit:stutter 1;
-    #set acid:scramble 1;
+    ##set acid:scramble 1;
     #set yoyo:scamble 1;
     #set iget:stutter 1;
     if (count % 2) {
@@ -35,35 +35,35 @@ let start_gen = gen()
       #set rhy:scramble 1;
     }
     if (count % 3 == 0) {
-      #set dsc:scramble 1;
-      ####set jbz:scramble 1;
-      ########set rf:stutter 1;
-      #set sb:stutter 1;
-      #set iget:scramble 1;
+      set dsc:scramble 1;
+      #set jbz:scramble 1;
+      #set rf:stutter 1;
+      set sb:stutter 1;
+      set iget:scramble 1;
       #set joey:scramble 1;
       #set yeahman:stutter 1;
       #set acid:stutter 1;
-      ##set turnit:scramble 1;
+      #set turnit:scramble 1;
       #set yoyo:stutter 1;
-      #set esk:stutter 1;
-      #set chj:scramble 1;
+      set esk:stutter 1;
+      set chj:scramble 1;
     }
     if (count % 4 == 0) {
       ##set jbz:stutter 1;
       #set yoyo:scramble 1;
       #set acid:scramble 1;
       #set joey:stutter 1;
-      ###set turnit:stutter 1;
-      #set dsc:stutter 1;
-      #set iget:stutter 1;
-      #set sb:scramble 1;
-      #set esk:scramble 1;
+      #set turnit:stutter 1;
+      set dsc:stutter 1;
+      set iget:stutter 1;
+      set sb:scramble 1;
+      set esk:scramble 1;
       set chj:stutter 1;
-      #######set bsa:stutter 1;
+      #set bsa:stutter 1;
       #set rhy:stutter 1;
     }
     if (count % 8 == 0) {
-      solo(sb);
+      #solo(sb);
     }
   }
 }
@@ -183,7 +183,7 @@ let hhblah_gen = gen()
         #}
       if (i % 4 == 0) {
         #set bsa:active 1;
-        note_on(loon, 1);
+        #note_on(loon, 1);
       }
     }
   }
@@ -228,6 +228,7 @@ let sblah_gen = gen()
     }
     if (count % 8 == 0) {
       rhm = rand_array(16, 0, len(sampz) + 3);
+      play noises/loon-bird.aiff;
     }
   }
 }

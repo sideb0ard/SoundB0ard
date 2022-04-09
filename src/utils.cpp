@@ -70,6 +70,12 @@ void print_vec_of_vec(std::vector<std::vector<int>> &vec) {
 }  // namespace
 
 namespace utils {
+
+bool FileExists(std::string filename) {
+  fs::path file_path = fs::current_path().string() + "/wavs/" + filename;
+  return fs::exists(file_path);
+}
+
 float LinTerp(float x1, float x2, float y1, float y2, float x) {
   float denom = x2 - x1;
   if (denom == 0) return y1;  // should not ever happen

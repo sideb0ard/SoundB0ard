@@ -487,9 +487,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   std::shared_ptr<ast::SampleExpression> sample =
       std::dynamic_pointer_cast<ast::SampleExpression>(node);
   if (sample) {
-    if (!sample->path_.empty())
+    if (utils::FileExists(sample->path_)) {
       return std::make_shared<object::Sample>(sample->path_);
-    else
+    } else
       std::cerr << "Nae sample path!!\n";
   }
 
