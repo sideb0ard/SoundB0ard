@@ -219,17 +219,27 @@ std::vector<int> GetMidiNotesInChord(unsigned int root_note,
     notes_in_chord.push_back(root_note + 7);
 
   switch (modification) {
-    case (1):
+    case (1):  // minor 7th
       notes_in_chord.push_back(root_note + 10);
       break;
-    case (2):  // augmentation
-      notes_in_chord.push_back(root_note + 10);
-      notes_in_chord.push_back(root_note - 12);
+    case (2):  // major 7th
+      notes_in_chord.push_back(root_note + 11);
       break;
-    case (3):  // augmentation
-      notes_in_chord.push_back(root_note + 10);
-      notes_in_chord.push_back(root_note - 24);
+    case (3):  // inverted minor 7th
+      notes_in_chord.push_back(root_note - 2);
       break;
+      // case (3):  // augmentation
+      //   notes_in_chord.push_back(root_note + 10);
+      //   notes_in_chord.push_back(root_note + 12);
+      //   break;
+      // case (4):  // augmentation
+      //   notes_in_chord.push_back(root_note + 10);
+      //   notes_in_chord.push_back(root_note - 24);
+      //   break;
+      // case (5):  // augmentation
+      //   notes_in_chord.push_back(root_note + 10);
+      //   notes_in_chord.push_back(root_note + 24);
+      //   break;
   }
 
   return notes_in_chord;
