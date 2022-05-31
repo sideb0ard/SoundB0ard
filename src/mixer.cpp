@@ -63,8 +63,6 @@ Mixer::Mixer() {
   timing_info.is_quarter = true;
   timing_info.is_third = true;
 
-  std::cout << "MIXER CREATED YO!" << std::endl;
-
   std::string contents = ReadFileContents(kStartupConfigFile);
   eval_command_queue.push(contents);
 }
@@ -424,7 +422,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
 
   int return_bpm = 0;
   if (bpm_to_be_updated > 0) {
-    std::cout << "SETTING TEMPOT TO " << bpm_to_be_updated << std::endl;
+    std::cout << "SETTING TEMPO TO " << bpm_to_be_updated << std::endl;
     return_bpm = bpm_to_be_updated;
     bpm_to_be_updated = 0;
   }
@@ -446,17 +444,6 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     const auto hostTime =
         beginHostTime +
         microseconds(llround(static_cast<double>(i) * microsPerSample));
-    // const auto lastSampleHostTime =
-    //     hostTime - microseconds(llround(microsPerSample));
-
-    // if (sessionState.phaseAtTime(hostTime, 1) <
-    //     sessionState.phaseAtTime(lastSampleHostTime, 1)) {
-    //   std::cout << "THUD\n";
-    // }
-    // if (sessionState.phaseAtTime(hostTime, 4) <
-    //     sessionState.phaseAtTime(lastSampleHostTime, 4)) {
-    //   std::cout << "TOP OF LOOP\n";
-    // }
 
     timing_info.is_midi_tick = false;
     auto beat_time = sessionState.beatAtTime(hostTime, quantum);
@@ -645,6 +632,7 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
       for (auto midinum : action.notes) {
         midi_event event_on = new_midi_event(MIDI_ON, midinum, action.velocity);
         event_on.source = EXTERNAL_OSC;
+        event_on.dur = action.duration;
 
         // used later for MIDI OFF MESSAGE
         int midi_note_on_time = timing_info.midi_tick;

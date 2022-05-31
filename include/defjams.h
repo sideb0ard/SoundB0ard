@@ -277,6 +277,7 @@ class midi_event {
   std::vector<int> dataz{};
   int hold{};  // millisecond hold value
   bool delete_after_use{false};
+  int dur{0};
 };
 
 struct MusicalEvent {

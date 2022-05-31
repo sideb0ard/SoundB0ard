@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "midi_freq_table.h"
+#include "utils.h"
 
 namespace {
 std::string GetOscType(int type) {
@@ -47,22 +48,15 @@ DrumSynth::DrumSynth() {
   osc2.m_waveform = NOISE;
   osc2_amp = 0;
 
-  pitch_env.SetEgMode(ANALOG);
-  pitch_env.SetAttackTimeMsec(0);
-  pitch_env.SetDecayTimeMsec(70);
-  pitch_env.SetSustainLevel(0);
-  pitch_env.SetReleaseTimeMsec(0);
-  pitch_env.ramp_mode = true;
-  pitch_env_to_osc1 = true;
-
-  amp_env.SetEgMode(ANALOG);
-  amp_env.SetAttackTimeMsec(0);
-  amp_env.SetDecayTimeMsec(300);
-  amp_env.SetSustainLevel(0);
-  amp_env.SetReleaseTimeMsec(3000);
-  amp_env.m_output_eg = true;
-  amp_env.ramp_mode = true;
-  amp_env.m_reset_to_zero = true;
+  m_eg.SetEgMode(ANALOG);
+  m_eg.SetAttackTimeMsec(1);
+  m_eg.SetDecayTimeMsec(100);
+  m_eg.SetSustainLevel(0.7);
+  m_eg.SetReleaseTimeMsec(50);
+  m_eg.m_output_eg = true;
+  // m_eg.ramp_mode = true;
+  m_eg.m_reset_to_zero = true;
+  m_eg.Update();
 
   m_dca.m_mod_source_eg = DEST_DCA_EG;
 
@@ -70,52 +64,46 @@ DrumSynth::DrumSynth() {
 }
 
 stereo_val DrumSynth::GenNext(mixer_timing_info tinfo) {
+  frames_per_midi_tick_ = tinfo.frames_per_midi_tick;
   stereo_val out = {.left = 0, .right = 0};
   if (!active) return out;
 
   if (osc1.m_note_on) {
-    // Pitch Envelope
-    double pitch_env_val = 0.0;
-    pitch_env.DoEnvelope(&pitch_env_val);
+    // m_eg.Update();
+    // double m_eg_val = 0.0;
+    // double eg_out = m_eg.DoEnvelope(&m_eg_val);
 
-    if (pitch_env_to_osc1) {
-      osc1.SetFoModExp(pitch_env_int * OSC_FO_MOD_RANGE * pitch_env_val);
-      osc1.Update();
+    double concav = concave_inverted_transform(modulo_);
+    if (concav < 0) {
+      osc1.m_note_on = false;
     }
-    double osc1_out = osc1.DoOscillate(nullptr);
+    osc1.m_osc_fo = concav * starting_frequency_;
+    modulo_ += inc_;
 
-    if (pitch_env_to_osc2) {
-      osc2.SetFoModExp(pitch_env_int * OSC_FO_MOD_RANGE * pitch_env_val);
-      osc2.Update();
-    }
-    double osc2_out = osc2.DoOscillate(nullptr);
-
-    double osc_mix = osc1_out * osc1_amp + osc2_out * osc2_amp;
-
-    // Amp Envelope
-    double amp_env_val = 0.0;
-    double eg_out = amp_env.DoEnvelope(&amp_env_val);
-
-    m_dca.SetEgMod(eg_out);
+    m_dca.SetEgMod(concav);
     m_dca.Update();
 
-    filter1.Update();
-    double filter_out = filter1.DoFilter(osc_mix);
+    osc1.Update();
+    // std::cout << "CONCA:" << concav << " MOD:" << modulo_
+    //           << " FOOO:" << osc1.m_fo << " (INC:" << inc_ << ")" <<
+    //           std::endl;
+    double osc1_out = osc1.DoOscillate(nullptr);
 
     double out_left = 0.0;
     double out_right = 0.0;
 
-    m_dca.DoDCA(filter_out, filter_out, &out_left, &out_right);
+    m_dca.DoDCA(osc1_out, osc1_out, &out_left, &out_right);
 
     out = {.left = out_left * volume, .right = out_right * volume};
     out = Effector(out);
   }
 
-  if (amp_env.GetState() == OFFF) {
-    osc1.StopOscillator();
-    osc2.StopOscillator();
-    amp_env.StopEg();
-  }
+  // if (m_eg.GetState() == OFFF) {
+  //   osc1.StopOscillator();
+  //   osc2.StopOscillator();
+  //   m_eg.StopEg();
+  // }
+
   return out;
 }
 
@@ -128,39 +116,10 @@ void DrumSynth::SetParam(std::string name, double val) {
     osc1_amp = val;
   else if (name == "o2amp")
     osc2_amp = val;
-  else if (name == "filter1")
-    filter1.SetType(val);
-  else if (name == "f1fc")
-    filter1.SetFcControl(val);
-  else if (name == "f1fq")
-    filter1.SetQControl(val);
-  else if (name == "f1_osc1_enable")
-    f1_osc1_enable = val;
-  else if (name == "f1_osc2_enable")
-    f1_osc2_enable = val;
-  else if (name == "filter2")
-    filter2.SetType(val);
-  else if (name == "f2fc")
-    filter2.SetFcControl(val);
-  else if (name == "f2fq")
-    filter2.SetQControl(val);
-  else if (name == "f2_osc1_enable")
-    f2_osc1_enable = val;
-  else if (name == "f2_osc2_enable")
-    f2_osc2_enable = val;
-  else if (name == "pitch_env_attack")
-    pitch_env.SetAttackTimeMsec(val);
-  if (name == "pitch_env_decay") pitch_env.SetDecayTimeMsec(val);
-  if (name == "pitch_env_sustain") pitch_env.SetSustainLevel(val);
-  if (name == "pitch_env_release") pitch_env.SetReleaseTimeMsec(val);
-  if (name == "pitch_env_int") pitch_env_int = val;
-  if (name == "pitch_env_to_osc1") pitch_env_to_osc1 = val;
-  if (name == "pitch_env_to_osc2") pitch_env_to_osc2 = val;
-  if (name == "amp_env_attack") amp_env.SetAttackTimeMsec(val);
-  if (name == "amp_env_decay") amp_env.SetDecayTimeMsec(val);
-  if (name == "amp_env_sustain") amp_env.SetSustainLevel(val);
-  if (name == "amp_env_release") amp_env.SetReleaseTimeMsec(val);
-  if (name == "amp_env_int") amp_env_int = val;
+  if (name == "eg_attack") m_eg.SetAttackTimeMsec(val);
+  if (name == "eg_decay") m_eg.SetDecayTimeMsec(val);
+  if (name == "eg_sustain") m_eg.SetSustainLevel(val);
+  if (name == "eg_release") m_eg.SetReleaseTimeMsec(val);
 }
 
 std::string DrumSynth::Status() {
@@ -172,29 +131,10 @@ std::string DrumSynth::Status() {
   ss << "DrumSynth osc1:" << GetOscType(osc1.m_waveform)
      << " o1amp:" << osc1_amp << " osc2:" << GetOscType(osc2.m_waveform)
      << " o2amp:" << osc2_amp << std::endl;
-  ss << "     filter1:" << filter1.m_filter_type << " f1fc:" << filter1.m_fc
-     << " f1fq:" << filter1.m_q
-     << " f1_osc1_enable:" << (f1_osc1_enable ? "true" : "false")
-     << " f1_osc2_enable:" << (f1_osc2_enable ? "true" : "false") << std::endl;
-  ss << "     filter2:" << filter2.m_filter_type << " f2fc:" << filter2.m_fc
-     << " f2fq:" << filter1.m_q
-     << " f2_osc1_enable:" << (f2_osc1_enable ? "true" : "false")
-     << " f2_osc2_enable:" << (f2_osc2_enable ? "true" : "false") << std::endl;
-
-  ss << "     pitch_env_attack:" << pitch_env.m_attack_time_msec
-     << " pitch_env_decay:" << pitch_env.m_decay_time_msec
-     << " pitch_env_sustain:" << pitch_env.m_sustain_level
-     << " pitch_env_release:" << pitch_env.m_release_time_msec << std::endl;
-  ss << "     pitch_env_to_osc1:" << (pitch_env_to_osc1 ? "true" : "false")
-     << " pitch_env_to_osc2:" << (pitch_env_to_osc2 ? "true" : "false")
-     << " pitch_env_int:" << pitch_env_int << std::endl;
-  ss << "     amp_env_attack:" << amp_env.m_attack_time_msec
-     << " amp_env_decay:" << amp_env.m_decay_time_msec
-     << " amp_env_sustain:" << amp_env.m_sustain_level
-     << " amp_env_release:" << amp_env.m_release_time_msec << std::endl;
-  ss << "     amp_env_to_osc1:" << (amp_env_to_osc1 ? "true" : "false")
-     << " amp_env_to_osc2:" << (amp_env_to_osc2 ? "true" : "false")
-     << " amp_env_int:" << amp_env_int;
+  ss << "     eg_attack:" << m_eg.m_attack_time_msec
+     << " eg_decay:" << m_eg.m_decay_time_msec
+     << " eg_sustain:" << m_eg.m_sustain_level
+     << " eg_release:" << m_eg.m_release_time_msec;
 
   return ss.str();
 }
@@ -215,20 +155,33 @@ void DrumSynth::start() {
   active = true;
 }
 
+void DrumSynth::stop() {
+  if (active) return;  // no-op
+  active = false;
+}
+
+void DrumSynth::noteOff(midi_event ev) { m_eg.NoteOff(); }
+
 void DrumSynth::noteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
 
   osc1.m_note_on = true;
   osc1.m_osc_fo = get_midi_freq(midinote);
+
+  starting_frequency_ = osc1.m_osc_fo;
+  modulo_ = 0;
+  double duration_in_frames = frames_per_midi_tick_ * ev.dur;
+  inc_ = 1. / duration_in_frames;
+
+  osc1.Update();
   osc1.StartOscillator();
 
-  osc2.m_note_on = true;
-  osc2.m_osc_fo = get_midi_freq(midinote);
-  osc2.StartOscillator();
+  // osc2.m_note_on = true;
+  // osc2.m_osc_fo = get_midi_freq(midinote);
+  // osc2.StartOscillator();
 
-  pitch_env.StartEg();
-  amp_env.StartEg();
+  m_eg.StartEg();
 }
 
 void DrumSynth::Save(std::string new_preset_name) {
@@ -264,54 +217,13 @@ void DrumSynth::Save(std::string new_preset_name) {
   fprintf(presetzzz, "::o2amp=%f", osc2_amp);
   settings_count++;
 
-  fprintf(presetzzz, "::filter1=%d", filter1.m_filter_type);
+  fprintf(presetzzz, "::eg_attack=%f", m_eg.m_attack_time_msec);
   settings_count++;
-  fprintf(presetzzz, "::f1fc=%f", filter1.m_fc);
+  fprintf(presetzzz, "::eg_decay=%f", m_eg.m_decay_time_msec);
   settings_count++;
-  fprintf(presetzzz, "::f1fq=%f", filter1.m_q);
+  fprintf(presetzzz, "::eg_sustain=%f", m_eg.m_sustain_level);
   settings_count++;
-  fprintf(presetzzz, "::f1_osc1_enable=%d", f1_osc1_enable);
-  settings_count++;
-  fprintf(presetzzz, "::f1_osc2_enable=%d", f1_osc2_enable);
-  settings_count++;
-
-  fprintf(presetzzz, "::filter2=%d", filter2.m_filter_type);
-  settings_count++;
-  fprintf(presetzzz, "::f2fc=%f", filter2.m_fc);
-  settings_count++;
-  fprintf(presetzzz, "::f2fq=%f", filter2.m_q);
-  settings_count++;
-  fprintf(presetzzz, "::f2_osc1_enable=%d", f2_osc1_enable);
-  settings_count++;
-  fprintf(presetzzz, "::f2_osc2_enable=%d", f2_osc2_enable);
-  settings_count++;
-
-  fprintf(presetzzz, "::pitch_env_attack=%f", pitch_env.m_attack_time_msec);
-  settings_count++;
-  fprintf(presetzzz, "::pitch_env_decay=%f", pitch_env.m_decay_time_msec);
-  settings_count++;
-  fprintf(presetzzz, "::pitch_env_sustain=%f", pitch_env.m_sustain_level);
-  settings_count++;
-  fprintf(presetzzz, "::pitch_env_release=%f", pitch_env.m_release_time_msec);
-  settings_count++;
-  fprintf(presetzzz, "::pitch_env_to_osc1=%d", pitch_env_to_osc1);
-  settings_count++;
-  fprintf(presetzzz, "::pitch_env_to_osc2=%d", pitch_env_to_osc1);
-  settings_count++;
-
-  fprintf(presetzzz, "::amp_env_attack=%f", amp_env.m_attack_time_msec);
-  settings_count++;
-  fprintf(presetzzz, "::amp_env_decay=%f", amp_env.m_decay_time_msec);
-  settings_count++;
-  fprintf(presetzzz, "::amp_env_sustain=%f", amp_env.m_sustain_level);
-  settings_count++;
-  fprintf(presetzzz, "::amp_env_release=%f", amp_env.m_release_time_msec);
-  settings_count++;
-  fprintf(presetzzz, "::amp_env_int=%f", amp_env_int);
-  settings_count++;
-  fprintf(presetzzz, "::amp_env_to_osc1=%d", amp_env_to_osc1);
-  settings_count++;
-  fprintf(presetzzz, "::amp_env_to_osc2=%d", amp_env_to_osc1);
+  fprintf(presetzzz, "::eg_release=%f", m_eg.m_release_time_msec);
   settings_count++;
 
   fprintf(presetzzz, ":::\n");

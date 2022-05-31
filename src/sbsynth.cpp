@@ -66,7 +66,7 @@ stereo_val SBSynth::GenNext(mixer_timing_info tinfo) {
     m_mod_osc.Update();
     double mod_out = m_mod_osc.DoOscillate(nullptr) * eg_out * m_mod_amp;
 
-    double freq_dev = 4 * m_car_osc.m_osc_fo;
+    double freq_dev = 5 * m_car_osc.m_osc_fo;
 
     m_car_osc.SetFoModExp(mod_out * freq_dev);
 
@@ -88,6 +88,9 @@ stereo_val SBSynth::GenNext(mixer_timing_info tinfo) {
     m_car_osc.StopOscillator();
     m_mod_osc.StopOscillator();
     m_eg1.StopEg();
+  }
+  if (out.left > 0) {
+    std::cout << "VAL:" << out.left << std::endl;
   }
 
   return out;

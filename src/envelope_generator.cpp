@@ -188,12 +188,10 @@ void EnvelopeGenerator::Update() {
 double EnvelopeGenerator::DoEnvelope(double *p_biased_output) {
   switch (m_state) {
     case OFFF: {
-      // std::cout << "OFF!!\n";
       if (m_reset_to_zero) m_envelope_output = 0.0;
       break;
     }
     case ATTACK: {
-      // std::cout << "ATTACK!!\n";
       m_envelope_output = m_attack_offset + m_envelope_output * m_attack_coeff;
       if (m_envelope_output >= 1.0 ||
           m_attack_time_scalar * m_attack_time_msec <= 0.0) {
@@ -205,14 +203,13 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output) {
       break;
     }
     case DECAY: {
-      // std::cout << "DECAY!!\n";
       m_envelope_output = m_decay_offset + m_envelope_output * m_decay_coeff;
       if (m_envelope_output <= m_sustain_level ||
           m_decay_time_scalar * m_decay_time_msec <= 0.0) {
         m_envelope_output = m_sustain_level;
-        if (ramp_mode)
+        if (ramp_mode) {
           NoteOff();
-        else
+        } else
           m_state = SUSTAIN;
         break;
       }
@@ -224,7 +221,6 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output) {
       break;
     }
     case RELEASE: {
-      // std::cout << "REEEEEEElease!!\n";
       if (m_sustain_override) {
         m_envelope_output = m_sustain_level;
         break;
@@ -246,7 +242,6 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output) {
       break;
     }
     case SHUTDOWN: {
-      /// std::cout << "SHUTDOooooWN!!\n";
       if (m_reset_to_zero) {
         m_envelope_output += m_inc_shutdown;
         if (m_envelope_output <= 0) {

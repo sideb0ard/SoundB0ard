@@ -19,7 +19,9 @@ class DrumSynth : public SoundGenerator {
   std::string Status() override;
   stereo_val GenNext(mixer_timing_info tinfo) override;
   void start() override;
+  void stop() override;
   void noteOn(midi_event ev) override;
+  void noteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
   void Load(std::string name) override;
   void Save(std::string name) override;
@@ -27,28 +29,19 @@ class DrumSynth : public SoundGenerator {
 
   std::string patch_name{};
 
+  // used for exponential detune
+  double modulo_{0};
+  double inc_{0};
+  double frames_per_midi_tick_{0};
+  double starting_frequency_{0};
+
   QBLimitedOscillator osc1;
   float osc1_amp{1};
 
   QBLimitedOscillator osc2;
   float osc2_amp{0};
 
-  EnvelopeGenerator amp_env;
-  bool amp_env_to_osc1{false};
-  bool amp_env_to_osc2{false};
-  float amp_env_int{1};
-
-  EnvelopeGenerator pitch_env;
-  bool pitch_env_to_osc1{true};
-  bool pitch_env_to_osc2{false};
-  float pitch_env_int{0.75};
-
-  MoogLadder filter1;
-  bool f1_osc1_enable{false};
-  bool f1_osc2_enable{false};
-  MoogLadder filter2;
-  bool f2_osc1_enable{false};
-  bool f2_osc2_enable{false};
+  EnvelopeGenerator m_eg;
 
   DCA m_dca;
 };
