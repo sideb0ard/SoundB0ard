@@ -7,6 +7,7 @@
 #include <fx/fx.h>
 #include <minisynth.h>
 #include <portaudio.h>
+#include <portmidi.h>
 #include <pthread.h>
 #include <soundgenerator.h>
 
@@ -73,7 +74,15 @@ struct Mixer {
 
   double volume{0.7};
 
+  PortMidiStream *midi_stream;
+  bool have_midi_controller;
+  std::string midi_controller_name{};
+  std::vector<int> midi_targets{};  // sound_generators_ idx
+
+  void AssignSoundGeneratorToMidiController(int soundgen_id);
+
   void CheckForDelayedEvents();
+  void CheckForExternalMidiEvents();
 
   void Help();
   void Ps(bool all);

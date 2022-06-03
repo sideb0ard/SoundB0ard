@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "PerlinNoise.hpp"
+#include "midi_device.h"
 
 namespace fs = std::filesystem;
 
@@ -585,6 +586,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"midi_ref", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
+                       (void)args;
                        mixr->PrintMidiInfo();
                        return evaluator::NULLL;
                      })},
@@ -631,12 +633,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"funcz", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {
+                    (void)args;
                     mixr->PrintFuncAndGenInfo();
                     return evaluator::NULLL;
                   })},
     {"timing_info", std::make_shared<object::BuiltIn>(
                         [](std::vector<std::shared_ptr<object::Object>> args)
                             -> std::shared_ptr<object::Object> {
+                          (void)args;
                           mixr->PrintTimingInfo();
                           return evaluator::NULLL;
                         })},
@@ -833,6 +837,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"unsolo", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object> {
+                     (void)args;
                      audio_action_queue_item action_req{
                          .type = AudioAction::UNSOLO};
                      audio_queue.push(action_req);
@@ -1042,6 +1047,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {
                     std::cout << "INBUILT SPEED CALLED!" << std::endl;
+                    (void)args;
                     return evaluator::NULLL;
                   })},
     {"add_fx", std::make_shared<object::BuiltIn>(
@@ -1370,6 +1376,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
      std::make_shared<
          object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)
                               -> std::shared_ptr<object::Object> {
+       (void)args;
        std::string cmd =
            "let bd = sample(" + GetRandomSampleNameFromDir("bd") + ")";
        eval_command_queue.push(cmd);
@@ -1828,6 +1835,28 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
            }
 
+           return evaluator::NULLL;
+         })},
+    {"midi_init", std::make_shared<object::BuiltIn>(
+                      [](std::vector<std::shared_ptr<object::Object>> args)
+                          -> std::shared_ptr<object::Object> {
+                        (void)args;
+                        MidiInit(mixr);
+                        return evaluator::NULLL;
+                      })},
+    {"midi_assign",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 1) {
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen) {
+               mixr->AssignSoundGeneratorToMidiController(
+                   soundgen->soundgen_id_);
+             }
+           }
            return evaluator::NULLL;
          })},
 };

@@ -1,16 +1,9 @@
 #pragma once
 
-#include <pthread.h>
-
 #include <defjams.h>
 #include <fx/fx.h>
 
-typedef enum
-{
-    OCTAVE_CHANGE
-} custom_event_type;
-
-void *midi_init(void *);
+typedef enum { OCTAVE_CHANGE } custom_event_type;
 
 midi_event new_midi_event(unsigned int event_type, unsigned int data1,
                           unsigned int data2);

@@ -15,13 +15,6 @@
 
 #include <iostream>
 
-extern char *s_synth_waves[6];
-
-// static void print_midi_event_rec(midi_event ev)
-//{
-//    printf("[Midi] note: %d\n", ev.data1);
-//}
-
 midi_event new_midi_event(unsigned int event_type, unsigned int data1,
                           unsigned int data2) {
   midi_event ev = {.event_type = event_type,

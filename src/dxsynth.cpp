@@ -200,7 +200,6 @@ stereo_val DXSynth::GenNext(mixer_timing_info tinfo) {
   double accum_out_left = 0.0;
   double accum_out_right = 0.0;
 
-  // float mix = 1.0 / MAX_DX_VOICES;
   float mix = 0.25;
 
   double out_left = 0.0;
@@ -294,7 +293,7 @@ void DXSynth::control(midi_event ev) { (void)ev; }
 void DXSynth::pitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
   unsigned int data2 = ev.data2;
-  // printf("Pitch bend, babee: %d %d\n", data1, data2);
+  printf("Pitch bend, babee: %d %d\n", data1, data2);
   int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
 
   if (actual_pitch_bent_val != 8192) {
@@ -303,17 +302,22 @@ void DXSynth::pitchBend(midi_event ev) {
     double scaley_val =
         // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
         scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
-    // printf("Cents to bend - %f\n", scaley_val);
-    for (int i = 0; i < MAX_DX_VOICES; i++) {
+    printf("Cents to bend - %f\n", scaley_val);
+    for (int i = 0; i < MAX_VOICES; i++) {
+      std::cout << i << ": osc1" << std::endl;
       voices_[i]->m_osc1->m_cents = scaley_val;
+      std::cout << i << ": osc2" << std::endl;
       voices_[i]->m_osc2->m_cents = scaley_val + 2.5;
+      std::cout << i << ": osc3" << std::endl;
       voices_[i]->m_osc3->m_cents = scaley_val;
+      std::cout << i << ": osc4" << std::endl;
       voices_[i]->m_osc4->m_cents = scaley_val + 2.5;
+      std::cout << i << ": modmatrix" << std::endl;
       voices_[i]->modmatrix.sources[SOURCE_PITCHBEND] =
           normalized_pitch_bent_val;
     }
   } else {
-    for (int i = 0; i < MAX_DX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++) {
       voices_[i]->m_osc1->m_cents = 0;
       voices_[i]->m_osc2->m_cents = 2.5;
       voices_[i]->m_osc3->m_cents = 0;

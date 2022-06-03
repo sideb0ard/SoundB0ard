@@ -10,8 +10,6 @@
 #include <soundgenerator.h>
 #include <voice.h>
 
-#define MAX_DX_VOICES 16
-
 namespace SBAudio {
 
 enum { DX1, DX2, DX3, DX4, DX5, DX6, DX7, DX8, MAXDX };

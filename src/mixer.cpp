@@ -12,6 +12,7 @@
 #include <mixer.h>
 #include <obliquestrategies.h>
 #include <portaudio.h>
+#include <portmidi.h>
 #include <soundgenerator.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,7 +74,9 @@ std::string Mixer::StatusMixr() {
   ss << COOL_COLOR_GREEN << ":::::::::::::::: vol:" << ANSI_COLOR_WHITE
      << volume << COOL_COLOR_GREEN << " bpm:" << ANSI_COLOR_WHITE << bpm
      << COOL_COLOR_GREEN << " looplen:" << ANSI_COLOR_WHITE << 3840
-     << COOL_COLOR_GREEN << " ::::::::::::::::::::::\n";
+     << COOL_COLOR_GREEN << " midi_device:" << ANSI_COLOR_WHITE
+     << (have_midi_controller ? "true" : "false") << COOL_COLOR_GREEN
+     << " ::::::::::::::::::::::\n";
   // clang-format on
 
   return ss.str();
@@ -368,8 +371,6 @@ void Mixer::MidiTick() {
     timing_info.is_start_of_loop = true;
   }
 
-  CheckForAudioActionQueueMessages();
-
   if (timing_info.midi_tick % 120 == 0) {
     timing_info.is_thirtysecond = true;
 
@@ -387,26 +388,8 @@ void Mixer::MidiTick() {
     }
   }
 
-  //// so far only used for ARP engines
-  // if (timing_info.midi_tick % 160 == 0) {
-  //   timing_info.is_twentyfourth = true;
-
-  //  if (timing_info.midi_tick % 320 == 0) {
-  //    timing_info.is_twelth = true;
-
-  //    if (timing_info.midi_tick % 640 == 0) {
-  //      timing_info.is_sixth = true;
-
-  //      if (timing_info.midi_tick % 1280 == 0) timing_info.is_third = true;
-  //    }
-  //  }
-  //}
-
-  // std::cout << "Mixer -- midi_tick:" << timing_info.midi_tick
-  //          << " 16th:" << timing_info.sixteenth_note_tick
-  //          << " Start of Loop:" <<
-  //          timing_info.is_start_of_loop
-  //          << std::endl;
+  CheckForAudioActionQueueMessages();
+  CheckForExternalMidiEvents();
 
   repl_queue.push("tick");
   EmitEvent((broadcast_event){.type = TIME_MIDI_TICK});
@@ -748,6 +731,35 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     sound_generators_[action.mixer_soundgen_idx]->randomize();
   } else if (action.type == AudioAction::PREVIEW) {
     PreviewAudio(action);
+  }
+}
+
+void Mixer::AssignSoundGeneratorToMidiController(int soundgen_id) {
+  if (IsValidSoundgenNum(soundgen_id)) {
+    std::cout << "MIDI Assign - " << soundgen_id << std::endl;
+    midi_targets.push_back(soundgen_id);
+  }
+}
+
+void Mixer::CheckForExternalMidiEvents() {
+  if (!have_midi_controller) return;
+
+  PmEvent msg[32];
+  if (Pm_Poll(mixr->midi_stream)) {
+    int cnt = Pm_Read(mixr->midi_stream, msg, 32);
+    for (int i = 0; i < cnt; i++) {
+      int status = Pm_MessageStatus(msg[i].message);
+      int data1 = Pm_MessageData1(msg[i].message);
+      int data2 = Pm_MessageData2(msg[i].message);
+
+      midi_event ev = new_midi_event(status, data1, data2);
+
+      for (auto sg : sound_generators_) {
+        sg->parseMidiEvent(ev, timing_info);
+      }
+      std::cout << "MIDI STATUS:" << status << " DATA1: " << data1
+                << " DATAT2:" << data2 << std::endl;
+    }
   }
 }
 
