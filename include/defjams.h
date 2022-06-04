@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -304,3 +305,5 @@ struct MusicalEvent {
 };
 
 typedef midi_event midi_pattern[PPBAR];
+
+typedef std::array<std::vector<midi_event>, PPBAR> MultiEventMidiPattern;

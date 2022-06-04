@@ -234,6 +234,11 @@ ObjectType Velocity::Type() { return VELOCITY_OBJ; }
 ObjectType ForLoop::Type() { return FORLOOP_OBJ; }
 std::string ForLoop::Inspect() { return "FOR LOOP"; }
 
+ObjectType MultiEventMidiPatternObj::Type() { return MULTI_EVENT_MIDI_OBJ; }
+std::string MultiEventMidiPatternObj::Inspect() {
+  return "MULTI EVENT MIDI PATTERN";
+}
+
 std::string Array::Inspect() {
   std::stringstream elems;
   int len = elements_.size();

@@ -158,6 +158,15 @@ void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
       .note_start_time = note_start_time};
   audio_queue.push(action_req);
 }
+void midi_event_at(int sgid, midi_event ev, int start_time) {
+  audio_action_queue_item action_req{
+      .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
+      .has_midi_event = true,
+      .event = ev,
+      .soundgen_num = sgid,
+      .note_start_time = start_time};
+  audio_queue.push(action_req);
+}
 
 void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur) {
   audio_action_queue_item action_req{.type = AudioAction::MIDI_EVENT_ADD,
@@ -281,6 +290,19 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
           if (midi_nums.size() > 0)
             note_on_at(sg->soundgen_id_, midi_nums, j_offset + i_offset, vel,
                        dur);
+        }
+      }
+    }
+  }
+  std::cout << "WE HERE>\n";
+  auto multi_midi_pat_obj =
+      std::dynamic_pointer_cast<object::MultiEventMidiPatternObj>(pattern);
+  if (multi_midi_pat_obj) {
+    std::cout << "GOTSZ A MULTIE EVENT MIDI OBJECT\n";
+    for (int i = 0; i < PPBAR; i++) {
+      if (multi_midi_pat_obj->events_.size() > 0) {
+        for (auto &e : multi_midi_pat_obj->events_[i]) {
+          midi_event_at(sg->soundgen_id_, e, i);
         }
       }
     }
@@ -1859,6 +1881,23 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            return evaluator::NULLL;
          })},
+    {"midi_rec", std::make_shared<object::BuiltIn>(
+                     [](std::vector<std::shared_ptr<object::Object>> args)
+                         -> std::shared_ptr<object::Object> {
+                       (void)args;
+                       mixr->RecordMidiToggle();
+                       return evaluator::NULLL;
+                     })},
+    {"midi_dump", std::make_shared<object::BuiltIn>(
+                      [](std::vector<std::shared_ptr<object::Object>> args)
+                          -> std::shared_ptr<object::Object> {
+                        (void)args;
+                        mixr->PrintRecordingBuffer();
+                        auto return_pattern =
+                            std::make_shared<object::MultiEventMidiPatternObj>(
+                                mixr->RecordingBuffer());
+                        return return_pattern;
+                      })},
 };
 
 }  // namespace builtin

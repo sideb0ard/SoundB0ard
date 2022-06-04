@@ -46,6 +46,9 @@ struct audio_action_queue_item {
   int delayed_by{0};  // in midi ticks
   int start_at{0};    // in midi ticks
 
+  bool has_midi_event{false};
+  midi_event event;
+
   // ADD varz
   unsigned int soundgenerator_type;
   std::string filepath;  // used for sample and digisynth

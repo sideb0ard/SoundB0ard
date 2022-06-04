@@ -957,3 +957,15 @@ std::vector<std::string> synth_return_presets(unsigned int synthtype) {
 
   return preset_names;
 }
+
+void PrintMultiMidi(MultiEventMidiPattern &pattern) {
+  for (int i = 0; i < PPBAR; i++) {
+    if (pattern[i].size() > 0) {
+      std::cout << "[" << i << "]\n";
+      for (auto &e : pattern[i]) {
+        std::cout << e.event_type << " " << e.data1 << " " << e.data2
+                  << std::endl;
+      }
+    }
+  }
+}

@@ -10,6 +10,8 @@
 #include <soundgenerator.h>
 #include <voice.h>
 
+#include <string>
+
 namespace SBAudio {
 
 enum { DX1, DX2, DX3, DX4, DX5, DX6, DX7, DX8, MAXDX };
@@ -17,7 +19,7 @@ enum { DX1, DX2, DX3, DX4, DX5, DX6, DX7, DX8, MAXDX };
 static const char DX_PRESET_FILENAME[] = "settings/dxpresets.dat";
 
 typedef struct dxsynthsettings {
-  char m_settings_name[256];
+  char m_settings_name[256]{};
 
   // LFO1     // lo/hi/def
   double m_lfo1_intensity;  // 0/1/0

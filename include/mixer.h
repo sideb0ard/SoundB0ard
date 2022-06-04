@@ -77,9 +77,12 @@ struct Mixer {
   PortMidiStream *midi_stream;
   bool have_midi_controller;
   std::string midi_controller_name{};
-  std::vector<int> midi_targets{};  // sound_generators_ idx
+  int midi_target;
+  // std::vector<int> midi_targets{};  // sound_generators_ idx
+  bool midi_recording = {false};
 
   void AssignSoundGeneratorToMidiController(int soundgen_id);
+  void RecordMidiToggle();
 
   void CheckForDelayedEvents();
   void CheckForExternalMidiEvents();
@@ -91,6 +94,10 @@ struct Mixer {
   std::string StatusMixr();
   std::string StatusProcz(bool all = false);
   std::string StatusSgz(bool all);
+
+  void PrintRecordingBuffer();
+  MultiEventMidiPattern RecordingBuffer() { return recording_buffer_; }
+  MultiEventMidiPattern recording_buffer_;
 
   void UpdateBpm(int bpm);
   void UpdateTimeUnit(unsigned int time_type, int val);

@@ -612,33 +612,40 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     if (IsValidSoundgenNum(action.soundgen_num)) {
       auto sg = sound_generators_[action.soundgen_num];
 
-      for (auto midinum : action.notes) {
-        midi_event event_on = new_midi_event(MIDI_ON, midinum, action.velocity);
-        event_on.source = EXTERNAL_OSC;
-        event_on.dur = action.duration;
-
-        // used later for MIDI OFF MESSAGE
-        int midi_note_on_time = timing_info.midi_tick;
-
-        if (action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
-          midi_note_on_time += action.note_start_time;
-
-          event_on.delete_after_use = true;
-
-          auto ev = DelayedMidiEvent(midi_note_on_time, event_on, sg);
-          _action_items.push_back(ev);
-        } else {
-          sg->noteOn(event_on);
-        }
-        int midi_off_tick = midi_note_on_time + action.duration;
-
-        midi_event event_off =
-            new_midi_event(MIDI_OFF, midinum, action.velocity);
-
-        event_off.delete_after_use = true;
-        auto ev = DelayedMidiEvent(midi_off_tick, event_off, sg);
-
+      if (action.has_midi_event) {
+        action.event.delete_after_use = true;
+        auto ev = DelayedMidiEvent(action.note_start_time, action.event, sg);
         _action_items.push_back(ev);
+      } else {
+        for (auto midinum : action.notes) {
+          midi_event event_on =
+              new_midi_event(MIDI_ON, midinum, action.velocity);
+          event_on.source = EXTERNAL_OSC;
+          event_on.dur = action.duration;
+
+          // used later for MIDI OFF MESSAGE
+          int midi_note_on_time = timing_info.midi_tick;
+
+          if (action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+            midi_note_on_time += action.note_start_time;
+
+            event_on.delete_after_use = true;
+
+            auto ev = DelayedMidiEvent(midi_note_on_time, event_on, sg);
+            _action_items.push_back(ev);
+          } else {
+            sg->noteOn(event_on);
+          }
+          int midi_off_tick = midi_note_on_time + action.duration;
+
+          midi_event event_off =
+              new_midi_event(MIDI_OFF, midinum, action.velocity);
+
+          event_off.delete_after_use = true;
+          auto ev = DelayedMidiEvent(midi_off_tick, event_off, sg);
+
+          _action_items.push_back(ev);
+        }
       }
     }
   } else if (action.type == AudioAction::MIDI_CHORD_EVENT_ADD ||
@@ -737,12 +744,22 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
 void Mixer::AssignSoundGeneratorToMidiController(int soundgen_id) {
   if (IsValidSoundgenNum(soundgen_id)) {
     std::cout << "MIDI Assign - " << soundgen_id << std::endl;
-    midi_targets.push_back(soundgen_id);
+    midi_target = soundgen_id;
+    // midi_targets.push_back(soundgen_id);
   }
+}
+
+void Mixer::RecordMidiToggle() {
+  if (midi_recording && IsValidSoundgenNum(midi_target)) {
+    sound_generators_[midi_target]->allNotesOff();
+  }
+  midi_recording = 1 - midi_recording;
 }
 
 void Mixer::CheckForExternalMidiEvents() {
   if (!have_midi_controller) return;
+
+  auto tic = timing_info.midi_tick % PPBAR;
 
   PmEvent msg[32];
   if (Pm_Poll(mixr->midi_stream)) {
@@ -754,11 +771,22 @@ void Mixer::CheckForExternalMidiEvents() {
 
       midi_event ev = new_midi_event(status, data1, data2);
 
-      for (auto sg : sound_generators_) {
-        sg->parseMidiEvent(ev, timing_info);
+      sound_generators_[midi_target]->parseMidiEvent(ev, timing_info);
+      // for (auto sg : sound_generators_) {
+      //   sg->parseMidiEvent(ev, timing_info);
+      // }
+      if (midi_recording) {
+        recording_buffer_[tic].push_back(ev);
+        std::cout << "TICK:" << tic << " MIDI STATUS:" << status
+                  << " DATA1: " << data1 << " DATAT2:" << data2 << std::endl;
+
+        PrintRecordingBuffer();
       }
-      std::cout << "MIDI STATUS:" << status << " DATA1: " << data1
-                << " DATAT2:" << data2 << std::endl;
+    }
+  }
+  if (midi_recording) {
+    for (auto e : recording_buffer_[tic]) {
+      sound_generators_[midi_target]->parseMidiEvent(e, timing_info);
     }
   }
 }
@@ -808,3 +836,5 @@ void Mixer::CheckForDelayedEvents() {
     }
   }
 }
+
+void Mixer::PrintRecordingBuffer() { PrintMultiMidi(recording_buffer_); }

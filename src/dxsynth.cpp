@@ -60,7 +60,7 @@ DXSynth::DXSynth() {
 
   PrepareForPlay();
 
-  Load("RAVER");
+  // Load("RAVER");
 
   active = true;
 }

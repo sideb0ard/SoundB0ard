@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "defjams.h"
+
 namespace object {
 
 constexpr char NULL_OBJ[] = "NULL";
@@ -39,6 +41,8 @@ constexpr char PATTERN_OBJ[] = "PATTERN";
 constexpr char SYNTH_OBJ[] = "SYNTH";
 constexpr char SAMPLE_OBJ[] = "SAMPLE";
 constexpr char GRANULAR_OBJ[] = "GRANULAR";
+
+constexpr char MULTI_EVENT_MIDI_OBJ[] = "MULTI_EVENT_MIDI_PATTERN";
 
 constexpr char AT_OBJ[] = "AT";
 constexpr char DURATION_OBJ[] = "DURATION";
@@ -215,6 +219,17 @@ class Function : public Object {
   std::vector<std::shared_ptr<ast::Identifier>> parameters_;
   std::shared_ptr<Environment> env_;
   std::shared_ptr<ast::BlockStatement> body_;
+};
+
+class MultiEventMidiPatternObj : public Object {
+ public:
+  MultiEventMidiPatternObj();
+  MultiEventMidiPatternObj(MultiEventMidiPattern events) : events_{events} {};
+  ~MultiEventMidiPatternObj() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
+
+  MultiEventMidiPattern events_;
 };
 
 class Pattern : public Object {
