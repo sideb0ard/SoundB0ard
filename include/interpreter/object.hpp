@@ -231,6 +231,8 @@ class MultiEventMidiPatternObj : public Object {
   std::string Inspect() override;
 
   MultiEventMidiPattern events_;
+  std::vector<midi_event> notes_on_;
+  std::vector<midi_event> control_messages_;
 };
 
 class Pattern : public Object {

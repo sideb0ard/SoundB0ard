@@ -99,8 +99,6 @@ enum { UP, DOWN };
 enum {
   MIDI_ON = 144,
   MIDI_OFF = 128,
-  CHORD_ON = 172,
-  CHORD_OFF = 173,
   MIDI_CONTROL = 176,
   MIDI_PITCHBEND = 224,
 };
@@ -270,11 +268,15 @@ enum {
 class midi_event {
  public:
   friend std::ostream &operator<<(std::ostream &, const midi_event &);
+  bool operator<(const midi_event &e) const {
+    return original_tick < e.original_tick;
+  }
 
   unsigned int source{};
   unsigned int event_type{};
   unsigned int data1{};
   unsigned int data2{};
+  unsigned int original_tick{};
   std::vector<int> dataz{};
   int hold{};  // millisecond hold value
   int dur{0};

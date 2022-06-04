@@ -128,10 +128,13 @@ std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz) {
 
 void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
                 int vel, int dur) {
-  audio_action_queue_item action_req{.type = AudioAction::RECORDED_MIDI_EVENT,
-                                     .soundgen_num = sgid,
-                                     .notes = midi_nums,
-                                     .start_at = note_start_time};
+  audio_action_queue_item action_req{
+      .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
+      .soundgen_num = sgid,
+      .notes = midi_nums,
+      .velocity = vel,
+      .duration = dur,
+      .note_start_time = note_start_time};
   audio_queue.push(action_req);
 }
 void midi_event_at(int sgid, midi_event ev, int start_time) {
@@ -269,17 +272,11 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
       }
     }
   }
-  std::cout << "WE HERE>\n";
   auto multi_midi_pat_obj =
       std::dynamic_pointer_cast<object::MultiEventMidiPatternObj>(pattern);
   if (multi_midi_pat_obj) {
-    std::cout << "GOTSZ A MULTIE EVENT MIDI OBJECT\n";
-    for (int i = 0; i < PPBAR; i++) {
-      if (multi_midi_pat_obj->events_.size() > 0) {
-        for (auto &e : multi_midi_pat_obj->events_[i]) {
-          midi_event_at(sg->soundgen_id_, e, i);
-        }
-      }
+    for (auto &e : multi_midi_pat_obj->notes_on_) {
+      midi_event_at(sg->soundgen_id_, e, e.original_tick % PPBAR);
     }
   }
 }

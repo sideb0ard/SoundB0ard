@@ -624,7 +624,6 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
 
         if (action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
           midi_note_on_time += action.note_start_time;
-
           auto ev = DelayedMidiEvent(midi_note_on_time, event_on, sg);
           _action_items.push_back(ev);
         } else {
@@ -743,6 +742,7 @@ void Mixer::CheckForExternalMidiEvents() {
       int data2 = Pm_MessageData2(msg[i].message);
 
       midi_event ev = new_midi_event(status, data1, data2);
+      ev.original_tick = timing_info.midi_tick;
 
       sound_generators_[midi_target]->parseMidiEvent(ev, timing_info);
       // for (auto sg : sound_generators_) {
@@ -794,21 +794,42 @@ void Mixer::CheckForDelayedEvents() {
     }
   }
 
+  std::vector<audio_action_queue_item> delayed_buffer;
   auto dit = _delayed_action_items.begin();
   while (dit != _delayed_action_items.end()) {
-    if (dit->start_at == timing_info.midi_tick) {
-      ProcessActionMessage(*dit);
-      // `erase()` invalidates the iterator, use returned iterator
-      dit = _delayed_action_items.erase(dit);
-    } else if (dit->start_at == (timing_info.midi_tick % PPBAR)) {
+    if (dit->start_at == (timing_info.midi_tick % PPBAR)) {
       if (IsValidSoundgenNum(dit->mixer_soundgen_idx)) {
         auto sg = sound_generators_[dit->mixer_soundgen_idx];
         sg->parseMidiEvent(dit->event, timing_info);
+
+        if (dit->event.event_type == MIDI_ON && dit->event.dur > 0) {
+          auto note_off = new_midi_event(MIDI_OFF, dit->event.data1, 0);
+          audio_action_queue_item note_off_action;
+          note_off_action.event = note_off;
+          note_off_action.type = RECORDED_MIDI_EVENT;
+          note_off_action.mixer_soundgen_idx = dit->mixer_soundgen_idx;
+          note_off_action.start_at = timing_info.midi_tick + dit->event.dur;
+          delayed_buffer.push_back(note_off_action);
+        }
       }
+      dit = _delayed_action_items.erase(dit);
+    } else if (dit->start_at == timing_info.midi_tick) {
+      if (dit->type == RECORDED_MIDI_EVENT) {
+        if (IsValidSoundgenNum(dit->mixer_soundgen_idx)) {
+          auto sg = sound_generators_[dit->mixer_soundgen_idx];
+          sg->parseMidiEvent(dit->event, timing_info);
+        }
+      } else {
+        ProcessActionMessage(*dit);
+      }
+      // `erase()` invalidates the iterator, use returned iterator
       dit = _delayed_action_items.erase(dit);
     } else {
       ++dit;
     }
+  }
+  for (auto d : delayed_buffer) {
+    _delayed_action_items.push_back(d);
   }
 }
 
