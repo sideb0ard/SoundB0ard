@@ -277,7 +277,6 @@ class midi_event {
   unsigned int data2{};
   std::vector<int> dataz{};
   int hold{};  // millisecond hold value
-  bool delete_after_use{false};
   int dur{0};
 };
 

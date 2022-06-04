@@ -88,3 +88,4 @@ bool FileExists(std::string filename);
 bool synth_list_presets(unsigned int synthtype);
 std::vector<std::string> synth_return_presets(unsigned int synthtype);
 void PrintMultiMidi(MultiEventMidiPattern &pattern);
+std::string MultiMidiString(MultiEventMidiPattern &pattern);

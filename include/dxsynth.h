@@ -99,7 +99,6 @@ class DXSynth : public SoundGenerator {
   void noteOn(midi_event ev) override;
   void noteOff(midi_event ev) override;
   void allNotesOff() override;
-  void ChordOn(midi_event ev) override;
   void control(midi_event ev) override;
   void pitchBend(midi_event ev) override;
   void randomize() override;

@@ -467,18 +467,6 @@ void MiniSynth::noteOff(midi_event ev) {
   }
 }
 
-void MiniSynth::ChordOn(midi_event ev) {
-  allNotesOff();
-  for (unsigned int d : ev.dataz) {
-    midi_event note_on = {.event_type = MIDI_ON,
-                          .data1 = d,
-                          .data2 = ev.data2,
-                          .delete_after_use = true,
-                          .source = EXTERNAL_OSC};
-    noteOn(note_on);
-  }
-}
-
 void MiniSynth::pitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
   unsigned int data2 = ev.data2;
@@ -2060,6 +2048,5 @@ void MiniSynth::SetParam(std::string name, double val) {
 
   Update();
 }
-
 
 };  // namespace SBAudio

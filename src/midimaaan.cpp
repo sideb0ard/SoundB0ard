@@ -17,17 +17,13 @@
 
 midi_event new_midi_event(unsigned int event_type, unsigned int data1,
                           unsigned int data2) {
-  midi_event ev = {.event_type = event_type,
-                   .data1 = data1,
-                   .data2 = data2,
-                   .delete_after_use = false};
+  midi_event ev = {.event_type = event_type, .data1 = data1, .data2 = data2};
   return ev;
 }
 
 std::ostream &operator<<(std::ostream &out, const midi_event &ev) {
   out << "MIDIEVENT:"
-      << "Type:" << ev.event_type << " D1:" << ev.data1 << " D2:" << ev.data2
-      << " Delete:" << (ev.delete_after_use ? "true" : "false");
+      << "Type:" << ev.event_type << " D1:" << ev.data1 << " D2:" << ev.data2;
   return out;
 }
 
@@ -78,10 +74,6 @@ void midi_pattern_print(midi_event *loop) {
           strcpy(type, "no_idea");
           break;
       }
-      printf(
-          "[Tick: %5d] - note: %4d velocity: %4d type: %s "
-          "delete_after_use: %s\n",
-          i, ev.data1, ev.data2, type, ev.delete_after_use ? "true" : "false");
     }
   }
 }
@@ -89,7 +81,6 @@ void midi_event_cp(midi_event *from, midi_event *to) {
   to->event_type = from->event_type;
   to->data1 = from->data1;
   to->data2 = from->data2;
-  to->delete_after_use = from->delete_after_use;
 }
 
 void midi_event_clear(midi_event *ev) { memset(ev, 0, sizeof(midi_event)); }
@@ -110,8 +101,6 @@ void midi_event_print(midi_event *ev) {
       strncpy(event_type, "PITCHBEND", 9);
       break;
   }
-  printf("EVENT! type:%s data1:%d data2:%d delete?%s\n", event_type, ev->data1,
-         ev->data2, ev->delete_after_use ? "true" : "false");
 }
 
 int get_midi_note_from_string(char *string) {

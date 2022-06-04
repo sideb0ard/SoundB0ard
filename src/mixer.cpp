@@ -607,65 +607,37 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     interpreter_sound_cmds::ParseFXCmd(action.args);
   else if (action.type == AudioAction::BPM)
     UpdateBpm(action.new_bpm);
-  else if (action.type == AudioAction::MIDI_EVENT_ADD ||
-           action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+  else if (action.type == AudioAction::RECORDED_MIDI_EVENT) {
+    _delayed_action_items.push_back(action);
+  } else if (action.type == AudioAction::MIDI_EVENT_ADD ||
+             action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
     if (IsValidSoundgenNum(action.soundgen_num)) {
       auto sg = sound_generators_[action.soundgen_num];
 
-      if (action.has_midi_event) {
-        action.event.delete_after_use = true;
-        auto ev = DelayedMidiEvent(action.note_start_time, action.event, sg);
-        _action_items.push_back(ev);
-      } else {
-        for (auto midinum : action.notes) {
-          midi_event event_on =
-              new_midi_event(MIDI_ON, midinum, action.velocity);
-          event_on.source = EXTERNAL_OSC;
-          event_on.dur = action.duration;
+      for (auto midinum : action.notes) {
+        midi_event event_on = new_midi_event(MIDI_ON, midinum, action.velocity);
+        event_on.source = EXTERNAL_OSC;
+        event_on.dur = action.duration;
 
-          // used later for MIDI OFF MESSAGE
-          int midi_note_on_time = timing_info.midi_tick;
+        // used later for MIDI OFF MESSAGE
+        int midi_note_on_time = timing_info.midi_tick;
 
-          if (action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
-            midi_note_on_time += action.note_start_time;
+        if (action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+          midi_note_on_time += action.note_start_time;
 
-            event_on.delete_after_use = true;
-
-            auto ev = DelayedMidiEvent(midi_note_on_time, event_on, sg);
-            _action_items.push_back(ev);
-          } else {
-            sg->noteOn(event_on);
-          }
-          int midi_off_tick = midi_note_on_time + action.duration;
-
-          midi_event event_off =
-              new_midi_event(MIDI_OFF, midinum, action.velocity);
-
-          event_off.delete_after_use = true;
-          auto ev = DelayedMidiEvent(midi_off_tick, event_off, sg);
-
+          auto ev = DelayedMidiEvent(midi_note_on_time, event_on, sg);
           _action_items.push_back(ev);
+        } else {
+          sg->noteOn(event_on);
         }
-      }
-    }
-  } else if (action.type == AudioAction::MIDI_CHORD_EVENT_ADD ||
-             action.type == AudioAction::MIDI_CHORD_EVENT_ADD_DELAYED) {
-    if (IsValidSoundgenNum(action.soundgen_num)) {
-      auto sg = sound_generators_[action.soundgen_num];
+        int midi_off_tick = midi_note_on_time + action.duration;
 
-      midi_event chord_on = {.event_type = CHORD_ON,
-                             .data2 = (unsigned int)action.velocity,
-                             .dataz = action.notes,
-                             .delete_after_use = false,
-                             .source = EXTERNAL_OSC};
+        midi_event event_off =
+            new_midi_event(MIDI_OFF, midinum, action.velocity);
 
-      if (action.type == AudioAction::MIDI_CHORD_EVENT_ADD_DELAYED) {
-        chord_on.delete_after_use = true;
-        auto ev = DelayedMidiEvent(
-            timing_info.midi_tick + action.note_start_time, chord_on, sg);
+        auto ev = DelayedMidiEvent(midi_off_tick, event_off, sg);
+
         _action_items.push_back(ev);
-      } else {
-        sg->ChordOn(chord_on);
       }
     }
   } else if (action.type == AudioAction::SOLO) {
@@ -693,7 +665,6 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
         // // ENUM to be able to do others
         // midi_event event =
         //     new_midi_event(MIDI_PITCHBEND, param_val * 10, 0);
-        // event.delete_after_use = true;
 
         // _action_items.push_back(DelayedMidiEvent(
         //     timing_info.midi_tick + action->delayed_by, event, sg));
@@ -741,6 +712,8 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
   }
 }
 
+void Mixer::ResetMidiRecording() { recording_buffer_.fill({}); }
+
 void Mixer::AssignSoundGeneratorToMidiController(int soundgen_id) {
   if (IsValidSoundgenNum(soundgen_id)) {
     std::cout << "MIDI Assign - " << soundgen_id << std::endl;
@@ -777,10 +750,6 @@ void Mixer::CheckForExternalMidiEvents() {
       // }
       if (midi_recording) {
         recording_buffer_[tic].push_back(ev);
-        std::cout << "TICK:" << tic << " MIDI STATUS:" << status
-                  << " DATA1: " << data1 << " DATAT2:" << data2 << std::endl;
-
-        PrintRecordingBuffer();
       }
     }
   }
@@ -830,6 +799,12 @@ void Mixer::CheckForDelayedEvents() {
     if (dit->start_at == timing_info.midi_tick) {
       ProcessActionMessage(*dit);
       // `erase()` invalidates the iterator, use returned iterator
+      dit = _delayed_action_items.erase(dit);
+    } else if (dit->start_at == (timing_info.midi_tick % PPBAR)) {
+      if (IsValidSoundgenNum(dit->mixer_soundgen_idx)) {
+        auto sg = sound_generators_[dit->mixer_soundgen_idx];
+        sg->parseMidiEvent(dit->event, timing_info);
+      }
       dit = _delayed_action_items.erase(dit);
     } else {
       ++dit;

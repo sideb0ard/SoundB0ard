@@ -7,6 +7,7 @@
 #include <minisynth.h>
 #include <mixer.h>
 #include <sbsynth.h>
+#include <utils.h>
 
 #include <interpreter/object.hpp>
 #include <iostream>
@@ -234,9 +235,11 @@ ObjectType Velocity::Type() { return VELOCITY_OBJ; }
 ObjectType ForLoop::Type() { return FORLOOP_OBJ; }
 std::string ForLoop::Inspect() { return "FOR LOOP"; }
 
+MultiEventMidiPatternObj::MultiEventMidiPatternObj(MultiEventMidiPattern events)
+    : events_{events} {}
 ObjectType MultiEventMidiPatternObj::Type() { return MULTI_EVENT_MIDI_OBJ; }
 std::string MultiEventMidiPatternObj::Inspect() {
-  return "MULTI EVENT MIDI PATTERN";
+  return MultiMidiString(events_);
 }
 
 std::string Array::Inspect() {

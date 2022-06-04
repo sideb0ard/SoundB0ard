@@ -12,6 +12,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <sstream>
 namespace fs = std::filesystem;
 
 #include "cmdloop.h"
@@ -959,13 +960,18 @@ std::vector<std::string> synth_return_presets(unsigned int synthtype) {
 }
 
 void PrintMultiMidi(MultiEventMidiPattern &pattern) {
+  std::cout << MultiMidiString(pattern) << std::endl;
+}
+
+std::string MultiMidiString(MultiEventMidiPattern &pattern) {
+  std::stringstream ss;
   for (int i = 0; i < PPBAR; i++) {
     if (pattern[i].size() > 0) {
-      std::cout << "[" << i << "]\n";
+      ss << "[" << i << "]\n";
       for (auto &e : pattern[i]) {
-        std::cout << e.event_type << " " << e.data1 << " " << e.data2
-                  << std::endl;
+        ss << e.event_type << " " << e.data1 << " " << e.data2 << std::endl;
       }
     }
   }
+  return ss.str();
 }

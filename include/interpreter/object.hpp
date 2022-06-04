@@ -224,7 +224,8 @@ class Function : public Object {
 class MultiEventMidiPatternObj : public Object {
  public:
   MultiEventMidiPatternObj();
-  MultiEventMidiPatternObj(MultiEventMidiPattern events) : events_{events} {};
+  MultiEventMidiPatternObj(
+      MultiEventMidiPattern events);  // : events_{events} { std};
   ~MultiEventMidiPatternObj() = default;
   ObjectType Type() override;
   std::string Inspect() override;

@@ -25,7 +25,6 @@ class SoundGenerator {
 
   virtual void noteOn(midi_event ev) { (void)ev; };
   virtual void noteOff(midi_event ev) { (void)ev; };
-  virtual void ChordOn(midi_event ev) { (void)ev; };
   virtual void Load(std::string preset_name);
   virtual void Save(std::string preset_name);
   virtual void ListPresets();

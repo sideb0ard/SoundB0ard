@@ -16,10 +16,9 @@ enum AudioAction {
   LIST_PRESETS,
   LOAD_PRESET,
   RAND_PRESET,
+  RECORDED_MIDI_EVENT,
   MIDI_EVENT_ADD,
   MIDI_EVENT_ADD_DELAYED,
-  MIDI_CHORD_EVENT_ADD,
-  MIDI_CHORD_EVENT_ADD_DELAYED,
   MIDI_EVENT_CLEAR,
   MIDI_INIT,
   MIXER_UPDATE,
@@ -51,8 +50,8 @@ struct audio_action_queue_item {
 
   // ADD varz
   unsigned int soundgenerator_type;
-  std::string filepath;  // used for sample and digisynth
-  bool loop_mode;        // for looper
+  std::string filepath;   // used for sample and digisynth
+  bool loop_mode{false};  // for looper
 
   // STATUS varz
   bool status_all{false};
@@ -64,7 +63,7 @@ struct audio_action_queue_item {
 
   // NOTE_ON varz
   std::vector<std::shared_ptr<object::Object>> args;
-  int soundgen_num;
+  int soundgen_num{-1};
   std::vector<int> notes;
   int velocity;
   int duration;

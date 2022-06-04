@@ -83,6 +83,7 @@ struct Mixer {
 
   void AssignSoundGeneratorToMidiController(int soundgen_id);
   void RecordMidiToggle();
+  void ResetMidiRecording();
 
   void CheckForDelayedEvents();
   void CheckForExternalMidiEvents();

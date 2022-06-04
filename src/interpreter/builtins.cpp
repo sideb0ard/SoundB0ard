@@ -126,45 +126,20 @@ std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz) {
   return midi_nums;
 }
 
-void chord_on_at(int sgid, std::vector<int> midi_nums, int chord_start_time,
-                 int vel, int dur) {
-  audio_action_queue_item action_req{
-      .type = AudioAction::MIDI_CHORD_EVENT_ADD_DELAYED,
-      .soundgen_num = sgid,
-      .notes = midi_nums,
-      .velocity = vel,
-      .duration = dur,
-      .note_start_time = chord_start_time};
-  audio_queue.push(action_req);
-}
-
-void chord_on(int sgid, std::vector<int> midi_nums, int vel, int dur) {
-  audio_action_queue_item action_req{.type = AudioAction::MIDI_CHORD_EVENT_ADD,
-                                     .soundgen_num = sgid,
-                                     .notes = midi_nums,
-                                     .velocity = vel,
-                                     .duration = dur};
-  audio_queue.push(action_req);
-}
-
 void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
                 int vel, int dur) {
-  audio_action_queue_item action_req{
-      .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
-      .soundgen_num = sgid,
-      .notes = midi_nums,
-      .velocity = vel,
-      .duration = dur,
-      .note_start_time = note_start_time};
+  audio_action_queue_item action_req{.type = AudioAction::RECORDED_MIDI_EVENT,
+                                     .soundgen_num = sgid,
+                                     .notes = midi_nums,
+                                     .start_at = note_start_time};
   audio_queue.push(action_req);
 }
 void midi_event_at(int sgid, midi_event ev, int start_time) {
-  audio_action_queue_item action_req{
-      .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
-      .has_midi_event = true,
-      .event = ev,
-      .soundgen_num = sgid,
-      .note_start_time = start_time};
+  audio_action_queue_item action_req{.type = AudioAction::RECORDED_MIDI_EVENT,
+                                     .has_midi_event = true,
+                                     .event = ev,
+                                     .mixer_soundgen_idx = sgid,
+                                     .start_at = start_time};
   audio_queue.push(action_req);
 }
 
@@ -883,86 +858,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    }
                    return evaluator::NULLL;
                  })},
-    {"chord_on",  // TODO - think i should delete these chord funcs
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
-           if (args.size() < 2)
-             return evaluator::NewError(
-                 "`chord_on` requires at least two "
-                 "args - a sound_generator target "
-                 "and a midi_note to play.");
-           auto soundgen =
-               std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
-           if (soundgen) {
-             int sgid = soundgen->soundgen_id_;
-             std::vector<int> object_val = GetMidiNotes(args[1]);
-
-             if (object_val.empty()) return evaluator::NULLL;
-
-             std::vector<int> notez = GetMidiNotesInChord(object_val[0], 0, 2);
-
-             int vel = 128;
-             int dur = 240;
-
-             for (auto a : args) {
-               if (a->Type() == object::DURATION_OBJ) {
-                 auto dur_obj = std::dynamic_pointer_cast<object::Duration>(a);
-                 dur = dur_obj->value_;
-               } else if (a->Type() == object::VELOCITY_OBJ) {
-                 auto vel_obj = std::dynamic_pointer_cast<object::Velocity>(a);
-                 vel = vel_obj->value_;
-               }
-             }
-
-             chord_on(sgid, notez, vel, dur);
-           }
-           return evaluator::NULLL;
-         })},
-    {"chord_on_at",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
-           if (args.size() < 3)
-             return evaluator::NewError(
-                 "`chord_on_at` requires at least three args - a "
-                 "sound_generator target, a midi_note to play and a time "
-                 "in the future specified in midi ticks.");
-
-           auto soundgen =
-               std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
-           if (soundgen) {
-             int sgid = soundgen->soundgen_id_;
-
-             std::vector<int> object_val = GetMidiNotes(args[1]);
-
-             if (object_val.empty()) return evaluator::NULLL;
-
-             std::vector<int> notez = GetMidiNotesInChord(object_val[0], 0, 2);
-
-             auto num_obj = std::dynamic_pointer_cast<object::Number>(args[2]);
-
-             if (!num_obj) return evaluator::NULLL;
-
-             int vel = 128;
-             int dur = 240;
-             int note_start_time = num_obj->value_;
-
-             for (auto a : args) {
-               if (a->Type() == object::DURATION_OBJ) {
-                 auto dur_obj = std::dynamic_pointer_cast<object::Duration>(a);
-                 dur = dur_obj->value_;
-               } else if (a->Type() == object::VELOCITY_OBJ) {
-                 auto vel_obj = std::dynamic_pointer_cast<object::Velocity>(a);
-                 vel = vel_obj->value_;
-               }
-             }
-
-             chord_on_at(sgid, notez, note_start_time, vel, dur);
-           }
-
-           return evaluator::NULLL;
-         })},
     {"note_on",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -1888,11 +1783,17 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        mixr->RecordMidiToggle();
                        return evaluator::NULLL;
                      })},
+    {"midi_reset", std::make_shared<object::BuiltIn>(
+                       [](std::vector<std::shared_ptr<object::Object>> args)
+                           -> std::shared_ptr<object::Object> {
+                         (void)args;
+                         mixr->ResetMidiRecording();
+                         return evaluator::NULLL;
+                       })},
     {"midi_dump", std::make_shared<object::BuiltIn>(
                       [](std::vector<std::shared_ptr<object::Object>> args)
                           -> std::shared_ptr<object::Object> {
                         (void)args;
-                        mixr->PrintRecordingBuffer();
                         auto return_pattern =
                             std::make_shared<object::MultiEventMidiPatternObj>(
                                 mixr->RecordingBuffer());

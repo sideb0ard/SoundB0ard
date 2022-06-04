@@ -276,18 +276,6 @@ void DXSynth::noteOff(midi_event ev) {
   for (auto v : voices_) v->NoteOff(ev.data1);
 }
 
-void DXSynth::ChordOn(midi_event ev) {
-  allNotesOff();
-  for (unsigned int d : ev.dataz) {
-    midi_event note_on = {.event_type = MIDI_ON,
-                          .data1 = d,
-                          .data2 = ev.data2,
-                          .delete_after_use = true,
-                          .source = EXTERNAL_OSC};
-    noteOn(note_on);
-  }
-}
-
 void DXSynth::control(midi_event ev) { (void)ev; }
 
 void DXSynth::pitchBend(midi_event ev) {
