@@ -276,7 +276,7 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
       std::dynamic_pointer_cast<object::MultiEventMidiPatternObj>(pattern);
   if (multi_midi_pat_obj) {
     for (auto &e : multi_midi_pat_obj->notes_on_) {
-      midi_event_at(sg->soundgen_id_, e, e.original_tick % PPBAR);
+      midi_event_at(sg->soundgen_id_, e, e.playback_tick);
     }
   }
 }
@@ -415,7 +415,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto return_array = std::make_shared<object::Array>(
                  std::vector<std::shared_ptr<object::Object>>());
 
-             for (int i = 0; i < num_to_take; i++) {
+             for (unsigned long i = 0; i < num_to_take; i++) {
                return_array->elements_.push_back(array_obj->elements_[i]);
              }
 
@@ -658,6 +658,21 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              return return_array;
            }
 
+           auto midi_array =
+               std::dynamic_pointer_cast<object::MultiEventMidiPatternObj>(
+                   input[0]);
+           if (midi_array) {
+             auto return_array =
+                 std::make_shared<object::MultiEventMidiPatternObj>(
+                     midi_array->notes_on_);
+
+             for (auto &e : return_array->notes_on_) {
+               e.playback_tick = PPBAR - e.playback_tick;
+             }
+
+             return return_array;
+           }
+
            std::shared_ptr<object::String> string_obj =
                std::dynamic_pointer_cast<object::String>(input[0]);
            if (string_obj) {
@@ -714,6 +729,26 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              std::rotate(return_array->elements_.begin(),
                          return_array->elements_.begin() + rotate_by,
                          return_array->elements_.end());
+
+             return return_array;
+           }
+
+           auto midi_array =
+               std::dynamic_pointer_cast<object::MultiEventMidiPatternObj>(
+                   input[0]);
+           if (midi_array && number) {
+             auto return_array =
+                 std::make_shared<object::MultiEventMidiPatternObj>(
+                     midi_array->notes_on_);
+
+             auto rotate_by = number->value_ * 240;
+
+             std::cout << "ROTATING MIDI ARRAY BY " << number->value_ << " ("
+                       << rotate_by << ")" << std::endl;
+
+             for (auto &e : return_array->notes_on_) {
+               e.playback_tick = (int)(e.playback_tick + rotate_by) % PPBAR;
+             }
 
              return return_array;
            }

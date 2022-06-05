@@ -27,6 +27,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"let", SLANG_LET},
     {"loop", SLANG_LOOP},
     {"ls", SLANG_LS},
+    {"midi_array", SLANG_MIDI_ARRAY},
     {"moog", SLANG_MOOG_SYNTH},
     {"osc", SLANG_OSC},
     {"over", SLANG_OVER},

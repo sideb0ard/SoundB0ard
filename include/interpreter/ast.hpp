@@ -176,6 +176,16 @@ class PatternExpression : public Expression {
   std::string string_pattern{};
 };
 
+class MidiArrayExpression : public Expression {
+ public:
+  MidiArrayExpression() {}
+  explicit MidiArrayExpression(Token token) : Expression{token} {}
+  std::string String() const override;
+
+ public:
+  std::shared_ptr<Expression> elements_;
+};
+
 class SynthExpression : public Expression {
  public:
   SynthExpression() {}

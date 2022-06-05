@@ -272,13 +272,12 @@ class midi_event {
     return original_tick < e.original_tick;
   }
 
-  unsigned int source{};
-  unsigned int event_type{};
-  unsigned int data1{};
-  unsigned int data2{};
-  unsigned int original_tick{};
-  std::vector<int> dataz{};
-  int hold{};  // millisecond hold value
+  int source{};
+  int event_type{};
+  int data1{};
+  int data2{};
+  int playback_tick{};
+  int original_tick{};
   int dur{0};
 };
 

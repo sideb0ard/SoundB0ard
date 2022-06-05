@@ -92,6 +92,8 @@ const TokenType SLANG_MOOG_SYNTH = "MOOG_SYNTH";
 const TokenType SLANG_DRUM_SYNTH = "DRUM_SYNTH";
 const TokenType SLANG_DIGI_SYNTH = "DIGI_SYNTH";
 
+const TokenType SLANG_MIDI_ARRAY = "MIDI_ARRAY";
+
 const TokenType SLANG_PROC = "PROC";
 const TokenType SLANG_PROC_ID = "PROC_ID";
 // Process pattern types

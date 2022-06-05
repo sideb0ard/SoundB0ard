@@ -95,6 +95,7 @@ class Parser {
   std::shared_ptr<ast::Expression> ParseHashLiteral();
   std::vector<std::shared_ptr<ast::Identifier>> ParseFunctionParameters();
 
+  std::shared_ptr<ast::Expression> ParseMidiArrayExpression();
   std::shared_ptr<ast::Expression> ParsePatternExpression();
   std::shared_ptr<ast::Expression> ParseSynthExpression();
   std::shared_ptr<ast::Expression> ParseSampleExpression();

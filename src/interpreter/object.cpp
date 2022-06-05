@@ -264,7 +264,7 @@ MultiEventMidiPatternObj::MultiEventMidiPatternObj(MultiEventMidiPattern events)
   size_t smallest = std::min(notes_off.size(), notes_on_.size());
   for (size_t i = 0; i < smallest; ++i) {
     notes_on_[i].dur = notes_off[i].original_tick - notes_on_[i].original_tick;
-    std::cout << "NOTE[" << i << "] DUR is " << notes_on_[i].dur << std::endl;
+    notes_on_[i].playback_tick = notes_on_[i].original_tick % PPBAR;
   }
 
   if (smallest < notes_on_.size()) {
@@ -276,8 +276,20 @@ MultiEventMidiPatternObj::MultiEventMidiPatternObj(MultiEventMidiPattern events)
 }
 
 ObjectType MultiEventMidiPatternObj::Type() { return MULTI_EVENT_MIDI_OBJ; }
+
 std::string MultiEventMidiPatternObj::Inspect() {
-  return MultiMidiString(events_);
+  std::stringstream ss;
+  ss << "{";
+  for (unsigned long i = 0; i < notes_on_.size(); i++) {
+    auto e = notes_on_[i];
+    ss << e.playback_tick << ":\"" << e.data1 << ":" << e.data2 << ":" << e.dur
+       << "\"";
+    if (i != notes_on_.size() - 1) {
+      ss << ", ";
+    }
+  }
+  ss << "}";
+  return ss.str();
 }
 
 std::string Array::Inspect() {
@@ -400,6 +412,15 @@ std::string Hash::Inspect() {
   out << "}";
 
   return out.str();
+}
+
+ObjectType MidiEventObj::Type() { return MIDI_EVENT_OBJ; }
+
+std::string MidiEventObj::Inspect() {
+  std::stringstream ss;
+  ss << onset_tick_ << ":" << midi_value_ << ":" << tick_duration_;
+  ss << std::endl;
+  return ss.str();
 }
 
 }  // namespace object

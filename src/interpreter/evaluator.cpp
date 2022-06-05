@@ -548,6 +548,45 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     }
   }
 
+  auto midi_array_exp =
+      std::dynamic_pointer_cast<ast::MidiArrayExpression>(node);
+  if (midi_array_exp) {
+    auto elements = Eval(midi_array_exp->elements_, env);
+    std::vector<midi_event> events;
+
+    auto el_events = std::dynamic_pointer_cast<object::Hash>(elements);
+    if (el_events) {
+      std::cout << "EVENTS!:" << std::endl;
+      std::string delimiter = ":";
+      for (auto const &it : el_events->pairs_) {
+        std::string midi_tick = it.second.key_->Inspect();
+        std::string note_and_dur = it.second.value_->Inspect();
+
+        int num_delim = count(note_and_dur.begin(), note_and_dur.end(), ':');
+
+        if (num_delim == 2) {
+          int first_delim = note_and_dur.find(delimiter);
+          std::string midi_note = note_and_dur.substr(0, first_delim);
+
+          int second_delim = note_and_dur.find(delimiter, first_delim + 1);
+          std::string velo = note_and_dur.substr(
+              first_delim + 1, second_delim - first_delim - 1);
+
+          std::string dura = note_and_dur.substr(second_delim + 1);
+
+          midi_event ev{.event_type = MIDI_ON,
+                        .data1 = std::stoi(midi_note),
+                        .data2 = std::stoi(velo),
+                        .dur = std::stoi(dura),
+                        .playback_tick = std::stoi(midi_tick)};
+          events.push_back(ev);
+        }
+      }
+    }
+
+    return std::make_shared<object::MultiEventMidiPatternObj>(events);
+  }
+
   return NULLL;
 }
 

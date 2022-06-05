@@ -15,8 +15,7 @@
 
 #include <iostream>
 
-midi_event new_midi_event(unsigned int event_type, unsigned int data1,
-                          unsigned int data2) {
+midi_event new_midi_event(int event_type, int data1, int data2) {
   midi_event ev = {.event_type = event_type, .data1 = data1, .data2 = data2};
   return ev;
 }

@@ -257,6 +257,13 @@ std::string GeneratorLiteral::String() const {
   return ss.str();
 }
 
+std::string MidiArrayExpression::String() const {
+  std::stringstream ss;
+  ss << "MIDI ARRAY!:" << token_.literal_ << ":";
+  ss << elements_->String();
+  return ss.str();
+}
+
 std::string SynthExpression::String() const {
   std::stringstream ss;
   ss << "SYNTH:" << token_.literal_;
