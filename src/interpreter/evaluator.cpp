@@ -584,7 +584,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       }
     }
 
-    return std::make_shared<object::MultiEventMidiPatternObj>(events);
+    return std::make_shared<object::MidiArray>(events);
   }
 
   return NULLL;

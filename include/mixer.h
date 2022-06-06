@@ -89,6 +89,7 @@ struct Mixer {
   void AddMidiMapping(int id, std::string param);
   void ResetMidiMappings();
   void PrintMidiMappings();
+  void HandleMidiControlMessage(int data1, int data2);
 
   void AssignSoundGeneratorToMidiController(int soundgen_id);
   void RecordMidiToggle();

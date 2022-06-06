@@ -749,6 +749,17 @@ void Mixer::RecordMidiToggle() {
   midi_recording = 1 - midi_recording;
 }
 
+void Mixer::HandleMidiControlMessage(int data1, int data2) {
+  if (midi_mapped_controls_.count(data1)) {
+    auto param = midi_mapped_controls_[data1];
+    const auto &[lo, hi] = GetBoundaries(param);
+    auto val = scaleybum(0, 127, lo, hi, data2);
+    std::stringstream ss;
+    ss << "set " << param << " " << val;
+    eval_command_queue.push(ss.str());
+  }
+}
+
 void Mixer::CheckForExternalMidiEvents() {
   if (!have_midi_controller) return;
 
@@ -762,36 +773,33 @@ void Mixer::CheckForExternalMidiEvents() {
       int data1 = Pm_MessageData1(msg[i].message);
       int data2 = Pm_MessageData2(msg[i].message);
 
-      if (status == 144 || status == 128) {
-        midi_event ev = new_midi_event(status, data1, data2);
-        ev.original_tick = timing_info.midi_tick;
+      midi_event ev = new_midi_event(status, data1, data2);
+      ev.original_tick = timing_info.midi_tick;
 
+      if (midi_recording) {
+        recording_buffer_[tic].push_back(ev);
+      }
+
+      // TODO - THESE SHOULD BE SHARED WITH MIDI MESSAGE PARSING
+      if (status == MIDI_ON || status == MIDI_OFF) {
         sound_generators_[midi_target]->parseMidiEvent(ev, timing_info);
         // for (auto sg : sound_generators_) {
         //   sg->parseMidiEvent(ev, timing_info);
         // }
-        if (midi_recording) {
-          recording_buffer_[tic].push_back(ev);
-        }
       }
 
-      if (status == 176) {
-        if (midi_mapped_controls_.count(data1)) {
-          auto param = midi_mapped_controls_[data1];
-          const auto &[lo, hi] = GetBoundaries(param);
-          std::cout << "LO:" << lo << " HI:" << hi << std::endl;
-          auto val = scaleybum(0, 127, lo, hi, data2);
-          std::stringstream ss;
-          ss << "set " << param << " " << val;
-          std::cout << "CMD is:" << ss.str() << std::endl;
-          eval_command_queue.push(ss.str());
-        }
+      if (status == MIDI_CONTROL) {
+        HandleMidiControlMessage(data1, data2);
       }
     }
   }
   if (midi_recording) {
     for (auto e : recording_buffer_[tic]) {
-      sound_generators_[midi_target]->parseMidiEvent(e, timing_info);
+      if (e.event_type == MIDI_CONTROL) {
+        HandleMidiControlMessage(e.data1, e.data2);
+      } else {
+        sound_generators_[midi_target]->parseMidiEvent(e, timing_info);
+      }
     }
   }
 }
@@ -822,6 +830,8 @@ void Mixer::CheckForDelayedEvents() {
       // TODO - push to action queue not call function
       if (it->sg) {
         it->sg->parseMidiEvent(it->event, timing_info);
+      } else if (it->event.event_type == MIDI_CONTROL) {
+        HandleMidiControlMessage(it->event.data1, it->event.data2);
       }
       // `erase()` invalidates the iterator, use returned iterator
       it = _action_items.erase(it);
@@ -834,10 +844,11 @@ void Mixer::CheckForDelayedEvents() {
   auto dit = _delayed_action_items.begin();
   while (dit != _delayed_action_items.end()) {
     if (dit->start_at == (timing_info.midi_tick % PPBAR)) {
-      if (IsValidSoundgenNum(dit->mixer_soundgen_idx)) {
+      if (dit->event.event_type == MIDI_CONTROL) {
+        HandleMidiControlMessage(dit->event.data1, dit->event.data2);
+      } else if (IsValidSoundgenNum(dit->mixer_soundgen_idx)) {
         auto sg = sound_generators_[dit->mixer_soundgen_idx];
         sg->parseMidiEvent(dit->event, timing_info);
-
         if (dit->event.event_type == MIDI_ON && dit->event.dur > 0) {
           auto note_off = new_midi_event(MIDI_OFF, dit->event.data1, 0);
           audio_action_queue_item note_off_action;

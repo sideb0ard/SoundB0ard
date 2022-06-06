@@ -235,8 +235,7 @@ ObjectType Velocity::Type() { return VELOCITY_OBJ; }
 ObjectType ForLoop::Type() { return FORLOOP_OBJ; }
 std::string ForLoop::Inspect() { return "FOR LOOP"; }
 
-MultiEventMidiPatternObj::MultiEventMidiPatternObj(MultiEventMidiPattern events)
-    : events_{events} {
+MidiArray::MidiArray(MultiEventMidiPattern events) : events_{events} {
   std::vector<midi_event> notes_off;
 
   for (int i = 0; i < PPBAR; i++) {
@@ -261,23 +260,19 @@ MultiEventMidiPatternObj::MultiEventMidiPatternObj(MultiEventMidiPattern events)
   std::sort(notes_off.begin(), notes_off.end());
   std::sort(control_messages_.begin(), control_messages_.end());
 
+  // TODO - should combine the control and note_ons
   size_t smallest = std::min(notes_off.size(), notes_on_.size());
   for (size_t i = 0; i < smallest; ++i) {
     notes_on_[i].dur = notes_off[i].original_tick - notes_on_[i].original_tick;
     notes_on_[i].playback_tick = notes_on_[i].original_tick % PPBAR;
   }
 
-  if (smallest < notes_on_.size()) {
-    std::cerr << "NOT ENOUGH NOTES OFF!\n";
-    for (size_t i = smallest; i < notes_on_.size(); ++i) {
-      notes_on_[i].dur = 1000;
-    }
-  }
+  for (auto &e : control_messages_) e.playback_tick = e.original_tick % PPBAR;
 }
 
-ObjectType MultiEventMidiPatternObj::Type() { return MULTI_EVENT_MIDI_OBJ; }
+ObjectType MidiArray::Type() { return MULTI_EVENT_MIDI_OBJ; }
 
-std::string MultiEventMidiPatternObj::Inspect() {
+std::string MidiArray::Inspect() {
   std::stringstream ss;
   ss << "{";
   for (unsigned long i = 0; i < notes_on_.size(); i++) {
@@ -412,15 +407,6 @@ std::string Hash::Inspect() {
   out << "}";
 
   return out.str();
-}
-
-ObjectType MidiEventObj::Type() { return MIDI_EVENT_OBJ; }
-
-std::string MidiEventObj::Inspect() {
-  std::stringstream ss;
-  ss << onset_tick_ << ":" << midi_value_ << ":" << tick_duration_;
-  ss << std::endl;
-  return ss.str();
 }
 
 }  // namespace object

@@ -29,8 +29,6 @@
 namespace ableton {
 namespace linkaudio {
 
-const double kMidiTickFracOfBeat = 1. / 960;
-
 AudioEngine::AudioEngine(Link& link, Mixer& mixer)
     : mLink(link),
       mMixer(mixer),

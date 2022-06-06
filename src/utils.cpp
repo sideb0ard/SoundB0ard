@@ -973,5 +973,6 @@ std::string MultiMidiString(MultiEventMidiPattern &pattern) {
       }
     }
   }
+
   return ss.str();
 }

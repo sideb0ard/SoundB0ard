@@ -222,29 +222,12 @@ class Function : public Object {
   std::shared_ptr<ast::BlockStatement> body_;
 };
 
-// UNUSED - SHOULD PROB DELETE
-class MidiEventObj : public Object {
+class MidiArray : public Object {
  public:
-  MidiEventObj() = default;
-  MidiEventObj(int tick, int val, int dur)
-      : onset_tick_{tick}, midi_value_{val}, tick_duration_{dur} {};
-  ~MidiEventObj() = default;
-  ObjectType Type() override;
-  std::string Inspect() override;
-
- public:
-  int onset_tick_{0};
-  int midi_value_{0};
-  int tick_duration_{0};
-};
-
-class MultiEventMidiPatternObj : public Object {
- public:
-  MultiEventMidiPatternObj();
-  MultiEventMidiPatternObj(MultiEventMidiPattern events);
-  MultiEventMidiPatternObj(std::vector<midi_event> notes_on)
-      : notes_on_{notes_on} {};
-  ~MultiEventMidiPatternObj() = default;
+  MidiArray();
+  MidiArray(MultiEventMidiPattern events);
+  MidiArray(std::vector<midi_event> notes_on) : notes_on_{notes_on} {};
+  ~MidiArray() = default;
   ObjectType Type() override;
   std::string Inspect() override;
 

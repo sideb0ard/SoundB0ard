@@ -286,9 +286,12 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
     }
   }
   auto multi_midi_pat_obj =
-      std::dynamic_pointer_cast<object::MultiEventMidiPatternObj>(pattern);
+      std::dynamic_pointer_cast<object::MidiArray>(pattern);
   if (multi_midi_pat_obj) {
     for (auto &e : multi_midi_pat_obj->notes_on_) {
+      midi_event_at(sg->soundgen_id_, e, e.playback_tick);
+    }
+    for (auto &e : multi_midi_pat_obj->control_messages_) {
       midi_event_at(sg->soundgen_id_, e, e.playback_tick);
     }
   }
@@ -672,12 +675,10 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
 
            auto midi_array =
-               std::dynamic_pointer_cast<object::MultiEventMidiPatternObj>(
-                   input[0]);
+               std::dynamic_pointer_cast<object::MidiArray>(input[0]);
            if (midi_array) {
              auto return_array =
-                 std::make_shared<object::MultiEventMidiPatternObj>(
-                     midi_array->notes_on_);
+                 std::make_shared<object::MidiArray>(midi_array->notes_on_);
 
              for (auto &e : return_array->notes_on_) {
                e.playback_tick = PPBAR - e.playback_tick;
@@ -747,12 +748,10 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
 
            auto midi_array =
-               std::dynamic_pointer_cast<object::MultiEventMidiPatternObj>(
-                   input[0]);
+               std::dynamic_pointer_cast<object::MidiArray>(input[0]);
            if (midi_array && number) {
              auto return_array =
-                 std::make_shared<object::MultiEventMidiPatternObj>(
-                     midi_array->notes_on_);
+                 std::make_shared<object::MidiArray>(midi_array->notes_on_);
 
              auto rotate_by = number->value_ * 240;
 
@@ -1840,7 +1839,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                           -> std::shared_ptr<object::Object> {
                         (void)args;
                         auto return_pattern =
-                            std::make_shared<object::MultiEventMidiPatternObj>(
+                            std::make_shared<object::MidiArray>(
                                 mixr->RecordingBuffer());
                         return return_pattern;
                       })},
