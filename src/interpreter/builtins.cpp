@@ -1843,6 +1843,27 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                                 mixr->RecordingBuffer());
                         return return_pattern;
                       })},
+    {"midi_fix", std::make_shared<object::BuiltIn>(
+                     [](std::vector<std::shared_ptr<object::Object>> args)
+                         -> std::shared_ptr<object::Object> {
+                       int args_size = args.size();
+                       if (args_size == 1) {
+                         auto midi_array =
+                             std::dynamic_pointer_cast<object::MidiArray>(
+                                 args[0]);
+                         if (midi_array) {
+                           for (auto &e : midi_array->notes_on_) {
+                             int new_pos_div = e.playback_tick / 120;
+                             e.playback_tick = new_pos_div * 120;
+                           }
+                           for (auto &e : midi_array->control_messages_) {
+                             int new_pos_div = e.playback_tick / 120;
+                             e.playback_tick = new_pos_div * 120;
+                           }
+                         }
+                       }
+                       return evaluator::NULLL;
+                     })},
     {"midi_map", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {

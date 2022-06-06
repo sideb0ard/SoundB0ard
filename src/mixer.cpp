@@ -36,6 +36,7 @@ std::pair<double, double> GetBoundaries(std::string param) {
   for (const auto &p : env_names) {
     if (param.find(p) != std::string::npos) return std::make_pair(1, 5000);
   }
+  if (param.find("fq") != std::string::npos) return std::make_pair(0.5, 9.7);
   if (param.find("det") != std::string::npos) return std::make_pair(-100, 100);
   if (param.find("int") != std::string::npos) return std::make_pair(-1, 1);
   if (param.find("rate") != std::string::npos) return std::make_pair(0.02, 20);
