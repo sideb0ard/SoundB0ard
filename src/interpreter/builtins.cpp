@@ -125,6 +125,19 @@ std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz) {
   }
   return midi_nums;
 }
+void SendMidiMappingShow() {
+  std::cout << "sending a midi map SHOW\n";
+  audio_action_queue_item action{.type = AudioAction::MIDI_MAP_SHOW};
+  audio_queue.push(action);
+}
+
+void SendMidiMapping(int mapped_id, std::string mapped_param) {
+  std::cout << "sending a midi map\n";
+  audio_action_queue_item action{.type = AudioAction::MIDI_MAP,
+                                 .mapped_id = mapped_id,
+                                 .mapped_param = mapped_param};
+  audio_queue.push(action);
+}
 
 void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
                 int vel, int dur) {
@@ -1831,6 +1844,26 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                                 mixr->RecordingBuffer());
                         return return_pattern;
                       })},
+    {"midi_map", std::make_shared<object::BuiltIn>(
+                     [](std::vector<std::shared_ptr<object::Object>> args)
+                         -> std::shared_ptr<object::Object> {
+                       int args_size = args.size();
+                       if (args_size == 2) {
+                         auto id =
+                             std::dynamic_pointer_cast<object::Number>(args[0]);
+                         auto param =
+                             std::dynamic_pointer_cast<object::String>(args[1]);
+                         if (id && param) {
+                           std::cout << "GOT ID AND PARAM:" << id->value_ << " "
+                                     << param->value_ << std::endl;
+                           SendMidiMapping(id->value_, param->value_);
+                         }
+                       } else {
+                         std::cout << "DUMP MIXER MAP\n";
+                         SendMidiMappingShow();
+                       }
+                       return evaluator::NULLL;
+                     })},
 };
 
 }  // namespace builtin

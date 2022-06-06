@@ -21,6 +21,8 @@ enum AudioAction {
   MIDI_EVENT_ADD_DELAYED,
   MIDI_EVENT_CLEAR,
   MIDI_INIT,
+  MIDI_MAP,
+  MIDI_MAP_SHOW,
   MIXER_UPDATE,
   MONITOR,
   NO_ACTION,
@@ -47,6 +49,10 @@ struct audio_action_queue_item {
 
   bool has_midi_event{false};
   midi_event event;
+
+  // MIDI MAP TYPE
+  int mapped_id;
+  std::string mapped_param;
 
   // ADD varz
   unsigned int soundgenerator_type;

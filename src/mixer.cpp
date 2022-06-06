@@ -28,6 +28,24 @@
 #include <sstream>
 #include <tsqueue.hpp>
 
+namespace {
+
+std::vector<std::string> env_names = {"att", "dec", "rel"};
+
+std::pair<double, double> GetBoundaries(std::string param) {
+  for (const auto &p : env_names) {
+    if (param.find(p) != std::string::npos) return std::make_pair(1, 5000);
+  }
+  if (param.find("det") != std::string::npos) return std::make_pair(-100, 100);
+  if (param.find("int") != std::string::npos) return std::make_pair(-1, 1);
+  if (param.find("rate") != std::string::npos) return std::make_pair(0.02, 20);
+  if (param.find("rat") != std::string::npos) return std::make_pair(0.01, 26);
+
+  return std::make_pair(0, 1);
+}
+
+}  // namespace
+
 Mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
 extern Tsqueue<event_queue_item> process_event_queue;
@@ -593,8 +611,11 @@ stereo_val PreviewBuffer::Generate() {
 }
 
 void Mixer::ProcessActionMessage(audio_action_queue_item action) {
-  if (action.type == AudioAction::STATUS)
-    Ps(action.status_all);
+  if (action.type == AudioAction::STATUS) Ps(action.status_all);
+  if (action.type == AudioAction::MIDI_MAP)
+    AddMidiMapping(action.mapped_id, action.mapped_param);
+  if (action.type == AudioAction::MIDI_MAP_SHOW)
+    PrintMidiMappings();
   else if (action.type == AudioAction::HELP)
     mixr->Help();
   else if (action.type == AudioAction::MONITOR) {
@@ -741,15 +762,30 @@ void Mixer::CheckForExternalMidiEvents() {
       int data1 = Pm_MessageData1(msg[i].message);
       int data2 = Pm_MessageData2(msg[i].message);
 
-      midi_event ev = new_midi_event(status, data1, data2);
-      ev.original_tick = timing_info.midi_tick;
+      if (status == 144 || status == 128) {
+        midi_event ev = new_midi_event(status, data1, data2);
+        ev.original_tick = timing_info.midi_tick;
 
-      sound_generators_[midi_target]->parseMidiEvent(ev, timing_info);
-      // for (auto sg : sound_generators_) {
-      //   sg->parseMidiEvent(ev, timing_info);
-      // }
-      if (midi_recording) {
-        recording_buffer_[tic].push_back(ev);
+        sound_generators_[midi_target]->parseMidiEvent(ev, timing_info);
+        // for (auto sg : sound_generators_) {
+        //   sg->parseMidiEvent(ev, timing_info);
+        // }
+        if (midi_recording) {
+          recording_buffer_[tic].push_back(ev);
+        }
+      }
+
+      if (status == 176) {
+        if (midi_mapped_controls_.count(data1)) {
+          auto param = midi_mapped_controls_[data1];
+          const auto &[lo, hi] = GetBoundaries(param);
+          std::cout << "LO:" << lo << " HI:" << hi << std::endl;
+          auto val = scaleybum(0, 127, lo, hi, data2);
+          std::stringstream ss;
+          ss << "set " << param << " " << val;
+          std::cout << "CMD is:" << ss.str() << std::endl;
+          eval_command_queue.push(ss.str());
+        }
       }
     }
   }
@@ -834,3 +870,13 @@ void Mixer::CheckForDelayedEvents() {
 }
 
 void Mixer::PrintRecordingBuffer() { PrintMultiMidi(recording_buffer_); }
+void Mixer::AddMidiMapping(int id, std::string param) {
+  midi_mapped_controls_[id] = param;
+}
+
+void Mixer::ResetMidiMappings() { midi_mapped_controls_.clear(); }
+void Mixer::PrintMidiMappings() {
+  for (const auto &[id, param] : midi_mapped_controls_) {
+    std::cout << "ID:" << id << " // Param:" << param << std::endl;
+  }
+}

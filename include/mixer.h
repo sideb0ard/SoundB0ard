@@ -12,7 +12,11 @@
 #include <soundgenerator.h>
 
 #include <ableton/Link.hpp>
+#include <array>
 #include <process.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 struct PreviewBuffer {
   std::string filename{};
@@ -80,6 +84,11 @@ struct Mixer {
   int midi_target;
   // std::vector<int> midi_targets{};  // sound_generators_ idx
   bool midi_recording = {false};
+  std::unordered_map<int, std::string> midi_mapped_controls_ = {};
+
+  void AddMidiMapping(int id, std::string param);
+  void ResetMidiMappings();
+  void PrintMidiMappings();
 
   void AssignSoundGeneratorToMidiController(int soundgen_id);
   void RecordMidiToggle();
