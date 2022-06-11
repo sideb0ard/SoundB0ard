@@ -10,7 +10,7 @@ namespace SBAudio {
 constexpr int kMaxConcurrentGrains = 1000;
 
 struct SoundGrainParams {
-  int dur{0};
+  float dur_frames{0};
   int starting_idx{0};
   int attack_pct{0};
   int release_pct{0};
@@ -42,17 +42,14 @@ struct SoundGrain {
   int degrade_by{0};
 
   bool active{false};
-  double amp{0};
   bool reverse_mode{false};
   bool debug{false};
 
-  // EnvelopeGenerator eg;
-  float attack_samples{0};
+  EnvelopeGenerator eg;
+  // double amp{0};
+  // double amp_increment;
   int start_sustain_frame{0};
   int release_frame{0};
-  float exp_min = 0.2;
-  float exp_mul{0};
-  float exp_now{0};
 };
 
 enum LoopMode {
@@ -104,6 +101,7 @@ class Looper : public SoundGenerator {
   int next_grain_launch_sample_time{0};
   int grain_attack_time_pct{0};
   int grain_release_time_pct{0};
+  int attack_frames_{0};
 
   EnvelopeGenerator m_eg1;  // start/stop amp
 
@@ -140,7 +138,7 @@ class Looper : public SoundGenerator {
   void ImportFile(std::string filename);
   void SetGateMode(bool b);
 
-  int CalculateGrainSpacing(mixer_timing_info tinfo);
+  // int CalculateGrainSpacing(mixer_timing_info tinfo);
   void SetGrainPitch(double pitch);
   void SetIncrSpeed(double speed);
   void SetGrainDuration(int dur);

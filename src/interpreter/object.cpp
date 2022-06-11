@@ -270,7 +270,7 @@ MidiArray::MidiArray(MultiEventMidiPattern events) : events_{events} {
   for (auto &e : control_messages_) e.playback_tick = e.original_tick % PPBAR;
 }
 
-ObjectType MidiArray::Type() { return MULTI_EVENT_MIDI_OBJ; }
+ObjectType MidiArray::Type() { return MIDI_ARRAY; }
 
 std::string MidiArray::Inspect() {
   std::stringstream ss;

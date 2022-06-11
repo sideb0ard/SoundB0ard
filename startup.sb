@@ -305,13 +305,14 @@ let gen_beat = fn()
   return beat;
 }
 
+let d = 1000;
 let stepper = fn(sg, pat, read_idx, play_idx)
 {
   if (type(pat[read_idx]) == "ARRAY") {
     note_on_at(sg, pat[read_idx][0], play_idx * pp);
   } else {
     if (pat[read_idx] > 0) {
-      note_on_at(sg, pat[read_idx], play_idx * pp);
+      note_on_at(sg, pat[read_idx], play_idx * pp, dur = d);
     }
   }
 }

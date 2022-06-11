@@ -12,6 +12,8 @@
 
 namespace SBAudio {
 
+constexpr double len_frame_ms = 1000. / 44100;
+
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 Looper::Looper(std::string filename, unsigned int loop_mode) {
@@ -23,7 +25,7 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   reverse_mode = false;
 
   density_duration_sync = true;
-  fill_factor = 3.;
+  // fill_factor = 2.;
   SetGrainDensity(30);
 
   type = LOOPER_TYPE;
@@ -51,7 +53,7 @@ void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
   }
 
   if (tinfo.is_midi_tick) {
-    grain_spacing = CalculateGrainSpacing(tinfo);
+    // grain_spacing = CalculateGrainSpacing(tinfo);
     if (started)
       cur_midi_idx_ = fmodf(cur_midi_idx_ + incr_speed_, PPBAR * loop_len);
     // cur_frame_tick = (cur_frame_tick + 1) % number_of_frames;
@@ -126,21 +128,20 @@ void Looper::LaunchGrain(mixer_timing_info tinfo) {
   next_grain_launch_sample_time = tinfo.cur_sample + grain_spacing;
   cur_grain_num = GetAvailableGrainNum();
 
-  int duration = grain_duration_ms * 44.1;
+  float duration_frames = grain_duration_ms * 44.1;
   if (quasi_grain_fudge != 0)
-    duration += rand() % (int)(quasi_grain_fudge * 44.1);
+    duration_frames += rand() % (int)(quasi_grain_fudge * 44.1);
 
   int grain_idx = audio_buffer_read_idx;
 
   if (granular_spray_frames > 0) grain_idx += rand() % granular_spray_frames;
 
-  int attack_time_pct = grain_attack_time_pct;
-  int release_time_pct = grain_release_time_pct;
-
-  SoundGrainParams params = {.dur = duration,
+  // float duration_frames = grain_duration_ms * 44.1;
+  attack_frames_ = duration_frames / 100. * grain_attack_time_pct;
+  SoundGrainParams params = {.dur_frames = duration_frames,
                              .starting_idx = grain_idx,
-                             .attack_pct = attack_time_pct,
-                             .release_pct = release_time_pct,
+                             .attack_pct = grain_attack_time_pct,
+                             .release_pct = grain_release_time_pct,
                              .reverse_mode = reverse_mode,
                              .pitch = grain_pitch,
                              .num_channels = num_channels,
@@ -161,32 +162,6 @@ stereo_val Looper::GenNext(mixer_timing_info tinfo) {
   if (loop_mode_ == LoopMode::loop_mode) {
     float loop_num = fmod(loop_counter, loop_len);
     if (loop_num < 0) loop_num = 0;
-
-    // float percent_position =
-    //     cur_frame_tick / (tinfo.loop_len_in_frames * loop_len);
-
-    // std::cout << "PERVCENT POS:" << percent_position
-    //           << " ReadIDX:" << new_read_idx
-    //           << " BUFFER LEN:" << audio_buffer.size()
-    //           << " FRAMENUM:" << cur_frame_tick << std::endl;
-
-    //// audio_buffer_read_idx = decimal_percent_of_loop *
-    /// audio_buffer.size();
-
-    // if (reverse_mode)
-    //   audio_buffer_read_idx =
-    //       (audio_buffer.size() - 1) - audio_buffer_read_idx;
-
-    // double new_read_idx = audio_buffer_read_idx += idx_incr;
-    //// this ensures new_read_idx is even
-    // if (num_channels == 2) new_read_idx -= ((int)new_read_idx & 1);
-
-    // if (new_read_idx >= audio_buffer.size()) {
-    //   std::cout << "RESET READIDX:" << new_read_idx << std::endl;
-    //   new_read_idx -= audio_buffer.size();
-    // }
-
-    // audio_buffer_read_idx = new_read_idx;
   }
 
   if (tinfo.cur_sample > next_grain_launch_sample_time)  // new grain time
@@ -194,7 +169,6 @@ stereo_val Looper::GenNext(mixer_timing_info tinfo) {
 
   for (int i = 0; i < highest_grain_num; i++) {
     stereo_val tmp = m_grains[i].Generate(audio_buffer);
-
     val.left += tmp.left;
     val.right += tmp.right;
   }
@@ -210,9 +184,6 @@ stereo_val Looper::GenNext(mixer_timing_info tinfo) {
 
   val.left = val.left * volume * eg_amp * pan_left;
   val.right = val.right * volume * eg_amp * pan_right;
-
-  // val.left = val.left * volume * pan_left;
-  // val.right = val.right * volume * pan_right;
 
   val = Effector(val);
 
@@ -275,17 +246,21 @@ Looper::~Looper() {
 // looper functions continue below
 
 void SoundGrain::Initialize(SoundGrainParams params) {
-  amp = 0;
   audiobuffer_start_idx = params.starting_idx;
-  grain_len_frames = params.dur;
+  grain_len_frames = params.dur_frames;
   grain_counter_frames = 0;
 
-  attack_samples = grain_len_frames / 100. * params.attack_pct;
-  start_sustain_frame = attack_samples;
-  release_frame = params.dur - attack_samples;
+  start_sustain_frame = grain_len_frames / 100. * params.attack_pct;
+  release_frame = params.dur_frames - start_sustain_frame;
 
-  exp_mul = pow(exp_min / (exp_min + 1), 1 / attack_samples);
-  exp_now = exp_min + 1;
+  // amp_increment = 1 / start_sustain_frame;
+  eg.Reset();
+  eg.SetSustainOverride(true);
+  eg.SetAttackTimeMsec(start_sustain_frame * len_frame_ms);
+  eg.SetDecayTimeMsec(0);
+  eg.SetSustainLevel(1.);
+  eg.SetReleaseTimeMsec(start_sustain_frame * len_frame_ms);
+  eg.StartEg();
 
   audiobuffer_num_channels = params.num_channels;
   degrade_by = params.degrade_by;
@@ -294,14 +269,12 @@ void SoundGrain::Initialize(SoundGrainParams params) {
   reverse_mode = params.reverse_mode;
   if (params.reverse_mode) {
     audiobuffer_cur_pos =
-        params.starting_idx + (params.dur * params.num_channels) - 1;
+        params.starting_idx + (params.dur_frames * params.num_channels) - 1;
     incr = -1.0 * params.pitch;
   } else {
     audiobuffer_cur_pos = params.starting_idx;
     incr = params.pitch;
   }
-
-  amp = 1;
 
   active = true;
 }
@@ -325,41 +298,24 @@ stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
   double frac = audiobuffer_cur_pos - read_idx;
   sound_grain_check_idx(&read_idx, audio_buffer.size());
 
-  float eg_amp = amp;
-  if (grain_counter_frames < start_sustain_frame ||
-      grain_counter_frames > release_frame) {
-    exp_now *= exp_mul;
-    eg_amp = (1 - (exp_now - exp_min));
-  } else if (grain_counter_frames == release_frame) {
-    exp_now = exp_min;
-    exp_mul = pow((exp_min + 1) / exp_min, 1 / attack_samples);
-  }
+  double eg_amp = eg.DoEnvelope(nullptr);
 
+  out.left = audio_buffer[read_idx] * eg_amp;
   if (num_channels == 1) {
-    int read_next_idx = read_idx + 1;
-    sound_grain_check_idx(&read_next_idx, audio_buffer.size());
-    out.left = utils::LinTerp(0, 1, audio_buffer[read_idx],
-                              audio_buffer[read_next_idx], frac);
-    out.left *= eg_amp;
     out.right = out.left;
   } else if (num_channels == 2) {
-    int read_next_idx = read_idx + 2;
-    sound_grain_check_idx(&read_next_idx, audio_buffer.size());
-    out.left = utils::LinTerp(0, 1, audio_buffer[read_idx],
-                              audio_buffer[read_next_idx], frac);
-    out.left *= eg_amp;
-
     int read_idx_right = read_idx + 1;
-    sound_grain_check_idx(&read_idx_right, audio_buffer.size());
-    int read_next_idx_right = read_idx_right + 2;
-    sound_grain_check_idx(&read_next_idx_right, audio_buffer.size());
-    out.right = utils::LinTerp(0, 1, audio_buffer[read_idx_right],
-                               audio_buffer[read_next_idx_right], frac);
-    out.right *= eg_amp;
+    out.right = audio_buffer[read_idx_right] * eg_amp;
   }
   audiobuffer_cur_pos += (incr * num_channels);
 
   grain_counter_frames++;
+
+  if (grain_counter_frames == release_frame) {
+    eg.SetSustainOverride(false);
+    eg.Release();
+  }
+
   if (grain_counter_frames > grain_len_frames) {
     active = false;
   }
@@ -375,10 +331,6 @@ void Looper::ImportFile(std::string filename) {
   SetLoopLen(1);
 }
 
-int Looper::CalculateGrainSpacing(mixer_timing_info tinfo) {
-  return grain_duration_ms * 44.1 / fill_factor;
-}
-
 void Looper::SetGrainDuration(int dur) {
   grain_duration_ms = dur;
   if (density_duration_sync) grains_per_sec = 1000. / grain_duration_ms;
@@ -387,6 +339,11 @@ void Looper::SetGrainDuration(int dur) {
 void Looper::SetGrainDensity(int gps) {
   grains_per_sec = gps;
   if (density_duration_sync) grain_duration_ms = 1000. / grains_per_sec;
+
+  float duration_frames = grain_duration_ms * 44.1;
+  attack_frames_ = duration_frames / 100. * grain_attack_time_pct;
+
+  grain_spacing = (44100. / grains_per_sec) - attack_frames_;
 }
 
 void Looper::SetGrainAttackSizePct(int attack_pct) {
@@ -551,6 +508,4 @@ void Looper::SetParam(std::string name, double val) {
   else if (name == "grain_rel_pct")
     SetGrainReleaseSizePct(val);
 }
-
-
 };  // namespace SBAudio

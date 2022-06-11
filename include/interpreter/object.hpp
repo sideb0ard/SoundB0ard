@@ -42,8 +42,7 @@ constexpr char SYNTH_OBJ[] = "SYNTH";
 constexpr char SAMPLE_OBJ[] = "SAMPLE";
 constexpr char GRANULAR_OBJ[] = "GRANULAR";
 
-constexpr char MULTI_EVENT_MIDI_OBJ[] = "MULTI_EVENT_MIDI_PATTERN";
-constexpr char MIDI_EVENT_OBJ[] = "MIDI_EVENT_OBJ";
+constexpr char MIDI_ARRAY[] = "MIDI_ARRAY";
 
 constexpr char AT_OBJ[] = "AT";
 constexpr char DURATION_OBJ[] = "DURATION";

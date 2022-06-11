@@ -33,6 +33,7 @@ namespace {
 std::vector<std::string> env_names = {"att", "dec", "rel"};
 
 std::pair<double, double> GetBoundaries(std::string param) {
+  if (param.find("pct") != std::string::npos) return std::make_pair(0, 100);
   for (const auto &p : env_names) {
     if (param.find(p) != std::string::npos) return std::make_pair(1, 5000);
   }
@@ -41,6 +42,9 @@ std::pair<double, double> GetBoundaries(std::string param) {
   if (param.find("int") != std::string::npos) return std::make_pair(-1, 1);
   if (param.find("rate") != std::string::npos) return std::make_pair(0.02, 20);
   if (param.find("rat") != std::string::npos) return std::make_pair(0.01, 26);
+  if (param.find("out") != std::string::npos) return std::make_pair(0, 100);
+  if (param.find("algo") != std::string::npos) return std::make_pair(0, 7);
+  if (param.find("grain") != std::string::npos) return std::make_pair(0, 100);
 
   return std::make_pair(0, 1);
 }

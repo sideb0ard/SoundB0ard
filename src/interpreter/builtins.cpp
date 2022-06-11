@@ -1735,6 +1735,46 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                    return evaluator::NULLL;
                  })},
+    {"scramble",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 1) {
+             auto array_to_scramble =
+                 std::dynamic_pointer_cast<object::Array>(args[0]);
+
+             if (array_to_scramble &&
+                 array_to_scramble->elements_.size() == 16) {
+               auto return_array = std::make_shared<object::Array>(
+                   std::vector<std::shared_ptr<object::Object>>());
+
+               std::vector<std::shared_ptr<object::Object>> vals = {};
+               for (int i = 0; i < 16; i++) {
+                 auto num = std::dynamic_pointer_cast<object::Number>(
+                     array_to_scramble->elements_[i]);
+                 if (num) {
+                   if (num->value_ > 0) {
+                     vals.push_back(array_to_scramble->elements_[i]);
+                   }
+                 }
+               }
+
+               for (int i = 0; i < 16; i++) {
+                 if (random() % 100 > 70) {
+                   return_array->elements_.push_back(
+                       vals[random() % vals.size()]);
+                 } else {
+                   return_array->elements_.push_back(
+                       std::make_shared<object::Number>(0));
+                 }
+               }
+
+               return return_array;
+             }
+           }
+           return evaluator::NULLL;
+         })},
     {"stutter",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -1843,6 +1883,70 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                                 mixr->RecordingBuffer());
                         return return_pattern;
                       })},
+    {"midi2array",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 1) {
+             auto midi_array =
+                 std::dynamic_pointer_cast<object::MidiArray>(args[0]);
+             if (midi_array) {
+               auto return_array = std::make_shared<object::Array>(
+                   std::vector<std::shared_ptr<object::Object>>());
+
+               for (int i = 0; i < 16; i++) {
+                 int lower_midi_index = 240 * i;
+                 int higher_midi_index = lower_midi_index + 240;  //
+
+                 bool found = false;
+                 for (auto &e : midi_array->notes_on_) {
+                   if (e.playback_tick > lower_midi_index &&
+                       e.playback_tick < higher_midi_index) {
+                     return_array->elements_.push_back(
+                         std::make_shared<object::Number>(e.data1));
+                     found = true;
+                     break;
+                   }
+                 }
+
+                 if (!found) {
+                   return_array->elements_.push_back(
+                       std::make_shared<object::Number>(0));
+                 }
+               }
+
+               return return_array;
+             }
+           }
+
+           return evaluator::NULLL;
+         })},
+    {"midi_at",
+     std::make_shared<object::BuiltIn>(  // TODO - better name!
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 2) {
+             auto midi_array =
+                 std::dynamic_pointer_cast<object::MidiArray>(args[0]);
+             auto index_at = std::dynamic_pointer_cast<object::Number>(args[1]);
+             if (midi_array && index_at) {
+               int index_at_val = index_at->value_;
+               int lower_midi_index = 240 * index_at_val;
+               int higher_midi_index = lower_midi_index + 240;
+
+               for (auto &e : midi_array->notes_on_) {
+                 if (e.playback_tick > lower_midi_index &&
+                     e.playback_tick < higher_midi_index) {
+                   return std::make_shared<object::Number>(e.data1);
+                 }
+               }
+               return std::make_shared<object::Number>(0);
+             }
+           }
+           return evaluator::NULLL;
+         })},
     {"midi_fix", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
