@@ -599,7 +599,6 @@ std::shared_ptr<ast::Expression> Parser::ParseDurationExpression() {
 std::shared_ptr<ast::Expression> Parser::ParseMidiArrayExpression() {
   auto midi_array = std::make_shared<ast::MidiArrayExpression>(cur_token_);
 
-  std::cout << "PARSING MIDI ARRAY. Next token is:" << peek_token_ << std::endl;
   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
   NextToken();
   midi_array->elements_ = ParseExpression(Precedence::LOWEST);

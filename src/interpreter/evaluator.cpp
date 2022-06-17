@@ -556,7 +556,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
 
     auto el_events = std::dynamic_pointer_cast<object::Hash>(elements);
     if (el_events) {
-      std::cout << "EVENTS!:" << std::endl;
       std::string delimiter = ":";
       for (auto const &it : el_events->pairs_) {
         std::string midi_tick = it.second.key_->Inspect();
