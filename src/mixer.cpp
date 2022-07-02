@@ -754,6 +754,8 @@ void Mixer::RecordMidiToggle() {
   midi_recording = 1 - midi_recording;
 }
 
+void Mixer::PrintMidiToggle() { midi_print = 1 - midi_print; }
+
 void Mixer::HandleMidiControlMessage(int data1, int data2) {
   if (midi_mapped_controls_.count(data1)) {
     auto param = midi_mapped_controls_[data1];
@@ -783,6 +785,10 @@ void Mixer::CheckForExternalMidiEvents() {
 
       if (midi_recording) {
         recording_buffer_[tic].push_back(ev);
+      }
+      if (midi_print) {
+        std::cout << "MIDI -- " << status << " " << data1 << " " << data2
+                  << std::endl;
       }
 
       // TODO - THESE SHOULD BE SHARED WITH MIDI MESSAGE PARSING

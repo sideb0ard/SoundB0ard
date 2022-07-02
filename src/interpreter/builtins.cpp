@@ -1867,6 +1867,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        mixr->RecordMidiToggle();
                        return evaluator::NULLL;
                      })},
+    {"midi_print", std::make_shared<object::BuiltIn>(
+                       [](std::vector<std::shared_ptr<object::Object>> args)
+                           -> std::shared_ptr<object::Object> {
+                         (void)args;
+                         mixr->PrintMidiToggle();
+                         return evaluator::NULLL;
+                       })},
     {"midi_reset", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object> {

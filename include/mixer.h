@@ -84,6 +84,7 @@ struct Mixer {
   int midi_target;
   // std::vector<int> midi_targets{};  // sound_generators_ idx
   bool midi_recording = {false};
+  bool midi_print = {false};
   std::unordered_map<int, std::string> midi_mapped_controls_ = {};
 
   void AddMidiMapping(int id, std::string param);
@@ -93,6 +94,7 @@ struct Mixer {
 
   void AssignSoundGeneratorToMidiController(int soundgen_id);
   void RecordMidiToggle();
+  void PrintMidiToggle();
   void ResetMidiRecording();
 
   void CheckForDelayedEvents();
