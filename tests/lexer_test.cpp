@@ -110,7 +110,7 @@ ps;
     std::cout << "Parsey setup!\n";
     lex = std::make_unique<lexer::Lexer>(input);
   }
-};  // namespace
+}  // namespace
 
 TEST_F(LexerTest, TestNextToken) {
   for (auto tt : testTokens) {

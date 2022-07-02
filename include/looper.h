@@ -170,5 +170,5 @@ class Looper : public SoundGenerator {
   void SetTraceEnvelope();
 };
 
-};      // namespace SBAudio
+}  // namespace SBAudio
 #endif  // LOOPER

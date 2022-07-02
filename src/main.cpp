@@ -49,7 +49,7 @@ struct State {
   }
 };
 
-};  // namespace
+}  // namespace
 
 void Eval(char *line, std::shared_ptr<object::Environment> env) {
   auto lex = std::make_shared<lexer::Lexer>();

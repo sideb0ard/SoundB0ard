@@ -57,4 +57,4 @@ class DrumSampler : public SoundGenerator {
   void SetGlitchRandFactor(int pct);
 };
 
-};  // namespace SBAudio
+}  // namespace SBAudio

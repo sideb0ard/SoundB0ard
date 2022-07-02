@@ -169,4 +169,4 @@ void SBSynth::noteOff(midi_event ev) {
   m_eg1.NoteOff();
 }
 
-};  // namespace SBAudio
+}  // namespace SBAudio

@@ -168,4 +168,4 @@ class DXSynth : public SoundGenerator {
   void SetActiveMidiOsc(int oscnum);
 };
 
-};  // namespace SBAudio
+}  // namespace SBAudio

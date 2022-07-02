@@ -81,4 +81,4 @@ class SoundGenerator {
   bool IsStepper();
 };
 
-};  // namespace SBAudio
+}  // namespace SBAudio

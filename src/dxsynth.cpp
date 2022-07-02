@@ -1386,4 +1386,4 @@ void DXSynth::ListPresets() {
   synth_list_presets(DXSYNTH_TYPE);
 }
 
-};  // namespace SBAudio
+}  // namespace SBAudio

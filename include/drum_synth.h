@@ -46,4 +46,4 @@ class DrumSynth : public SoundGenerator {
   DCA m_dca;
 };
 
-};  // namespace SBAudio
+}  // namespace SBAudio

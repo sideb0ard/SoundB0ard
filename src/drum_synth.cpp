@@ -283,4 +283,4 @@ void DrumSynth::ListPresets() {
   fclose(presetzzz);
 }
 
-};  // namespace SBAudio
+}  // namespace SBAudio

@@ -189,4 +189,4 @@ bool SoundGenerator::IsStepper() {
   return false;
 }
 
-};  // namespace SBAudio
+}  // namespace SBAudio

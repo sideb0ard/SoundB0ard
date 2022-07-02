@@ -1097,9 +1097,6 @@ void MiniSynth::Save(std::string new_preset_name) {
   return;
 }
 
-// bool minisynth_load_settings( char *preset_to_load)
-//{
-//    void Save(std::string preset_name);
 void MiniSynth::Load(std::string preset_name) {
   if (preset_name.empty()) {
     printf(
@@ -2049,4 +2046,4 @@ void MiniSynth::SetParam(std::string name, double val) {
   Update();
 }
 
-};  // namespace SBAudio
+}  // namespace SBAudio

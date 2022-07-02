@@ -508,4 +508,4 @@ void Looper::SetParam(std::string name, double val) {
   else if (name == "grain_rel_pct")
     SetGrainReleaseSizePct(val);
 }
-};  // namespace SBAudio
+}  // namespace SBAudio

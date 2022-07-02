@@ -289,4 +289,4 @@ class MiniSynth : public SoundGenerator {
   void SetHardSync(bool b);
 };
 
-};  // namespace SBAudio
+}  // namespace SBAudio

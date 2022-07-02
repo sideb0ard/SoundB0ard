@@ -186,4 +186,4 @@ void DrumSampler::SetParam(std::string name, double val) {
   }
 }
 
-};  // namespace SBAudio
+}  // namespace SBAudio
