@@ -330,11 +330,7 @@ void Mixer::UpdateBpm(int new_bpm) {
   bpm_to_be_updated = new_bpm;
   timing_info.bpm = bpm;
   timing_info.frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
-  std::cout << "FRAMERS PER MIDI TICK:" << timing_info.frames_per_midi_tick
-            << std::endl;
   timing_info.loop_len_in_frames = timing_info.frames_per_midi_tick * PPBAR;
-  std::cout << "LOOP LEN IN FRAMES :" << timing_info.loop_len_in_frames
-            << std::endl;
   timing_info.loop_len_in_ticks = PPBAR;
 
   timing_info.ms_per_midi_tick = 60000.0 / (bpm * PPQN);
@@ -428,7 +424,6 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
 
   int return_bpm = 0;
   if (bpm_to_be_updated > 0) {
-    std::cout << "SETTING TEMPO TO " << bpm_to_be_updated << std::endl;
     return_bpm = bpm_to_be_updated;
     bpm_to_be_updated = 0;
   }

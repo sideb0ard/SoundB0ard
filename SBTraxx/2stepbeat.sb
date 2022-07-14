@@ -1,14 +1,42 @@
 let subd = sample(bd/subbass1.aiff);
-let mkd = sample(bd/mkKick.aiff);
+#let mkd = sample(bd/mkKick.aiff);
+let bd = sample(bd/AbraKick.aiff);
 let sd = sample(sd/acidHatSnare.aiff);
 let hh = sample(ch/acidHat3.aiff);
-let shk = sample(perc/tuffShaker.aiff);
-let tmb = sample(perc/tambourine.aif);
+#let shk = sample(perc/tuffShaker.aiff);
+let shk = sample(perc/krushping.wav);
+#let tmb = sample(perc/tambourine.aif);
+let tmb = sample(perc/kk.wav);
 let mawcp = sample(cp/mawClapDelayed.aiff);
-vol tmb 0.2;
+vol tmb 0.4;
 #set tmb:decay_ms 90;
 #set shk:decay_ms 110;
 #set hh:decay_ms 250;
+
+let time_gen = gen()
+{
+  setup()
+  {
+    let the_bpm = 140;
+  }
+  run()
+  {
+    if (count % 8 == 7) {
+      bpm 132;
+    } else {
+      bpm 140;
+    }
+  }
+}
+
+let randoffset_fn = fn()
+{
+  let num =  rand(20);
+  if (rand(100) > 50) {
+    return -1 * num;
+  }
+  return num;
+}
 
 let b2step_gen = gen()
 {
@@ -16,6 +44,8 @@ let b2step_gen = gen()
   {
     let swng = 40;
     let hatv = 80;
+    let btpz = [0.8, 2, 1.2, 1, 1];
+    let btx = 0;
   }
   run()
   {
@@ -25,13 +55,24 @@ let b2step_gen = gen()
         if (rand(100) > 90) {
           note_on_at(subd, 1, 14 * pp + 120);
         }
-        note_on(mkd, 1, vel = 100);
-        note_on_at(mkd, 1, 11 * pp);
-        note_on_at(mkd, 1, 14 * pp);
+
+        note_on(bd, 1, vel = 100);
+
+        set bd:pitch btpz[btx];
+
+        set tmb:pitch btpz[btx];
+        btx = incr(btx, 0, len(btpz));
+
+        note_on_at(bd, 1, 11 * pp + randoffset_fn());
+        set bd:pitch btpz[btx] at = 11* pp;
+        btx = incr(btx, 0, len(btpz));
+
+        note_on_at(bd, 1, 14 * pp + randoffset_fn());
+
       } else {
-        note_on_at(mkd, 1, 8 * pp);
-        note_on_at(mkd, 1, 11 * pp);
-        note_on_at(mkd, 1, 14 * pp);
+        note_on_at(bd, 1, 8 * pp + randoffset_fn());
+        note_on_at(bd, 1, 11 * pp + randoffset_fn());
+        note_on_at(bd, 1, 14 * pp + randoffset_fn());
       }
     }
 
@@ -71,7 +112,7 @@ let b2step_gen = gen()
         note_on_at(tmb, 1, tick, vel = v);
       }
 
-      if (count % 19 < 4) {
+      if (count % 19 < 8) {
         if (i == 4 || i == 12) {
           note_on_at(sd, 1, tick - rand(20));
           note_on_at(mawcp, 1, tick + rand(20));
@@ -170,7 +211,7 @@ let mostringz_gen = gen()
     let ntz = down(notes_in_chord(notez[nx], 1, 1), dwnz[dwx]);
     # halien
     if (count % 12 == 11) {
-      print("DX!!");
+      #print("DX!!");
       note_on(dx, down(ntz,12), dur = 4000);
     }
 
@@ -262,7 +303,7 @@ vol wut 0.2;
 
 
 #let branz = [gu, te, teh, waii];
-let branz = [ah2, aye, wut];
+let branz = [ut];
 let bx = 0;
 
 let brandylah_gen = gen()
@@ -283,6 +324,43 @@ let brandylah_gen = gen()
     if (count % 11 == 0) {
       beat = rand_array(16, 0, len(branz) + 2);
     }
+  }
+}
+
+let mooblah_gen = gen()
+{
+  setup()
+  {
+    let mel1_map = {0:44, 3:44, 7:44, 9:56};
+    #let mel1_map = {0:47, 3:47, 7:47, 9:54};
+    let mel1 = map_to_array(mel1_map, 16);
+
+    let mel2_map = {0:44, 3:44, 6:44, 9:56, 13:51};
+    #let mel2_map = {0:47, 3:47, 6:47, 9:50, 13:49};
+    let mel2 = map_to_array(mel2_map, 16);
+
+    let px = 0;
+    let pxlen = 3;
+  }
+  run()
+  {
+    let mel = mel2;
+    if (count % 2 == 0) {
+      mel = mel1;
+    }
+    if (count % 4 == 3) {
+      mel = down(mel, 12);
+    }
+
+    if (count % 5 > 3) {
+      for (i = 0; i < 16; ++i) {
+        stepper(mo2, mel, px, i);
+        px = incr(px, 0, pxlen);
+      }
+
+      pxlen = incr(pxlen, 3, 16);
+    }
+
   }
 }
 

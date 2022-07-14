@@ -305,8 +305,7 @@ let gen_beat = fn()
   return beat;
 }
 
-let d = 1000;
-let stepper = fn(sg, pat, read_idx, play_idx)
+let stepper = fn(sg, pat, read_idx, play_idx, d)
 {
   if (type(pat[read_idx]) == "ARRAY") {
     note_on_at(sg, pat[read_idx][0], play_idx * pp);
