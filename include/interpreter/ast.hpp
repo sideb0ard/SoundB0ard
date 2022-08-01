@@ -370,6 +370,17 @@ class ReturnStatement : public Statement {
   std::shared_ptr<Expression> return_value_{nullptr};
 };
 
+class ProcessSetStatement : public Statement {
+ public:
+  explicit ProcessSetStatement(Token token);
+  std::string String() const override;
+
+ public:
+  int mixer_process_id_{-1};
+  std::string param_;
+  std::shared_ptr<Expression> value_{nullptr};
+};
+
 class ProcessStatement : public Statement {
  public:
   explicit ProcessStatement(Token token);
@@ -437,6 +448,7 @@ class SetStatement : public Statement {
 
  public:
   std::shared_ptr<Expression> target_{nullptr};
+  std::string process_id_;  // not always used.
   std::string param_;
   std::shared_ptr<Expression> value_{nullptr};
   std::shared_ptr<Expression> when_{nullptr};

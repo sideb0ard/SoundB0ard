@@ -224,6 +224,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     }
   }
 
+  auto pset_stmt = std::dynamic_pointer_cast<ast::ProcessSetStatement>(node);
+  if (pset_stmt) {
+    return EvalProcessSetStatement(pset_stmt, env);
+  }
+
   std::shared_ptr<ast::SetStatement> set_stmt =
       std::dynamic_pointer_cast<ast::SetStatement>(node);
   if (set_stmt) {
@@ -258,7 +263,10 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
           .delayed_by = delayed_by,
           .param_val = val};
       audio_queue.push(action);
-    } else if (target->Type() == "ERROR") {
+      return NULLL;
+    }
+
+    if (target->Type() == "ERROR") {
       // this section allows use of sX type identifier e.g. 's0' - needed
       // to address and disable a sound generator when i accidentally
       // create one without assigning it to a variable
@@ -1311,6 +1319,26 @@ std::shared_ptr<object::Object> EvalProcessStatement(
   ev.funcz = process_funcz;
 
   process_event_queue.push(ev);
+
+  return NULLL;
+}
+std::shared_ptr<object::Object> EvalProcessSetStatement(
+    std::shared_ptr<ast::ProcessSetStatement> proc_set,
+    std::shared_ptr<object::Environment> env) {
+  event_queue_item ev;
+  ev.type = Event::PROCESS_SET_PARAM_EVENT;
+  ev.target_process_id = proc_set->mixer_process_id_;
+
+  auto eval_val = Eval(proc_set->value_, env);
+  if (eval_val->Type() == "ERROR") {
+    std::cerr << "COuldn't EVAL your statement value!!\n";
+    return NULLL;
+  }
+  auto num = std::dynamic_pointer_cast<object::Number>(eval_val);
+  if (num) {
+    ev.loop_len = num->value_;
+    process_event_queue.push(ev);
+  }
 
   return NULLL;
 }

@@ -154,15 +154,40 @@ std::shared_ptr<ast::PlayStatement> Parser::ParsePlayStatement() {
   return stmt;
 }
 
-std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement() {
+std::shared_ptr<ast::Statement> Parser::ParseProcessSetStatement() {
+  auto stmt = std::make_shared<ast::ProcessSetStatement>(cur_token_);
+  if (!ExpectPeek(token::SLANG_COLON)) {
+    std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_ << std::endl;
+    return nullptr;
+  }
+
+  if (!ExpectPeek(token::SLANG_IDENT) && !ExpectPeek(token::SLANG_DURATION)) {
+    std::cerr << "NOT GOT PARAM ! Peek token is " << peek_token_ << std::endl;
+    return nullptr;
+  }
+
+  stmt->param_ = cur_token_.literal_;
+
+  NextToken();
+  stmt->value_ = ParseExpression(Precedence::LOWEST);
+
+  if (PeekTokenIs(token::SLANG_SEMICOLON)) NextToken();
+
+  return stmt;
+}
+
+std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
   std::shared_ptr<ast::SetStatement> stmt =
       std::make_shared<ast::SetStatement>(cur_token_);
 
-  if (!ExpectPeek(token::SLANG_IDENT)) {
+  if (ExpectPeek(token::SLANG_IDENT)) {
+    stmt->target_ = ParseExpression(Precedence::LOWEST);
+  } else if (ExpectPeek(token::SLANG_PROC_ID)) {
+    return ParseProcessSetStatement();
+  } else {
     std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_ << std::endl;
     return nullptr;
   }
-  stmt->target_ = ParseExpression(Precedence::LOWEST);
 
   if (!ExpectPeek(token::SLANG_COLON)) {
     std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_ << std::endl;
@@ -189,9 +214,11 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement() {
     }
   }
   stmt->param_ = cur_token_.literal_;
+  std::cout << "YO, PARAM IS " << stmt->param_ << std::endl;
 
   NextToken();
   stmt->value_ = ParseExpression(Precedence::LOWEST);
+  std::cout << "YO, VALUE IS " << stmt->value_ << std::endl;
 
   if (PeekTokenIs(token::SLANG_AT)) {
     NextToken();
@@ -847,7 +874,7 @@ void Parser::ConsumePatternFunctions(
   proc->functions_.push_back(func);
 }
 
-std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement() {
+std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
   auto process = std::make_shared<ast::ProcessStatement>(cur_token_);
 
   if (PeekTokenIs(token::SLANG_DOLLAR)) {

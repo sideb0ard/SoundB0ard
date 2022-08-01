@@ -42,9 +42,13 @@ let tth = sample(TT-NOCERA/tth.wav);
 # let ork = grain(TT-ROYALHOUSE/orkloop.wav); vol ork 0.4;
 # p1 < osc 32 "0 100" "set ork:idx %"
 # add_fx(ork, "reverb");
+# p2 < osc 16 "100 1000" "set ork:fx0:reverbtime %";
+# p3 < osc 13 "20 100" "set ork:fx0:wetmx %";
 # p10 < every 4 "1 2" "set ork:pitch %"
-# p12 < osc 16 "100 1000" "set ork:fx0:reverbtime %";
-# p13 < osc 13 "20 100" "set ork:fx0:wetmx %";
+
+let plen = 16;
+# p4 < osc 32 "16 32" "plen = %"
+# p5 < every 1 plen "p1 < osc % \"0 100\" \"set ork:idx \%\"";
 
 #let yg = grain(TT-ROYALHOUSE/yek.wav);
 #vol yg 0.1;

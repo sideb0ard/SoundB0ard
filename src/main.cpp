@@ -111,6 +111,12 @@ void *process_worker_thread() {
           std::cerr << "WAH! INVALID process id: " << event->target_process_id
                     << std::endl;
         }
+      } else if (event->type == Event::PROCESS_SET_PARAM_EVENT) {
+        if (event->target_process_id >= 0 &&
+            event->target_process_id < MAX_NUM_PROC) {
+          mixr->processes_[event->target_process_id]->UpdateLoopLen(
+              event->loop_len);
+        }
       }
     }
   }

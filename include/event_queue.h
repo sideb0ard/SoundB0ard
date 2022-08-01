@@ -6,6 +6,7 @@
 enum Event {
   TIMING_EVENT,
   PROCESS_UPDATE_EVENT,
+  PROCESS_SET_PARAM_EVENT,
 };
 
 struct event_queue_item {

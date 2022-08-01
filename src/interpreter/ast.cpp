@@ -308,6 +308,14 @@ std::string PatternFunctionExpression::String() const {
   return ss.str();
 }
 
+ProcessSetStatement::ProcessSetStatement(Token token) : Statement(token) {
+  mixer_process_id_ = std::stoi(token.literal_);
+}
+
+std::string ProcessSetStatement::String() const {
+  return "process set statement yo";
+}
+
 ProcessStatement::ProcessStatement(Token token) : Statement(token) {
   mixer_process_id_ = std::stoi(token.literal_);
 }

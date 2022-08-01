@@ -440,3 +440,13 @@ void Process::SetSpeed(float val) { event_incr_speed_ = val; }
 void Process::AppendPatternFunction(std::shared_ptr<PatternFunction> func) {
   pattern_functions_.push_back(func);
 }
+
+void Process::UpdateLoopLen(int val) {
+  loop_len_ = val;
+  float diff = std::abs(start_ - end_);
+  incr_ = diff / (loop_len_ * PPBAR);
+  if (incr_ == 0) {
+    std::cout << "Nah mate, nae zeros allowed!\n";
+    return;
+  }
+}

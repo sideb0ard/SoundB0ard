@@ -40,6 +40,7 @@ class Process {
   void EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
                    int target_start, int target_end);
   void AppendPatternFunction(std::shared_ptr<PatternFunction> func);
+  void UpdateLoopLen(int val);
 
  public:
   std::string name;
