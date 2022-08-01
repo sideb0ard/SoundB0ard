@@ -39,20 +39,24 @@ let bgn4 = sample(TT-ROYALHOUSE/bgn4.wav);
 
 let tth = sample(TT-NOCERA/tth.wav);
 
-# p4 $ "[~ <sn sn2>]*2";
-#p5 $ "<ch*16 ~ ch*16 ~ ch*4> ";
-#p6 < osc 11 "2 70" "set ch:fx0:delayms %";
-#p7 < osc 12 "2 70" "set ch:fx0:fb %";
-
-#p8 $ "<~ tth*16 tth*16 tth*12 tth*16>";
-
-# let ork = grain(TT-ROYALHOUSE/orkloop.wav);
+# let ork = grain(TT-ROYALHOUSE/orkloop.wav); vol ork 0.4;
+# p1 < osc 32 "0 100" "set ork:idx %"
+# add_fx(ork, "reverb");
 # p10 < every 4 "1 2" "set ork:pitch %"
-# p11 < osc 32 "0 100" "set ork:idx %"
+# p12 < osc 16 "100 1000" "set ork:fx0:reverbtime %";
+# p13 < osc 13 "20 100" "set ork:fx0:wetmx %";
 
 #let yg = grain(TT-ROYALHOUSE/yek.wav);
 #vol yg 0.1;
 #p7 < every 2 "<1 1 1.5 2>" "set yg:pitch %";
+
+# p4 $ "[~ <sn sn2>]*2";
+#p5 $ "<ch*16 ~ ch*16 ~ ch*4> ";
+# add_fx(ch, "delay");
+#p6 < osc 11 "2 70" "set ch:fx0:delayms %";
+#p7 < osc 12 "2 70" "set ch:fx0:fb %";
+
+#p8 $ "<~ tth*16 tth*16 tth*12 tth*16>";
 
 let PP16 = 240;
 # 19 midi ticks per 4% swing
@@ -62,27 +66,6 @@ let pat_len = pat_lenz[1];
 let pulses_per = 3840 / pat_len;
 
 let pitchy = 1;
-
-let timrz = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    PPSWING = incr(PPSWING, 0, 23);
-    if (count % 3 == 0) {
-      bpm 140;
-    }
-    if (count % 3 == 0) {
-      bpm 146;
-    }
-    if (count % 7 == 0) {
-      bpm 144;
-    }
-  }
-}
-
 
 let bdz = gen()
 {

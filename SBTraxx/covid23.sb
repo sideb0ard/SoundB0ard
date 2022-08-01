@@ -1,0 +1,55 @@
+
+# let bd = sample(bd/stetienneKickBrief.aif)
+# let ss = loop(dloops/simple_song.aiff); set ss:len 2;
+# let peir = loop(dloops/pierrehouse.aiff);
+
+let rff = [56, 0, 53, 53, 0, 53, 0, 60, 0, 53, 0, 56, 60, 0, 56, 0];
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let b = rand_array(16, 0, 1);
+  }
+  run()
+  {
+
+    if (count % 2 == 0) {
+      play_array(dx, p);
+    }
+    if (count % 3 == 0) {
+      play_array(dx2, q);
+      #play_array(dx2, mm);
+    }
+
+    if (count % 8 == 7) {
+      #play_array(dx2, lp);
+      play_array(dx2, scramble(rotate(midi2array(p), 4)));
+    }
+
+    for (i = 0; i < 16; ++i) {
+      if (b[i] == 1) {
+        note_on_at(ss, 1, i * pp);
+      } else {
+        note_on_at(peir, 1, i * pp);
+      }
+    }
+
+    if (count % 7 == 6) {
+      play_array(dx, scramble(rff));
+    }
+
+    if (count % 8 == 0) {
+      b = rand_array(16, 0, 1);
+    }
+
+    if (count % 8 > 5) {
+      set ss:scramble 1;
+    }
+
+    if (count % 12 == 11) {
+      set ss:stutter 1;
+    }
+  }
+}
+

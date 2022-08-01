@@ -1,0 +1,54 @@
+
+let cblah_gen = gen()
+{
+  setup()
+  {
+    let ix = 0;
+    let ixm = 3;
+
+    let pp = midi2array(p);
+  }
+  run()
+  {
+    unsolo();
+    if (count % 2 == 0) {
+      play_array(dx, p);
+    } else {
+      play_array(mo, momel);
+    }
+
+    if (count % 4 == 0) {
+      pp = scramble(midi2array(p));
+      set mw:scramble 1;
+    }
+
+    if (count % 7 == 0) {
+      pp = rotate(midi2array(p), ix);
+      set mw:stutter 1;
+    }
+    if (count % 13 == 0) {
+      solo(mw);
+    }
+
+    ## SECTION 2
+    let mmp = midi2array(momel);
+    for (i = 0; i < 16; ++i) {
+      stepper(dx, pp, ix, i);
+      if (count % 4 == 0) {
+        stepper(bd, pp, ix, i);
+        stepper(mo, mmp, ix, i);
+      }
+      ix = incr(ix, 0, ixm);
+    }
+    ixm = incr(ixm, 3, 16);
+
+    ## SECTION 3
+    if (count % 2 == 0) {
+      #play_array(mo, rotate(mel2, ixm));
+    }
+    if (count % 8 == 7) {
+      #play_array(mo, stutter(rotate(midi2array(mel2), 8)));
+    }
+  }
+}
+

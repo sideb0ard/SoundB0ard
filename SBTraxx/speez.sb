@@ -1,0 +1,144 @@
+
+let kk = sample(perc/kk.wav);
+let thee = sample(perc/thee.wav);
+let clv = sample(perc/808clave.aif);
+let gc = sample(noises/gunclicktwo.aiff);
+
+let ooh = sample(TT-NOCERA/ooh.wav);
+let stb = sample(TT-NOCERA/stab.wav);
+let pah = sample(TT-NOCERA/pah.wav);
+let tth = sample(TT-NOCERA/tth.wav);
+
+let pecx = sample(qebo/QEBO-LOCKDOWNFM-18FMPERCUSSION10.wav);
+let dk = sample(TT-NOCERA/dryKICK.wav);
+let ump = sample(TT-NOCERA/umPIAN.wav);
+
+
+let durz = [100, 500, 50, 70, 250, 40, 20];
+let drx = 0;
+
+let ptblah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [3, 0, 5, 7, 0, 11, 11];
+    let lx = 0;
+    let percz = [ooh, thee, tth];
+    let px = 0;
+
+    let hitz = [pecx, dk, ump];
+    let hx = 0;
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      let beat1 = bjork(lenz[lx], 16);
+      perky(beat1, percz);
+      lx = incr(lx, 0, len(lenz));
+    }
+
+    if (count % 4 == 0) {
+      let beat2 = bjork(lenz[lx], 16);
+      perky(beat2, hitz);
+    }
+
+  }
+}
+
+# let jbz = loop(dloops/junglist2bar.wav) ; set jbz:len 4;
+# let kc2 = loop(dloops/kennyCrunkBeatLoop2.aiff);
+# let kc = loop(dloops/kennyCrunkLoop.aiff); set kc:len 2;
+# let rs = loop(dloops/raggaSTEREOTYP.aiff)
+
+let jblah_gen = gen()
+{
+  setup()
+  {
+    # let ptz = [0.7, 1, 1.3, 1.7, 2];
+    let ptz = [1];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 7 == 3) {
+      let b = rand_beat();
+      play_array(kc2, b);
+    }
+    if (count % 2 == 0) {
+      set kc2:on 1;
+      #set rs:on 1;
+    }
+
+    if (count % 3 == 0) {
+      set kc2:scramble 1;
+      let b2 = rand_beat();
+      play_array(rs, b2);
+    }
+    if (count % 4 == 0) {
+      set kc2:stutter 1;
+      set kc2:pitch ptz[px];
+      px = incr(px, 0, len(ptz));
+
+    }
+  }
+}
+
+# mo = swqSAW //  melodiuy // wzaupo // RUBBERduck // flexxy0c // daisyz
+let moblah_gen = gen()
+{
+  setup()
+  {
+    let rf =  [30, 0, 0, 32, 0, 27, 0, 0, 23, 0, 0, 27, 0, 32, 0, 0];
+    let rf2 = [0, 0, 27, 0, 0, 27, 0, 0, 23, 27, 23, 39, 0, 0, 32, 32];
+    #let presetz = ["RUBBERduck", "flexxy0c"];
+    let presetz = ["RUBBERduck"];
+    let prx = 0;
+    let velz = 100;
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      let mel = rf;
+      if (count % 4 == 3) {
+        mel = rf2;
+        #load_preset(mo, presetz[prx]);
+        #prx = incr(prx, 0, len(presetz));
+      }
+      if (count % 7 == 0) {
+        mel = reverse(double(mel));
+
+      }
+      for (i = 0; i < 16; ++i) {
+        if (mel[i] > 0) {
+          note_on_at(mo, mel[i], i * pp, dur = durz[drx], vel = velz);
+        }
+        drx = incr(drx, 0, len(durz));
+        velz =  velz + 10;
+        if (velz > 127) {
+          velz = 92;
+        }
+      }
+    }
+
+  }
+}
+
+# otherwurld
+let ddblah_gen = gen()
+{
+  setup()
+  {
+    let drif =  [40, 0, 35, 35, 0, 37, 0, 35, 0, 40, 0, 42, 42, 0, 40, 0];
+  }
+  run()
+  {
+    if (count % 8 > 5) {
+      for (i = 0; i < 16; ++i) {
+        if (drif[i] > 0) {
+          note_on_at(dx, drif[i], i * pp, dur = durz[drx]);
+        }
+      }
+    }
+  }
+}
+

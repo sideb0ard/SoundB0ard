@@ -41,10 +41,11 @@ std::pair<double, double> GetBoundaries(std::string param) {
   if (param.find("det") != std::string::npos) return std::make_pair(-100, 100);
   if (param.find("int") != std::string::npos) return std::make_pair(-1, 1);
   if (param.find("rate") != std::string::npos) return std::make_pair(0.02, 20);
-  if (param.find("rat") != std::string::npos) return std::make_pair(0.01, 26);
+  if (param.find("rat") != std::string::npos) return std::make_pair(0.1, 26);
   if (param.find("out") != std::string::npos) return std::make_pair(0, 100);
   if (param.find("algo") != std::string::npos) return std::make_pair(0, 7);
   if (param.find("grain") != std::string::npos) return std::make_pair(0, 100);
+  if (param.find("wav") != std::string::npos) return std::make_pair(0, 7);
 
   return std::make_pair(0, 1);
 }

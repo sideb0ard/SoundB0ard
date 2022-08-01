@@ -144,7 +144,9 @@ let combinor = fn(rhythm, melody)
     else {
       if (rhythm[i] > 0) {
         return_melody = push(return_melody, melody[mel_idx]);
-        mel_idx = incr(mel_idx, 0, len(melody));
+        if (rand(10) > 5) {
+          mel_idx = incr(mel_idx, 0, len(melody));
+        }
       } else {
         return_melody = push(return_melody, 0);
       }
@@ -489,4 +491,26 @@ let dbeat = fn(bd)
       note_on_at(bd, 1, i * pp + offset, vel = v);
     }
   }
+}
+
+let moog_midi_assign = fn()
+{
+  midi_map(1, "mo:eg1_attack");
+  midi_map(2, "mo:eg1_decay");
+  midi_map(3, "mo:eg1_release");
+  midi_map(4, "mo:l1rate");
+  midi_map(5, "mo:fc");
+  midi_map(6, "mo:fq");
+}
+
+let dx_midi_assign = fn()
+{
+  midi_map(1, "dx:algo");
+  midi_map(2, "dx:o1wav");
+  midi_map(3, "dx:o1rat");
+  midi_map(4, "dx:o1det");
+  midi_map(5, "dx:e1att");
+  midi_map(6, "dx:e1dec");
+  midi_map(7, "dx:e1sus");
+  midi_map(8, "dx:r1rel");
 }

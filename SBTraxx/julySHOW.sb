@@ -40,7 +40,6 @@ let dxblah_gen = gen()
 }
 
 
-# let nots = loop(voices/notstayinghome.wav);
 # let medih = loop(voices/mediahypethis.wav); set medih:len 2;
 let dxdblah_gen = gen()
 {
@@ -163,8 +162,13 @@ let tnblah_gen = gen()
   }
 }
 
+# vol arc 0; vol tb 0; vol lgn 0
+
+let yo = sample(voices/yo.wav);
 
 # let boom = loop(dloops/90sboombap2Bar.aiff); set boom:len 2; vol boom 0
+# p10 $ wahblah_gen; vol tb2 1 ; vol tb 1
+
 let wahblah_gen = gen()
 {
   setup()
@@ -173,22 +177,45 @@ let wahblah_gen = gen()
   run()
   {
     if (count % 4 < 3)  {
-      vol boom 0.5;
+      #vol boom 0.5;
       set boom:scramble 1;
     } else {
       vol boom 0;
+    }
+
+    if (count % 8 == 7) {
+      note_on(yo, 1);
+    }
+  }
+}
+
+# let verbal = loop(voices/verbalspit.wav); set verbal:len 4;
+# let mark = loop(dloops/markdistort.wav)
+let mahkblah_gen = gen()
+{
+  setup()
+  {
+    let mord = 2;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      set verbal:scramble 1;
+      set mark:stutter 1;
+      mord = incr(mord, 2, 3);
+    }
+    if (count % mord == 0) {
+      set verbal:stutter 1;
+      set mark:scramble 1;
     }
   }
 }
 
 
-# let krs = loop(dloops/krushSnareRoll.aiff);
 
 let dx2blah_gen = gen()
 {
   # muffin **
-  # quazzz sounding good.
-  # narf ok
   setup()
   {
     let bll = [5, 7, 11, 4];
@@ -224,6 +251,7 @@ let dx2blah_gen = gen()
       nx = incr(nx, 0, len(notz));
     }
     nx = incr(nx, 0, len(notz));
+
 
   }
 }
@@ -293,6 +321,8 @@ let blah_gen = gen()
 
 #  let omar = loop(dloops/omarB.wav)
 # let omarb = loop(dloops/omarB2.wav)
+# let krs = loop(dloops/krushSnareRoll.aiff);
+
 let omalah_gen = gen()
 {
   setup()
@@ -302,10 +332,12 @@ let omalah_gen = gen()
   {
     if (count % 2 == 1) {
       set omar:scramble 1;
+      set krs:stutter 1;
     }
     if (count % 3 == 1) {
       set omarb:scramble 1;
       set omar:stutter 1;
+      set krs:scramble 1;
     }
   }
 }
@@ -340,46 +372,15 @@ let dddblah_gen = gen()
   }
 }
 
-
-# let chz = loop(dloops/chezBeaat.aiff)
-# let far = loop(dloops/FarleyJamesFiget.aiff); set far:len 2
-# load_preset(mo, "innercc");
-
-let ccclah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 2 == 0) {
-      set far:scramble 1;
-    }
-    if (count % 3 == 0) {
-      set chz:scramble 1;
-      let b = rand_array(16, 0, 1);
-      for (i = 0; i < 16; ++i) {
-        if (b[i] == 1) {
-          note_on_at(far, 1, i * pp);
-        } else {
-          note_on_at(chz, 1, i * pp);
-        }
-      }
-
-    }
-  }
-}
-
 ## BREKADOWN
-# loops/houseintro.aiff
-# let hr = loop(loops/houseintro.aiff); set hr:len 8; vol omar 0; vol omarb 0; vol far 0
-# let hr = loop(loops/houseintro.aiff); set hr:len 8; vol omar 0; vol omarb 0; vol far 0
 
-# let pei = loop(dloops/pierrehouse.aiff)
 # let xb = loop(dloops/xbeatloop.aif)
 
 # let abto = loop(voices/about2wreck.wav); set abto:len 2; vol abto 1
 # p11 $ mmodxblah_gen; let xb = loop(dloops/xbeatloop.aif);
+
+# let pei = loop(dloops/pierrehouse.aiff)
+
 let melz1 = [0, 0, 15, 15, 13, 0, 13, 13, 0, 0, 0, 17, 0, 17, 15];
 let melz2 = [13, 16, 16, 0, 0, 20, 0, 13, 0, 0, 28, 17, 0, 28, 15];
 let melz = melz1;

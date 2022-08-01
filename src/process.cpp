@@ -142,7 +142,9 @@ void Process::EventNotify(mixer_timing_info tinfo) {
         } else if (f->func_type_ == PatternFunctionType::PROCESS_OP &&
                    f->active_) {
           auto speed_func = std::dynamic_pointer_cast<PatternSpeed>(f);
-          if (speed_func) event_incr_speed_ = speed_func->speed_multiplier_;
+          if (speed_func) {
+            event_incr_speed_ = speed_func->speed_multiplier_;
+          }
         }
       }
     }

@@ -1,0 +1,21 @@
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let pat = rand_array(16, 0, 3);
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (pat[i] == 1) {
+        note_on_at(dx, 61, i * pp);
+      }
+      if (pat[i] == 2) {
+        note_on_at(dx, 63, i * pp);
+      }
+    }
+
+  }
+}
+
