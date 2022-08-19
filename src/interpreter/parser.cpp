@@ -214,11 +214,9 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
     }
   }
   stmt->param_ = cur_token_.literal_;
-  std::cout << "YO, PARAM IS " << stmt->param_ << std::endl;
 
   NextToken();
   stmt->value_ = ParseExpression(Precedence::LOWEST);
-  std::cout << "YO, VALUE IS " << stmt->value_ << std::endl;
 
   if (PeekTokenIs(token::SLANG_AT)) {
     NextToken();
@@ -934,12 +932,8 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
     // else is checked for above in the PeekTokenIsPatternCommandTimerType()
 
     NextToken();
-    if (!CurTokenIs(token::SLANG_NUMBER)) {
-      std::cerr << "Need a NUMBER after timer type\n";
-      return nullptr;
-    }
 
-    process->loop_len_ = std::stof(cur_token_.literal_);
+    process->loop_len_ = ParseExpression(Precedence::PREFIX);
     NextToken();
 
     process->pattern_expression_ = ParseExpression(Precedence::PREFIX);

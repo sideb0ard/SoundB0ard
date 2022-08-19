@@ -16,8 +16,11 @@
 #vol dx2 0;
 #p11 < osc 7 "0.1 0.5" "vol hh %";
 
-let bd2 = sample(bd/gaborKick.aiff);
-let bd = sample(bd/dm02_909_kickdrum_004_drive.wav);
+let bd = sample(bd/mkKick.aiff);
+let bd2 = sample(bd/lm1-kick.aif);
+#add_fx(bd, "filter"); set bd:fx0:lfo1_rate 13;
+#add_fx(bd2, "filter"); set bd2:fx0:lfo1_rate 1.7;
+
 let hh = sample(ch/LOUhat.aiff);
 let cp = sample(cp/clap25.aif);
 
@@ -45,7 +48,7 @@ let rf = [16, 0, 0, 24, 0, 23, 0, 16, 0, 24, 0, 0, 23, 0, 16, 0];
 # rf = combinor(bjork(11,16), [27, 28, 32]);
 #let rf =  chord_riff([4, 7]);
 #let rf =  chord_riff([4, 7]);
-let blah_gen = gen()
+let bdlah_gen = gen()
 {
   setup()
   {
@@ -77,14 +80,14 @@ let blah_gen = gen()
         stepper(bd, gahu, cx2, i, drr);
       }
       ##
-      #stepper(hh, rotate(soukous, rotr[rx]), cx2, i);
+      stepper(hh, rotate(soukous, rotr[rx]), cx2, i, 100);
       cx = incr(cx, 0, maxl);
       cx2 = incr(cx2, 0, maxl2);
     }
     rx = incr(rx, 0, len(rotr));
     if (count % 3 == 0) {
       ##
-      play_array(dx2, mask(rotate(rf, rotr[rx]), gahu));
+      #play_array(dx2, mask(rotate(rf, rotr[rx]), gahu));
     }
 
     if (count % dcx == 0) {
@@ -93,11 +96,15 @@ let blah_gen = gen()
       for (i = 0; i < 16; ++i) {
         ##
         if (i % 2 == 0) {
-          #stepper(cp, rumba, cx2, i);
+          #stepper(cp, rumba, cx2, i, 50);
         }
         cx2 = incr(cx2, 0, maxl2);
-        ##
+        ## TONIC
         stepper(dx, up(rf, 24), cx2, i, drr);
+      }
+      drr = drr + 10;
+      if (drr > 200) {
+        drr = 50;
       }
     }
 
@@ -122,8 +129,9 @@ let blah_gen = gen()
 
 #let gras = grain(skrslazrs/SHØCK13.wav);
 #p13 < osc 12 "0 100"  "set gras:idx %"
-#add_fx(gras, "delay")
-#p14 < osc 13 "0 400"  "set gras:fx0:delayms %"
+#add_fx(gras, "reverb")
+#p14 < osc 13 "100 1000"  "set gras:fx0:reverbtime %"
+# p15 < osc 13 "20 90"  "set gras:fx0:wetmx %"
 #p15 < osc 12 "0 78"  "set gras:fx0:fb %"
 #vol dx2 0
 #add_fx(gras, "sidechain", bd2)
@@ -142,6 +150,8 @@ let space_between_beats = fn(abeat)
   return lenz;
 }
 
+# mo = wurpy
+#load_preset(mo, "twitchrrr");
 let string_gen = gen()
 {
   setup()
@@ -228,7 +238,7 @@ let todd_gen = gen()
 # load_preset(dx2, "narf2");
 # vol dx2 0.2;
 
-# p4 $ todd_gen; p1 $ blah2_gen
+# p4 $ todd_gen; p1 $ dblah2_gen
 
 # let dzl = loop(dloops/dizzeebeat1barloop.aiff) ; vol dzl 0
 # set dzl:pitch 2
@@ -236,8 +246,10 @@ let todd_gen = gen()
 # add_fx(dzl, "sidechain", bd2);
 # add_fx(zzz, "sidechain", bd2)
 
+
+# dx surgefizz
 let dxm = [44, 0, 0, 47, 0, 27, 0, 44, 0, 47, 0, 0, 27, 0, 44, 0];
-let blah2_gen = gen()
+let dblah2_gen = gen()
 {
   setup()
   {
@@ -247,21 +259,67 @@ let blah2_gen = gen()
     #let dxm = up(rand_array(16,0, 2), 13);
     let ratz = [7, 3.5, 7, 14];
     let rx = 0;
+
+    let drz = [50, 70, 99, 120, 150, 300];
+    let drx = 0;
   }
   run()
   {
-    play_array(bd2, beat);
+    #play_array(bd2, beat);
     play_array(hh, sdbeat);
     let mel = mask(dxm, "ff70");
     if (count % 7 == 0) {
       mel = mask(dxm, "0070");
     }
-    play_array(dx2, mel);
+    play_array(dx, mel, dur = drz[drx]);
+    drx = incr(drx, 0, len(drz));
+    if (count % 3 == 0) {
+      set dzl:scramble 1;
+    }
     if (count % 4 == 0) {
       # dxm = up(rand_array(16,0, 2), 13);
       #print("Setting to ", ratz[rx]);
-      set dx2:o1rat ratz[rx];
+      set dx:o1rat ratz[rx];
       rx = incr(rx, 0, len(ratz));
+      beat = rand_beat();
+      set dzl:stutter 1;
+    }
+  }
+}
+
+let drum_gen = gen()
+{
+  setup()
+  {
+    let beat = gen_beat();
+    let idxr = 3;
+    let idx = 0;
+    let rf = riff(23);
+  }
+  run()
+  {
+    play_array(bd, beat);
+
+    if (count % 3 == 0) {
+      beat = gen_beat();
+      set dzl:stutter 1;
+    }
+    # dx = DxSynth(beleep) vol:0.70 pan:0.00 algo:5
+    # dx2 = DxSynth(klonk) vol:0.70 pan:0.00 algo:5
+    if (count % 2 == 0) {
+
+      for (i = 0; i < 16; ++i) {
+        stepper(mo, rf, idx, i, 400);
+        if (count % 4 == 0) {
+          stepper(dx, rotate(rf, idx % 7), idx, i, 500);
+        }
+        if (count % 3 == 0) {
+          stepper(dx2, up(rotate(rf, idx), 3),  idx, i, 500);
+        }
+        idx = incr(idx, 0, idxr);
+      }
+      idxr = incr(idxr, 0, 16);
+      set dzl:scramble 1;
     }
   }
 }

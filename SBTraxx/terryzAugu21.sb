@@ -2,7 +2,7 @@ let bd = sample(TT-BLACKRIOT-DAYINLIFE/bd.wav);
 let bd2 = sample(TT-ROYALHOUSE/bdork.wav);
 let bd3 = sample(TT-ROYALHOUSE/bdvocwah.wav);
 let bd4 = sample(TT-ROYALHOUSE/beet.wav);
-let bd5 = sample(TT-ROYALHOUSE/blah.wav);
+let bd5 = sample(TT-ROYALHOUSE/not.wav);
 let bt = sample(TT-ROYALHOUSE/bdtail.wav);
 
 let chw = sample(TT-ROYALHOUSE/chewit.wav);
@@ -39,23 +39,19 @@ let bgn4 = sample(TT-ROYALHOUSE/bgn4.wav);
 
 let tth = sample(TT-NOCERA/tth.wav);
 
-# let ork = grain(TT-ROYALHOUSE/orkloop.wav); vol ork 0.4;
-# p1 < osc 32 "0 100" "set ork:idx %"
+# let ork = grain(TT-ROYALHOUSE/orkloop.wav); vol ork 0;
+# p2 < osc 21 "0 100"  "set ork:idx %"
+
+# play skrslazrs/SHØCK07.wav
+
 # add_fx(ork, "reverb");
-# p2 < osc 16 "100 1000" "set ork:fx0:reverbtime %";
-# p3 < osc 13 "20 100" "set ork:fx0:wetmx %";
-# p10 < every 4 "1 2" "set ork:pitch %"
+# p4 < osc 13 "20 100" "set ork:fx0:wetmx %";
+# p5 < osc 16 "100 1000" "set ork:fx0:reverbtime %";
 
-let plen = 16;
-# p4 < osc 32 "16 32" "plen = %"
-# p5 < every 1 plen "p1 < osc % \"0 100\" \"set ork:idx \%\"";
 
-#let yg = grain(TT-ROYALHOUSE/yek.wav);
-#vol yg 0.1;
+#let yg = grain(TT-ROYALHOUSE/yek.wav); vol yg 0.1;
 #p7 < every 2 "<1 1 1.5 2>" "set yg:pitch %";
 
-# p4 $ "[~ <sn sn2>]*2";
-#p5 $ "<ch*16 ~ ch*16 ~ ch*4> ";
 # add_fx(ch, "delay");
 #p6 < osc 11 "2 70" "set ch:fx0:delayms %";
 #p7 < osc 12 "2 70" "set ch:fx0:fb %";
@@ -70,6 +66,24 @@ let pat_len = pat_lenz[1];
 let pulses_per = 3840 / pat_len;
 
 let pitchy = 1;
+
+
+let grainblah_gen = gen()
+{
+  setup()
+  {
+    let plen = 2;
+  }
+  run()
+  {
+    set p2:len plen;
+    plen = plen * 2;
+    if (plen > 128) {
+      plen = 1;
+    }
+  }
+}
+
 
 let bdz = gen()
 {
@@ -112,16 +126,9 @@ let percz = gen()
   }
 
   run() {
-    for (i = 0; i < 16; ++i) {
-      if (i == 7 || i == 9) {
-        set_pitch(samplz[smp_idx], pitchy);
-        note_on_at(samplz[smp_idx], 1, i * pulses_per, 90);
-        smp_idx = incr(smp_idx, 0, smp_num);
-      }
-    }
-    if (count % 3 == 0) {
-      smp_num = incr(smp_num, 0, len(samplz) + 1);
-    }
+
+    cbeat(samplz[smp_idx]);
+    smp_idx = incr(smp_idx, 0, len(samplz));
   }
 }
 
@@ -171,8 +178,8 @@ let snrz = gen()
 {
   setup()
   {
-    #let snz=  [sn, sn2, che];
-    let snz=  [sn];
+    let snz=  [sn, sn2, che];
+    #let snz=  [sn];
     let snz_idx = 0;
     let swing_setting = 3;
   }
@@ -241,93 +248,118 @@ let itnot = gen()
     let vocz = [not, chw, it, tic, sw];
     let vocz_idx = 0;
     let voc_len = 1;
-    let pat = distrhythms_int();
-    let max = 0;
+    let pat = rand_array(16, 0, 1);
+    let maxx = 0;
   }
   run()
   {
     for (i = 0; i < len(pat); ++i) {
       let randy = rand(100);
-      if (pat[i] == 1 && randy < max)  {
+      if (pat[i] == 1 && randy < maxx)  {
         note_on_at(vocz[vocz_idx], 1, i * pulses_per);
         vocz_idx = incr(vocz_idx, 0, voc_len);
       }
     }
     voc_len = incr(voc_len, 1, len(vocz)+1);
-    max = max + 10;
-    if (max > 100) {
-      max = 0;
+    maxx = maxx + 10;
+    if (maxx > 100) {
+      maxx = 0;
     }
-    pat = distrhythms_int();
+    pat = rand_array(16, 0, 1);
   }
 }
+
+let rim = sample(rims/hes23rim1.aif);
 
 let mair_drumz = gen()
 {
   setup()
   {
-    let sampz = [tic, sw];
+    let sampz = [tic, sw, rim];
     let s_idx = 0;
+    let velr = 70;
   }
   run()
   {
     for (i = 0; i < 16; ++i) {
       if (i == 7 || i == 11) {
         if (rand(100)> 20) {
-          let shuf = rand(20);
-          note_on_at(sampz[0], 1, i*pulses_per+ shuf);
+          let shuf = 0;
+          note_on_at(sampz[s_idx], 1, i*pulses_per+ shuf, vel = velr);
           s_idx = incr(s_idx,0,len(sampz));
         }
       }
-      if (i == 13 || i == 15) {
+      if (i == 12 || i == 14) {
         if (rand(100)> 40) {
-          let shuf = rand(20);
-          note_on_at(sampz[0], 1, i*pulses_per+ shuf);
-          # s_idx = incr(s_idx,0,len(sampz));
+          let shuf =  0;
+          note_on_at(sampz[s_idx], 1, i*pulses_per+ shuf, vel = velr);
+          s_idx = incr(s_idx,0,len(sampz));
         }
+      }
+      velr = velr + 5;
+      if (velr > 127) {
+        velr = 70;
       }
     }
   }
 }
 
 
-#let melod = gen()
-#{
-#  setup()
-#  {
-#    let hatz = [ch, uh];
-#    let h_idx = 0;
-#  }
-#  run()
-#  {
-#    for (i = 0; i < 16; ++i) {
-#      let randy = rand(100);
-#      if (randy < 40) {
-#        let vel = rand(20) + 77;
-#        let shuf = rand(20);
-#        note_on_at(hatz[h_idx], i, i*pulses_per + shuf, vel);
-#      }
-#      h_idx = incr(h_idx, 0, len(hatz));
-#    }
-#  }
-#}
-#
-#let pitchrrr = gen()
-#{
-#  setup()
-#  {
-#  }
-#  run()
-#  {
-#    if (count % 4 == 0) {
-#      pitchy = 1;
-#    }
-#    if (count % 7 == 0) {
-#      pitchy = 2;
-#    }
-#    if (count % 11 == 0) {
-#      pitchy = 1.6;
-#    }
-#  }
-#}
+# let toddr = loop(dloops/toddTerryLIKE.aiff)
+# let papa = loop(loops/papuaNewGuineaStringsSeagulls.aiff); set papa:len 4; vol papa 0;
 
+let tblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      #set toddr:on 1;
+    }
+    #if (count % 3 == 0) {
+      #  set toddr:scramble 1;
+      #}
+    if (count % 4 == 0) {
+      set toddr:stutter 1;
+    }
+    if (count % 8 == 7) {
+      let b = rand_beat();
+      play_array(toddr, b);
+      set papa:scramble 1;
+      play_array(papa, invert(b));
+    }
+  }
+}
+
+# dx = crepe fnc TONIC
+# p13 < osc 8 "3 8" "set dx:o1rat %"
+let dxxblah_gen = gen()
+{
+  setup()
+  {
+    let mel = [20, 0, 20, 20, 0, 20, 0, 20, 0, 20, 0, 20, 20, 0, 20, 0];
+    let ix = 0;
+    let lenx = 3;
+
+    let lenz = [50, 100, 200, 300];
+    let lx = 0;
+
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(dx, mel, ix, i, lenz[lx]);
+      ix = incr(ix, 0, lenx);
+    }
+    lx = incr(lx, 0, len(lenz));
+    lenx = incr(lenx, 3, len(mel));
+    if (count % 4 == 0) {
+      mel = riff(20);
+    }
+  }
+}
+
+
+# play skrslazrs/SHØCK11.wav

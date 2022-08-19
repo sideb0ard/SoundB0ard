@@ -65,7 +65,7 @@ let cp_gen = gen()
     for (i = offset; i < 3840; i + inc) {
       if (bt[btx] > 0) {
         note_on_at(bd2, notz[ntx], i, dur = drz[drx]);
-        note_on_at(rp, notz[ntx], i, dur = drz[drx]);
+        #note_on_at(rp, notz[ntx], i, dur = drz[drx]);
         ntx = incr(ntx, 0, len(notz));
         drx = incr(drx, 0, len(drz));
       }

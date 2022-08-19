@@ -16,7 +16,7 @@ let blah_gen = gen()
   {
     for (i = 0; i < 16; ++i) {
       if (beatp[i] == 1) {
-        print(notes_in_chord(notez[nx], 1, 1));
+        #print(notes_in_chord(notez[nx], 1, 1));
         note_on_at(mo, notes_in_chord(notez[nx], 0, 3), i* pp, dur = durr);
         nx = incr(nx, 0, len(notez));
       }

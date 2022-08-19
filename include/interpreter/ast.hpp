@@ -395,7 +395,7 @@ class ProcessStatement : public Statement {
 
   // Command Process Vars
   ProcessTimerType process_timer_type_{ProcessTimerType::NO_PROCESS_TIMER_TYPE};
-  float loop_len_;
+  std::shared_ptr<Expression> loop_len_{nullptr};
   std::string command_;
 
   // Pattern Process Vars

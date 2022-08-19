@@ -1300,6 +1300,18 @@ std::shared_ptr<object::Object> EvalProcessStatement(
 
   ev.pattern_expression = proc->pattern_expression_;
 
+  auto eval_val = Eval(proc->loop_len_, env);
+  if (eval_val->Type() == "ERROR") {
+    std::cerr << "COuldn't EVAL your statement value!!\n";
+    return NULLL;
+  }
+  auto loop_len = std::dynamic_pointer_cast<object::Number>(eval_val);
+  if (loop_len) {
+    ev.loop_len = loop_len->value_;
+  } else {
+    ev.loop_len = 1;
+  }
+
   std::vector<std::shared_ptr<PatternFunction>> process_funcz;
 
   for (auto &f : proc->functions_) {
@@ -1312,7 +1324,6 @@ std::shared_ptr<object::Object> EvalProcessStatement(
   ev.process_name = proc->name;
   ev.process_type = proc->process_type_;
   ev.timer_type = proc->process_timer_type_;
-  ev.loop_len = proc->loop_len_;
   ev.command = proc->command_;
   ev.target_type = proc->target_type_;
   ev.targets = proc->targets_;

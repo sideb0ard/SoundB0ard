@@ -23,8 +23,8 @@ let blah_gen = gen()
       play_array(mo, rf);
     }
     if (count % 3 == 0) {
-      play_array(mo, rotate(rf, lenz[lx]));
-      play_array(cb, rotate(rf, lenz[lx] + 3), dur = pp*5);
+      #play_array(mo, rotate(rf, lenz[lx]));
+      #play_array(cb, rotate(rf, lenz[lx] + 3), dur = pp*5);
     }
     play_array(bd2, bjork(lenz[lx],16));
 
@@ -52,16 +52,16 @@ let drum_gen = gen()
     }
     # let rf = riff(23);
     # dx = DxSynth(beleep) vol:0.70 pan:0.00 algo:5
-    # dx2 = DxSynth(waaaat) vol:0.70 pan:0.00 algo:5
+    # dx2 = DxSynth(klonk) vol:0.70 pan:0.00 algo:5
     if (count % 2 == 0) {
 
       for (i = 0; i < 16; ++i) {
-        stepper(mo, rf, idx, i);
+        #stepper(mo, rf, idx, i, 400);
         if (count % 4 == 0) {
-          stepper(dx, down(rotate(rf, idx % 7), idx % 2), idx, i);
+          stepper(dx, rotate(rf, idx % 7), idx, i, 500);
         }
         if (count % 3 == 0) {
-          stepper(dx2, up(rotate(rf, idx), 12),  2, i);
+          stepper(dx2, up(rotate(rf, idx), 3),  idx, i, 500);
         }
         idx = incr(idx, 0, idxr);
       }
