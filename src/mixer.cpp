@@ -583,7 +583,7 @@ void Mixer::PreviewAudio(audio_action_queue_item action) {
   if (action.buffer.size() > 0) {
     preview.filename = action.preview_filename;
     preview.audio_buffer_len = action.audio_buffer_details.buffer_length;
-    preview.audio_buffer = action.buffer;
+    preview.audio_buffer = std::move(action.buffer);
     preview.num_channels = action.audio_buffer_details.num_channels;
     preview.audio_buffer_read_idx = 0;
     preview.enabled = true;
