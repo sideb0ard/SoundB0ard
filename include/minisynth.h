@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dca.h>
+#include <defjams.h>
 #include <envelope_generator.h>
 #include <filter.h>
 #include <midimaaan.h>
@@ -13,8 +14,6 @@
 #include <array>
 
 namespace SBAudio {
-
-static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
 
 typedef struct synthsettings {
   char m_settings_name[256];
@@ -192,6 +191,8 @@ class MiniSynth : public SoundGenerator {
   void SetParam(std::string name, double val) override;
   void Save(std::string preset_name) override;
   void Load(std::string preset_name) override;
+  void LoadPreset(std::string preset_name,
+                  std::map<std::string, double> preset) override;
 
   void LoadDefaults();
 

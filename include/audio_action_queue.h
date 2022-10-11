@@ -4,6 +4,7 @@
 #include <soundgenerator.h>
 
 #include <interpreter/object.hpp>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -40,6 +41,9 @@ struct audio_action_queue_item {
   AudioAction type;
   int mixer_soundgen_idx{-1};
   std::shared_ptr<SBAudio::SoundGenerator> sg;
+
+  std::string preset_name;
+  std::map<std::string, double> preset;
 
   std::vector<double> buffer;
   AudioBufferDetails audio_buffer_details;

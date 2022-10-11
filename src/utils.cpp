@@ -888,10 +888,10 @@ bool synth_list_presets(unsigned int synthtype) {
   FILE *presetzzz = NULL;
   switch (synthtype) {
     case (MINISYNTH_TYPE):
-      presetzzz = fopen(SBAudio::MOOG_PRESET_FILENAME, "r+");
+      presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
       break;
     case (DXSYNTH_TYPE):
-      presetzzz = fopen(SBAudio::DX_PRESET_FILENAME, "r+");
+      presetzzz = fopen(DX_PRESET_FILENAME, "r+");
       break;
   }
 
@@ -926,10 +926,10 @@ std::vector<std::string> synth_return_presets(unsigned int synthtype) {
   FILE *presetzzz = NULL;
   switch (synthtype) {
     case (MINISYNTH_TYPE):
-      presetzzz = fopen(SBAudio::MOOG_PRESET_FILENAME, "r+");
+      presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
       break;
     case (DXSYNTH_TYPE):
-      presetzzz = fopen(SBAudio::DX_PRESET_FILENAME, "r+");
+      presetzzz = fopen(DX_PRESET_FILENAME, "r+");
       break;
   }
 

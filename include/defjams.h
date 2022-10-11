@@ -2,6 +2,9 @@
 
 #include <stdbool.h>
 
+static const char DX_PRESET_FILENAME[] = "settings/dxpresets.dat";
+static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
+
 #include <array>
 #include <string>
 #include <vector>

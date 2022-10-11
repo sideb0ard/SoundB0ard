@@ -72,12 +72,24 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args) {
         } else if (args.size() == 3) {
           std::shared_ptr<object::String> str_cmd =
               std::dynamic_pointer_cast<object::String>(args[2]);
-          if (str_cmd->value_ == "load")
-            sg->Load(str_obj->value_);
-          else if (str_cmd->value_ == "save")
-            sg->Save(str_obj->value_);
+          // if (str_cmd->value_ == "load")
+          //   sg->Load(str_obj->value_);
+          //   TODO - OFFLOAD THIS FROM AUDIO THREAD
+          if (str_cmd->value_ == "save") sg->Save(str_obj->value_);
         }
       }
+    }
+  }
+}
+void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
+                     const std::string &preset_name,
+                     const std::map<std::string, double> &preset) {
+  auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(obj);
+  if (soundgen) {
+    if (mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+      auto sg = mixr->sound_generators_[soundgen->soundgen_id_];
+
+      sg->LoadPreset(preset_name, preset);
     }
   }
 }

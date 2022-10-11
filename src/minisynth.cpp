@@ -1097,6 +1097,199 @@ void MiniSynth::Save(std::string new_preset_name) {
   return;
 }
 
+void MiniSynth::LoadPreset(std::string preset_name,
+                           std::map<std::string, double> preset) {
+  strncpy(m_settings.m_settings_name, preset_name.c_str(), 256);
+  for (const auto &[key, val] : preset) {
+    if (key == "voice_mode")
+      m_settings.m_voice_mode = val;
+
+    else if (key == "monophonic")
+      m_settings.m_monophonic = val;
+
+    else if (key == "lfo1_waveform")
+      m_settings.m_lfo1_waveform = val;
+
+    else if (key == "lfo1_dest")
+      m_settings.m_lfo1_dest = val;
+
+    else if (key == "lfo1_mode")
+      m_settings.m_lfo1_mode = val;
+
+    else if (key == "lfo1_rate")
+      m_settings.m_lfo1_rate = val;
+
+    else if (key == "lfo1_amp")
+      m_settings.m_lfo1_amplitude = val;
+
+    else if (key == "lfo1_osc_pitch_intensity")
+      m_settings.m_lfo1_osc_pitch_intensity = val;
+
+    else if (key == "lfo1_osc_pitch_enabled")
+      m_settings.m_lfo1_osc_pitch_enabled = val;
+
+    else if (key == "lfo1_filter_fc_intensity")
+      m_settings.m_lfo1_filter_fc_intensity = val;
+
+    else if (key == "lfo1_filter_fc_enabled")
+      m_settings.m_lfo1_filter_fc_enabled = val;
+
+    else if (key == "lfo1_amp_intensity")
+      m_settings.m_lfo1_amp_intensity = val;
+
+    else if (key == "lfo1_amp_enabled")
+      m_settings.m_lfo1_amp_enabled = val;
+
+    else if (key == "lfo1_pan_intensity")
+      m_settings.m_lfo1_pan_intensity = val;
+
+    else if (key == "lfo1_pan_enabled")
+      m_settings.m_lfo1_pan_enabled = val;
+
+    else if (key == "lfo1_pulsewidth_intensity")
+      m_settings.m_lfo1_pulsewidth_intensity = val;
+
+    else if (key == "lfo1_pulsewidth_enabled")
+      m_settings.m_lfo1_pulsewidth_enabled = val;
+
+    else if (key == "lfo2_waveform")
+      m_settings.m_lfo2_waveform = val;
+
+    else if (key == "lfo2_dest")
+      m_settings.m_lfo2_dest = val;
+
+    else if (key == "lfo2_mode")
+      m_settings.m_lfo2_mode = val;
+
+    else if (key == "lfo2_rate")
+      m_settings.m_lfo2_rate = val;
+
+    else if (key == "lfo2_amp")
+      m_settings.m_lfo2_amplitude = val;
+
+    else if (key == "lfo2_osc_pitch_intensity")
+      m_settings.m_lfo2_osc_pitch_intensity = val;
+
+    else if (key == "lfo2_osc_pitch_enabled")
+      m_settings.m_lfo2_osc_pitch_enabled = val;
+
+    else if (key == "lfo2_filter_fc_intensity")
+      m_settings.m_lfo2_filter_fc_intensity = val;
+
+    else if (key == "lfo2_filter_fc_enabled")
+      m_settings.m_lfo2_filter_fc_enabled = val;
+
+    else if (key == "lfo2_amp_intensity")
+      m_settings.m_lfo2_amp_intensity = val;
+
+    else if (key == "lfo2_amp_enabled")
+      m_settings.m_lfo2_amp_enabled = val;
+
+    else if (key == "lfo2_pan_intensity")
+      m_settings.m_lfo2_pan_intensity = val;
+
+    else if (key == "lfo2_pan_enabled")
+      m_settings.m_lfo2_pan_enabled = val;
+
+    else if (key == "lfo2_pulsewidth_intensity")
+      m_settings.m_lfo2_pulsewidth_intensity = val;
+
+    else if (key == "lfo2_pulsewidth_enabled")
+      m_settings.m_lfo2_pulsewidth_enabled = val;
+
+    else if (key == "attack_time_msec")
+      m_settings.m_eg1_attack_time_msec = val;
+
+    else if (key == "decay_time_msec")
+      m_settings.m_eg1_decay_time_msec = val;
+
+    else if (key == "release_time_msec")
+      m_settings.m_eg1_release_time_msec = val;
+
+    else if (key == "sustain_level")
+      m_settings.m_eg1_sustain_level = val;
+
+    else if (key == "volume_db")
+      volume = val;
+
+    else if (key == "fc_control")
+      m_settings.m_fc_control = val;
+
+    else if (key == "q_control")
+      m_settings.m_q_control = val;
+
+    else if (key == "detune_cents")
+      m_settings.m_detune_cents = val;
+
+    else if (key == "pulse_width_pct")
+      m_settings.m_pulse_width_pct = val;
+
+    else if (key == "sub_osc_db")
+      m_settings.m_sub_osc_db = val;
+
+    else if (key == "noise_osc_db")
+      m_settings.m_noise_osc_db = val;
+
+    else if (key == "eg1_osc_intensity")
+      m_settings.m_eg1_osc_intensity = val;
+
+    else if (key == "eg1_osc_enabled")
+      m_settings.m_eg1_osc_enabled = val;
+
+    else if (key == "eg1_filter_intensity")
+      m_settings.m_eg1_filter_intensity = val;
+
+    else if (key == "eg1_filter_enabled")
+      m_settings.m_eg1_filter_enabled = val;
+
+    else if (key == "eg1_dca_intensity")
+      m_settings.m_eg1_dca_intensity = val;
+
+    else if (key == "eg1_dca_enabled")
+      m_settings.m_eg1_dca_enabled = val;
+
+    else if (key == "filter_keytrack_intensity")
+      m_settings.m_filter_keytrack_intensity = val;
+
+    else if (key == "octave")
+      m_settings.m_octave = val;
+
+    else if (key == "pitchbend_range")
+      m_settings.m_pitchbend_range = val;
+
+    else if (key == "legato_mode")
+      m_settings.m_legato_mode = val;
+
+    else if (key == "reset_to_zero")
+      m_settings.m_reset_to_zero = val;
+
+    else if (key == "filter_keytrack")
+      m_settings.m_filter_keytrack = val;
+
+    else if (key == "filter_type")
+      m_settings.m_filter_type = val;
+
+    else if (key == "filter_saturation")
+      m_settings.m_filter_saturation = val;
+
+    else if (key == "nlp")
+      m_settings.m_nlp = val;
+
+    else if (key == "velocity_to_attack_scaling")
+      m_settings.m_velocity_to_attack_scaling = val;
+
+    else if (key == "note_number_to_decay_scaling")
+      m_settings.m_note_number_to_decay_scaling = val;
+
+    else if (key == "portamento_time_msec")
+      m_settings.m_portamento_time_msec = val;
+
+    else if (key == "sustain_override")
+      m_settings.m_eg1_sustain_override = val;
+  }
+  Update();
+}
+
 void MiniSynth::Load(std::string preset_name) {
   if (preset_name.empty()) {
     printf(

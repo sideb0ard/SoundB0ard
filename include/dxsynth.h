@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dca.h>
+#include <defjams.h>
 #include <dxsynth_voice.h>
 #include <envelope_generator.h>
 #include <filter.h>
@@ -15,8 +16,6 @@
 namespace SBAudio {
 
 enum { DX1, DX2, DX3, DX4, DX5, DX6, DX7, DX8, MAXDX };
-
-static const char DX_PRESET_FILENAME[] = "settings/dxpresets.dat";
 
 typedef struct dxsynthsettings {
   char m_settings_name[256]{};
@@ -105,6 +104,8 @@ class DXSynth : public SoundGenerator {
   void randomize() override;
   void SetParam(std::string name, double val) override;
   void Load(std::string preset_name) override;
+  void LoadPreset(std::string preset_name,
+                  std::map<std::string, double> preset) override;
   void Save(std::string preset_name) override;
   void ListPresets() override;
 

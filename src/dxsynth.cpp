@@ -759,6 +759,143 @@ void DXSynth::Save(std::string preset) {
   printf("Wrote %d settings\n", settings_count++);
 }
 
+void DXSynth::LoadPreset(std::string preset_name,
+                         std::map<std::string, double> preset) {
+  strncpy(m_settings.m_settings_name, preset_name.c_str(), 256);
+  for (const auto &[key, val] : preset) {
+    if (key == "m_lfo1_intensity")
+      m_settings.m_lfo1_intensity = val;
+    else if (key == "m_lfo1_rate")
+      m_settings.m_lfo1_rate = val;
+    else if (key == "m_lfo1_waveform")
+      m_settings.m_lfo1_waveform = val;
+
+    else if (key == "m_lfo1_mod_dest1")
+      m_settings.m_lfo1_mod_dest1 = val;
+
+    else if (key == "m_lfo1_mod_dest2")
+      m_settings.m_lfo1_mod_dest2 = val;
+
+    else if (key == "m_lfo1_mod_dest3")
+      m_settings.m_lfo1_mod_dest3 = val;
+
+    else if (key == "m_lfo1_mod_dest4")
+      m_settings.m_lfo1_mod_dest4 = val;
+
+    else if (key == "m_op1_waveform")
+      m_settings.m_op1_waveform = val;
+
+    else if (key == "m_op1_ratio")
+      m_settings.m_op1_ratio = val;
+
+    else if (key == "m_op1_detune_cents")
+      m_settings.m_op1_detune_cents = val;
+
+    else if (key == "m_eg1_attack_ms")
+      m_settings.m_eg1_attack_ms = val;
+
+    else if (key == "m_eg1_decay_ms")
+      m_settings.m_eg1_decay_ms = val;
+
+    else if (key == "m_eg1_sustain_lvl")
+      m_settings.m_eg1_sustain_lvl = val;
+
+    else if (key == "m_eg1_release_ms")
+      m_settings.m_eg1_release_ms = val;
+
+    else if (key == "m_op1_output_lvl")
+      m_settings.m_op1_output_lvl = val;
+
+    else if (key == "m_op2_waveform")
+      m_settings.m_op2_waveform = val;
+
+    else if (key == "m_op2_ratio")
+      m_settings.m_op2_ratio = val;
+
+    else if (key == "m_op2_detune_cents")
+      m_settings.m_op2_detune_cents = val;
+
+    else if (key == "m_eg2_attack_ms")
+      m_settings.m_eg2_attack_ms = val;
+
+    else if (key == "m_eg2_decay_ms")
+      m_settings.m_eg2_decay_ms = val;
+
+    else if (key == "m_eg2_sustain_lvl")
+      m_settings.m_eg2_sustain_lvl = val;
+
+    else if (key == "m_eg2_release_ms")
+      m_settings.m_eg2_release_ms = val;
+
+    else if (key == "m_op2_output_lvl")
+      m_settings.m_op2_output_lvl = val;
+
+    else if (key == "m_op3_waveform")
+      m_settings.m_op3_waveform = val;
+
+    else if (key == "m_op3_ratio")
+      m_settings.m_op3_ratio = val;
+
+    else if (key == "m_op3_detune_cents")
+      m_settings.m_op3_detune_cents = val;
+
+    else if (key == "m_eg3_attack_ms")
+      m_settings.m_eg3_attack_ms = val;
+
+    else if (key == "m_eg3_decay_ms")
+      m_settings.m_eg3_decay_ms = val;
+
+    else if (key == "m_eg3_sustain_lvl")
+      m_settings.m_eg3_sustain_lvl = val;
+
+    else if (key == "m_eg3_release_ms")
+      m_settings.m_eg3_release_ms = val;
+
+    else if (key == "m_op3_output_lvl")
+      m_settings.m_op3_output_lvl = val;
+
+    else if (key == "m_op4_waveform")
+      m_settings.m_op4_waveform = val;
+
+    else if (key == "m_op4_ratio")
+      m_settings.m_op4_ratio = val;
+
+    else if (key == "m_op4_detune_cents")
+      m_settings.m_op4_detune_cents = val;
+
+    else if (key == "m_eg4_attack_ms")
+      m_settings.m_eg4_attack_ms = val;
+
+    else if (key == "m_eg4_decay_ms")
+      m_settings.m_eg4_decay_ms = val;
+    else if (key == "m_eg4_sustain_lvl")
+      m_settings.m_eg4_sustain_lvl = val;
+    else if (key == "m_eg4_release_ms")
+      m_settings.m_eg4_release_ms = val;
+    else if (key == "m_op4_output_lvl")
+      m_settings.m_op4_output_lvl = val;
+    else if (key == "m_op4_feedback")
+      m_settings.m_op4_feedback = val;
+    else if (key == "m_portamento_time_ms")
+      m_settings.m_portamento_time_ms = val;
+    else if (key == "m_volume_db")
+      m_settings.m_volume_db = val;
+    else if (key == "m_pitchbend_range")
+      m_settings.m_pitchbend_range = val;
+    else if (key == "m_voice_mode")
+      m_settings.m_voice_mode = val;
+    else if (key == "m_velocity_to_attack_scaling")
+      m_settings.m_velocity_to_attack_scaling = val;
+    else if (key == "m_note_number_to_decay_scaling")
+      m_settings.m_note_number_to_decay_scaling = val;
+    else if (key == "m_reset_to_zero")
+      m_settings.m_reset_to_zero = val;
+    else if (key == "m_legato_mode")
+      m_settings.m_legato_mode = val;
+  }
+  Update();
+}
+
 void DXSynth::Load(std::string preset_name) {
   if (preset_name.empty()) {
     printf(
@@ -781,6 +918,7 @@ void DXSynth::Load(std::string preset_name) {
   char const *sep = "::";
 
   while (fgets(line, sizeof(line), presetzzz)) {
+    std::cout << "LINE:" << line << std::endl;
     int settings_count = 0;
 
     for (tok = strtok_r(line, sep, &last_tok); tok;

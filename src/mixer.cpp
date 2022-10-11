@@ -723,9 +723,11 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     }
   } else if (action.type == AudioAction ::SAVE_PRESET ||
              action.type == AudioAction ::RAND_PRESET ||
-             action.type == AudioAction ::LIST_PRESETS ||
-             action.type == AudioAction::LOAD_PRESET) {
+             action.type == AudioAction ::LIST_PRESETS) {
     interpreter_sound_cmds::ParseSynthCmd(action.args);
+  } else if (action.type == AudioAction::LOAD_PRESET) {
+    interpreter_sound_cmds::SynthLoadPreset(action.args[0], action.preset_name,
+                                            action.preset);
   } else if (action.type == AudioAction::RAND) {
     sound_generators_[action.mixer_soundgen_idx]->randomize();
   } else if (action.type == AudioAction::PREVIEW) {
