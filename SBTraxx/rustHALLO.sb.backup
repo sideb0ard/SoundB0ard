@@ -1,0 +1,250 @@
+# let rvr = loop(hallow/rustREVmel.wav); set rvr:vol 1
+# set on:pitch 2;
+
+let on = sample(hallow/ovalLOOPopen.wav);
+let yo = sample(voices/yo.wav);
+
+# add_fx(rvr2, "delay");
+# p2 < osc 8 "10 90" "set rvr2:fx0:delayms %";
+# p3 < osc 7 "10 90" "set rvr2:fx0:fb %";
+
+let ruststartgen = gen()
+{
+  setup()
+  {
+    let lenz = [2, 1, 1.3];
+    let lx = 0;
+    let durz = [400, 300, 200, 100, 50];
+    let drx = 0;
+    let bt = rand_beat();
+  }
+  run()
+  {
+    set rvr:on 1;
+    if (count % 2 == 0) {
+      set rvr:stutter 1;
+    }
+    if (count % 3 == 0) {
+      set rvr:scramble 1;
+    }
+    if (count % 4 == 3) {
+      bt = rand_beat();
+      play_array(rvr, bt, dur = durz[drx]);
+      drx = incr(drx, 0, len(durz));
+      set rvr:len lenz[lx];
+      lx = incr(lx, 0, len(lenz));
+      set rvr2:len lenz[lx];
+    }
+    if (count % 8 == 6) {
+      note_on(yo, 1, dur = durz[drx]);
+      play_array(rvr, bt, dur = durz[drx]);
+      play_array(on, invert(bt), dur = durz[drx]);
+    }
+  }
+}
+
+# let kdg = grain(hallow/kd6LOOF.wav); p1 $ yogen
+
+# p2 < osc 8 "0 100" "set kdg:idx %"
+
+let yogen = gen()
+{
+  setup()
+  {
+    let durz = [100, 250, 500, 750];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      note_on(yo, 1, dur = durz[drx]);
+      drx = incr(drx, 0, len(durz));
+    }
+  }
+}
+
+# let kdg2 = grain(hallow/kd6LOOF.wav); set kdg2:pitch 2
+
+
+let hh = sample(ch/dr606closedhh.aif);
+
+
+let jbh = sample(noises/jbs3rdhit.aiff);
+# let rust  = loop(dloops/rsuteri.wav); set rust:len 2;
+# let stv = loop(dloops/steveMUR.wav); set stv:len 0.5; vol stv 0; p2 $ rust_gen
+let rust_gen = gen()
+{
+  setup()
+  {
+    let beat = rand_beat();
+    let msk = "ff00";
+  }
+  run()
+  {
+
+    set rust:on 1;
+    set rust:pitch 1;
+    vol stv 0;
+    if (count % 8 == 7) {
+      beat = rand_beat();
+      play_array(rust, beat);
+      vol stv 1;
+      play_array(stv, invert(beat));
+      play_array(kdg2, invert(beat));
+      note_on(yo, 1, dur = 500);
+    }
+    if (count % 3 == 0) {
+      set rust:scramble 1;
+      let beat = rand_beat();
+      play_array(rust, beat);
+      play_array(kdg, invert(beat),dur=400);
+      hhbeat(hh);
+
+    }
+    if (count % 5 == 0) {
+      set rust:stutter 1;
+      set rust:pitch 2;
+      play_array(jbh, mask(beat, msk));
+      msk = rotate(msk, 1);
+    }
+    if (count % 4 == 0) {
+      cbeat(sd);
+      if (rand(10) > 8) {
+        set rust:stutter 1;
+        set rust:pitch 0.7;
+      }
+    }
+  }
+}
+
+
+#let dre = loop(loops/drestrings.aiff); set dre:len 8; p2 $ dregen
+let dregen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set dre:stutter 1;
+    }
+    if (count % 3 == 0) {
+      set dre:scramble 1;
+    }
+    if (count % 8 == 0) {
+      vol dre 0.6;
+    }
+    if (count % 8 == 4) {
+      vol dre 0;
+    }
+  }
+}
+#let nszl = loop(hallow/NOISEintroLOOP.wav); set nszl:len 8; p3 $ nzblah_gen
+let nzblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 7 == 0) {
+      set nszl:stutter 1;
+    }
+  }
+}
+
+# fade rust
+
+# let cliff = loop(hallow/cliffLOOP.wav); set cliff:len 12; p4 $ clgen
+let clgen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set cliff:reverse 0;
+    if (count % 3 == 0) {
+      set cliff:stutter 1;
+    }
+    if (count % 4 == 3) {
+      set cliff:reverse 1;
+    }
+  }
+}
+
+# p5 < osc 16 "100 1000" "set cliff:fx0:reverbtime %"
+
+
+
+#let crnkl = loop(hallow/crnkloop.wav); p6 $ hah_gen
+#add_fx(crnkl, "distort"); set crnkl:fx0:threshold 0.4;
+
+# add_fx(cliff, "sidechain", crnkl);
+# add_fx(kdg2, "sidechain", crnkl);
+let bwah = sample(hallow/bwah.wav);
+let ov = sample(hallow/ovalNOTE.wav);
+let hahz = [bwah];
+
+let hah_gen = gen()
+{
+  setup()
+  {
+    let bt = rand_beat();
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      set crnkl:stutter 1;
+    }
+    if (count % 2 == 0) {
+      perky(rand_beat(), hahz);
+    }
+    if (count % 4 == 0) {
+      set crnkl:scramble 1;
+      perky(bt, hahz);
+    }
+  }
+}
+
+#let brk = loop(hallow/brkLOOP.wav); vol brk 1;
+
+# dx = longthrum
+let rrrdgen = gen()
+{
+  setup()
+  {
+    #let notz = notes_in_chord(79, 1);
+    let notz = [79, 76];
+    let nx = 0;
+
+    let durz = [300, 40, 500, 700, 100, 30];
+    let drx = 0;
+
+    let velz = [120, 127, 100, 110, 80, 127];
+    let vx = 0;
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      play_array(dx, combinor(rand_beat(), [notz[nx]]), dur = durz[drx], vel = velz[vx]);
+      drx = incr(drx, 0, len(durz));
+      vx = incr(vx, 0, len(velz));
+    }
+    if (count % 8 == 7) {
+      play_array(dx, up(combinor(rand_beat()*2, [notz[nx]]), 6), dur = durz[drx], vel = velz[vx]);
+      drx = incr(drx, 0, len(durz));
+      vx = incr(vx, 0, len(velz));
+    }
+
+    if (count % 16 == 15) {
+      nx = incr(nx, 0, len(notz));
+    }
+    if (count % 7 == 0) {
+      play_array(dx, combinor(rand_beat()*2, [67]), dur = durz[drx], vel = velz[vx]);
+      vx = incr(vx, 0, len(velz));
+    }
+  }
+}
+

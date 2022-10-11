@@ -9,7 +9,6 @@ let dxblah_gen = gen()
 {
   setup()
   {
-    # i like klonk
     # dx = narf
     let bemt = [1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1];
     let ntz = [15, 27, 22];
@@ -32,7 +31,7 @@ let dxblah_gen = gen()
     }
     if (count % 8 == 0) {
       play_array(dx, reverse(mel));
-      play_array(cmon, reverse(mel));
+      #play_array(cmon, reverse(mel));
       play_array(dx, down(patno, 12), dur = 20);
       set dx:algo algoz[ax];
       ax = incr(ax, 0, len(algoz));
@@ -41,7 +40,7 @@ let dxblah_gen = gen()
 }
 
 
-# let medih = loop(voices/mediahypethis.wav); set medih:len 2;
+# let medih = loop(voices/mediahypethis.wav); set medih:len 2; p3 $ dxdblah_gen
 let dxdblah_gen = gen()
 {
   setup()
@@ -126,12 +125,14 @@ let vblah_gen = gen()
       beat = mask(rand_array(blen, 0, 7), "f0f0");
     }
   }
+  let blah_fn = fn()let boom = loop(dloops/90sboombap2Bar.aiff); set boom:len 2; vol boom 0rc
+  {
+  }
 }
 
-# let tb2 = loop(dloops/technB.wav); set tb2:len 2
-# let tb = loop(dloops/techNOBe.wav); set tb:len 2
+# let tb2 = loop(dloops/technB.wav); set tb2:len 2; vol tb2 1;
+# let tb = loop(dloops/techNOBe.wav); set tb:len 2 ; vol tb 1;
 
-# let arc = loop(loops/aphexCURve.aiff);
 # vol dx 0; let arc = loop(loops/aphexCURve.aiff); p4 $ tnblah_gen
 
 #let lgn = sample(legowelt/Synth-SeeFeelesque2.wav); vol lgn 0.4;
@@ -139,6 +140,7 @@ let tnblah_gen = gen()
 {
   setup()
   {
+    let drz = [50, 100, 300, 500, 1000];
   }
   run()
   {
@@ -163,9 +165,10 @@ let tnblah_gen = gen()
     # let lgn = sample(legowelt/Synth-SeeFeelesque2.wav); vol lgn 0.4
     if (count % 4 == 0) {
       set arc:stutter 1;
-      note_on_at(lgn, 1, 4 * pp);
+      note_on_at(lgn, 1, 4 * pp, dur = drz[drzx]);
+      drzx = incr(drzx, 0, len(drz));
     }
-  }
+  }let boom = loop(dloops/90sboombap2Bar.aiff); set boom:len 2; vol boom 0
 }
 
 # vol arc 0; vol tb 0; vol lgn 0
@@ -179,20 +182,29 @@ let wahblah_gen = gen()
 {
   setup()
   {
+    let drz = [500, 10, 50, 80, 100, 200, 300];
+    let drx = 0;
   }
   run()
   {
-    if (count % 4 < 3)  {
-      vol boom 0.5;
+    set tb2:on 1;
+    set tb:on 1;
+    if (count % 4 < 2)  {
+      vol boom 0.9;
       set boom:scramble 1;
     } else {
-      #vol boom 0;
+      vol boom 0;
     }
 
-    if (count % 8 == 7) {
+    if (count % 4 == 1) {
       let b = rand_beat();
-      play_array(boom, b);
-      note_on(yo, 1);
+      play_array(boom, b, dur = drz[dx]);
+      play_array(tb, rand_beat());
+    }
+    if (count % 8 == 7) {
+      note_on(yo, 1, dur = drz[dx]);
+      drx = incr(drx, 0, len(drz));
+      play_array(tb2, rand_beat());
     }
   }
 }
@@ -250,12 +262,12 @@ let dx2blah_gen = gen()
     }
 
     if (count % 2 == 0) {
-      play_array(dx2, combinor(beat, notz));
+      play_array(dx, combinor(beat, notz));
     }
 
     for (i = 0; i < 16; ++i) {
       if (beat[i] == 1) {
-        note_on_at(dx2, notz[nx], i * pp, dur = 100);
+        note_on_at(dx, notz[nx], i * pp, dur = 100);
       }
       nx = incr(nx, 0, len(notz));
     }
@@ -328,8 +340,8 @@ let blah_gen = gen()
   }
 }
 
-#  let omar = loop(dloops/omarB.wav)
-# let omarb = loop(dloops/omarB2.wav)
+#  let omar = loop(dloops/omarB.wav); vol omar 1;
+# let omarb = loop(dloops/omarB2.wav); vol omarb 1;
 # let krs = loop(dloops/krushSnareRoll.aiff);
 
 let omalah_gen = gen()
@@ -415,12 +427,12 @@ let mmodxblah_gen = gen()
         if (melz[i] > 0) {
           note_on_at(dx, melz[i], i * pp);
         } else {
-          #set abto:stutter 1;
-          #note_on_at(abto, melz[i], i * pp);
+          set abto:stutter 1;
+          note_on_at(abto, melz[i], i * pp);
         }
       }
     } else {
-      #set abto:on 1;
+      set abto:on 1;
     }
 
     set xb:on 1;

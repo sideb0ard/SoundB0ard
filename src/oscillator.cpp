@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <iostream>
+
 #include "modmatrix.h"
 #include "soundgenerator.h"
 #include "utils.h"

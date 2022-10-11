@@ -185,12 +185,14 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
   } else if (ExpectPeek(token::SLANG_PROC_ID)) {
     return ParseProcessSetStatement();
   } else {
-    std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_ << std::endl;
+    // std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_ <<
+    // std::endl;
     return nullptr;
   }
 
   if (!ExpectPeek(token::SLANG_COLON)) {
-    std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_ << std::endl;
+    // std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_ <<
+    // std::endl;
     return nullptr;
   }
 
@@ -296,7 +298,8 @@ std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement() {
       std::make_shared<ast::PanStatement>(cur_token_);
 
   if (!ExpectPeek(token::SLANG_IDENT)) {
-    std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_ << std::endl;
+    // std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_ <<
+    // std::endl;
     return nullptr;
   }
   stmt->target_ = ParseIdentifier();

@@ -42,12 +42,9 @@ set VSpitch:decay_ms 90;
 # p? < osc 17 "50 190" "set BLURP:decay_ms %"
 
 let rf = [16, 0, 0, 24, 0, 23, 0, 16, 0, 24, 0, 0, 23, 0, 16, 0];
-#let rf = [4, 0, 0, 7, 0, 4, 0, 7, 0, 4, 0, 0, 7, 0, 4, 0];
-#let rf = [16, 0, 0, 24, 0, 23, 0, 16, 0, 24, 0, 0, 23, 0, 16, 0];
-# rf = combinor(bjork(7,16), [16, 24, 23]);
-# rf = combinor(bjork(11,16), [27, 28, 32]);
-#let rf =  chord_riff([4, 7]);
-#let rf =  chord_riff([4, 7]);
+
+# p1 $ bdlah_gen ; load_preset(dx, "surgefizz")
+# surgefizz
 let bdlah_gen = gen()
 {
   setup()
@@ -96,7 +93,7 @@ let bdlah_gen = gen()
       for (i = 0; i < 16; ++i) {
         ##
         if (i % 2 == 0) {
-          #stepper(cp, rumba, cx2, i, 50);
+          stepper(cp, rumba, cx2, i, 50);
         }
         cx2 = incr(cx2, 0, maxl2);
         ## TONIC
@@ -129,12 +126,6 @@ let bdlah_gen = gen()
 
 #let gras = grain(skrslazrs/SHØCK13.wav);
 #p13 < osc 12 "0 100"  "set gras:idx %"
-#add_fx(gras, "reverb")
-#p14 < osc 13 "100 1000"  "set gras:fx0:reverbtime %"
-# p15 < osc 13 "20 90"  "set gras:fx0:wetmx %"
-#p15 < osc 12 "0 78"  "set gras:fx0:fb %"
-#vol dx2 0
-#add_fx(gras, "sidechain", bd2)
 
 let space_between_beats = fn(abeat)
 {
@@ -150,7 +141,6 @@ let space_between_beats = fn(abeat)
   return lenz;
 }
 
-# mo = wurpy
 #load_preset(mo, "twitchrrr");
 let string_gen = gen()
 {
@@ -209,6 +199,7 @@ vol blt 0.4;
 
 #add_fx(blt, "distort");
 
+# go down *vvv*
 let todd_gen = gen()
 {
   setup()
@@ -235,16 +226,13 @@ let todd_gen = gen()
   }
 }
 
-# load_preset(dx2, "narf2");
-# vol dx2 0.2;
-
 # p4 $ todd_gen; p1 $ dblah2_gen
 
-# let dzl = loop(dloops/dizzeebeat1barloop.aiff) ; vol dzl 0
-# set dzl:pitch 2
+# let dzl = loop(dloops/dizzeebeat1barloop.aiff) ; vol dzl 0; set dzl:pitch 2
 # p5 < every 2 "1" "set dzl:stutter %";
 # add_fx(dzl, "sidechain", bd2);
-# add_fx(zzz, "sidechain", bd2)
+# p8 < ramp 8 "0 0.8" "vol dzl %"
+# p9 < every 5 "1" "set dzl:scramble %";
 
 
 # dx surgefizz
@@ -265,9 +253,9 @@ let dblah2_gen = gen()
   }
   run()
   {
-    #play_array(bd2, beat);
     play_array(hh, sdbeat);
     let mel = mask(dxm, "ff70");
+    set dzl:on 1;
     if (count % 7 == 0) {
       mel = mask(dxm, "0070");
     }
@@ -275,10 +263,14 @@ let dblah2_gen = gen()
     drx = incr(drx, 0, len(drz));
     if (count % 3 == 0) {
       set dzl:scramble 1;
+      cbeat(dzl);
+      #play_array(dzl, sdbeat);
     }
-    if (count % 4 == 0) {
+    if (count % 4 == 3) {
+      dbeat(dzl);
       # dxm = up(rand_array(16,0, 2), 13);
       #print("Setting to ", ratz[rx]);
+      #play_array(bd, beat);
       set dx:o1rat ratz[rx];
       rx = incr(rx, 0, len(ratz));
       beat = rand_beat();

@@ -105,7 +105,8 @@ std::string DXSynth::Info() {
      << "## Voice Section ####################################\n";
   ss << INSTRUMENT_COLOR_A;
   ss << "   algo:" << m_settings.m_voice_mode << " vol:" << volume
-     << " pan:" << pan << "\n";
+     << " pan:" << pan << " pitchbend:" << m_settings.m_actual_pitch_bent_val
+     << "\n";
 
   ss << "   midi_osc:" << active_midi_osc
      << " porta:" << m_settings.m_portamento_time_ms
@@ -282,24 +283,26 @@ void DXSynth::pitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
   unsigned int data2 = ev.data2;
   printf("Pitch bend, babee: %d %d\n", data1, data2);
-  int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
+  m_settings.m_actual_pitch_bent_val =
+      (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
+  printf("ACTUALPitch bend, babee: %d %d\n", data1, data2);
 
-  if (actual_pitch_bent_val != 8192) {
+  if (m_settings.m_actual_pitch_bent_val != 8192) {
     double normalized_pitch_bent_val =
-        (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
+        (float)(m_settings.m_actual_pitch_bent_val - 0x2000) / (float)(0x2000);
     double scaley_val =
         // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
-        scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
+        scaleybum(0, 16383, -600, 600, m_settings.m_actual_pitch_bent_val);
     printf("Cents to bend - %f\n", scaley_val);
     for (int i = 0; i < MAX_VOICES; i++) {
       std::cout << i << ": osc1" << std::endl;
-      voices_[i]->m_osc1->m_cents = scaley_val;
+      m_settings.m_op1_detune_cents = scaley_val;
       std::cout << i << ": osc2" << std::endl;
-      voices_[i]->m_osc2->m_cents = scaley_val + 2.5;
+      m_settings.m_op1_detune_cents = scaley_val + 2.5;
       std::cout << i << ": osc3" << std::endl;
-      voices_[i]->m_osc3->m_cents = scaley_val;
+      m_settings.m_op1_detune_cents = scaley_val;
       std::cout << i << ": osc4" << std::endl;
-      voices_[i]->m_osc4->m_cents = scaley_val + 2.5;
+      m_settings.m_op1_detune_cents = scaley_val + 2.5;
       std::cout << i << ": modmatrix" << std::endl;
       voices_[i]->modmatrix.sources[SOURCE_PITCHBEND] =
           normalized_pitch_bent_val;
@@ -1242,6 +1245,26 @@ void DXSynth::SetOp4Feedback(double val) {
     printf("Op4 feedback val has to be [0-70]\n");
 }
 
+void DXSynth::SetPitchbendFromREPL(double val) {
+  if (val < -12 || val > 12) {
+    std::cout << "Val should be between -12 and +12\n";
+    return;
+  }
+
+  m_settings.m_actual_pitch_bent_val = val;
+
+  double scaley_val = 0;
+  if (m_settings.m_actual_pitch_bent_val != 0) {
+    scaley_val =
+        scaleybum(-12, 12, -100, 100, m_settings.m_actual_pitch_bent_val);
+  }
+
+  m_settings.m_op1_detune_cents = scaley_val;
+  m_settings.m_op2_detune_cents = scaley_val + 2.5;
+  m_settings.m_op3_detune_cents = scaley_val;
+  m_settings.m_op4_detune_cents = scaley_val + 2.5;
+}
+
 void DXSynth::SetActiveMidiOsc(int osc_num) {
   if (osc_num >= 1 && osc_num <= 4) active_midi_osc = osc_num;
 }
@@ -1258,6 +1281,8 @@ void DXSynth::SetParam(std::string name, double val) {
     SetPortamentoTimeMs(val);
   else if (name == "pitchrange")
     SetPitchbendRange(val);
+  else if (name == "pitchbend")
+    SetPitchbendFromREPL(val);
   else if (name == "op4fb")
     SetOp4Feedback(val);
   else if (name == "vel2att")

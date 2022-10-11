@@ -5,7 +5,7 @@ let soukous = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0];
 let gahu = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
 let bossa = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0];
 
-let rhythms_int = [ shiko, son, rumba, soukous, gahu, bossa ];
+let rhythms_int = [ shiko, son, rumba, soukous, gahu, bossa, bjork(3, 16), bjork(7, 16), bjork(5, 16), bjork(11, 16) ];
 
 let briff = fn(root)
 {
@@ -144,7 +144,7 @@ let combinor = fn(rhythm, melody)
     else {
       if (rhythm[i] > 0) {
         return_melody = push(return_melody, melody[mel_idx]);
-        if (rand(10) > 5) {
+        if (rand(10) > 7) {
           mel_idx = incr(mel_idx, 0, len(melody));
         }
       } else {
@@ -493,6 +493,24 @@ let dbeat = fn(bd)
   }
 }
 
+let hhbeat = fn(hh)
+{
+  let sw = rand(pp/2);
+  if (rand(100) < 95) {
+    for (i = 0; i < 16; ++i) {
+      if (rand(100) < 95) {
+        let offset = 0;
+        let v = 80 + rand(27);
+        if (i % 2 == 1) {
+          offset = sw;
+        }
+        note_on_at(hh, 1, i * pp + offset, vel = v);
+      }
+    }
+  }
+}
+
+
 let moog_midi_assign = fn()
 {
   midi_map(1, "mo:eg1_attack");
@@ -513,4 +531,36 @@ let dx_midi_assign = fn()
   midi_map(6, "dx:e1dec");
   midi_map(7, "dx:e1sus");
   midi_map(8, "dx:r1rel");
+}
+
+let play_sub = fn(instrument, start_idx, sub_range, arr)
+{
+  let local_inc = sub_range / len(arr);
+  for (i = 0; i < len(arr); ++i) {
+    let plx = start_idx + i * local_inc;
+
+    if (type(arr[i]) == "ARRAY") {
+      if (rand(10) < 9) {
+        play_sub(instrument, plx, local_inc, arr[i]);
+      }
+    }
+    let drift = 0;
+    if (i % 2 == 1) {
+      drift = rand(20);
+    }
+    let v = 100 + rand(27);
+    if (plx % 960 == 0) {
+      v = 127;
+    }
+    if (type(arr[i]) == "NUMBER" && arr[i] > 0) {
+      note_on_at(instrument, arr[i], plx + drift, dur = 200 + rand(300), vel = v);
+    }
+  }
+
+
+}
+
+let player = fn(instrument, beat)
+{
+  play_sub(instrument, 0, 3840, beat);
 }

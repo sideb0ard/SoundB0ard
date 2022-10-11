@@ -179,6 +179,9 @@ let snrz = gen()
   setup()
   {
     let snz=  [sn, sn2, che];
+    let blah_fn = fn()
+    {
+    }
     #let snz=  [sn];
     let snz_idx = 0;
     let swing_setting = 3;

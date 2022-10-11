@@ -1635,7 +1635,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              return evaluator::NULLL;
            }
 
-           int vel = 128;
+           int vel = 110 + (rand() % 17);
            int dur = 240;
 
            for (auto a : args) {

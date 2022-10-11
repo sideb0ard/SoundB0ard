@@ -78,6 +78,7 @@ typedef struct dxsynthsettings {
   // VOICE
   double m_portamento_time_ms{0};  // 0/5000/0
   double m_volume_db{20};          // -96/20/0
+  int m_actual_pitch_bent_val{0};  // 0 - 128
   int m_pitchbend_range{12};       // 0/12/1
   unsigned int m_voice_mode{1};    // DX[1-8];
   bool m_velocity_to_attack_scaling{false};
@@ -160,6 +161,7 @@ class DXSynth : public SoundGenerator {
   void SetPortamentoTimeMs(double val);
   void SetVolumeDb(double val);
   void SetPitchbendRange(unsigned int val);
+  void SetPitchbendFromREPL(double val);
   void SetVoiceMode(unsigned int val);
   void SetVelocityToAttackScaling(bool b);
   void SetNoteNumberToDecayScaling(bool b);

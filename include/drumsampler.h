@@ -21,6 +21,7 @@ class DrumSampler : public SoundGenerator {
   stereo_val GenNext(mixer_timing_info tinfo) override;
   void start() override;
   void noteOn(midi_event ev) override;
+  void noteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
   void pitchBend(midi_event ev) override;
 

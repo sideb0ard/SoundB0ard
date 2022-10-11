@@ -378,7 +378,6 @@ void Looper::SetEnvelopeMode(unsigned int mode) { envelope_mode = mode; }
 void Looper::SetReverseMode(bool b) { reverse_mode = b; }
 
 void Looper::SetLoopMode(unsigned int m) {
-  std::cout << "LOOP MODE IS:" << m << std::endl;
   volume = 0.2;
   switch (m) {
     case (0):

@@ -1,0 +1,17 @@
+
+let tgen = gen()
+{
+  setup()
+  {
+    let full = 3840;
+    let carry = 0;
+    let cur_num = 1;
+  }
+  run()
+  {
+    for (i = 0; i < 10; ++i) {
+      print("I:", i);
+    }
+  }
+}
+

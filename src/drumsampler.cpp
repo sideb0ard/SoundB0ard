@@ -133,6 +133,8 @@ void DrumSampler::noteOn(midi_event ev) {
   eg.StartEg();
 }
 
+void DrumSampler::noteOff(midi_event ev) { is_playing = false; }
+
 void DrumSampler::pitchBend(midi_event ev) {
   float pitch_val = ev.data1 / 10.;
   SetPitch(pitch_val);
