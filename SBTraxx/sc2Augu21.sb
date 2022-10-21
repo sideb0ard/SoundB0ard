@@ -43,8 +43,8 @@ set VSpitch:decay_ms 90;
 
 let rf = [16, 0, 0, 24, 0, 23, 0, 16, 0, 24, 0, 0, 23, 0, 16, 0];
 
-# p1 $ bdlah_gen ; load_preset(dx, "surgefizz")
-# surgefizz
+# p1 $ bdlah_gen ; load_preset(dx, "surgefizz2")
+# surgefizz2
 let bdlah_gen = gen()
 {
   setup()
@@ -228,11 +228,9 @@ let todd_gen = gen()
 
 # p4 $ todd_gen; p1 $ dblah2_gen
 
-# let dzl = loop(dloops/dizzeebeat1barloop.aiff) ; vol dzl 0; set dzl:pitch 2
-# p5 < every 2 "1" "set dzl:stutter %";
+# let dzl = loop(dloops/dizzeebeat1barloop.aiff) ; set dzl:pitch 2; vol dzl 0;
 # add_fx(dzl, "sidechain", bd2);
 # p8 < ramp 8 "0 0.8" "vol dzl %"
-# p9 < every 5 "1" "set dzl:scramble %";
 
 
 # dx surgefizz
@@ -264,13 +262,14 @@ let dblah2_gen = gen()
     if (count % 3 == 0) {
       set dzl:scramble 1;
       cbeat(dzl);
-      #play_array(dzl, sdbeat);
+      play_array(bd2, sdbeat);
     }
     if (count % 4 == 3) {
       dbeat(dzl);
+      set dzl:stutter 1;
       # dxm = up(rand_array(16,0, 2), 13);
       #print("Setting to ", ratz[rx]);
-      #play_array(bd, beat);
+      play_array(bd2, beat);
       set dx:o1rat ratz[rx];
       rx = incr(rx, 0, len(ratz));
       beat = rand_beat();

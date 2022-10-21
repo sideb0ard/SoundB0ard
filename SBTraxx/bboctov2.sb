@@ -6,11 +6,40 @@ let tgen = gen()
     let full = 3840;
     let carry = 0;
     let cur_num = 1;
+    let max_num = 7;
+    let d = 10;
+
+    let melz = [53, 51, 57];
+    let mlx = 0;
   }
   run()
   {
-    for (i = 0; i < 10; ++i) {
-      print("I:", i);
+    let first_part = full / max_num * cur_num;
+    let remain = full - first_part;
+
+    let pp1 = first_part / 3;
+    for (i = 0; i < 3; ++i) {
+      let on_at = i * pp1;
+      let v = 100 + rand(27);
+      note_on_at(bd, 1, on_at, dur = d, vel = v);
+      note_on_at(dx, melz[mlx], on_at + pp1, dur = d, vel = v);
+    }
+
+    let pp2 = (full - remain) / 4;
+    for ( i = 0; i < 4; ++i) {
+      let on_at = remain + (i * pp2);
+      note_on_at(bd, 1, on_at, dur = d, vel = 100 + rand(27));
+      note_on_at(dx, melz[mlx], on_at + pp2, dur = d, vel = v);
+    }
+    mlx = incr(mlx, 0, len(melz));
+    d = d + 10;
+    if (d > 300) {
+      d = 10;
+    }
+
+    cur_num = incr(cur_num, 1, max_num);
+    if (count % max_num == 2) {
+      max_num = incr(max_num, 4, 10);
     }
   }
 }

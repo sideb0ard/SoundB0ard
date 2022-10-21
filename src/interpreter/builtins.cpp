@@ -1105,14 +1105,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                args.push_back(cmd_name);
                audio_action_queue_item action_req{
                    .type = AudioAction::LOAD_PRESET, .args = args};
+               // read its preset file
+               action_req.preset_name = preset_name->value_;
+               action_req.preset = GetPreset(soundgen->soundgenerator_type,
+                                             preset_name->value_);
                audio_queue.push(action_req);
              }
-             //  auto cmd_name =
-             //      std::make_shared<object::String>("rand");
-             //  args.push_back(cmd_name);
-             //  audio_action_queue_item action_req{
-             //      .type = AudioAction::RAND_PRESET, .args = args};
-             //  audio_queue.push(action_req);
            }
            return evaluator::NULLL;
          })},
