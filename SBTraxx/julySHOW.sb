@@ -41,7 +41,7 @@ let dxblah_gen = gen()
 }
 
 
-# let medih = loop(voices/mediahypethis.wav); set medih:len 2; p3 $ dxdblah_gen
+# let medih = loop(voices/mediahypethis.wav); set medih:len 2; p1 $ dxdblah_gen
 let dxdblah_gen = gen()
 {
   setup()
@@ -128,7 +128,8 @@ let vblah_gen = gen()
   }
 }
 
-# vol rap 0
+# vol rap 0; vol cmon 0
+
 # let tb2 = loop(dloops/technB.wav); set tb2:len 2; vol tb2 1;
 # let tb = loop(dloops/techNOBe.wav); set tb:len 2 ; vol tb 1;
 
@@ -190,6 +191,7 @@ let wahblah_gen = gen()
   {
     set tb2:on 1;
     set tb:on 1;
+    #set rka:stutter 1;
     if (count % 4 < 2)  {
       vol boom 0.9;
       set boom:scramble 1;
@@ -210,7 +212,7 @@ let wahblah_gen = gen()
   }
 }
 
-# let verbal = loop(voices/verbalspit.wav); set verbal:len 4;
+# let verbal = loop(voices/verbalspit.wav); set verbal:len 4; vol arc 0
 # let mark = loop(dloops/markdistort.wav); p1 $ mahkblah_gen
 let mahkblah_gen = gen()
 {
@@ -279,6 +281,8 @@ let dx2blah_gen = gen()
   }
 }
 
+# play skrslazrs/SHØCK01.wav
+
 # let lg = grain(legowelt/Pad-SoEarly90s.wav)
 # p9 < osc 12 "0 100"  "set lg:idx %"
 
@@ -338,6 +342,10 @@ let blah_gen = gen()
       set cmon:stutter 1;
       set rap:scramble 1;
       set rap:on 1;
+    }
+    set cmon:reverse 0;
+    if (count % 9 == 8) {
+      set cmon:reverse 1;
     }
   }
 }

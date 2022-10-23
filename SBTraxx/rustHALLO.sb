@@ -35,28 +35,9 @@ let yogen = gen()
   }
 }
 
-let bd = sample(bd/808kick.aif);
-let cp = sample(cp/distCllap.aiff);
-
-let bdblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    dbeat(bd);
-    if (count % 3 == 0) {
-      hhbeat(hh);
-    }
-    if (count % 4 == 0) {
-      cbeat(cp);
-    }
-  }
-}
-
 
 # mo = android2Dream
+# p2 $ morust_gen
 let morust_gen = gen()
 {
   setup()
@@ -125,77 +106,6 @@ let morust_gen = gen()
   }
 }
 
-## mo = boardy2
-let thumoblah = gen()
-{
-  setup()
-  {
-    let mel = [53, 57, 50];
-    let mx = 0;
-    let drr = 1000;
-    let bjz = [3, 5, 7];
-    let bjx = 0;
-  }
-  run()
-  {
-    if (count % 8 == 0) {
-      let beat = bjork(bjz[bjx], 16);
-      let pp = 3840 * 8;
-
-      for (i = 0; i < 16; ++i) {
-        if (beat[i] == 1) {
-          print(i*pp);
-          note_on_at(mo, mel[mx], i * pp);
-          mx = incr(mx, 0, len(mel));
-        }
-      }
-    }
-  }
-}
-#
-## mo = wurpy // gurl2 // mogurl
-let mooblah_gen = gen()
-{
-  setup()
-  {
-    #let bnote = 38;
-    let bnote = 17;
-    let notz = notes_in_chord(bnote, 1, 1);
-
-    let durz = [300, 400, 600, 900, 500, 50];
-    let drx = 0;
-
-    let brjz = [3, 5, 7, 11];
-    let brx = 0;
-  }
-  run()
-  {
-    let  beat = bossa;
-    let mel = combinor(beat, notz);
-    if (count % 8 == 3) {
-      mel = combinor(rand_beat(), [bnote, bnote - 3 ]);
-    }
-    #let mel = combinor(bjork(brjz[brx], 16), notz);
-    #brx = incr(brx, 0, len(brjz));
-    for (i = 0; i < 16; ++i) {
-      if (mel[i] > 0) {
-        note_on_at(mo, mel[i], i * pp, dur = durz[drx], vel = 100+ rand(27));
-        drx = incr(drx, 0, len(durz));
-      }
-    }
-  }
-}
-
-let oh_fn = fn(oh)
-{
-  for (i = 0; i < 16; ++i) {
-    if (i % 4 == 2) {
-      note_on_at(oh, 1, i *pp);
-    }
-  }
-}
-
-
 let scif = sample(perc/scratchClap.aiff);
 let tth = sample(perc/thee.wav);
 let lzp = sample(perc/krushbrk.wav);
@@ -235,7 +145,7 @@ let rustblah_gen = gen()
 
 # dx = rustNAST
 # p11 < osc 7 "0.1 0.5" "vol hh %";
-# let stv = loop(dloops/steveMUR.wav); set stv:len 0.5; vol stv 0; p3 $ rust_gen; p2 $ ""
+# let stv = loop(dloops/steveMUR.wav); set stv:len 0.5; vol stv 0; p3 $ rust_gen;
 # p2 $ fmblah_gen
 let rust_gen = gen()
 {
@@ -246,7 +156,6 @@ let rust_gen = gen()
   run()
   {
 
-    set rust:on 1;
     set rust:pitch 1;
     vol stv 0;
     if (count % 8 == 7) {
@@ -256,6 +165,9 @@ let rust_gen = gen()
       play_array(stv, invert(beat));
       play_array(grn, invert(beat));
       note_on(yo, 1, dur = 500);
+    }
+    if (count % 2 == 0) {
+      set rust:on 1;
     }
     if (count % 3 == 0) {
       set rust:scramble 1;
@@ -357,11 +269,11 @@ let clgen = gen()
 
 
 #let crnkl = loop(hallow/crnkloop.wav); p6 $ hah_gen ; vol crnkl 1
-
 # add_fx(cliff, "sidechain", crnkl);
 let bwah = sample(hallow/bwah.wav);
 let ov = sample(hallow/ovalNOTE.wav);
-let hahz = [bwah];
+let nt = sample(TT-MAW-ALRIGHTALRIGHT/note4.wav);
+let hahz = [bwah, nt];
 
 let hah_gen = gen()
 {
@@ -427,6 +339,7 @@ let rrrdgen = gen()
 
 # mo = Esgr
 # thunderzz // Esgr
+# p6 $ mfffgen
 let mfffgen = gen()
 {
   setup()

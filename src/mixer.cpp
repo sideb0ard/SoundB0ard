@@ -629,6 +629,8 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     interpreter_sound_cmds::ParseFXCmd(action.args);
   else if (action.type == AudioAction::BPM)
     UpdateBpm(action.new_bpm);
+  else if (action.type == AudioAction::VOLUME)
+    VolChange(action.new_volume);
   else if (action.type == AudioAction::RECORDED_MIDI_EVENT) {
     _delayed_action_items.push_back(action);
   } else if (action.type == AudioAction::MIDI_EVENT_ADD ||
@@ -711,10 +713,6 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
           sg->SetParam(action.param_name, param_val);
         }
       }
-    } else {
-      // no soundgen - must be mixer
-      float param_val = std::stod(action.param_val);
-      if (action.param_name == "volume") VolChange(param_val);
     }
   } else if (action.type == AudioAction ::INFO) {
     if (IsValidSoundgenNum(action.mixer_soundgen_idx)) {

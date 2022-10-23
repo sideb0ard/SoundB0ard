@@ -35,6 +35,7 @@ enum AudioAction {
   STOP,
   UNSOLO,
   UPDATE,
+  VOLUME,
 };
 
 struct audio_action_queue_item {
@@ -87,4 +88,5 @@ struct audio_action_queue_item {
 
   // BPM varz
   double new_bpm;
+  double new_volume;
 };

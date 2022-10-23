@@ -884,6 +884,22 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      audio_queue.push(action_req);
                      return evaluator::NULLL;
                    })},
+    {"mvol",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           if (args.size() != 1)
+             return evaluator::NewError(
+                 "`Master Volume` requires a volume value.");
+
+           auto num_obj = std::dynamic_pointer_cast<object::Number>(args[0]);
+           if (!num_obj) return evaluator::NULLL;
+
+           audio_action_queue_item action_req{.type = AudioAction::VOLUME,
+                                              .new_volume = num_obj->value_};
+           audio_queue.push(action_req);
+           return evaluator::NULLL;
+         })},
     {"stop", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> args)
                      -> std::shared_ptr<object::Object> {
