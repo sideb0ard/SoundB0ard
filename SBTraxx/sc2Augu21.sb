@@ -141,46 +141,6 @@ let space_between_beats = fn(abeat)
   return lenz;
 }
 
-#load_preset(mo, "twitchrrr");
-let string_gen = gen()
-{
-  setup()
-  {
-    let mx = 0;
-    let lx = 0;
-    let bjeat = rand_beat();
-    let spd = [2, 4, 3];
-    let spx = 0;
-    let upperz = [13, 27, 38, 47];
-    let ux = 0;
-  }
-  run()
-  {
-    let lenz = space_between_beats(bjeat);
-    let downby = 0;
-    if (count % 4 == 0) {
-      downby = -12;
-    }
-    if (count % 4 == 0) {
-      downby = 24;
-      #fast(mo, up(rf, upperz[ux]), spd[spx]);
-      spx = incr(spx, 0, len(spd));
-      ux = incr(ux, 0, len(upperz));
-    }
-    if (count % 7 == 0) {
-      downby = 12;
-      bjeat = rand_beat();
-    }
-    for (i = 0; i < 16; ++i) {
-      if (bjeat[i] == 1) {
-        note_on_at(mo, up([rf[mx]], downby), i*pp, dur = lenz[lx] * pp );
-        lx = incr(lx, 0, len(lenz));
-        mx = incr(mx, 0, len(rf));
-      }
-    }
-  }
-}
-
 #let zzz = grain(legowelt/Synth-ZeemeeuwHotel.wav);
 # p7 < osc 24 "0 100" "set zzz:idx %"
 
@@ -274,43 +234,6 @@ let dblah2_gen = gen()
       rx = incr(rx, 0, len(ratz));
       beat = rand_beat();
       set dzl:stutter 1;
-    }
-  }
-}
-
-let drum_gen = gen()
-{
-  setup()
-  {
-    let beat = gen_beat();
-    let idxr = 3;
-    let idx = 0;
-    let rf = riff(23);
-  }
-  run()
-  {
-    play_array(bd, beat);
-
-    if (count % 3 == 0) {
-      beat = gen_beat();
-      set dzl:stutter 1;
-    }
-    # dx = DxSynth(beleep) vol:0.70 pan:0.00 algo:5
-    # dx2 = DxSynth(klonk) vol:0.70 pan:0.00 algo:5
-    if (count % 2 == 0) {
-
-      for (i = 0; i < 16; ++i) {
-        stepper(mo, rf, idx, i, 400);
-        if (count % 4 == 0) {
-          stepper(dx, rotate(rf, idx % 7), idx, i, 500);
-        }
-        if (count % 3 == 0) {
-          stepper(dx2, up(rotate(rf, idx), 3),  idx, i, 500);
-        }
-        idx = incr(idx, 0, idxr);
-      }
-      idxr = incr(idxr, 0, 16);
-      set dzl:scramble 1;
     }
   }
 }

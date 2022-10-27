@@ -192,14 +192,14 @@ let wahblah_gen = gen()
     set tb2:on 1;
     set tb:on 1;
     #set rka:stutter 1;
-    if (count % 4 < 2)  {
+    if (count % 4 < 3)  {
       vol boom 0.9;
       set boom:scramble 1;
     } else {
       vol boom 0;
     }
 
-    if (count % 4 == 1) {
+    if (count % 4 == 3) {
       let b = rand_beat();
       play_array(boom, b, dur = drz[dx]);
       play_array(tb, rand_beat());
@@ -281,6 +281,7 @@ let dx2blah_gen = gen()
   }
 }
 
+let shk = sample(skrslazrs/SHØCK01.wav);
 # play skrslazrs/SHØCK01.wav
 
 # let lg = grain(legowelt/Pad-SoEarly90s.wav)
