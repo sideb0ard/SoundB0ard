@@ -430,6 +430,9 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     bpm_to_be_updated = 0;
   }
 
+  // The number of microseconds that elapse between samples
+  const auto microsPerSample = 1e6 / SAMPLE_RATE;
+
   for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2) {
     double output_left = 0.0;
     double output_right = 0.0;
@@ -442,8 +445,6 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
       output_right += preview_audio.right * 0.6;
     }
 
-    // The number of microseconds that elapse between samples
-    const auto microsPerSample = 1e6 / SAMPLE_RATE;
     const auto hostTime =
         beginHostTime +
         microseconds(llround(static_cast<double>(i) * microsPerSample));

@@ -43,7 +43,9 @@ set VSpitch:decay_ms 90;
 
 let rf = [16, 0, 0, 24, 0, 23, 0, 16, 0, 24, 0, 0, 23, 0, 16, 0];
 
+# SYNC WITH KEI --------------------- ########
 # p1 $ bdlah_gen ; load_preset(dx, "surgefizz2")
+# p8 < ramp 8 "0.7 0"  "vol cliff %"
 # surgefizz2
 let bdlah_gen = gen()
 {
@@ -124,6 +126,7 @@ let bdlah_gen = gen()
   }
 }
 
+# SYNC WITH KEI --------------------- ########
 #let gras = grain(skrslazrs/SHØCK13.wav);
 #p13 < osc 12 "0 100"  "set gras:idx %"
 
@@ -157,8 +160,6 @@ vol youv 0.4;
 vol whft 0.4;
 vol blt 0.4;
 
-#add_fx(blt, "distort");
-
 # go down *vvv*
 let todd_gen = gen()
 {
@@ -186,6 +187,7 @@ let todd_gen = gen()
   }
 }
 
+# SYNC WITH KEI --------------------- ########
 # p4 $ todd_gen; p1 $ dblah2_gen
 
 # let dzl = loop(dloops/dizzeebeat1barloop.aiff) ; set dzl:pitch 2; vol dzl 0;
@@ -213,6 +215,7 @@ let dblah2_gen = gen()
   {
     play_array(hh, sdbeat);
     let mel = mask(dxm, "ff70");
+    set dzl:reverse 0;
     set dzl:on 1;
     if (count % 7 == 0) {
       mel = mask(dxm, "0070");
@@ -221,6 +224,7 @@ let dblah2_gen = gen()
     drx = incr(drx, 0, len(drz));
     if (count % 3 == 0) {
       set dzl:scramble 1;
+      set dzl:reverse 1;
       cbeat(dzl);
       play_array(bd2, sdbeat);
     }

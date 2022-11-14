@@ -113,6 +113,7 @@ let gz = sample(perc/gltchString.aiff);
 let sd = sample(sd/acidSnare2slow.aiff);
 
 
+# SYNC WITH KEI --------------------- ########
 let hh = sample(ch/dr606closedhh.aif);
 let jbh = sample(noises/jbs3rdhit.aiff);
 # let rust  = loop(dloops/rsuteri.wav); set rust:len 2; p3 $ rustblah_gen; vol grn 0
@@ -143,6 +144,7 @@ let rustblah_gen = gen()
 
 
 
+# SYNC WITH KEI --------------------- ########
 # dx = rustNAST
 # p11 < osc 7 "0.1 0.5" "vol hh %";
 # let stv = loop(dloops/steveMUR.wav); set stv:len 0.5; vol stv 0; p3 $ rust_gen; p2 $ ""
@@ -234,7 +236,6 @@ let fmblah_gen = gen()
 }
 
 # fade rust
-
 #let nszl = loop(hallow/NOISEintroLOOP.wav); set nszl:len 8; p4 $ nzblah_gen
 let nzblah_gen = gen()
 {
@@ -268,6 +269,7 @@ let clgen = gen()
 }
 
 
+# SYNC WITH KEI --------------------- ########
 #let crnkl = loop(hallow/crnkloop.wav); p6 $ hah_gen ; vol crnkl 1
 # add_fx(cliff, "sidechain", crnkl);
 let bwah = sample(hallow/bwah.wav);
@@ -342,7 +344,7 @@ let rrrdgen = gen()
 # mo = Esgr
 # thunderzz // Esgr
 # load_preset(mo, "Esgr")
-# p6 $ mfffgen
+# p5 $ mfffgen
 let mfffgen = gen()
 {
   setup()
@@ -369,3 +371,4 @@ let mfffgen = gen()
   }
 }
 
+# vol nszl 0
