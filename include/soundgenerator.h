@@ -75,6 +75,7 @@ class SoundGenerator {
   int AddDecimate();
   int AddDelay();
   int AddEnvelope();
+  int AddGenZ();
   int AddModdelay();
   int AddModfilter();
   int AddFollower();

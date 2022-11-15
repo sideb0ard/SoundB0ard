@@ -5,6 +5,7 @@
 #include <fx/distortion.h>
 #include <fx/dynamics_processor.h>
 #include <fx/fx.h>
+#include <fx/genz.h>
 #include <fx/modfilter.h>
 #include <fx/modular_delay.h>
 #include <fx/reverb.h>
@@ -117,6 +118,12 @@ int SoundGenerator::AddBasicfilter() {
   printf("Fffuuuuhfilter!\n");
   FilterPass *fp = new FilterPass();
   return AddFx((Fx *)fp);
+}
+
+int SoundGenerator::AddGenZ() {
+  printf("GEEEEEENZZZZZ!\n");
+  GenZ *gz = new GenZ();
+  return AddFx((Fx *)gz);
 }
 
 int SoundGenerator::AddBitcrush() {

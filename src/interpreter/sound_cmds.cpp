@@ -30,6 +30,8 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args) {
           sg->AddDecimate();
         else if (str_obj->value_ == "filter")
           sg->AddBasicfilter();
+        else if (str_obj->value_ == "genz")
+          sg->AddGenZ();
         else if (str_obj->value_ == "reverb")
           sg->AddReverb();
         else if (str_obj->value_ == "sidechain") {
