@@ -9,10 +9,12 @@ class GenZ : Fx {
   std::string Status() override;
   stereo_val Process(stereo_val input) override;
   void SetParam(std::string name, double val) override;
+  void EventNotify(broadcast_event event, mixer_timing_info tinfo) override;
 
  private:
-  void Init();
-  void Update();
+  void Reset();
 
-  double some_setting_;
+  int64_t counter_;
+  int64_t loop_len_in_frames_;
+  double signal_;
 };

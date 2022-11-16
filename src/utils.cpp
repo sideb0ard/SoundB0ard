@@ -485,6 +485,36 @@ double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
 
   return return_val;
 }
+// hmm, this now seems to make more sense for ordering than scaleybum!
+double scale(double cur_val, double cur_min, double cur_max, double new_min,
+             double new_max) {
+  return scaleybum(cur_min, cur_max, new_min, new_max, cur_val);
+}
+
+double wrap(double cur_val, double min_val, double max_val) {
+  double cur_range = max_val - min_val;
+  while (cur_val > max_val) {
+    cur_val -= cur_range;
+  }
+  return cur_val;
+}
+
+double fold(double cur_val, double min_val, double max_val) {
+  int attempts = 0;
+  while (cur_val < min_val || cur_val > max_val) {
+    if (cur_val < min_val) {
+      double diff = min_val - cur_val;
+      cur_val = min_val + diff;
+
+    } else if (cur_val > max_val) {
+      double diff = cur_val - max_val;
+      cur_val = max_val - diff;
+    }
+    attempts++;
+    if (attempts > 5) break;
+  }
+  return cur_val;
+}
 
 // http://devmaster.net/posts/9648/fast-and-accurate-sine-cosine
 // input is -pi to +pi

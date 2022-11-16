@@ -83,7 +83,8 @@ void Envelope::CalculateTimings() {
   env_length_ticks_counter_ = info.midi_tick % env_length_ticks_;
 }
 
-void Envelope::EventNotify(broadcast_event event) {
+void Envelope::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
+  (void)tinfo;
   switch (event.type) {
     case (TIME_BPM_CHANGE):
       CalculateTimings();

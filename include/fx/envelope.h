@@ -11,7 +11,7 @@ class Envelope : Fx {
   Envelope();
   std::string Status() override;
   stereo_val Process(stereo_val input) override;
-  void EventNotify(broadcast_event event) override;
+  void EventNotify(broadcast_event event, mixer_timing_info tinfo) override;
   void SetParam(std::string name, double val) override;
 
  private:

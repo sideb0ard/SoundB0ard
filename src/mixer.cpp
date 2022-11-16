@@ -320,7 +320,7 @@ void Mixer::EmitEvent(broadcast_event event) {
       for (int j = 0; j < sg->effects_num; j++) {
         if (sg->effects[j]) {
           Fx *f = sg->effects[j];
-          f->EventNotify(event);
+          f->EventNotify(event, timing_info);
         }
       }
     }

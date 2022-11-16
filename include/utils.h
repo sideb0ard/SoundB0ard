@@ -33,6 +33,10 @@ double parabolic_sine(double x, bool highprecision);
 // new_min, new_max
 double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
                  double cur_val);
+double scale(double cur_val, double cur_min, double cur_max, double new_min,
+             double new_max);
+double wrap(double cur_val, double min_val, double max_val);
+double fold(double cur_val, double min_val, double max_val);
 
 void itoa(int n, char s[]);
 void reverse_string(char s[]);
