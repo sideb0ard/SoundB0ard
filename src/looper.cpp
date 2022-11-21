@@ -12,9 +12,16 @@
 
 namespace SBAudio {
 
-constexpr double len_frame_ms = 1000. / 44100;
+namespace {
+void check_idx(int *index, int buffer_len) {
+  while (*index < 0.0) *index += buffer_len;
+  while (*index >= buffer_len) *index -= buffer_len;
+}
 
+constexpr double len_frame_ms = 1000. / 44100;
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
+
+}  // namespace
 
 Looper::Looper(std::string filename, unsigned int loop_mode) {
   std::cout << "NEW LOOOOOPPPPPER " << loop_mode << std::endl;
@@ -187,6 +194,12 @@ stereo_val Looper::GenNext(mixer_timing_info tinfo) {
 
   val = Effector(val);
 
+  // if (reverse_mode)
+  //   audio_buffer_read_idx--;
+  // else
+  //   audio_buffer_read_idx++;
+  // check_idx(&audio_buffer_read_idx, audio_buffer.size());
+
   return val;
 }
 
@@ -279,11 +292,6 @@ void SoundGrain::Initialize(SoundGrainParams params) {
   active = true;
 }
 
-static inline void sound_grain_check_idx(int *index, int buffer_len) {
-  while (*index < 0.0) *index += buffer_len;
-  while (*index >= buffer_len) *index -= buffer_len;
-}
-
 stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
   stereo_val out = {0., 0.};
   if (!active) return out;
@@ -296,7 +304,7 @@ stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
 
   int read_idx = (int)audiobuffer_cur_pos;
   double frac = audiobuffer_cur_pos - read_idx;
-  sound_grain_check_idx(&read_idx, audio_buffer.size());
+  check_idx(&read_idx, audio_buffer.size());
 
   double eg_amp = eg.DoEnvelope(nullptr);
 

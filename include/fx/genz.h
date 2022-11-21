@@ -14,7 +14,8 @@ class GenZ : Fx {
  private:
   void Reset();
 
-  int64_t counter_;
-  int64_t loop_len_in_frames_;
-  double signal_;
+  int64_t counter_{0};
+  int64_t loop_len_in_frames_{0};
+  double signal_{0};
+  double rate_{1};
 };

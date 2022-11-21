@@ -79,7 +79,7 @@ class Looper : public SoundGenerator {
   std::vector<double> audio_buffer{};
   int num_channels{0};
   int size_of_sixteenth{0};
-  double audio_buffer_read_idx{0};
+  int audio_buffer_read_idx{0};
 
   int num_active_grains{0};
   int highest_grain_num{0};

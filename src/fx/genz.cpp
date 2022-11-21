@@ -14,23 +14,22 @@ GenZ::GenZ() {
 
 std::string GenZ::Status() {
   std::stringstream ss;
-  ss << "counter_:" << counter_;
+  ss << "signal:" << signal_ << " rate:" << rate_;
 
   return ss.str();
 }
 
 stereo_val GenZ::Process(stereo_val input) {
   // do something
-  signal_ = scale(counter_, 0, loop_len_in_frames_, 0, 1);
+  signal_ = scale(counter_, 0, loop_len_in_frames_ * rate_, 0, 1);
   counter_++;
 
   return input;
 }
 
 void GenZ::SetParam(std::string name, double val) {
-  if (name == "some_setting") {
-    // update it;
-    // Update();
+  if (name == "rate") {
+    rate_ = val;
   }
 }
 
@@ -42,11 +41,11 @@ void GenZ::Reset() {
 void GenZ::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   if (event.type == TIME_MIDI_TICK) {
     loop_len_in_frames_ = tinfo.loop_len_in_frames;
-    if (tinfo.is_start_of_loop) {
+    if (tinfo.midi_tick % (int)(rate_ * PPBAR) == 0) {
       Reset();
     }
   }
   if (tinfo.is_sixteenth) {
-    std::cout << "RAMP:" << signal_ << std::endl;
+    std::cout << "SIG:" << signal_ << std::endl;
   }
 }

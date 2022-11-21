@@ -331,10 +331,12 @@ void Mixer::UpdateBpm(int new_bpm) {
   bpm = new_bpm;
   bpm_to_be_updated = new_bpm;
   timing_info.bpm = bpm;
-  timing_info.frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
+  // timing_info.frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
+  timing_info.frames_per_midi_tick = (bpm / 60.0 * SAMPLE_RATE) / PPQN;
   timing_info.loop_len_in_frames = timing_info.frames_per_midi_tick * PPBAR;
   timing_info.loop_len_in_ticks = PPBAR;
 
+  // hmm, not sure if these are correct!
   timing_info.ms_per_midi_tick = 60000.0 / (bpm * PPQN);
   timing_info.midi_ticks_per_ms = PPQN / (60000.0 / bpm);
 
