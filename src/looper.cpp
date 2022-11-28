@@ -18,7 +18,6 @@ void check_idx(int *index, int buffer_len) {
   while (*index >= buffer_len) *index -= buffer_len;
 }
 
-constexpr double len_frame_ms = 1000. / 44100;
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 }  // namespace
@@ -41,7 +40,6 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   eg_.m_release_time_msec = 50;
 
   degrade_by_ = 0;
-  gate_mode_ = false;
 
   SetLoopMode(loop_mode);
 
@@ -169,7 +167,6 @@ void Looper::SwitchXFadeGrains() {
 stereo_val Looper::GenNext(mixer_timing_info tinfo) {
   stereo_val val = {0., 0.};
   if (!started_ || !active) return val;
-  cur_frame_tick_++;
 
   if (stop_pending_ && eg_.m_state == OFFF) active = false;
 
@@ -193,8 +190,8 @@ stereo_val Looper::GenNext(mixer_timing_info tinfo) {
     LaunchGrain(incoming_grain_, tinfo);
   }
 
-  stereo_val active_val = active_grain_->Generate(1, audio_buffer_);
-  stereo_val incoming_val = incoming_grain_->Generate(2, audio_buffer_);
+  stereo_val active_val = active_grain_->Generate(audio_buffer_);
+  stereo_val incoming_val = incoming_grain_->Generate(audio_buffer_);
 
   if (xfader_active_) {
     double incoming_vol = xfader_.Generate();
@@ -300,7 +297,7 @@ void SoundGrain::Initialize(SoundGrainParams params) {
   active = true;
 }
 
-stereo_val SoundGrain::Generate(int nom, std::vector<double> &audio_buffer) {
+stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
   stereo_val out = {0., 0.};
   if (!active) return out;
 
@@ -335,7 +332,6 @@ stereo_val SoundGrain::Generate(int nom, std::vector<double> &audio_buffer) {
 void Looper::ImportFile(std::string filename) {
   AudioBufferDetails deetz = ImportFileContents(audio_buffer_, filename);
   num_channels_ = deetz.num_channels;
-  number_of_frames_ = audio_buffer_.size() / num_channels_;
   SetLoopLen(1);
 }
 
@@ -356,7 +352,7 @@ void Looper::SetGrainDensity(int gps) {
   std::cout << " TIME B4 NEXT GRAIN:" << grain_spacing_frames_ << std::endl;
 }
 
-void Looper::SetAudioBufferReadIdx(int pos) {
+void Looper::SetAudioBufferReadIdx(size_t pos) {
   if (pos < 0 || pos >= audio_buffer_.size()) {
     return;
   }
@@ -407,8 +403,6 @@ void Looper::SetLoopLen(double bars) {
   }
 }
 
-void Looper::SetGateMode(bool b) { gate_mode_ = b; }
-
 void Looper::SetDegradeBy(int degradation) {
   if (degradation >= 0 && degradation <= 100) degrade_by_ = degradation;
 }
@@ -434,9 +428,7 @@ void Looper::SetParam(std::string name, double val) {
     SetIncrSpeed(val);
   else if (name == "mode") {
     SetLoopMode(val);
-  } else if (name == "gate_mode")
-    SetGateMode(val);
-  else if (name == "idx") {
+  } else if (name == "idx") {
     if (val <= 100) {
       double pos = audio_buffer_.size() / 100 * val;
       SetAudioBufferReadIdx(pos);

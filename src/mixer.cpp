@@ -139,7 +139,10 @@ std::string Mixer::StatusEnv() {
          << sg->Status() << ANSI_COLOR_RESET << std::endl;
 
       std::stringstream margin;
-      for (auto c : var_name) margin << " ";
+      size_t len_var = var_name.size();
+      for (size_t i = 0; i < len_var; i++) {
+        margin << " ";
+      }
       margin << "   ";  // for the ' = '
 
       for (int i = 0; i < sg->effects_num; i++) {
@@ -493,7 +496,8 @@ bool Mixer::DelSoundgen(int soundgen_num) {
 }
 
 bool Mixer::IsValidSoundgenNum(int sg_num) {
-  if (sg_num < sound_generators_.size() && sound_generators_[sg_num])
+  if (sg_num < static_cast<int>(sound_generators_.size()) &&
+      sound_generators_[sg_num])
     return true;
 
   return false;
@@ -597,7 +601,7 @@ stereo_val PreviewBuffer::Generate() {
   stereo_val ret = {.0, .0};
   if (!enabled) return ret;
 
-  if (audio_buffer_read_idx < audio_buffer.size()) {
+  if (audio_buffer_read_idx < static_cast<int>(audio_buffer.size())) {
     ret.left = audio_buffer[audio_buffer_read_idx];
     if (num_channels == 1)
       ret.right = ret.left;

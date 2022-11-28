@@ -21,7 +21,7 @@ struct SoundGrain {
   SoundGrain() = default;
   ~SoundGrain() = default;
 
-  stereo_val Generate(int nom, std::vector<double> &audio_buffer);
+  stereo_val Generate(std::vector<double> &audio_buffer);
   void Initialize(SoundGrainParams);
 
   int grain_len_frames{0};
@@ -109,7 +109,6 @@ class Looper : public SoundGenerator {
   int stutter_idx_{0};
 
   bool stop_pending_{false};  // allow eg to stop
-  bool gate_mode_{false};     // use midi to trigger env amp
 
   int degrade_by_{0};  // percent change to drop bits
 
@@ -117,22 +116,17 @@ class Looper : public SoundGenerator {
 
   double incr_speed_{1};
   double cur_midi_idx_{-1};
-  int cur_frame_tick_{-1};
-  int number_of_frames_{0};
-  float idx_incr_{0};
 
  public:
   void ImportFile(std::string filename);
-  void SetGateMode(bool b);
 
   void SetGrainPitch(double pitch);
   void SetIncrSpeed(double speed);
   void SetGrainDuration(int dur);
   void SetGrainDensity(int gps);
-  void SetAudioBufferReadIdx(int position);
+  void SetAudioBufferReadIdx(size_t position);
   void SetGranularSpray(int spray_ms);
   void SetQuasiGrainFudge(int fudgefactor);
-  void SetSelectionMode(unsigned int mode);
   void SetReverseMode(bool b);
   void SetLoopMode(unsigned int m);
   void SetLoopLen(double bars);
