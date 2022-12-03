@@ -14,7 +14,7 @@ class SoundGenerator {
   SoundGenerator();
   virtual ~SoundGenerator() = default;
 
-  virtual stereo_val GenNext(mixer_timing_info tinfo) = 0;
+  virtual StereoVal GenNext(mixer_timing_info tinfo) = 0;
 
   virtual std::string Info() = 0;
   virtual std::string Status() = 0;
@@ -82,7 +82,7 @@ class SoundGenerator {
   int AddReverb();
   int AddWaveshape();
 
-  stereo_val Effector(stereo_val val);
+  StereoVal Effector(StereoVal val);
 
   bool IsSynth();
   bool IsStepper();

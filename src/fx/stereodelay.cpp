@@ -178,8 +178,8 @@ std::string StereoDelay::Status() {
   return ss.str();
 }
 
-stereo_val StereoDelay::Process(stereo_val input) {
-  stereo_val output = {};
+StereoVal StereoDelay::Process(StereoVal input) {
+  StereoVal output = {};
   ProcessAudio(&input.left, &input.right, &output.left, &output.right);
   return output;
 }

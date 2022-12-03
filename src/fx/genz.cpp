@@ -19,7 +19,7 @@ std::string GenZ::Status() {
   return ss.str();
 }
 
-stereo_val GenZ::Process(stereo_val input) {
+StereoVal GenZ::Process(StereoVal input) {
   // do something
   signal_ = scale(counter_, 0, loop_len_in_frames_ * rate_, 0, 1);
   counter_++;

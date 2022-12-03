@@ -39,7 +39,7 @@ std::string FilterPass::Status() {
   return ss.str();
 }
 
-stereo_val FilterPass::Process(stereo_val input) {
+StereoVal FilterPass::Process(StereoVal input) {
   double lfo1_val = 0.0;
   double lfo2_val = 0.0;
 

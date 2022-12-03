@@ -202,7 +202,7 @@ std::string DynamicsProcessor::Status() {
   return ss.str();
 }
 
-stereo_val DynamicsProcessor::Process(stereo_val input) {
+StereoVal DynamicsProcessor::Process(StereoVal input) {
   // double inputgain = pow(10.0, m_inputgain_db / 20.0);
   double outputgain = pow(10.0, m_outputgain_db_ / 20.0);
 

@@ -17,8 +17,8 @@ std::string Distortion::Status() {
   return ss.str();
 }
 
-stereo_val Distortion::Process(stereo_val input) {
-  stereo_val out = {};
+StereoVal Distortion::Process(StereoVal input) {
+  StereoVal out = {};
 
   if (input.left >= 0)
     out.left = fmin(input.left, m_threshold_);

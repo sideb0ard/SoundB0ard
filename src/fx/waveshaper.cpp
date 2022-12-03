@@ -22,8 +22,8 @@ std::string WaveShaper::Status() {
   return ss.str();
 }
 
-stereo_val WaveShaper::Process(stereo_val input) {
-  stereo_val out = {};
+StereoVal WaveShaper::Process(StereoVal input) {
+  StereoVal out = {};
   out.left = ProcessAudio(input.left);
   out.right = ProcessAudio(input.right);
 

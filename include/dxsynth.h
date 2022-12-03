@@ -91,7 +91,7 @@ class DXSynth : public SoundGenerator {
  public:
   DXSynth();
   ~DXSynth() = default;
-  stereo_val GenNext(mixer_timing_info tinfo) override;
+  StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Info() override;
   std::string Status() override;
   void start() override;

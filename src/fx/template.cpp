@@ -18,7 +18,7 @@ std::string Template::Status() {
   return ss.str();
 }
 
-stereo_val Template::Process(stereo_val input) {
+StereoVal Template::Process(StereoVal input) {
   // do something
   return input;
 }

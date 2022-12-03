@@ -43,7 +43,7 @@ DrumSampler::DrumSampler(std::string filename) {
   is_playing = false;
 }
 
-stereo_val DrumSampler::GenNext(mixer_timing_info tinfo) {
+StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
   (void)tinfo;
 
   double left_val = 0;
@@ -85,7 +85,7 @@ stereo_val DrumSampler::GenNext(mixer_timing_info tinfo) {
   double pan_right = 0.707;
   calculate_pan_values(pan, &pan_left, &pan_right);
 
-  stereo_val out = {.left = left_val * out_vol * pan_left,
+  StereoVal out = {.left = left_val * out_vol * pan_left,
                     .right = right_val * out_vol * pan_right};
   out = Effector(out);
   return out;

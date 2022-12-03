@@ -26,7 +26,7 @@ struct PreviewBuffer {
   int audio_buffer_read_idx{};
   bool enabled{};
 
-  stereo_val Generate();
+  StereoVal Generate();
   // void ImportFile(std::string filename);
 };
 
@@ -63,7 +63,7 @@ struct Mixer {
       {};  // TODO get rid of this version
   std::vector<audio_action_queue_item> _delayed_action_items = {};
 
-  stereo_val soundgen_cur_val[MAX_NUM_SOUND_GENERATORS] = {};
+  StereoVal soundgen_cur_val[MAX_NUM_SOUND_GENERATORS] = {};
   double soundgen_volume[MAX_NUM_SOUND_GENERATORS] = {};
 
   int soloed_sound_generator_idx{-1};

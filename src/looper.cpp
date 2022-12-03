@@ -164,8 +164,8 @@ void Looper::SwitchXFadeGrains() {
   }
 }
 
-stereo_val Looper::GenNext(mixer_timing_info tinfo) {
-  stereo_val val = {0., 0.};
+StereoVal Looper::GenNext(mixer_timing_info tinfo) {
+  StereoVal val = {0., 0.};
   if (!started_ || !active) return val;
 
   if (stop_pending_ && eg_.m_state == OFFF) active = false;
@@ -190,8 +190,8 @@ stereo_val Looper::GenNext(mixer_timing_info tinfo) {
     LaunchGrain(incoming_grain_, tinfo);
   }
 
-  stereo_val active_val = active_grain_->Generate(audio_buffer_);
-  stereo_val incoming_val = incoming_grain_->Generate(audio_buffer_);
+  StereoVal active_val = active_grain_->Generate(audio_buffer_);
+  StereoVal incoming_val = incoming_grain_->Generate(audio_buffer_);
 
   if (xfader_active_) {
     double incoming_vol = xfader_.Generate();
@@ -297,8 +297,8 @@ void SoundGrain::Initialize(SoundGrainParams params) {
   active = true;
 }
 
-stereo_val SoundGrain::Generate(std::vector<double> &audio_buffer) {
-  stereo_val out = {0., 0.};
+StereoVal SoundGrain::Generate(std::vector<double> &audio_buffer) {
+  StereoVal out = {0., 0.};
   if (!active) return out;
 
   if (degrade_by > 0) {

@@ -46,7 +46,7 @@ std::string Envelope::Status() {
   return ss.str();
 }
 
-stereo_val Envelope::Process(stereo_val input) {
+StereoVal Envelope::Process(StereoVal input) {
   double env_out = eg_.DoEnvelope(NULL);
   input.left *= env_out;
   input.right *= env_out;

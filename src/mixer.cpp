@@ -445,7 +445,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     timing_info.cur_sample++;
 
     if (preview.enabled) {
-      stereo_val preview_audio = preview.Generate();
+      StereoVal preview_audio = preview.Generate();
       output_left += preview_audio.left * 0.6;
       output_right += preview_audio.right * 0.6;
     }
@@ -597,8 +597,8 @@ void Mixer::PreviewAudio(audio_action_queue_item action) {
   }
 }
 
-stereo_val PreviewBuffer::Generate() {
-  stereo_val ret = {.0, .0};
+StereoVal PreviewBuffer::Generate() {
+  StereoVal ret = {.0, .0};
   if (!enabled) return ret;
 
   if (audio_buffer_read_idx < static_cast<int>(audio_buffer.size())) {

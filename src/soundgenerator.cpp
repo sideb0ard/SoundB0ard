@@ -174,7 +174,7 @@ int SoundGenerator::AddEnvelope() {
   return AddFx((Fx *)e);
 }
 
-stereo_val SoundGenerator::Effector(stereo_val val) {
+StereoVal SoundGenerator::Effector(StereoVal val) {
   int num_fx = effects_num.load();
   for (int i = 0; i < num_fx; i++) {
     Fx *f = effects[i];

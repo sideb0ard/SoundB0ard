@@ -108,7 +108,7 @@ double ModDelay::CalculateDelayOffset(double lfo_sample) {
   return 0.0;  // shouldn't happen
 }
 
-stereo_val ModDelay::ProcessAudio(stereo_val input) {
+StereoVal ModDelay::ProcessAudio(StereoVal input) {
   double yn = 0;
   double yqn = 0;
   yn = m_lfo_.DoOscillate(&yqn);
@@ -124,7 +124,7 @@ stereo_val ModDelay::ProcessAudio(stereo_val input) {
   m_ddl_.m_delay_ms = delay;
   m_ddl_.Update();
 
-  stereo_val out;
+  StereoVal out;
   m_ddl_.ProcessAudio(&input.left, &out.left);
   m_ddl_.ProcessAudio(&input.right, &out.right);
 
@@ -143,7 +143,7 @@ std::string ModDelay::Status() {
   return ss.str();
 }
 
-stereo_val ModDelay::Process(stereo_val input) { return ProcessAudio(input); }
+StereoVal ModDelay::Process(StereoVal input) { return ProcessAudio(input); }
 
 void ModDelay::SetDepth(double val) {
   if (val >= 0 && val <= 100)

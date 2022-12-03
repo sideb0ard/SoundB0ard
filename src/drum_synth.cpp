@@ -63,9 +63,9 @@ DrumSynth::DrumSynth() {
   active = true;
 }
 
-stereo_val DrumSynth::GenNext(mixer_timing_info tinfo) {
+StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   frames_per_midi_tick_ = tinfo.frames_per_midi_tick;
-  stereo_val out = {.left = 0, .right = 0};
+  StereoVal out = {.left = 0, .right = 0};
   if (!active) return out;
 
   if (osc1.m_note_on) {

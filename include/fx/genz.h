@@ -7,7 +7,7 @@ class GenZ : Fx {
  public:
   GenZ();
   std::string Status() override;
-  stereo_val Process(stereo_val input) override;
+  StereoVal Process(StereoVal input) override;
   void SetParam(std::string name, double val) override;
   void EventNotify(broadcast_event event, mixer_timing_info tinfo) override;
 

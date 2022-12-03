@@ -105,8 +105,8 @@ void ModFilter::CalculateRightLpfCoeffs(double cutoff_freq, double q) {
   m_right_lpf_.m_b2 = 2.0 * beta;
 }
 
-stereo_val ModFilter::Process(stereo_val in) {
-  stereo_val out = {};
+StereoVal ModFilter::Process(StereoVal in) {
+  StereoVal out = {};
 
   double yn = 0.0;
   double yqn = 0;  // quad phase

@@ -55,8 +55,8 @@ SBSynth::SBSynth() {
   active = true;
 }
 
-stereo_val SBSynth::GenNext(mixer_timing_info tinfo) {
-  stereo_val out = {.left = 0, .right = 0};
+StereoVal SBSynth::GenNext(mixer_timing_info tinfo) {
+  StereoVal out = {.left = 0, .right = 0};
   if (!active) return out;
 
   if (m_car_osc.m_note_on) {

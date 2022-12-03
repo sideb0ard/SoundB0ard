@@ -194,9 +194,9 @@ std::string DXSynth::Info() {
   return ss.str();
 }
 
-stereo_val DXSynth::GenNext(mixer_timing_info tinfo) {
+StereoVal DXSynth::GenNext(mixer_timing_info tinfo) {
   (void)tinfo;
-  if (!active) return (stereo_val){0, 0};
+  if (!active) return (StereoVal){0, 0};
 
   double accum_out_left = 0.0;
   double accum_out_right = 0.0;
@@ -219,7 +219,7 @@ stereo_val DXSynth::GenNext(mixer_timing_info tinfo) {
   double pan_right = 0.707;
   calculate_pan_values(pan, &pan_left, &pan_right);
 
-  stereo_val out = {.left = accum_out_left * volume * pan_left,
+  StereoVal out = {.left = accum_out_left * volume * pan_left,
                     .right = accum_out_right * volume * pan_right};
   out = Effector(out);
   return out;

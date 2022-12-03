@@ -28,7 +28,7 @@ class Fx {
   Fx() = default;
   virtual ~Fx() = default;
   virtual std::string Status() = 0;
-  virtual stereo_val Process(stereo_val input) = 0;
+  virtual StereoVal Process(StereoVal input) = 0;
   virtual void SetParam(std::string name, double val) = 0;
 
   virtual void EventNotify(broadcast_event event, mixer_timing_info tinfo);

@@ -48,7 +48,7 @@ std::string Decimate::Status() {
   return ss.str();
 }
 
-stereo_val Decimate::Process(stereo_val input) {
+StereoVal Decimate::Process(StereoVal input) {
   if (samples_left--) {
     return input;
   } else {
@@ -58,7 +58,7 @@ stereo_val Decimate::Process(stereo_val input) {
         (int)((1 + (big_divisor * 1024.)) * (1.0 - sample_hold_freq));
   }
 
-  stereo_val output;
+  StereoVal output;
   bit1 += destroy(quantize(bit1, bitres), destruct);  // accumulating
   bit2 += destroy(quantize(bit2, bitres), destruct);
 

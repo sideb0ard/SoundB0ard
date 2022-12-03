@@ -10,7 +10,7 @@ class ModDelay : Fx {
  public:
   ModDelay();
   std::string Status() override;
-  stereo_val Process(stereo_val input) override;
+  StereoVal Process(StereoVal input) override;
   void SetParam(std::string name, double val) override;
 
  private:
@@ -21,7 +21,7 @@ class ModDelay : Fx {
   void CookModType();
   double CalculateDelayOffset(double lfo_sample);
   bool PrepareForPlay();
-  stereo_val ProcessAudio(stereo_val input);
+  StereoVal ProcessAudio(StereoVal input);
 
   void SetDepth(double val);
   void SetRate(double val);

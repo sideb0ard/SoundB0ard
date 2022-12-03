@@ -257,10 +257,10 @@ typedef struct pattern_change_info {
   bool temporary;
 } pattern_change_info;
 
-typedef struct stereo_val {
+typedef struct StereoVal {
   double left;
   double right;
-} stereo_val;
+} StereoVal;
 
 enum {
   INTERNAL_SYNTH,

@@ -21,7 +21,7 @@ std::string BitCrush::Status() {
   return ss.str();
 }
 
-stereo_val BitCrush::Process(stereo_val input) {
+StereoVal BitCrush::Process(StereoVal input) {
   phasor_ += sample_hold_freq_;
   if (phasor_ >= 1) {
     phasor_ -= 1;

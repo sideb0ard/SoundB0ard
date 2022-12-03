@@ -41,7 +41,7 @@ Reverb::Reverb() {
   enabled_ = true;
 }
 
-stereo_val Reverb::Process(stereo_val in) {
+StereoVal Reverb::Process(StereoVal in) {
   double input_sample = in.left + in.right * 0.5;
 
   double pre_delay_out = 0;
@@ -93,7 +93,7 @@ stereo_val Reverb::Process(stereo_val in) {
   double apf_4_out = 0;
   delay_apf_process_audio(&m_output_apf_4, &damping_lpf_2_out, &apf_4_out);
 
-  stereo_val out = {};
+  StereoVal out = {};
   out.left = ((100.0 - m_wet_pct) / 100.0) * input_sample +
              (m_wet_pct / 100.0) * (apf_3_out);
 
