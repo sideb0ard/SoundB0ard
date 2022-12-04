@@ -257,10 +257,17 @@ typedef struct pattern_change_info {
   bool temporary;
 } pattern_change_info;
 
-typedef struct StereoVal {
+struct StereoVal {
   double left;
   double right;
-} StereoVal;
+
+  StereoVal operator+(StereoVal const &obj) {
+    StereoVal res;
+    res.left = left + obj.left;
+    res.right = right + obj.right;
+    return res;
+  }
+};
 
 enum {
   INTERNAL_SYNTH,

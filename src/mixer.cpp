@@ -318,7 +318,7 @@ void Mixer::EmitEvent(broadcast_event event) {
   process_event_queue.push(ev);
 
   for (auto sg : sound_generators_) {
-    sg->eventNotify(event, timing_info);
+    sg->EventNotify(event, timing_info);
     if (sg->effects_num > 0) {
       for (int j = 0; j < sg->effects_num; j++) {
         if (sg->effects[j]) {

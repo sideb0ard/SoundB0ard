@@ -54,7 +54,7 @@ class Looper : public SoundGenerator {
   std::string Info() override;
   void start() override;
   void stop() override;
-  void eventNotify(broadcast_event event, mixer_timing_info tinfo) override;
+  void EventNotify(broadcast_event event, mixer_timing_info tinfo) override;
   void noteOn(midi_event ev) override;
   void noteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
@@ -117,6 +117,9 @@ class Looper : public SoundGenerator {
   double incr_speed_{1};
   double cur_midi_idx_{-1};
 
+  double plooplen_{16};
+  double poffset_{0};
+
  public:
   void ImportFile(std::string filename);
 
@@ -137,6 +140,9 @@ class Looper : public SoundGenerator {
 
   void SetGrainSlopePct(int percent);
   void SetDegradeBy(int degradation);
+
+  void SetPOffset(int poffset);
+  void SetPlooplen(int plooplen);
 };
 
 }  // namespace SBAudio

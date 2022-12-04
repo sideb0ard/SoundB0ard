@@ -71,7 +71,7 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo) {
   }
 }
 
-void SoundGenerator::eventNotify(broadcast_event event,
+void SoundGenerator::EventNotify(broadcast_event event,
                                  mixer_timing_info tinfo) {
   (void)event;
 }

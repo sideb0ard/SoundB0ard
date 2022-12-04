@@ -33,6 +33,8 @@ double parabolic_sine(double x, bool highprecision);
 // new_min, new_max
 double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
                  double cur_val);
+// this is the same as scaleybum but i've come around to having the cur_val
+// first.
 double scale(double cur_val, double cur_min, double cur_max, double new_min,
              double new_max);
 double wrap(double cur_val, double min_val, double max_val);

@@ -46,11 +46,10 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   start();
 }
 
-void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
-  SoundGenerator::eventNotify(event, tinfo);
+void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
+  SoundGenerator::EventNotify(event, tinfo);
 
   if (!started_ && tinfo.is_start_of_loop) {
-    std::cout << "LETS START!\n";
     started_ = true;
     LaunchGrain(active_grain_, tinfo);
   }
@@ -65,12 +64,21 @@ void Looper::eventNotify(broadcast_event event, mixer_timing_info tinfo) {
       if (reverse_mode_)
         new_read_idx = (audio_buffer_.size() - 1) - new_read_idx;
 
+      // std::cout << "READIDX: " << new_read_idx << std::endl;
+      new_read_idx =
+          fmodf((fmodf(new_read_idx, size_of_sixteenth_ * plooplen_) +
+                 poffset_ * size_of_sixteenth_),
+                audio_buffer_.size());
+      // std::cout << "PLOOPED READIDX: " << new_read_idx << std::endl;
+
       // this ensures new_read_idx is even
       if (num_channels_ == 2) new_read_idx -= ((int)new_read_idx & 1);
 
       audio_buffer_read_idx_ = new_read_idx;
+
       int rel_pos_within_a_sixteenth =
           fmod(audio_buffer_read_idx_, size_of_sixteenth_);
+
       if (scramble_mode_) {
         audio_buffer_read_idx_ =
             (scramble_idx_ * size_of_sixteenth_) + rel_pos_within_a_sixteenth;
@@ -176,11 +184,9 @@ StereoVal Looper::GenNext(mixer_timing_info tinfo) {
   }
 
   if (tinfo.cur_sample == start_xfade_at_frame_time_) {
-    // std::cout << "START XFADE:" << tinfo.cur_sample << "\n";
     xfader_active_ = true;
   }
   if (tinfo.cur_sample == stop_xfade_at_frame_time_) {
-    // std::cout << "STOP XFADE // SWITCH GRAINS:" << tinfo.cur_sample << "\n";
     SwitchXFadeGrains();
     xfader_active_ = false;
     xfader_.Reset(xfade_time_in_frames_);
@@ -196,14 +202,11 @@ StereoVal Looper::GenNext(mixer_timing_info tinfo) {
   if (xfader_active_) {
     double incoming_vol = xfader_.Generate();
     double active_vol = 1.0 - incoming_vol;
-    // std::cout << "INCOMING VOL:" << incoming_vol << " ACTIVE:" << active_vol
-    //           << std::endl;
 
     val.left = active_val.left * active_vol + incoming_val.left * incoming_vol;
     val.right =
         active_val.right * active_vol + incoming_val.right * incoming_vol;
   } else {
-    // std::cout << " PLAYBACK FULL\n";
     val.left = active_val.left;
     val.right = active_val.right;
   }
@@ -249,7 +252,8 @@ std::string Looper::Info() {
      << " mode:" << kLoopModeNames[loop_mode_]
      << "\ngrain_dur_ms:" << grain_duration_frames_
      << " grains_per_sec:" << grains_per_sec_
-     << " quasi_grain_fudge:" << quasi_grain_fudge_
+     << " quasi_grain_fudge:" << quasi_grain_fudge_ << " poffset:" << poffset_
+     << " plooplen:" << plooplen_
      << "\ngrain_spray_ms:" << granular_spray_frames_ / 44.1
      << " attack:" << eg_.m_attack_time_msec
      << " decay:" << eg_.m_decay_time_msec
@@ -417,6 +421,18 @@ void Looper::noteOff(midi_event ev) {
   eg_.NoteOff();
 }
 
+void Looper::SetPOffset(int poffset) {
+  if (poffset >= 0 && poffset <= 15) {
+    poffset_ = poffset;
+  }
+}
+
+void Looper::SetPlooplen(int plooplen) {
+  if (plooplen > 0 && plooplen <= 16) {
+    plooplen_ = plooplen;
+  }
+}
+
 void Looper::SetParam(std::string name, double val) {
   if (name == "on") {
     eg_.StartEg();
@@ -430,11 +446,15 @@ void Looper::SetParam(std::string name, double val) {
     SetLoopMode(val);
   } else if (name == "idx") {
     if (val <= 100) {
-      double pos = audio_buffer_.size() / 100 * val;
+      double pos = audio_buffer_.size() / 100. * val;
       SetAudioBufferReadIdx(pos);
     }
   } else if (name == "len")
     SetLoopLen(val);
+  else if (name == "poffset")
+    SetPOffset(val);
+  else if (name == "plooplen")
+    SetPlooplen(val);
   else if (name == "scramble")
     SetScramblePending();
   else if (name == "stutter")
