@@ -26,6 +26,7 @@ constexpr char BREAK_OBJ[] = "BREAK";
 constexpr char FORLOOP_OBJ[] = "FOR LOOP";
 constexpr char FUNCTION_OBJ[] = "FUNCTION";
 constexpr char GENERATOR_OBJ[] = "GENERATOR";
+constexpr char PHASOR_OBJ[] = "PHASOR";
 
 constexpr char STRING_OBJ[] = "STRING";
 
@@ -204,6 +205,17 @@ class Environment {
 };
 
 /////////////////////////////////////////////////
+
+class Phasor : public Object {
+ public:
+  Phasor(int frequency) : frequency_{frequency} {};
+  ~Phasor() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
+
+ public:
+  int frequency_;
+};
 
 class Function : public Object {
  public:

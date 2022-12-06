@@ -153,6 +153,17 @@ class FunctionLiteral : public Expression {
   std::shared_ptr<BlockStatement> body_{nullptr};
 };
 
+class PhasorLiteral : public Expression {
+ public:
+  PhasorLiteral() {}
+  explicit PhasorLiteral(Token token) : Expression{token} {}
+
+  std::string String() const override;
+
+ public:
+  std::shared_ptr<Expression> frequency_{nullptr};
+};
+
 class GeneratorLiteral : public Expression {
  public:
   GeneratorLiteral() {}

@@ -532,6 +532,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
     return ParseIfExpression();
   else if (cur_token_.type_ == token::SLANG_FUNCTION)
     return ParseFunctionLiteral();
+  else if (cur_token_.type_ == token::SLANG_PHASOR)
+    return ParsePhasorLiteral();
   else if (cur_token_.type_ == token::SLANG_GENERATOR)
     return ParseGeneratorLiteral();
   else if (cur_token_.type_ == token::SLANG_GRANULAR ||
@@ -687,6 +689,14 @@ std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral() {
 
   lit->body_ = ParseBlockStatement();
 
+  return lit;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParsePhasorLiteral() {
+  std::cout << "PARSLEY PHASOR\n";
+  auto lit = std::make_shared<ast::PhasorLiteral>(cur_token_);
+  if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
+  lit->frequency_ = ParseExpression(Precedence::LOWEST);
   return lit;
 }
 

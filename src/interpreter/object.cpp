@@ -175,6 +175,12 @@ Error::Error(std::string err_msg) : message_{err_msg} {}
 std::string Error::Inspect() { return "ERROR: " + message_; }
 ObjectType Error::Type() { return ERROR_OBJ; }
 
+ObjectType Phasor::Type() { return PHASOR_OBJ; }
+std::string Phasor::Inspect() {
+  std::stringstream reply;
+  reply << "phasor. freq:" << frequency_;
+  return reply.str();
+}
 ObjectType Function::Type() { return FUNCTION_OBJ; }
 std::string Function::Inspect() {
   std::stringstream params;

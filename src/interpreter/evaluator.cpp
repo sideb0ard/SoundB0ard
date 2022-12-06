@@ -370,6 +370,18 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     return EvalIdentifier(ident, env);
   }
 
+  std::shared_ptr<ast::PhasorLiteral> ph =
+      std::dynamic_pointer_cast<ast::PhasorLiteral>(node);
+  if (ph) {
+    std::cout << "GOT A PHASOR!\n";
+    auto val = Eval(ph->frequency_, env);
+    auto int_obj = std::dynamic_pointer_cast<object::Number>(val);
+    if (int_obj) {
+      std::cout << "Oh, we good!- freq is " << int_obj->value_ << "\n";
+      return std::make_shared<object::Phasor>(int_obj->value_);
+    }
+  }
+
   std::shared_ptr<ast::FunctionLiteral> fn =
       std::dynamic_pointer_cast<ast::FunctionLiteral>(node);
   if (fn) {

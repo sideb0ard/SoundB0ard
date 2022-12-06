@@ -219,6 +219,13 @@ std::string EveryExpression::String() const {
   return ss.str();
 }
 
+std::string PhasorLiteral::String() const {
+  std::stringstream ss;
+
+  ss << frequency_;
+  return ss.str();
+}
+
 std::string FunctionLiteral::String() const {
   std::stringstream ss;
 
