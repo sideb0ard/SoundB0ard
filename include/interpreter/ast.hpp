@@ -175,6 +175,7 @@ class GeneratorLiteral : public Expression {
   std::vector<std::shared_ptr<Identifier>> parameters_;
   std::shared_ptr<BlockStatement> setup_{nullptr};
   std::shared_ptr<BlockStatement> run_{nullptr};
+  std::shared_ptr<BlockStatement> signal_generator_{nullptr};
 };
 
 class PatternExpression : public Expression {

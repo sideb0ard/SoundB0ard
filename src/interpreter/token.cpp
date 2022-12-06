@@ -43,6 +43,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"sample", SLANG_SAMPLE},
     {"set", SLANG_SET},
     {"setup", SLANG_GENERATOR_SETUP},
+    {"signal_generator", SLANG_GENERATOR_SIGNAL_GENERATOR},
     {"strategy", SLANG_STRATEGY},
     {"true", SLANG_TRUE},
     {"vel", SLANG_VELOCITY},

@@ -411,8 +411,10 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     auto params = gn->parameters_;
     auto setup = gn->setup_;
     auto run = gn->run_;
+    auto signal_generator = gn->signal_generator_;
     auto new_env = std::make_shared<object::Environment>(env);
-    auto gen = std::make_shared<object::Generator>(params, new_env, setup, run);
+    auto gen = std::make_shared<object::Generator>(params, new_env, setup, run,
+                                                   signal_generator);
     Eval(gen->setup_, gen->env_);
     return gen;
   }
@@ -1109,6 +1111,21 @@ std::shared_ptr<object::Object> ApplyGeneratorRun(
     // func->env_ = ExtendFunctionEnv(func, args);
     auto evaluated = Eval(gen->run_, gen->env_);
     return UnwrapReturnValue(evaluated);
+  }
+
+  return NewError("Something stinky wit yer GENERaTOR , mate!");
+}
+
+std::shared_ptr<object::Object> ApplyGeneratorSignalGenerator(
+    std::shared_ptr<object::Object> callable) {
+  std::shared_ptr<object::Generator> gen =
+      std::dynamic_pointer_cast<object::Generator>(callable);
+  if (gen) {
+    // func->env_ = ExtendFunctionEnv(func, args);
+    if (gen->signal_generator_) {
+      auto evaluated = Eval(gen->signal_generator_, gen->env_);
+      return UnwrapReturnValue(evaluated);
+    }
   }
 
   return NewError("Something stinky wit yer GENERaTOR , mate!");

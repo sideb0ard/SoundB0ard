@@ -175,6 +175,13 @@ Error::Error(std::string err_msg) : message_{err_msg} {}
 std::string Error::Inspect() { return "ERROR: " + message_; }
 ObjectType Error::Type() { return ERROR_OBJ; }
 
+double Phasor::Generate() {
+  signal_ = scale(counter_, 0, frequency_, 0, 1);
+  counter_++;
+  if (counter_ == frequency_) counter_ = 0;
+  return signal_;
+}
+
 ObjectType Phasor::Type() { return PHASOR_OBJ; }
 std::string Phasor::Inspect() {
   std::stringstream reply;

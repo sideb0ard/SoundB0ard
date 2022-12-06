@@ -213,8 +213,13 @@ class Phasor : public Object {
   ObjectType Type() override;
   std::string Inspect() override;
 
+ private:
+  int frequency_{0};  // how often this will be called
+  double signal_{0};  // return value
+  int counter_{0};    // internal counter
+
  public:
-  int frequency_;
+  double Generate();
 };
 
 class Function : public Object {
@@ -272,13 +277,19 @@ class Pattern : public Object {
                    int target_start, int target_end);
 };
 
+// TODO - rename to ProcessGenerator
 class Generator : public Object {
  public:
   Generator(std::vector<std::shared_ptr<ast::Identifier>> parameters,
             std::shared_ptr<Environment> env,
             std::shared_ptr<ast::BlockStatement> setup,
-            std::shared_ptr<ast::BlockStatement> run)
-      : parameters_{parameters}, env_{env}, setup_{setup}, run_{run} {};
+            std::shared_ptr<ast::BlockStatement> run,
+            std::shared_ptr<ast::BlockStatement> signal_generator = nullptr)
+      : parameters_{parameters},
+        env_{env},
+        setup_{setup},
+        run_{run},
+        signal_generator_{signal_generator} {};
   ~Generator() = default;
   ObjectType Type() override;
   std::string Inspect() override;
@@ -288,6 +299,7 @@ class Generator : public Object {
   std::shared_ptr<Environment> env_;
   std::shared_ptr<ast::BlockStatement> setup_;
   std::shared_ptr<ast::BlockStatement> run_;
+  std::shared_ptr<ast::BlockStatement> signal_generator_;
 };
 
 class ForLoop : public Object {

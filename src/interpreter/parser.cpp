@@ -728,6 +728,16 @@ std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral() {
 
   lit->run_ = ParseBlockStatement();
 
+  if (PeekTokenIs(token::SLANG_GENERATOR_SIGNAL_GENERATOR)) {
+    std::cout << "WUFF< GOT A SIGNAL GEN!\n";
+    NextToken();
+    if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
+    if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
+    if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
+
+    lit->signal_generator_ = ParseBlockStatement();
+  }
+
   return lit;
 }
 
