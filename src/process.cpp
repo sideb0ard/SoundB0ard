@@ -114,29 +114,31 @@ void Process::EventNotify(mixer_timing_info tinfo) {
     if (pattern_obj->Type() == "GENERATOR") {
       auto gen_obj = std::dynamic_pointer_cast<object::Generator>(pattern_obj);
       if (gen_obj) {
-        if (tinfo.is_start_of_loop) {
-          auto pattern_obj = evaluator::ApplyGeneratorRun(gen_obj);
-          auto pattern_string =
-              std::dynamic_pointer_cast<object::String>(pattern_obj);
-          if (pattern_string) {
-            pattern_ = pattern_string->value_;
-            ParsePattern();
+        if (tinfo.is_midi_tick) {
+          if (tinfo.is_start_of_loop) started_ = true;
+          if (started_) {
+            auto pattern_obj =
+                evaluator::ApplyGeneratorSignalGenerator(gen_obj);
+            auto pattern_string =
+                std::dynamic_pointer_cast<object::String>(pattern_obj);
+            if (pattern_string) {
+              pattern_ = pattern_string->value_;
+              ParsePattern();
+            }
           }
-        } else if (tinfo.is_midi_tick) {
-          auto pattern_obj = evaluator::ApplyGeneratorSignalGenerator(gen_obj);
-          auto pattern_string =
-              std::dynamic_pointer_cast<object::String>(pattern_obj);
-          if (pattern_string) {
-            pattern_ = pattern_string->value_;
-            ParsePattern();
+          if (tinfo.is_start_of_loop) {
+            auto pattern_obj = evaluator::ApplyGeneratorRun(gen_obj);
+            auto pattern_string =
+                std::dynamic_pointer_cast<object::String>(pattern_obj);
+            if (pattern_string) {
+              pattern_ = pattern_string->value_;
+              ParsePattern();
+            }
           }
         }
       }
     }
   }
-  // if (tinfo.is_midi_tick && pattern_expression_) {
-  //   auto new_env = std::make_shared<object::Environment>(global_env);
-  // }
 
   // PATTERN_PROCESS i.e. '#' or '$'
   if (process_type_ == PATTERN_PROCESS) {
