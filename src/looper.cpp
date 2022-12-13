@@ -65,10 +65,10 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
         new_read_idx = (audio_buffer_.size() - 1) - new_read_idx;
 
       // std::cout << "READIDX: " << new_read_idx << std::endl;
-      new_read_idx =
-          fmodf((fmodf(new_read_idx, size_of_sixteenth_ * plooplen_) +
-                 poffset_ * size_of_sixteenth_),
-                audio_buffer_.size());
+      new_read_idx = fmodf(
+          (fmodf(new_read_idx, size_of_sixteenth_ * plooplen_ * loop_len_) +
+           poffset_ * size_of_sixteenth_),
+          audio_buffer_.size());
       // std::cout << "PLOOPED READIDX: " << new_read_idx << std::endl;
 
       // this ensures new_read_idx is even

@@ -1307,16 +1307,18 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto upper_val =
                  std::dynamic_pointer_cast<object::Number>(args[2]);
              if (length && lower_val && upper_val) {
-               // not dealing with error, just return
-               if (lower_val->value_ >= upper_val->value_)
-                 return evaluator::NULLL;
+               int low = lower_val->value_;
+               int hi = upper_val->value_;
+               if (low > hi) {
+                 int tmp = low;
+                 low = hi;
+                 hi = tmp;
+               }
 
                auto return_array = std::make_shared<object::Array>(
                    std::vector<std::shared_ptr<object::Object>>());
                for (int i = 0; i < length->value_; i++) {
-                 auto rand_number =
-                     rand() % (int)(upper_val->value_ - lower_val->value_ + 1) +
-                     lower_val->value_;
+                 auto rand_number = rand() % (int)(hi - low + 1) + low;
                  auto num_obj = std::make_shared<object::Number>(rand_number);
                  return_array->elements_.push_back(num_obj);
                }
