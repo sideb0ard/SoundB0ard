@@ -50,6 +50,12 @@ StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
   double right_val = 0;
   if (!is_playing) return {left_val, right_val};
 
+  double amp_env = eg.DoEnvelope(NULL);
+  if (amp_env == 0) {
+    is_playing = false;
+    return {left_val, right_val};
+  }
+
   double amp = scaleybum(0, 127, 0, 1, velocity);
   left_val += buffer[play_idx] * amp;
 
@@ -75,8 +81,6 @@ StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
     }
   }
 
-  double amp_env = eg.DoEnvelope(NULL);
-
   float out_vol = volume * amp_env;
 
   pan = fmin(pan, 1.0);
@@ -86,7 +90,7 @@ StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
   calculate_pan_values(pan, &pan_left, &pan_right);
 
   StereoVal out = {.left = left_val * out_vol * pan_left,
-                    .right = right_val * out_vol * pan_right};
+                   .right = right_val * out_vol * pan_right};
   out = Effector(out);
   return out;
 }
@@ -133,7 +137,7 @@ void DrumSampler::noteOn(midi_event ev) {
   eg.StartEg();
 }
 
-void DrumSampler::noteOff(midi_event ev) { is_playing = false; }
+void DrumSampler::noteOff(midi_event ev) { eg.StopEg(); }
 
 void DrumSampler::pitchBend(midi_event ev) {
   float pitch_val = ev.data1 / 10.;

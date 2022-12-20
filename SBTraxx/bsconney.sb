@@ -1,0 +1,44 @@
+# let dub = loop(loops/dubLOOPsnrsz.aiff);
+let sd = sample(sd/dubReverbSnare.aiff);
+let rh = sample(ch/reggaHatz.aiff);
+
+let kk = sample(perc/kk.wav);
+let glz = sample(perc/glitchssz.aiff);
+let don = sample(perc/CrackleDonnaBreath.aiff);
+let kd = sample(hallow/kd6LOO.wav);
+
+let ooh = sample(TT-NOCERA/OOHlong.wav);
+let cp = sample(cp/clapLongReverb.aif);
+
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set dub:on 1;
+    set dub:plooplen 16;
+    if (count % 4 == 3) {
+      cbeat(sd);
+      play_array(rh, rand_array(16, 0, 1), dur=30);
+    }
+    if (count % 8 == 7) {
+      set dub:stutter 1;
+      set dub:plooplen 1;
+    }
+
+    if (count % 4 == 0) {
+      note_on(don, 1, dur = 1000);
+    }
+    if (count % 8 == 2) {
+      #let b = rand_beat();
+      #perky(b, [ooh, kd, kk, glz]);
+      set dub:plooplen 2;
+      note_on_at(cp, 1, 12 * pp, dur = 1000);
+      #play_array(dub, b, dur = 200);
+    }
+  }
+}
+

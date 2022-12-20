@@ -1,0 +1,41 @@
+
+# let scd = loop(loops/scuddubraggableep.aiff); set scd:len 8
+# let scd2 = loop(loops/scuddubraggableep.aiff); set scd2:len 7
+
+let cp = sample(cp/mawClapDelayed.aiff);
+
+let scdblah_gen = gen()
+{
+  setup()
+  {
+    let ploop = 8;
+  }
+  run()
+  {
+    set scd:plooplen ploop;
+    if (count % 2 == 0) {
+      ploop = incr(ploop, 3, 16);
+      set scd2:plooplen ploop;
+      set jjjz:on 1;
+    }
+
+    if (count % 4 == 0) {
+      set scd:stutter 1;
+      set scd2:scramble 1;
+      set jjjz:stutter 1;
+    }
+    if (count % 3 == 0) {
+      set jjjz:scramble 1;
+      set scd:scramble 1;
+      set scd2:stutter 1;
+      cbeat(cp);
+    }
+
+    if (count % 4 == 3) {
+      let beat = rand_beat();
+      play_array(jjjz, beat);
+      #play_array(jbz, invert(beat));
+    }
+  }
+}
+

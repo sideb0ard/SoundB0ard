@@ -1,0 +1,93 @@
+
+#let brk = loop(hallow/brkLOOP.wav);
+#let fd = loop(hallow/fadeout.wav);
+#let hst = loop(dloops/hustlrrrInstrmtal.aif); set hst:len 2
+#let frk = loop(dloops/freekMe.aiff); set frk:len 4;
+#
+#let dx = fm();
+#load_preset(dx, "sawrr");
+#let rf =  [30, 0, 0, 32, 0, 27, 0, 0, 23, 0, 0, 27, 0, 32, 0, 0];
+# let rf =  [45, 0, 0, 45, 0, 45, 0, 45, 0, 45, 0, 0, 45, 0, 45, 0];
+# let rf3 = [0, 38, 0, 38, 38, 0, 38, 38, 0, 38, 0, 38, 38, 0, 38, 38];
+
+# let gs = loop(dloops/garageSWUng.aiff)
+
+# let mo = mooog();
+# load_preset(mo, "louend");
+
+let dec_gen = gen()
+{
+  setup()
+  {
+    let cnt = 0;
+
+    let cntA_inc = 3;
+    let cntB_inc = 4;
+
+    let nlen = 50;
+
+    let ptz = [1, 2, 1.4, 1.5];
+    let ptx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if  ((cnt + i) % cntA_inc == 0) {
+        note_on_at(brk, 1, pp*i, dur = nlen);
+      }
+      if  ((cnt + i) % cntB_inc == 0) {
+        note_on_at(fd, 1, pp*i, dur = nlen * 2);
+      }
+    }
+
+    if (count % 3 == 0) {
+      play_array(dx, rf);
+      set gs:stutter 1;
+    }
+    if (count % 3 == 0) {
+      set brk:stutter 1;
+      set frk:scramble 1;
+    }
+    if (count % 7 == 0) {
+      set brk:scramble 1;
+      set frk:stutter 1;
+      set gs:reverse 0;
+    }
+    if (count % 4 == 0) {
+      set hst:stutter 1;
+      set fd:scramble 1;
+      set gs:reverse 1;
+      play_array(mo, rf3);
+    }
+    cnt = cnt + 16;
+    nlen = nlen + 10;
+    if (nlen > 200) {
+      nlen = 20;
+    }
+
+    ++cntA_inc;
+    vol brk 0.8;
+    if (cntA_inc > 7) {
+      cntA_inc = 3;
+      vol frk 0.7;
+      vol brk 0;
+    }
+    ++cntB_inc;
+    vol hst 0.8;
+    if (cntB_inc > 11 ) {
+      cntB_inc = 4;
+      vol frk 0;
+      vol hst 0;
+    }
+
+    set hst:on 1;
+    if (count % 4 == 3) {
+      let bt = rand_beat();
+      play_array(hst, bt);
+      play_array(brk, invert(bt));
+      set frk:pitch ptz[ptx];
+      ptx = incr(ptx, 0, len(ptz));
+    }
+  }
+}
+

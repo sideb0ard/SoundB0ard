@@ -1,0 +1,54 @@
+let maxx = 8;
+
+let brk_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+
+    if (count % 4 == 0) {
+      set brk:stutter 1;
+      vol mawc 0;
+    }
+    if (count % 3 == 0) {
+      vol mawc 0.8;
+      set brk:scramble 1;
+      set brk:on 1;
+      set mawc:stutter 1;
+    }
+  }
+}
+
+#let momel = [0, 32, 0, 32, 0, 32, 0, 0, 0, 32, 0, 0, 0, 22, 28, 0];
+let momel = [12, 13, 16, 0, 0, 23, 0, 23, 12, 0, 13, 0, 0, 16, 0, 24];
+let moblah_gen = gen()
+{
+  setup()
+  {
+    let mx = 0;
+    let lenn = 10;
+    let ph = phasor(32);
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      for (i = 0; i < 16; ++i) {
+        stepper(mo, momel, mx, i, lenn);
+        lenn = incr(lenn, 10, 100);
+        stepper(brk, rotate(momel, 1), mx, i, 100);
+        mx = incr(mx, 0, maxx);
+      }
+    }
+    set brk:plooplen maxx;
+    maxx = incr(maxx, 3, 16);
+    set mawc:plooplen maxx;
+
+    let v = signal_from(ph);
+    let fc = v * 17000 + 300;
+    set mo:fc fc;
+
+  }
+}
+

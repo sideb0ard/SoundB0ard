@@ -1,0 +1,137 @@
+# 49 and 56
+
+
+let meel = [49, 0, 49, 0, 49, 0, 49, 0, 49, 0, 56, 49, 0, 56, 49, 0];
+
+# let maw = loop(dloops/hipHopBap.aiff);
+
+let maw_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set maw:plooplen 16;
+      set maw:pitch 1;
+    }
+    if (count % 4 == 3) {
+      set maw:scramble 1;
+    }
+    if (count % 12 == 11) {
+      set maw:stutter 1;
+    }
+    if (count % 16 == 10) {
+      set maw:plooplen 2;
+      set maw:pitch 2;
+    }
+  }
+}
+
+let hh = sample(ch/CasioMT70ClosedHihat.aif);
+
+let hh1 = sample(ch/LOUhat.aiff);
+let hh2 = sample(ch/hh8.aif);
+let hh3 = sample(ch/timabHat2.aiff);
+
+let hhz = [hh1, hh2, hh3];
+let hhx = 0;
+
+let hhgen = gen()
+{
+  setup()
+  {
+    let px = 2;
+  }
+  run()
+  {
+
+    if (count % 4 < 3) {
+      let pat = [];
+      for (i = 0; i < 4; ++i) {
+        if (i == px) {
+          pat = pat + rand_array(4, 0, 1);
+        } else {
+          pat = pat + rand_array(4, 0, 0);
+        }
+      }
+      play_array(hhz[hhx], pat);
+      px = incr(px, 0, 4);
+      hhx = incr(hhx, 0, len(hhz));
+    }
+
+  }
+}
+
+
+# let cherry = loop(loops/chezCherryLipBalm.aiff)
+
+let cherry_gen = gen()
+{
+  setup()
+  {
+    let ploop = 3;
+  }
+  run()
+  {
+    vol cherry 0;
+    if (count % 8 == 7) {
+      set cherry:plooplen ploop;
+      vol cherry 0.7;
+      ploop = incr(ploop, 4, 16);
+    }
+  }
+}
+
+let momel = [0, 15, 0, 15, 0, 0, 17, 0, 0, 18, 0, 0, 0, 15, 0, 0];
+let dr = 50;
+let moblah_gen = gen()
+{
+  setup()
+  {
+    let mlx = 0;
+    let mxx = 4;
+  }
+  run()
+  {
+    if (count % 8 == 7) {
+      play_array(mo, riff(23), dur = dr);
+    }
+    else {
+      for (i = 0; i < 16; ++i) {
+        stepper(mo, momel, mlx, i, dr);
+        mlx = incr(mlx, 0, mxx);
+      }
+      mxx = incr(mxx, 3, 16);
+      dr = dr + 10;
+      if (dr > 150) {
+        dr = 50;
+      }
+    }
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let mlx = 0;
+    let mxx = 4;
+  }
+  run()
+  {
+    if (count % 8 == 3) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, up(momel, 12), mlx, i, dr);
+        if (rand(100) < 70) {
+          mlx = incr(mlx, 0, mxx);
+        }
+      }
+      if (rand(100) < 70) {
+        mxx = incr(mxx, 3, 16);
+      }
+    }
+  }
+}
+

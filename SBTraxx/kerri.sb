@@ -1,0 +1,41 @@
+# let watchme = loop(voices/watchmeerase.wav); set watchme:len 2
+let basslah_gen = gen()
+{
+  setup()
+  {
+    #let nt = [45, 40];
+    let nt = [45, 40];
+    #let nt = [33, 28];
+    #let nt = [51, 59];
+    let ntx = 0;
+    let dr = 100;
+  }
+  run()
+  {
+
+    if (count % 8 < 7) {
+      let mel = combinor(bassgen(), [nt[ntx]]);
+
+      if (count % 6 == 0) {
+        mel = stutter(mel);
+      }
+      dr = dr + 25;
+      if (dr > 300) {
+        dr = 45;
+      }
+
+      if (count % 4 == 3) {
+        set watchme:on 1;
+      }
+      if (count % 4 == 0) {
+        ntx = incr(ntx, 0, len(nt));
+        set watchme:stutter 1;
+      }
+      set watchme:scramble 1;
+    } else {
+      set ab:stutter 1;
+      play_array(watchme, rand_beat());
+    }
+  }
+}
+

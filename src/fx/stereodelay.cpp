@@ -45,7 +45,7 @@ void StereoDelay::SetWetMix(double wet_mix) {
     m_wet_mix_ = wet_mix;
     Update();
   } else
-    printf("Wetmix must be between 0 and 100\n");
+    printf("Wetmix must be between 0 and 1\n");
 }
 
 void StereoDelay::Update() {

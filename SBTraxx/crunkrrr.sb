@@ -1,0 +1,35 @@
+
+let III = 53;
+let VII = 48;
+let IV = 55;
+let i = 49;
+let prog = [III, VII, i, IV, VII, i];
+let px = 0;
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let mx = 0;
+    let mxx = 3;
+    let mel = chord_riff(notes_in_chord(prog[px]))
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(mo, mel, mx, i, 20);
+      mx = incr(mx, 0, mxx);
+    }
+    mxx = incr(mxx, 3, 16);
+
+    if (count % 8 == 0) {
+      if (rand(100) < 80) {
+        px = incr(px, 0, len(prog));
+      }
+    }
+    if (count % 4 == 0) {
+      mel = chord_riff(notes_in_chord(prog[px]))
+    }
+  }
+}
+

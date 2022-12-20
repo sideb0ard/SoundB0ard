@@ -848,6 +848,18 @@ std::shared_ptr<object::Object> EvalInfixExpression(
     auto leftie = std::dynamic_pointer_cast<object::Number>(left);
     auto rightie = std::dynamic_pointer_cast<object::Number>(right);
     return EvalNumberInfixExpression(op, leftie, rightie);
+  } else if (left->Type() == object::BOOLEAN_OBJ &&
+             right->Type() == object::NUMBER_OBJ) {
+    auto leftie = std::dynamic_pointer_cast<object::Boolean>(left);
+    auto rightie = std::dynamic_pointer_cast<object::Number>(right);
+    // TODO - implement for other infix operators, not just '-'
+    return NativeBoolToBooleanObject(leftie->value_ - rightie->value_);
+  } else if (left->Type() == object::NUMBER_OBJ &&
+             right->Type() == object::BOOLEAN_OBJ) {
+    auto leftie = std::dynamic_pointer_cast<object::Number>(left);
+    auto rightie = std::dynamic_pointer_cast<object::Boolean>(right);
+    // TODO - implement for other infix operators, not just '-'
+    return NativeBoolToBooleanObject(leftie->value_ - rightie->value_);
   } else if (left->Type() == object::STRING_OBJ &&
              right->Type() == object::STRING_OBJ) {
     auto leftie = std::dynamic_pointer_cast<object::String>(left);
