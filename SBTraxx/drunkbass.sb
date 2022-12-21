@@ -1,5 +1,4 @@
-# bpm 90
-# let ab = loop(dloops/autechreBeat.aiff);
+# let ab = loop(dloops/autechreBeat.aiff); add_fx(ab, "distort");
 # dloops/autechreBeat.aiff
 # let cpb = loop(dloops/clapbeat2bar.aiff); set cpb:len 2;
 
@@ -21,7 +20,7 @@ let yogen = gen()
   }
 }
 
-# let planz = loop(voices/planzcanfademe.wav);
+# let planz = loop(voices/planzcanfademe.wav); add_fx(planz, "delay");
 ## let strz = loop(loops/strongsNHats.aiff); set strz:len 4; set strz:grains_per_sec 20
 let samblah_gen = gen()
 {
@@ -32,10 +31,12 @@ let samblah_gen = gen()
   run()
   {
     if (count % 2 == 0) {
+      set cpb:reverse 0;
       play_array(planz, rand_beat());
     }
-    if (count % 8 < 6) {
+    if (count % 7 == 0) {
       set planz:on 1;
+      set cpb:scramble 1;
     }
     set planz:plooplen pll;
     pll = incr(pll, 3, 16);
@@ -46,6 +47,7 @@ let samblah_gen = gen()
     }
     if (count % 8 == 6) {
       set ab:scramble 1;
+      set cpb:stutter 1;
     }
     set ab:on 1;
     if (count % 8 == 5) {
@@ -54,6 +56,7 @@ let samblah_gen = gen()
     }
     if (count % 12 == 0) {
       set strz:scramble 1;
+      set cpb:reverse 1;
     }
 
     set strz:on 1;
@@ -62,79 +65,3 @@ let samblah_gen = gen()
     }
   }
 }
-
-
-#let melmo = [0, 0, 21, 0, 0, 12, 0, 12, 0, 0, 9, 0, 0, 12, 21, 0];
-let meel = [49, 0, 49, 0, 49, 0, 49, 0, 49, 0, 56, 49, 0, 56, 49, 0];
-let melmo2 = [0, 23, 0 , 21, 0, 24, 0, 17, 13, 0, 9, 0, 10, 14, 21, 0];
-let play_synth = false;
-# mo - squarey
-
-
-let mooblah_gen = gen()
-{
-  setup()
-  {
-    let mx = 0;
-    let mxx = 3;
-    let dr = 100;
-  }
-  run()
-  {
-    let mel = down(meel, 24);
-    if (count % 8 == 7) {
-      mel = melmo2;
-      set cpb:scramble 1;
-      set ab:stutter 1;
-    }
-
-    if (count % 4 == 0) {
-      set ab:stutter 1;
-      set cpb:scramble 1;
-      play_synth = play_synth - 1;
-    }
-
-    if (count % 2 == 0 && rand(100) > 70) {
-      play_array(mo, scramble(meel));
-    }
-
-    if (count % 12 == 11) {
-      mel = up(mel, 12);
-    }
-
-    if (play_synth) {
-      if (count % 8 < 6) {
-        if (count % 2 == 0) {
-          play_array(mo, mel, dr);
-        }
-      } else {
-        for (i = 0; i < 16; ++i) {
-          stepper(mo, mel, mx, i, dr);
-          mx = incr(mx, 0, mxx);
-          if (rand(100) > 60) {
-            dr = dr + 50;
-            if (dr > 400) {
-              dr = 70;
-            }
-          }
-        }
-        mxx = incr(mxx, 3, 16);
-      }
-    }
-  }
-}
-
-let meeel = [55, 0, 55, 0, 55, 0, 55, 0, 55, 0, 56, 55, 0, 56, 55, 0];
-let moo2blah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 8 == 1) {
-      play_array(mo, down(meeel, 24), 30);
-    }
-  }
-}
-

@@ -1,9 +1,10 @@
 # 49 and 56
 
-
 let meel = [49, 0, 49, 0, 49, 0, 49, 0, 49, 0, 56, 49, 0, 56, 49, 0];
 
-# let maw = loop(dloops/hipHopBap.aiff);
+# let maw = loop(dloops/hipHopBap.aiff); add_fx(maw, "distort");
+# p15 < every 1 "<12 6 7 8 12>" "set maw:fx0:bitdepth %"
+let ah2 = sample(brandyvocalz/ah2.wav);
 
 let maw_gen = gen()
 {
@@ -21,8 +22,10 @@ let maw_gen = gen()
     }
     if (count % 12 == 11) {
       set maw:stutter 1;
+      set maw:plooplen 3;
     }
     if (count % 16 == 10) {
+      play_array(ah2, rand_beat());
       set maw:plooplen 2;
       set maw:pitch 2;
     }
@@ -30,12 +33,16 @@ let maw_gen = gen()
 }
 
 let hh = sample(ch/CasioMT70ClosedHihat.aif);
+vol hh 0.5;
 
 let hh1 = sample(ch/LOUhat.aiff);
+vol hh1 0.5;
 let hh2 = sample(ch/hh8.aif);
+vol hh2 0.5;
 let hh3 = sample(ch/timabHat2.aiff);
+vol hh3 0.5;
 
-let hhz = [hh1, hh2, hh3];
+let hhz = [hh, hh1, hh2, hh3];
 let hhx = 0;
 
 let hhgen = gen()
@@ -65,7 +72,7 @@ let hhgen = gen()
 }
 
 
-# let cherry = loop(loops/chezCherryLipBalm.aiff)
+# let cherry = loop(loops/chezCherryLipBalm.aiff); p12 $ cherry_gen;
 
 let cherry_gen = gen()
 {
@@ -111,27 +118,3 @@ let moblah_gen = gen()
     }
   }
 }
-
-let dblah_gen = gen()
-{
-  setup()
-  {
-    let mlx = 0;
-    let mxx = 4;
-  }
-  run()
-  {
-    if (count % 8 == 3) {
-      for (i = 0; i < 16; ++i) {
-        stepper(dx, up(momel, 12), mlx, i, dr);
-        if (rand(100) < 70) {
-          mlx = incr(mlx, 0, mxx);
-        }
-      }
-      if (rand(100) < 70) {
-        mxx = incr(mxx, 3, 16);
-      }
-    }
-  }
-}
-

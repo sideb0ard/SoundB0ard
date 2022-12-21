@@ -8,7 +8,8 @@
 Distortion::Distortion() {
   type_ = DISTORTION;
   enabled_ = true;
-  m_threshold_ = 0.707;
+  // m_threshold_ = 0.707;
+  m_threshold_ = 0.507;
 }
 
 std::string Distortion::Status() {
@@ -38,7 +39,6 @@ StereoVal Distortion::Process(StereoVal input) {
 void Distortion::SetParam(std::string name, double val) {
   if (name == "threshold") SetThreshold(val);
 }
-
 
 void Distortion::SetThreshold(double val) {
   if (val >= 0.01 && val <= 1.0)

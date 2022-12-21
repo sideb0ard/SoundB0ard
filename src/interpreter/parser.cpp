@@ -211,7 +211,7 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
       }
       NextToken();
     } else {
-      std::cerr << "Tried FX - no num!\n";
+      /// std::cerr << "Tried FX - no num!\n";
       return nullptr;
     }
   }

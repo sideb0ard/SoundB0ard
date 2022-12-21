@@ -47,7 +47,7 @@ class StereoDelay : Fx {
  private:
   DDLModule m_left_delay_;
   DDLModule m_right_delay_;
-  double m_delay_time_ms_{0};     // 0 - 2000
+  double m_delay_time_ms_{23};    // 0 - 2000
   double m_feedback_percent_{0};  // -100 - 100
   double m_delay_ratio_{0};
   double m_wet_mix_{0.5};  // 0 - 100
