@@ -63,24 +63,11 @@ class SoundGenerator {
   int note_duration_ms_{100};
 
   std::atomic<int16_t> effects_num{0};  // num of effects
-  Fx *effects[kMaxNumSoundGenFx] = {};
+  std::array<std::shared_ptr<Fx>, kMaxNumSoundGenFx> effects_;
   bool effects_on{true};  // bool
 
  public:
-  int AddFx(Fx *f);
-  int AddBasicfilter();
-  int AddBitcrush();
-  int AddCompressor();
-  int AddDistortion();
-  int AddDecimate();
-  int AddDelay();
-  int AddEnvelope();
-  int AddGenZ();
-  int AddModdelay();
-  int AddModfilter();
-  int AddFollower();
-  int AddReverb();
-  int AddWaveshape();
+  void AddFx(std::shared_ptr<Fx>);
 
   StereoVal Effector(StereoVal val);
 

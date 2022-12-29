@@ -153,7 +153,7 @@ std::string Mixer::StatusEnv() {
 
       for (int i = 0; i < sg->effects_num; i++) {
         ss << margin.str();
-        Fx *f = sg->effects[i];
+        auto f = sg->effects_[i];
         if (f->enabled_)
           ss << COOL_COLOR_YELLOW;
         else
@@ -182,7 +182,7 @@ std::string Mixer::StatusSgz(bool all) {
         if (sg->effects_num > 0) {
           ss << "      ";
           for (int j = 0; j < sg->effects_num; j++) {
-            Fx *f = sg->effects[j];
+            auto f = sg->effects_[j];
             if (f->enabled_)
               ss << COOL_COLOR_YELLOW;
             else
@@ -327,8 +327,8 @@ void Mixer::EmitEvent(broadcast_event event) {
     sg->EventNotify(event, timing_info);
     if (sg->effects_num > 0) {
       for (int j = 0; j < sg->effects_num; j++) {
-        if (sg->effects[j]) {
-          Fx *f = sg->effects[j];
+        if (sg->effects_[j]) {
+          auto f = sg->effects_[j];
           f->EventNotify(event, timing_info);
         }
       }
@@ -513,7 +513,7 @@ bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
     std::shared_ptr<SBAudio::SoundGenerator> sg =
         sound_generators_[soundgen_num];
-    if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects[fx_num])
+    if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects_[fx_num])
       return true;
   }
   return false;
@@ -638,13 +638,16 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     if (action.sg) {
       AddSoundGenerator(action.sg);
     }
-  } else if (action.type == AudioAction::ADD_FX)
-    interpreter_sound_cmds::ParseFXCmd(action.args);
-  else if (action.type == AudioAction::BPM)
+  } else if (action.type == AudioAction::ADD_FX) {
+    if (action.sg && action.fx) {
+      std::cout << "GOT ACTION TYPE ADD_FX\n";
+      action.sg->AddFx(action.fx);
+    }
+  } else if (action.type == AudioAction::BPM) {
     UpdateBpm(action.new_bpm);
-  else if (action.type == AudioAction::VOLUME)
+  } else if (action.type == AudioAction::VOLUME) {
     VolChange(action.new_volume);
-  else if (action.type == AudioAction::RECORDED_MIDI_EVENT) {
+  } else if (action.type == AudioAction::RECORDED_MIDI_EVENT) {
     _delayed_action_items.push_back(action);
   } else if (action.type == AudioAction::MIDI_EVENT_ADD ||
              action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
@@ -715,7 +718,7 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
         if (action.fx_id != -1) {
           int fx_num = action.fx_id;
           if (IsValidFx(action.mixer_soundgen_idx, fx_num)) {
-            Fx *f = sg->effects[fx_num];
+            auto f = sg->effects_[fx_num];
             if (action.param_name == "active")
               f->enabled_ = param_val;
             else

@@ -1,11 +1,11 @@
 #pragma once
-#include "delay.h"
 #include <stdbool.h>
 
-typedef struct comb_filter
-{
-    delay m_delay;   // base class
-    double m_comb_g; // one co-efficient
+#include "delay.h"
+
+typedef struct comb_filter {
+  delay m_delay;    // base class
+  double m_comb_g;  // one co-efficient
 } comb_filter;
 
 void comb_filter_init(comb_filter *c, int delay_len);

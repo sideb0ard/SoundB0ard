@@ -1027,17 +1027,29 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     (void)args;
                     return evaluator::NULLL;
                   })},
-    {"add_fx", std::make_shared<object::BuiltIn>(
-                   [](std::vector<std::shared_ptr<object::Object>> args)
-                       -> std::shared_ptr<object::Object> {
-                     int args_size = args.size();
-                     if (args_size >= 2) {
-                       audio_action_queue_item action_req{
-                           .type = AudioAction::ADD_FX, .args = args};
-                       audio_queue.push(action_req);
-                     }
-                     return evaluator::NULLL;
-                   })},
+    {"add_fx",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size >= 2) {
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen && mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+               std::cout << "YO, VALID SG\n";
+               auto fx = interpreter_sound_cmds::ParseFXCmd(args);
+               if (fx) {
+                 std::cout << "YO, GOT FX\n";
+                 audio_action_queue_item action_req{
+                     .type = AudioAction::ADD_FX,
+                     .sg = mixr->sound_generators_[soundgen->soundgen_id_],
+                     .fx = fx};
+                 audio_queue.push(action_req);
+               }
+             }
+           }
+           return evaluator::NULLL;
+         })},
     {"monitor", std::make_shared<object::BuiltIn>(
                     [](std::vector<std::shared_ptr<object::Object>> args)
                         -> std::shared_ptr<object::Object> {

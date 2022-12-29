@@ -431,16 +431,16 @@ let mask = fn(original_pattern, mask_pattern)
 
 let perky = fn(beat_pattern, sample_array)
 {
-  if (len(beat_pattern) != 16 || len(sample_array) == 0) {
+  if (len(beat_pattern) == 0 || len(sample_array) == 0) {
     return;
   }
 
-  for (i = 0; i < 16; ++i) {
+  for (i = 0; i < len(beat_pattern); ++i) {
     let v = rand(90) + 37;
     if (type(beat_pattern[i]) == "ARRAY") {
       let larr = beat_pattern[i];
       let ppp = pp / len(larr);
-      for (j = 0; j < 16; ++j) {
+      for (j = 0; j < len(larr); ++j) {
         if (larr[j] > 0) {
           note_on_at(sample_array[rand(len(sample_array))], 1, i * pp + j * ppp, vel = v);
         }

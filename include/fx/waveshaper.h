@@ -4,7 +4,7 @@
 #include <fx/fx.h>
 #include <stdbool.h>
 
-class WaveShaper : Fx {
+class WaveShaper : public Fx {
  public:
   WaveShaper();
   std::string Status() override;

@@ -10,7 +10,8 @@
 
 namespace interpreter_sound_cmds {
 
-void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args);
+std::shared_ptr<Fx> ParseFXCmd(
+    std::vector<std::shared_ptr<object::Object>> &args);
 void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args);
 void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
                      const std::string &preset_name,

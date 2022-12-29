@@ -1,11 +1,11 @@
 #pragma once
-#include "delay.h"
 #include <stdbool.h>
 
-typedef struct delay_apf
-{
-    delay m_delay;  // base class
-    double m_apf_g; // one co-efficient
+#include "delay.h"
+
+typedef struct delay_apf {
+  delay m_delay;   // base class
+  double m_apf_g;  // one co-efficient
 } delay_apf;
 
 void delay_apf_init(delay_apf *d, int delay_len);

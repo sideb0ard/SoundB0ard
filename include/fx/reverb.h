@@ -7,7 +7,7 @@
 #include "lpfcombfilter.h"
 #include "onepolelpf.h"
 
-class Reverb : Fx {
+class Reverb : public Fx {
  public:
   Reverb();
   std::string Status() override;

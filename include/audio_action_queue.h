@@ -1,6 +1,7 @@
 #pragma once
 
 #include <audioutils.h>
+#include <fx/fx.h>
 #include <soundgenerator.h>
 
 #include <interpreter/object.hpp>
@@ -42,6 +43,7 @@ struct audio_action_queue_item {
   AudioAction type;
   int mixer_soundgen_idx{-1};
   std::shared_ptr<SBAudio::SoundGenerator> sg;
+  std::shared_ptr<Fx> fx;
 
   std::string preset_name;
   std::map<std::string, double> preset;

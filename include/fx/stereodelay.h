@@ -21,7 +21,7 @@ enum DelaySyncLen {
   SIXTEENTH,
 };
 
-class StereoDelay : Fx {
+class StereoDelay : public Fx {
  public:
   StereoDelay();
   ~StereoDelay() = default;

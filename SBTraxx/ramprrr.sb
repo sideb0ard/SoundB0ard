@@ -1,138 +1,64 @@
-
-# let notz1 = [28, 34];
-# let notz2 = [18, 13];
-
-let notz1 = [24];
-let notz2 = [26, 20];
-let notz = [notz1, notz2];
-
-let notez = notz[0];
-let nx = 0;
-
-#let note1 = 28;
-#let note2 = 34;
-#let note1 = 18;
-#let note2 = 13;
-let note3 = 43;
-let mel =  riff(notez[0]);
-let mel2 = rotate(riff(notez[1]), 2);
-
-# dx = garage // nrth // glitchrrr // wururrrp // wuurpr // bitshifty
 let rblah_gen = gen()
 {
   setup()
   {
-    let ph = phasor( 16 );
-    let v = -1;
-
-    let mx = 0;
-    let mx_max = 2;
-
-    let mx2 = 0;
-    let mx_max2 = 3;
-
-    let drx = 250;
-    let drx2 = 500;
-
-    let msk = "00FF";
+    let ph = phasor( 3840 );
+    let lastv = -1;
   }
   run()
   {
 
-    if (count % 8 == 0) {
-      notez = notz[nx];
-      nx = incr(nx, 0, len(notz));
-    }
-
-    if (count % 12 < 10) {
-      for (i = 0; i < 16; ++i) {
-        stepper(dx, mel, mx, i, drx);
-        mx = incr(mx, 0, mx_max);
-
-        stepper(dx, mel2, mx2, i, drx2);
-        mx2 = incr(mx2, 0, mx_max2);
-
-        let v = signal_from(ph);
-        let rat = v * 20 + 0.1;
-        set dx:l1_rate rat at=i*pp;
-        set dx:l1_int v at=i*pp;
-        #set dx:o1rat rat at=i*pp;
-        set dx:e1rel rat*200+ 10 at=i*pp;
+    for (i = 0; i < 3840; ++i) {
+      let v = signal_from(ph) * 16 % 3;
+      #print("v:", v);
+      if (abs(v - lastv) > 0.5) {
+        print("I:",  i, " ", v);
+        print(i*pp);
+        note_on_at(bd, 1, i);
       }
-    }
-    mx_max = incr(mx_max, 2, 16);
-    mx_max2 = incr(mx_max2, 3, 16);
+      lastv = v;
 
-    if (count % 2 == 0) {
-      drx = drx + 10;
-      let blah_fn = fn()
-      {
-      }
-      if (drx > 350) {
-        drx = 50;
-        mel2 = rotate(riff(notez[1]), 4);
-      }
-    }
-    if (count % 3 == 0) {
-      drx2 = drx2 + 30;
-      if (drx2 > 450) {
-        drx2 = 150;
-      }
-      mel = riff(notez[0]);
+      #v = floor(v * 16) / 16;
+      #if (lastv != v) {
+        #  print("I:", i);
+        #  lastv = v;
+        #}
 
-      let mel3 = [0,0,0,0] + [riff(note3)] + [0, 0, 0, 0];
-      play_array(dx, mel3);
+      #print(v);
     }
   }
 }
 
-# mo = 4tet // sqwuash
-let momel = [0, notz1[0], 0, notz1[0], 0, 0, notz2[0], notz2[0], 0, 0, notz1[0], 0, 0, notz1[0], 0, notz2[0]];
 # set pop:grains_per_sec 10
 # let pop = loop(loops/PopPercShortLoop.aiff); set pop:len 0.5; set pop:pitch 0.8
 let pop_gen = gen()
 {
   setup()
   {
-    let mmx = 0;
-    let maxxx = 3;
-
-    let rmp = phasor(64);
   }
   run()
   {
+    #set watchme:stutter 1;
+    play_array(watchme, rand_beat(), dur=2000);
     if (count % 3 == 0) {
       set pop:on 1;
+      set watchme:stutter 1;
     }
-    set pop:plooplen maxxx;
-
-
-    for (i = 0; i < 16; ++i) {
-      #stepper(mo, momel, mmx, i, 150);
-      mmx = incr(mmx, 0, maxxx);
-      let v = signal_from(rmp);
-      let fc = v * 17000 + 300;
-      set mo:fc fc at=i*pp;
-      let fq = v * 9 + 0.5;
-      set mo:fq fq at=i*pp;
-    }
-    maxxx = incr(maxxx, 1, 16);
 
     set pop:reverse 0;
     if (count % 3 == 0) {
       set pop:stutter 1;
-      cbeat(cp);
     }
     if (count % 4 == 0) {
       set pop:scramble 1;
+      set pop2:stutter 1;
     }
     if (count % 8 == 7) {
       set pop:reverse 1;
     }
     if (count % 8 > 6) {
-      play_array(pop, momel, dur=200);
+      play_array(pop, rand_beat(), dur=200);
+      set pop2:stutter 1;
     }
   }
 }
-
-

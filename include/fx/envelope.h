@@ -6,7 +6,7 @@
 
 enum { ENV_MODE_TRIGGER, ENV_MODE_SUSTAIN };
 
-class Envelope : Fx {
+class Envelope : public Fx {
  public:
   Envelope();
   std::string Status() override;

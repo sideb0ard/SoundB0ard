@@ -1,13 +1,13 @@
 #pragma once
-#include "delay.h"
 #include <stdbool.h>
 
-typedef struct lpf_comb_filter
-{
-    delay m_delay;
-    double m_comb_g; // comb coefficient
-    double m_lpf_g;  // lpf coefficient
-    double m_lpf_z1; // one sample delay
+#include "delay.h"
+
+typedef struct lpf_comb_filter {
+  delay m_delay;
+  double m_comb_g;  // comb coefficient
+  double m_lpf_g;   // lpf coefficient
+  double m_lpf_z1;  // one sample delay
 } lpf_comb_filter;
 
 void lpf_comb_filter_set_comb_g(lpf_comb_filter *l, double g);

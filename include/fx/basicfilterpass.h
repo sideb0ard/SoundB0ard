@@ -8,7 +8,7 @@
 
 enum { LOWPASS, HIGHPASS, ALLPASS, BANDPASS };
 
-class FilterPass : Fx {
+class FilterPass : public Fx {
  public:
   FilterPass();
   std::string Status() override;

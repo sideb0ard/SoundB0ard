@@ -3,7 +3,7 @@
 #include <defjams.h>
 #include <fx/fx.h>
 
-class GenZ : Fx {
+class GenZ : public Fx {
  public:
   GenZ();
   std::string Status() override;

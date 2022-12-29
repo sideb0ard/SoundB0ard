@@ -11,7 +11,7 @@
 
 enum { COMP, LIMIT, EXPAND, GATE };
 
-class DynamicsProcessor : Fx {
+class DynamicsProcessor : public Fx {
  public:
   DynamicsProcessor();
   std::string Status() override;

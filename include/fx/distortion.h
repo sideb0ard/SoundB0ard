@@ -3,7 +3,7 @@
 #include <defjams.h>
 #include <fx/fx.h>
 
-class Distortion : Fx {
+class Distortion : public Fx {
  public:
   Distortion();
 

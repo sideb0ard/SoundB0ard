@@ -4,7 +4,7 @@
 #include "fx.h"
 #include "wt_oscillator.h"
 
-class ModFilter : Fx {
+class ModFilter : public Fx {
  public:
   ModFilter();
   std::string Status() override;

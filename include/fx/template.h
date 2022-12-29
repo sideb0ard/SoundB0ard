@@ -3,7 +3,7 @@
 #include <defjams.h>
 #include <fx/fx.h>
 
-class Template : Fx {
+class Template : public Fx {
  public:
   Template();
   std::string Status() override;

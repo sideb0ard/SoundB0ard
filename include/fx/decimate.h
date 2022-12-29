@@ -5,7 +5,7 @@
 
 #include <string>
 
-class Decimate : Fx {
+class Decimate : public Fx {
  public:
   Decimate();
   std::string Status() override;

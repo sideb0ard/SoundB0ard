@@ -3,7 +3,7 @@
 #include <defjams.h>
 #include <fx/fx.h>
 
-class BitCrush : Fx {
+class BitCrush : public Fx {
  public:
   BitCrush();
   std::string Status() override;

@@ -6,7 +6,7 @@
 
 enum class ModDelayAlgorithm { kFlanger, kChorus, kVibrato };
 
-class ModDelay : Fx {
+class ModDelay : public Fx {
  public:
   ModDelay();
   std::string Status() override;

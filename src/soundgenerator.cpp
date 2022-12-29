@@ -82,102 +82,18 @@ void SoundGenerator::SetPan(double val) {
   if (val >= -1.0 && val <= 1.0) pan = val;
 }
 
-int SoundGenerator::AddFx(Fx *f) {
+void SoundGenerator::AddFx(std::shared_ptr<Fx> f) {
+  std::cout << "YO, ADDING FX TO SG\n";
   if (effects_num < kMaxNumSoundGenFx) {
-    effects[effects_num] = f;
+    effects_[effects_num++] = f;
     printf("done adding effect\n");
-    return effects_num++;
   }
-
-  return -1;
-}
-
-int SoundGenerator::AddDelay() {
-  printf(
-      "Booya, adding a new DELAY to "
-      "SoundGenerator!\n");
-  StereoDelay *sd = new StereoDelay();
-  return AddFx((Fx *)sd);
-}
-
-int SoundGenerator::AddReverb() {
-  printf(
-      "Booya, adding a new REVERB to "
-      "SoundGenerator!\n");
-  Reverb *r = new Reverb();
-  return AddFx((Fx *)r);
-}
-
-int SoundGenerator::AddWaveshape() {
-  printf("WAVshape\n");
-  WaveShaper *ws = new WaveShaper();
-  return AddFx((Fx *)ws);
-}
-
-int SoundGenerator::AddBasicfilter() {
-  printf("Fffuuuuhfilter!\n");
-  FilterPass *fp = new FilterPass();
-  return AddFx((Fx *)fp);
-}
-
-int SoundGenerator::AddGenZ() {
-  printf("GEEEEEENZZZZZ!\n");
-  GenZ *gz = new GenZ();
-  return AddFx((Fx *)gz);
-}
-
-int SoundGenerator::AddBitcrush() {
-  printf("BITCRUSH!\n");
-  BitCrush *bc = new BitCrush();
-  return AddFx((Fx *)bc);
-}
-
-int SoundGenerator::AddDecimate() {
-  printf("DECIMATE!!\n");
-  Decimate *dc = new Decimate();
-  return AddFx((Fx *)dc);
-}
-
-int SoundGenerator::AddCompressor() {
-  printf("COMPresssssion!\n");
-  DynamicsProcessor *dp = new DynamicsProcessor();
-  return AddFx((Fx *)dp);
-}
-
-int SoundGenerator::AddModdelay() {
-  printf(
-      "Booya, adding a new MODDELAY to "
-      "SoundGenerator!\n");
-  ModDelay *md = new ModDelay();
-  return AddFx((Fx *)md);
-}
-
-int SoundGenerator::AddModfilter() {
-  printf(
-      "Booya, adding a new MODFILTERRRRR to "
-      "SoundGenerator!\n");
-  ModFilter *mf = new ModFilter();
-  return AddFx((Fx *)mf);
-}
-
-int SoundGenerator::AddDistortion() {
-  printf("BOOYA! Distortion all up in this kittycat\n");
-  Distortion *d = new Distortion();
-  return AddFx((Fx *)d);
-}
-
-int SoundGenerator::AddEnvelope() {
-  printf(
-      "Booya, adding a new envelope to "
-      "SoundGenerator!\n");
-  Envelope *e = new Envelope();
-  return AddFx((Fx *)e);
 }
 
 StereoVal SoundGenerator::Effector(StereoVal val) {
   int num_fx = effects_num.load();
   for (int i = 0; i < num_fx; i++) {
-    Fx *f = effects[i];
+    auto f = effects_[i];
     if (f && f->enabled_) {
       val = f->Process(val);
     }
