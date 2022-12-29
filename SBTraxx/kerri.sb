@@ -14,29 +14,13 @@ let basslah_gen = gen()
   run()
   {
 
-    if (count % 8 < 7) {
-      let mel = combinor(bassgen(), [nt[ntx]]);
-
-      if (count % 6 == 0) {
-        mel = stutter(mel);
-      }
-      dr = dr + 25;
-      if (dr > 300) {
-        dr = 45;
-      }
-
-      #if (count % 7 == 3) {
-        #  set watchme:on 1;
-        #  set watchme:scramble 1;
-        #}
-      if (count % 4 == 0) {
-        ntx = incr(ntx, 0, len(nt));
-        #set watchme:on 1;
-        set watchme:stutter 1;
-        play_array(watchme, rand_beat());
-      }
-    } else {
-      set ab:stutter 1;
+    if (count % 3 == 0) {
+      set watchme:on 1;
+      set watchme:stutter 1;
+    }
+    if (count % 4 == 0) {
+      #set watchme:on 1;
+      set watchme:scramble 1;
       play_array(watchme, rand_beat());
     }
   }

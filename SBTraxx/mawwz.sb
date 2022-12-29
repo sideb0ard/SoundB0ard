@@ -3,7 +3,7 @@
 let meel = [49, 0, 49, 0, 49, 0, 49, 0, 49, 0, 56, 49, 0, 56, 49, 0];
 
 # let maw = loop(dloops/hipHopBap.aiff); add_fx(maw, "distort");
-# p15 < every 1 "<12 6 7 8 12>" "set maw:fx0:bitdepth %"
+# p15 < every 1 "<12 6 7 8 12>" "set maw:fx1:bitdepth %"
 let ah2 = sample(brandyvocalz/ah2.wav);
 
 let maw_gen = gen()
