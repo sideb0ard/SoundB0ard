@@ -1,0 +1,221 @@
+# let one = sample(TT-BANGO/1.wav)
+# let two = sample(TT-BANGO/2.wav)
+# let three = sample(TT-BANGO/3.wav)
+# let four = sample(TT-BANGO/4.wav)
+# let five = sample(TT-BANGO/5.wav)
+# let six = sample(TT-BANGO/6.wav)
+# let seven = sample(TT-BANGO/7.wav)
+# let eight = sample(TT-BANGO/8.wav)
+# let nine = sample(TT-BANGO/9.wav)
+# let ten = sample(TT-BANGO/10.wav)
+# let eleven = sample(TT-BANGO/11.wav)
+# let twelve = sample(TT-BANGO/12.wav)
+# let thirteen = sample(TT-BANGO/13.wav)
+# let fourteen = sample(TT-BANGO/14.wav)
+# let fifteen = sample(TT-BANGO/15.wav)
+# let sixteen = sample(TT-BANGO/16.wav)
+# let bong1 = sample(TT-BANGO/bingoBON.wav)
+# let bong2 = sample(TT-BANGO/HAHSLIDE.wav)
+#  vol bong2 0.5
+# let bong3 = sample(TT-BANGO/bingoBanog.wav)
+# let dum = sample(TT-BANGO/dum.wav)
+# let hh = sample(TT-BANGO/hatty.wav)
+# vol hh = 0.3
+# let kd = sample(TT-BANGO/kickPHAT.wav)
+# let kd2 = sample(TT-BANGO/kickMELODY.wav)
+# let kick = sample(TT-BANGO/kiCK.wav)
+# let sqk = sample(TT-BANGO/laugsqeeuk.wav)
+# let aigh = sample(TT-BANGO/AIIGH.wav)
+# let scrm = sample(TT-BANGO/scream.wav)
+# let feel = sample(TT-BANGO/feel3.wav)
+# let zt = sample(TT-BANGO/zoot.wav)
+# let flg = grain(TT-BANGO/flute.wav)
+# vol flg 0
+# let noizes = [aigh, feel, zt, sqk ]
+# let noizesname = ["aigh", "feel", "zt", "sqk"]
+# 
+# let mel = sample(TT-BANGO/melod.wav)
+# let mel2 = sample(TT-BANGO/melod4.wav)
+# let mel3 = sample(TT-BANGO/melodKICK.wav)
+# 
+# # let noizes = [mel, mel2, mel3]
+# # let noizesname = ["mel", "mel2", "mel3"]
+# 
+# let tom = sample(TT-BANGO/TOM.wav)
+# let tom2 = sample(TT-BANGO/TOM3.wav)
+# let tom3 = sample(TT-BANGO/TO.wav)
+# let tomz = [tom, tom2, tom3]
+# let tomz_names = ["tom", "tom2", "tom3"]
+# let baf = loop(TT-BANGO/bongoLAFlooo.wav)
+
+let numz = ["one", "two", "three", "four", "five","six","seven","eight", "nine","ten","eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen"]
+
+let rhythms = [
+  #shiko
+  "1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #son
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #rumba
+  "1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
+  #soukous
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
+  #gahu
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
+  #bossa-nova
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
+]
+
+let distrhythms = gen()
+{
+  setup() {}
+  
+  run() {
+    let idx = rand(len(rhythms))
+    #puts("IDX is ", idx, " - pattern is: ", rhythms[idx])
+    return rhythms[idx]
+  }
+}
+    
+let mapz = gen()
+{
+    setup()
+    { 
+      let count = 0;
+      let beatz_count = [4, 8, 12];
+      let beat_count_idx = 0;
+    }
+
+    run()
+    {
+      let pat = ""
+      let arr = rand_array(16,1,beatz_count[beat_count_idx])
+      for (i = 0; i < len(arr); ++i) {
+        # puts("i is ", i, " arr[i] is ", arr[i], " and numz[arr[i]] is ", numz[arr[i]])
+        if (count % 4 == 0 || count % 3 == 0) {
+          pat = pat + numz[i] + " "
+        } else {
+          if (rand(100) > 90) {
+            pat = pat + "~ "
+          } else {
+            pat = pat + numz[arr[i] - 1] + " "
+          }
+        }
+      }
+
+      
+      ++count
+		  beat_count_idx = incr(beat_count_idx, 0, len(beatz_count))
+      return pat
+    }
+}
+
+let pitchz = gen()
+{
+    setup()
+    { 
+      let count = 0;
+      let pitchz = [0.7, 0.4, 0.7, 0.3, 0.7];
+      let pit_idx = 0;
+    }
+
+    run()
+    {
+      if (count % 4 == 0) { 
+			   set flg:pitch pitchz[pit_idx];
+         pit_idx = incr(pit_idx, 0, len(pitchz));
+       }
+
+      ++count;
+    }
+}
+
+let hatz = gen()
+{
+  setup()
+  {
+    let speedz = ["*16", "*8", "*16", "(3,8)", "*16"]
+    let spd_idx = 0
+    let hh_pitch = 1
+  }
+  run()
+  {
+    let pat = "hh" + speedz[spd_idx]
+    spd_idx = incr(spd_idx, 0, len(speedz))
+    if (hh_pitch == 1) {
+      set hh:pitch 2;
+      hh_pitch = 2
+    }
+    else {
+    }
+      set hh:pitch 1;
+      hh_pitch = 1
+    return pat
+ 
+  }
+}
+
+let bongz = gen()
+{
+    setup()
+    { 
+      let count = 0;
+      let pitchz = [0.7, 0.4, 0.7, 0.3, 0.7];
+      let pit_idx = 0;
+    }
+
+    run()
+    {
+      
+      let rhm = distrhythms()
+      let newrhm = ""
+      for (i = 0 ; i < len(rhm); ++i) {
+         if (rhm[i] == "1") {
+           newrhm = newrhm + noizesname[rand(len(noizes))]
+           # puts("PITCHIDz:", pit_idx)
+         } else {
+           newrhm = newrhm + rhm[i]
+         }
+      }
+
+      if (count % 4 == 0) {
+         noizes = [mel, mel2, mel3]
+         noizesname = ["mel", "mel2", "mel3"]
+      }
+      if (count % 3 == 0) {
+         noizes = [aigh, feel, zt, sqk ]
+         noizesname = ["aigh", "feel", "zt", "sqk"]
+      }
+
+      ++count
+      return newrhm
+    }
+}
+
+let tomzg = gen()
+{
+    setup()
+    { 
+      let count = 0;
+      let tom_idx = 0;
+    }
+
+    run()
+    {
+      
+      let rhm = distrhythms()
+      let newrhm = ""
+      for (i = 0 ; i < len(rhm); ++i) {
+         if (rhm[i] == "1") {
+           newrhm = newrhm + tomz_names[tom_idx];
+      	   tom_idx = incr(tom_idx, 0, len(tomz));
+         } else {
+           newrhm = newrhm + rhm[i]
+         }
+      }
+      
+
+      ++count
+      return newrhm
+    }
+}
+

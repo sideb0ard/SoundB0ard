@@ -1,0 +1,371 @@
+let am = sample(TT-MAW-ALRIGHTALRIGHT/am.wav);
+let bd = sample(TT-MAW-ALRIGHTALRIGHT/bd.wav);
+let bd2 = sample(TT-MAW-ALRIGHTALRIGHT/bd2.wav);
+let bng = sample(TT-MAW-ALRIGHTALRIGHT/bng.wav);
+let brap = sample(TT-MAW-ALRIGHTALRIGHT/brap.wav);
+let ch = sample(TT-MAW-ALRIGHTALRIGHT/ch.wav);
+let ch2 = sample(TT-MAW-ALRIGHTALRIGHT/ch2.wav);
+let ch3 = sample(TT-MAW-ALRIGHTALRIGHT/ch3.wav);
+let clng = sample(TT-MAW-ALRIGHTALRIGHT/clng.wav);
+let clng2 = sample(TT-MAW-ALRIGHTALRIGHT/clng2.wav);
+let clvc = sample(TT-MAW-ALRIGHTALRIGHT/clvc.wav);
+let eh = sample(TT-MAW-ALRIGHTALRIGHT/eh.wav);
+let ehp = sample(TT-MAW-ALRIGHTALRIGHT/ehp.wav);
+let foo = sample(TT-MAW-ALRIGHTALRIGHT/foo.wav);
+let git2 = sample(TT-MAW-ALRIGHTALRIGHT/git2.wav);
+let gltch = sample(TT-MAW-ALRIGHTALRIGHT/gltch.wav);
+let gnt = sample(TT-MAW-ALRIGHTALRIGHT/gnt.wav);
+let gp = sample(TT-MAW-ALRIGHTALRIGHT/gp.wav);
+let gt = sample(TT-MAW-ALRIGHTALRIGHT/gt.wav);
+let hatnote = sample(TT-MAW-ALRIGHTALRIGHT/hatnote.wav);
+let hatnote2= sample(TT-MAW-ALRIGHTALRIGHT/hatnote2.wav);
+let hht = sample(TT-MAW-ALRIGHTALRIGHT/hht.wav);
+let ht = sample(TT-MAW-ALRIGHTALRIGHT/ht.wav);
+let htj = sample(TT-MAW-ALRIGHTALRIGHT/htj.wav);
+let it = sample(TT-MAW-ALRIGHTALRIGHT/it.wav);
+let ja = sample(TT-MAW-ALRIGHTALRIGHT/ja.wav);
+let jackhit= sample(TT-MAW-ALRIGHTALRIGHT/jackhit.wav);
+let kd = sample(TT-MAW-ALRIGHTALRIGHT/kd.wav);
+let note = sample(TT-MAW-ALRIGHTALRIGHT/note.wav);
+let note2 = sample(TT-MAW-ALRIGHTALRIGHT/note2.wav);
+let note3 = sample(TT-MAW-ALRIGHTALRIGHT/note3.wav);
+let note4 = sample(TT-MAW-ALRIGHTALRIGHT/note4.wav);
+#let = sample(TT-MAW-ALRIGHTALRIGHT/openingSynthLoop.wav);
+let pc = sample(TT-MAW-ALRIGHTALRIGHT/pc.wav);
+let revc = sample(TT-MAW-ALRIGHTALRIGHT/revc.wav);
+let sn = sample(TT-MAW-ALRIGHTALRIGHT/sn.wav);
+let sn2 = sample(TT-MAW-ALRIGHTALRIGHT/sn2.wav);
+let snphah = sample(TT-MAW-ALRIGHTALRIGHT/snphah.wav);
+let snrr = sample(TT-MAW-ALRIGHTALRIGHT/snrr.wav);
+let sqk = sample(TT-MAW-ALRIGHTALRIGHT/sqk.wav);
+let tom = sample(TT-MAW-ALRIGHTALRIGHT/tom.wav);
+
+let pp = 240;
+let swing = 10;
+let randy = 20;
+
+let bdz = [bd, bd2];
+let bd_idx = 0;
+let notes = [note3, note2, note4, hatnote2];
+set note3:pitch 0.5;
+set note2:pitch 0.5;
+set note4:pitch 0.5;
+#let notes = [it, eh, ja, kd, jackhit, am ];
+#let notes = [ja, kd, jackhit, bng ];
+let notes_idx = 0;
+let notes_len = 1;
+let vel = 128;
+let rot = 1;
+let putch = 1;
+
+let pitchx = [0.5, 1, 0.8, 1.2, 1.8, 2];
+let pitch_idx = 0;
+
+let play_notes_fn = fn(tick)
+{
+  noteOnDelayed(bdz[bd_idx],1,  tick, vel + 10);
+  #noteOnDelayed(notes[notes_idx], 1,  tick, vel);
+  if (count % 2 == 0) {
+    notes_idx = incr(notes_idx, 0, notes_len + 1);
+    vel = vel - 10;
+    if (vel < 30) {
+      vel = 128;
+    }
+    notes_len = incr(notes_len, 1, len(notes));
+    # noteOnDelayed(notes[notes_idx], 1,  tick, vel);
+    bd_idx = incr(bd_idx, 0, len(bdz) + 1);
+  }
+}
+
+
+let rec_drum_gen = gen()
+{
+  setup()
+  {
+    let depth = 1;
+  }
+  run()
+  {
+
+  }
+}
+
+
+let kick_pat = gen()
+{
+  setup()
+  {
+    let pats1  = distrhythms_int();
+    let pats2  = distrhythms_int();
+  }
+  run()
+  {
+    let pat = pats2;
+    # puts("PAT", pat);
+
+    if (count % 2 == 0) {
+      pat = pats1;
+    }
+
+    if (count % 8 == 7) {
+      #puts("LAST BAR OF PHRASE");
+      let wpp = pp / 2;
+      let half = 3840;
+      for ( i = 0; i < 16; ++i) {
+        if (pats1[i] == 1) {
+          play_notes_fn(i * wpp);
+        }
+        if (pats2[i] == 1) {
+          play_notes_fn(half + i * pp);
+        }
+      }
+    } else {
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1) {
+          play_notes_fn(i * pp);
+        }
+      }
+    }
+
+    #if (count % 2 == 0) {
+      #  setPitch(bdz[bd_idx], putch);
+      #}
+
+    if (count % 32 == 0) {
+      pats1  = distrhythms_int();
+      pats2  = distrhythms_int();
+    }
+  }
+}
+
+set ch:pitch 2;
+set hht:pitch 2;
+
+let hatz = [ch];
+let hat_idx = 0;
+let play_pat = fn(pat, ppn, offset)
+{
+  for (i = 0; i < 16; ++i) {
+    if (pat[i] == 1) {
+      #puts(i*ppn + offset);
+      noteOnDelayed(hatz[hat_idx], 1, i*ppn + offset);
+      noteOnDelayed(notes[notes_idx], 1, i*ppn + offset);
+      # if (count % 3 == 0 && count > 24) {
+        #   noteOnDelayed(nzsn, 1, i*ppn + offset);
+        #   if (rand(10) > 5) {
+          #     noteOnDelayed(bass2, 1, i*ppn + offset);
+          #   }
+        # }
+    }
+  }
+}
+
+let haf_gen = gen()
+{
+  setup()
+  {
+    let pat = distrhythms_int();
+  }
+  run()
+  {
+    if (count % 8 > 3) {
+    } else {
+      let div = count % 4 + 1;
+      let ppn = pp / div;
+      let offset_multi = 3840 / div;
+      for (i = 0; i < div; ++i) {
+        let offset = i * offset_multi;
+        play_pat(pat, ppn, offset);
+      }
+
+      if (count % 7 == 0) {
+        pat = distrhythms_int();
+      }
+    }
+  }
+}
+let hatz_gen = gen()
+{
+  setup()
+  {
+    # let hatz = [htj, ch2, htj, tom, pc, snphah];
+    #let hatz = [tom, snphah, bng];
+    #let hatz = [ch, ht, hatnote2];
+    let hat_len = 1;
+    let vel = 70;
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      for (i = 0; i < 16; ++i) {
+        hat_idx = incr(hat_idx, 0, hat_len);
+        setPitch(hatz[hat_idx], pitchx[pitch_idx]);
+        if (rand(100) > randy) {
+          if (i % 2 == 0) {
+            noteOnDelayed(hatz[hat_idx], 1, pp*i, vel);
+          }
+          else {
+            noteOnDelayed(hatz[hat_idx], 1, pp*i + swing, vel);
+          }
+          vel = vel + 13;
+          if (vel > 128){
+            vel = 70;
+          }
+        }
+      }
+    }
+    if (count % 2 == 0) {
+      # hatz = rotate(hatz, 3);
+      hat_len = incr(hat_len, 1, len(hatz) + 1);
+    }
+  }
+}
+
+let swingrrr = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    swing = incr(swing, 0, 25);
+    if (count % 4 == 0) {
+      randy = randy + 13;
+      if (randy > 70) {
+        randy = 20;
+      }
+    }
+  }
+}
+
+let sn_gen = gen()
+{
+  setup()
+  {
+    let snrz = [sn2, snphah, snrr];
+    let sn_idx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (i == 4) {
+        noteOnDelayed(snrz[sn_idx], 1, i * pp);
+        sn_idx = incr(sn_idx, 0, len(snrz) + 1);
+      }
+      if (i == 8) {
+        if (rand(100) > randy) {
+          noteOnDelayed(snrz[sn_idx], 1, i * pp);
+        } else {
+          noteOnDelayed(snrz[sn_idx], 1, 10 * pp);
+        }
+      }
+    }
+  }
+}
+
+let melody = gen()
+{
+  setup()
+  {
+    let ntz = [note, note2, note3, note4];
+    let nt_idx = 0;
+    let ppp = pp / 2;
+    let halfp = 3840 / 2 ;
+    let pitchhh = 1;
+    let vel = 50;
+    let pat = distrhythms_int();
+  }
+  run()
+  {
+
+    if (count % 3 == 2)  {
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1) {
+          noteOnDelayed(ntz[nt_idx], 1, i * pp, vel);
+          nt_idx = incr(nt_idx, 0, len(ntz) + 1);
+          noteOnDelayed(ntz[nt_idx], 1, i * pp + swing*3, vel);
+          setPitch(ntz[nt_idx], pitchx[putch], i * pp);
+          putch = incr(putch, 1, len(pitchx));
+          if (rand(100) > 70) {
+            noteOnDelayed(ntz[nt_idx], 1, i * ppp + halfp, vel);
+          }
+        }
+      }
+      vel = vel + swing;
+      if (vel > 108) {
+        vel = 40;
+      }
+    }
+
+    if (count % 3 == 0) {
+      pat = rotate(pat, rot);
+    }
+
+    if (count % 7 == 0 ) {
+      pat = distrhythms_int();
+    }
+  }
+}
+
+let bass_gen = gen()
+{
+  setup()
+  {
+    # let ntz = [hatnote, gp, git2, brap];
+    let ntz = [brap, git2];
+    let nt_idx = 0;
+    let nt_len = 1;
+    let pp_third  = pp / 3;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      let pat = distrhythms_int();
+      for (i = 0; i < 16; ++i) {
+        #puts("I", i);
+        if (pat[i] == 1) {
+          noteOnDelayed(ntz[nt_idx], 1, pp * i);
+          if (i == 4 || i == 12)
+          {
+            pitch_idx = incr(pitch_idx, 0, len(pitchx) + 1);
+            setPitch(ntz[nt_idx], pitchx[pitch_idx]);
+            if (rand(100) > 80) {
+              noteOnDelayed(ntz[nt_idx], 1, pp * i + pp_third);
+              noteOnDelayed(ntz[nt_idx], 1, pp * i + pp_third*2);
+            }
+            nt_idx = incr(nt_idx, 0, nt_len);
+          }
+        }
+      }
+      nt_len = incr(nt_len, 1, len(ntz) + 1);
+    }
+  }
+}
+
+
+let hilit_gen = gen()
+{
+  setup()
+  {
+    let smap = [eh, foo, am, gltch];
+    let sidx = 0;
+    let ppp = pp / 4;
+    let third = (3840 / 4) * 2;
+  }
+  run()
+  {
+    let pat = distrhythms_int();
+
+    for (i = 0; i < 16; ++i) {
+      if (pat[i] == 1)
+      {
+        # noteOnDelayed(smap[sidx], 1, pp * i);
+        noteOnDelayed(smap[sidx], 1, ppp * i + third);
+        noteOnDelayed(smap[sidx], 1, ppp * i + third + ppp) ;
+        sidx = incr(sidx, 0, len(smap) + 1);
+      }
+    }
+
+  }
+}
+

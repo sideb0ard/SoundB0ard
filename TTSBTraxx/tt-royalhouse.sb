@@ -1,0 +1,310 @@
+let bd = sample(TT-ROYALHOUSE/bd.wav);
+set bd:pitch 2
+let bd2 = sample(TT-ROYALHOUSE/bdork.wav);
+let bd3 = sample(TT-ROYALHOUSE/bdvocwah.wav);
+let bd4 = sample(TT-ROYALHOUSE/beet.wav);
+let bd5 = sample(TT-ROYALHOUSE/blah.wav);
+let bt = sample(TT-ROYALHOUSE/bdtail.wav);
+
+let chw = sample(TT-ROYALHOUSE/chewit.wav);
+let ch = sample(TT-ROYALHOUSE/ch.wav);
+set ch:pitch 2
+let uh = sample(TTUnreleaseProject/UHhat.wav);
+let ch2 = sample(TTUnreleaseProject/ch.wav);
+let che = sample(TT-ROYALHOUSE/che.wav);
+let wh = sample(TT-ROYALHOUSE/whft.wav);
+let yv = sample(TT-ROYALHOUSE/youv.wav);
+let yek = sample(TT-ROYALHOUSE/yek.wav);
+let ec = sample(TT-ROYALHOUSE/ech.wav);
+let cn = sample(TT-ROYALHOUSE/canu.wav);
+let sw = sample(TT-ROYALHOUSE/schwip.wav);
+
+let teh = sample(TT-ROYALHOUSE/teh.wav);
+let not = sample(TT-ROYALHOUSE/not.wav);
+vol not 0.3;
+let it = sample(TT-ROYALHOUSE/it.wav);
+vol it 0.2;
+
+let mfa = sample(TT-ROYALHOUSE/mfa.wav);
+
+let sn = sample(TT-ROYALHOUSE/sn.wav);
+let sn2 = sample(TT-ROYALHOUSE/sn2.wav);
+let ehit  = sample(TT-ROYALHOUSE/ehit.wav);
+
+let bgn = sample(TT-ROYALHOUSE/bng.wav);
+let bgn1 = sample(TT-ROYALHOUSE/bgn1.wav);
+let bgn2 = sample(TT-ROYALHOUSE/bgn2.wav);
+let bgn3 = sample(TT-ROYALHOUSE/bgn3.wav);
+let bgn4 = sample(TT-ROYALHOUSE/bgn4.wav);
+
+let tth = sample(TT-NOCERA/tth.wav);
+
+# p4 $ "[~ <sn sn2>]*2";
+#p5 $ "<ch*16 ~ ch*16 ~ ch*4> ";
+#p6 < osc 12 "2 70" "set ch:fx1:fb %";
+
+# p8 $ "<~ tth*16 tth*16 tth*12 tth*16>";
+# let ork = grain(TT-ROYALHOUSE/orkloop.wav)
+# p11 < osc 32 "0 100" "set ork:idx %"
+
+# let yg = grain(TT-ROYALHOUSE/yek.wav);
+# vol yg 0.2;
+# p7 < every 2 "<1 1 1.5 2>" "set yg:pitch %";
+
+let PP16 = 240;
+# 19 midi ticks per 4% swing
+let PPSWING = 19;
+let pat_lenz = [8, 16, 12];
+let pat_len = pat_lenz[1];
+let pulses_per = 3840 / pat_len;
+
+
+let bdz = gen()
+{
+  setup()
+  {
+    #let bdz = [bd, bd2, bd3, bd4, bd5];
+    let bdz = [bd, bd2, bt, bd4, bt, bd5];
+    let bd_idx = 0;
+    let bd_num = 1;
+    let probz = [ 90, 0, 10, 10,  0, 0, 10, 10, 90, 0, 40, 10, 0, 0, 10, 30];
+  }
+
+  run() {
+
+    for (i = 0; i < pat_len; ++i)  {
+      if (i == 0 || i == 10) {
+        noteOnDelayed(bdz[bd_idx], 1, i * pulses_per);
+      }
+      if (count % 2 != 0 && i == 1) {
+        noteOnDelayed(bdz[bd_idx], 1, i * pulses_per);
+      }
+      # bd_idx = incr(bd_idx, 0, len(bdz));
+    }
+  }
+}
+
+let percz = gen()
+{
+  setup()
+  {
+    # let samplz = [ch, wh, yv, ec, sw];
+    # let samplz = [yek, yv, mfa];
+    let samplz = [ch, yv, yek, mfa];
+    let smp_idx = 0;
+    let smp_num = 1;
+    let rhythm = distrhythms_int();
+  }
+
+  run() {
+    if (count % 2 == 0) {
+      for (i = 0; i < pat_len; ++i)  {
+        if (rhythm[i]) {
+          noteOnDelayed(samplz[smp_idx], 1, i * pulses_per);
+          smp_idx = incr(smp_idx, 0, smp_num);
+        }
+      }
+      rhythm = distrhythms_int();
+      #samplz = rotate(samplz, 1);
+    }
+    if (count % 3 == 0) {
+      smp_num = incr(smp_num, 0, len(samplz) + 1);
+    }
+  }
+}
+
+let hatz = gen()
+{
+  setup()
+  {
+    # let samplz = [not, it, teh, ehit, cn];
+    # let samplz = [ch, bgn, teh];
+    #let samplz = [bgn, teh, ch, ch2, uh, it, not, tth];
+    let samplz = [ch, bgn, teh];
+    # let smp_idx = 0;
+    # let smp_num = 1;
+    let swing_setting = 1;
+    # let smp_num = 1;
+    #let rhythm = distrhythms_int();
+    let pat = rand_array(16, 0, len(samplz));
+  }
+
+  run() {
+    for (i= 0; i < 16; ++i) {
+
+      let swing_delay = 0;
+      if (i % 2 == 0) {
+        swing_delay = swing_setting * PPSWING;
+      }
+      if (pat[i] < len(samplz)) {
+        noteOnDelayed(samplz[pat[i]], 1, i * pulses_per + swing_delay);
+        # smp_idx = incr(smp_idx, 0, smp_num);
+        #swing_setting = incr(swing_setting, 0, 3);
+      }
+    }
+    pat = rand_array(16, 0, len(samplz));
+    #smp_num = incr(smp_num, 1, len(samplz) + 1);
+    #samplz = rotate(samplz, 1);
+  }
+}
+
+let snrz = gen()
+{
+  setup()
+  {
+    let snz=  [sn, sn2, che];
+    let snz_idx = 0;
+    let swing_setting = 2;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if ( i == 4 || i == 8) {
+        noteOnDelayed(snz[snz_idx], 1, i * pulses_per);
+        snz_idx = incr(snz_idx, 0, len(snz));
+      }
+      if (i == 12 && ( rand(10) > 4) ) {
+        let num_rolls = rand(5);
+        let offset = pulses_per / num_rolls + swing_setting * PPSWING;
+        for ( j = 0; j < num_rolls; ++j) {
+          noteOnDelayed(snz[snz_idx], 1, (i * pulses_per) + j*offset);
+          swing_setting = incr(swing_setting,0, 4);
+        }
+      }
+    }
+  }
+}
+
+let bongoz = gen()
+{
+  setup()
+  {
+    let bngz=  [bgn1, bgn2, bgn3, bgn4, bd2];
+    let rand_limit = 1;
+  }
+  run()
+  {
+    let randy_rhythm = rand_array(16, 0, len(bngz));
+    for (i = 0; i < pat_len; ++i) {
+      let randy_num = rand(10);
+      if (randy_num < rand_limit) {
+        if (randy_rhythm[i] < len(bngz)) {
+          noteOnDelayed(bngz[randy_rhythm[i]], 1, i * pulses_per);
+        }
+      }
+    }
+    rand_limit = incr(rand_limit, 3, 10);
+  }
+}
+
+let vocz = gen()
+{
+  setup()
+  {
+    let vz = [mfa, cn, yv, chw];
+    let vz_idx= 0;
+  }
+  run()
+  {
+    let rit = distrhythms_int();
+
+
+    #puts("RIT", rit);
+    for (i = 0; i < len(rit); ++i) {
+      if (i == 1) {
+        let v  =vz[rand(len(vz))];
+        noteOnDelayed(v, 1, i * pulses_per);
+        setPitch(v, rand(2) + 1);
+        # noteOnDelayed(vz[vz_idx], 1, i * pulses_per);
+        # vz_idx = incr(vz_idx, 0, len(vz));
+        #puts("RAND:", rand(len(vz)));
+      }
+    }
+  }
+}
+
+let htz = gen()
+{
+  setup()
+  {
+    let smp =  [tth];
+    let smp_idx = 0;
+    let count_mod = 2;
+  }
+  run()
+  {
+    if ( count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        # puts("i:", i* pulses_per, " smp_idx:", smp_idx);
+        let s = smp[smp_idx];
+        noteOnDelayed(s, 1, i * pulses_per, 127);
+        # smp_idx = incr(smp_idx, 0, len(smp));
+        # setPitch(s, rand(2) + 1);
+      }
+      # count_mod = incr(count_mod, 1, 3);
+    }
+  }
+}
+
+# dupes to pitch up
+let bdp = sample(TT-ROYALHOUSE/bd.wav);
+set bdp:pitch 2;
+let bdpt = sample(TT-ROYALHOUSE/bdtail.wav);
+set bdpt:pitch 2;
+let snp = sample(TT-ROYALHOUSE/sn2.wav);
+set snp:pitch 2;
+let itp = sample(TT-ROYALHOUSE/it.wav);
+set itp:pitch 2;
+let tic = sample(TT-BLACKRIOT-DAYINLIFE/tic.wav)
+
+let dz2 = gen()
+{
+  setup()
+  {
+    let smp = [bdp, bdpt, tic, itp, snp];
+    let smp_idx = 0;
+    let btz = rand_array(16, 0, len(smp));
+  }
+  run()
+  {
+    if (count % 1 == 0) {
+      for (i= 0; i < 16; ++i) {
+
+        if (btz[i] < len(smp)) {
+          noteOnDelayed(smp[btz[i]], 1, i * pulses_per);
+          smp_idx = incr(smp_idx, 0, len(smp));
+        }
+      }
+      btz = rand_array(16, 0, len(smp));
+    }
+  }
+}
+
+
+let harmonic = gen()
+{
+  setup()
+  {
+    let bdz = [bdp, itp, snp, bdpt];
+    let bdz_idx = 0;
+    let beat = distrhythms_int();
+    let vel_multi = 127 / 16;
+    let pulse_multi = 3840 / 16;
+  }
+  run()
+  {
+    for (i= 0; i < 16; ++i) {
+
+      if (beat[i] == 1) {
+        let vel = 127 - i * vel_multi;
+        noteOnDelayed(bdz[bdz_idx], 1, i * pulse_multi, vel);
+        bdz_idx = incr(bdz_idx, 0, len(bdz));
+      }
+    }
+    #len_idx = incr(len_idx, 0, len(lenz));
+    if (count % 4 == 0) {
+      beat = distrhythms_int();
+    }
+  }
+}
+
