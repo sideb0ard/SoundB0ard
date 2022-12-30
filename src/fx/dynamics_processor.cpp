@@ -212,7 +212,7 @@ StereoVal DynamicsProcessor::Process(StereoVal input) {
 
   double left_detector_input = input.left;
   if (m_external_source_ >= 0)
-    left_detector_input = mixr->soundgen_cur_val[m_external_source_].left;
+    left_detector_input = mixr->soundgen_cur_val_[m_external_source_].left;
 
   double left_detector =
       envelope_detector_detect(&m_left_detector_, left_detector_input);
@@ -291,4 +291,3 @@ void DynamicsProcessor::SetParam(std::string name, double val) {
   else if (name == "extsource")
     SetExternalSource(val);
 }
-

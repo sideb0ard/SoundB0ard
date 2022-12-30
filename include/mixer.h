@@ -63,10 +63,9 @@ struct Mixer {
       {};  // TODO get rid of this version
   std::vector<audio_action_queue_item> _delayed_action_items = {};
 
-  StereoVal soundgen_cur_val[MAX_NUM_SOUND_GENERATORS] = {};
-  double soundgen_volume[MAX_NUM_SOUND_GENERATORS] = {};
+  std::array<StereoVal, MAX_NUM_SOUND_GENERATORS> soundgen_cur_val_{};
 
-  int soloed_sound_generator_idx{-1};
+  std::vector<int> soloed_sound_generator_idz{};
 
   bool debug_mode{false};
 

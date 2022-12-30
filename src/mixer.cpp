@@ -475,10 +475,13 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
 
     int idx = 0;
     for (auto sg : sound_generators_) {
-      soundgen_cur_val[idx] = sg->GenNext(timing_info);
-      if (soloed_sound_generator_idx < 0 || idx == soloed_sound_generator_idx) {
-        output_left += soundgen_cur_val[idx].left;
-        output_right += soundgen_cur_val[idx].right;
+      soundgen_cur_val_[idx] = sg->GenNext(timing_info);
+      if (!soloed_sound_generator_idz.empty() ||
+          std::find(soloed_sound_generator_idz.begin(),
+                    soloed_sound_generator_idz.end(),
+                    idx) != soloed_sound_generator_idz.end()) {
+        output_left += soundgen_cur_val_[idx].left;
+        output_right += soundgen_cur_val_[idx].right;
       }
       idx++;
     }
@@ -681,10 +684,10 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     }
   } else if (action.type == AudioAction::SOLO) {
     if (IsValidSoundgenNum(action.soundgen_num)) {
-      soloed_sound_generator_idx = action.soundgen_num;
+      soloed_sound_generator_idz.push_back(action.soundgen_num);
     }
   } else if (action.type == AudioAction::UNSOLO) {
-    soloed_sound_generator_idx = -1;
+    soloed_sound_generator_idz.clear();
   } else if (action.type == AudioAction::STOP) {
     if (IsValidSoundgenNum(action.soundgen_num)) {
       auto sg = sound_generators_[action.soundgen_num];

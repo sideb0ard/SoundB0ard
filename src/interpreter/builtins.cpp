@@ -860,18 +860,16 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"solo", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> args)
                      -> std::shared_ptr<object::Object> {
-                   if (args.size() != 1)
-                     return evaluator::NewError(
-                         "`solo` requires a sound_generator target");
-
-                   auto soundgen =
-                       std::dynamic_pointer_cast<object::SoundGenerator>(
-                           args[0]);
-                   if (soundgen) {
-                     audio_action_queue_item action_req{
-                         .type = AudioAction::SOLO,
-                         .soundgen_num = soundgen->soundgen_id_};
-                     audio_queue.push(action_req);
+                   for (int i = 0; i < args.size(); i++) {
+                     auto soundgen =
+                         std::dynamic_pointer_cast<object::SoundGenerator>(
+                             args[i]);
+                     if (soundgen) {
+                       audio_action_queue_item action_req{
+                           .type = AudioAction::SOLO,
+                           .soundgen_num = soundgen->soundgen_id_};
+                       audio_queue.push(action_req);
+                     }
                    }
                    return evaluator::NULLL;
                  })},
