@@ -82,7 +82,7 @@ StereoVal MiniSynth::GenNext(mixer_timing_info tinfo) {
   calculate_pan_values(pan, &pan_left, &pan_right);
 
   StereoVal out = {.left = accum_out_left * volume * pan_left,
-                    .right = accum_out_right * volume * pan_right};
+                   .right = accum_out_right * volume * pan_right};
 
   out = Effector(out);
   return out;
@@ -1095,6 +1095,14 @@ void MiniSynth::Save(std::string new_preset_name) {
   fclose(presetzzz);
   printf("Wrote %d settings\n", settings_count++);
   return;
+}
+
+void MiniSynth::ListPresets() {
+  // TODO - implement this properly!
+  auto preset_names = GetSynthPresets(MINISYNTH_TYPE);
+  for (const auto &n : preset_names) {
+    std::cout << n << std::endl;
+  }
 }
 
 void MiniSynth::LoadPreset(std::string preset_name,

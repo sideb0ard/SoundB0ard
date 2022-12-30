@@ -95,6 +95,7 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args) {
     }
   }
 }
+
 void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
                      const std::string &preset_name,
                      const std::map<std::string, double> &preset) {

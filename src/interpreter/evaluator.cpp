@@ -500,9 +500,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       std::dynamic_pointer_cast<ast::SynthPresetExpression>(node);
   if (synth_preset) {
     if (synth_preset->token_.type_ == token::SLANG_MOOG_SYNTH) {
-      synth_list_presets(MINISYNTH_TYPE);
+      GetSynthPresets(MINISYNTH_TYPE);
+      std::cout << "NOOP - FIX ME?\n";
     } else if (synth_preset->token_.type_ == token::SLANG_FM_SYNTH) {
-      synth_list_presets(DXSYNTH_TYPE);
+      GetSynthPresets(DXSYNTH_TYPE);
+      std::cout << "NOOP - FIX ME?\n";
     } else
       std::cerr << "NOT A SYNTH TYPE!\n";
   }

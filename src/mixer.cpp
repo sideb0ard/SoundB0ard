@@ -643,7 +643,6 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     }
   } else if (action.type == AudioAction::ADD_FX) {
     if (action.sg && action.fx) {
-      std::cout << "GOT ACTION TYPE ADD_FX\n";
       action.sg->AddFx(action.fx);
     }
   } else if (action.type == AudioAction::BPM) {
@@ -809,9 +808,6 @@ void Mixer::CheckForExternalMidiEvents() {
       // TODO - THESE SHOULD BE SHARED WITH MIDI MESSAGE PARSING
       if (status == MIDI_ON || status == MIDI_OFF) {
         sound_generators_[midi_target]->parseMidiEvent(ev, timing_info);
-        // for (auto sg : sound_generators_) {
-        //   sg->parseMidiEvent(ev, timing_info);
-        // }
       }
 
       if (status == MIDI_CONTROL) {

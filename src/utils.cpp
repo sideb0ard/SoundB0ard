@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 namespace fs = std::filesystem;
@@ -912,80 +913,53 @@ std::vector<int> GenerateBjork(int num_pulses, int seq_length) {
   return bjorks;
 }
 
-bool synth_list_presets(unsigned int synthtype) {
-  std::cout << "IT ME!\n";
+std::vector<std::string> GetSynthPresets(unsigned int synthtype) {
+  std::cout << "GET ME!\n";
 
-  FILE *presetzzz = NULL;
+  std::string preset_file_name{};
   switch (synthtype) {
     case (MINISYNTH_TYPE):
-      presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
+      preset_file_name = MOOG_PRESET_FILENAME;
       break;
     case (DXSYNTH_TYPE):
-      presetzzz = fopen(DX_PRESET_FILENAME, "r+");
-      break;
-  }
-
-  if (presetzzz == NULL) return false;
-
-  char line[256];
-  char setting_key[512];
-  char setting_val[512];
-
-  char *tok, *last_tok;
-  char const *sep = "::";
-
-  while (fgets(line, sizeof(line), presetzzz)) {
-    for (tok = strtok_r(line, sep, &last_tok); tok;
-         tok = strtok_r(NULL, sep, &last_tok)) {
-      sscanf(tok, "%[^=]=%s", setting_key, setting_val);
-      if (strcmp(setting_key, "name") == 0) {
-        printf("%s\n", setting_val);
-        break;
-      }
-    }
-  }
-
-  fclose(presetzzz);
-
-  return true;
-}
-
-std::vector<std::string> synth_return_presets(unsigned int synthtype) {
-  std::cout << "IT ME!\n";
-
-  FILE *presetzzz = NULL;
-  switch (synthtype) {
-    case (MINISYNTH_TYPE):
-      presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
-      break;
-    case (DXSYNTH_TYPE):
-      presetzzz = fopen(DX_PRESET_FILENAME, "r+");
+      preset_file_name = DX_PRESET_FILENAME;
       break;
   }
 
   std::vector<std::string> preset_names{};
-  if (presetzzz == NULL) return preset_names;
+  std::ifstream presetzzz{preset_file_name};
 
-  char line[256];
-  char setting_key[512];
-  char setting_val[512];
+  if (presetzzz.is_open()) {
+    std::string line;
 
-  char *tok, *last_tok;
-  char const *sep = "::";
+    while (std::getline(presetzzz, line)) {
+      std::string delimiter = "::";
 
-  while (fgets(line, sizeof(line), presetzzz)) {
-    for (tok = strtok_r(line, sep, &last_tok); tok;
-         tok = strtok_r(NULL, sep, &last_tok)) {
-      sscanf(tok, "%[^=]=%s", setting_key, setting_val);
-      if (strcmp(setting_key, "name") == 0) {
-        preset_names.push_back(setting_val);
-        break;
+      size_t pos = 0;
+      std::string cur_setting{};
+      std::string name{};
+      std::string val{};
+
+      while ((pos = line.find(delimiter)) != std::string::npos) {
+        cur_setting = line.substr(0, pos);
+        std::stringstream ss{cur_setting};
+        int found_count{0};
+        while (!ss.eof()) {
+          if (found_count == 0)
+            std::getline(ss, name, '=');
+          else if (found_count == 1)
+            std::getline(ss, val, '=');
+          found_count++;
+        }
+
+        if (name == "name") {
+          preset_names.push_back(val);
+          break;
+        }
+        line.erase(0, pos + delimiter.length());
       }
     }
   }
-
-  fclose(presetzzz);
-
   return preset_names;
 }
 

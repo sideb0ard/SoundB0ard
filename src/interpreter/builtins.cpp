@@ -1119,7 +1119,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
              auto sg_type = soundgen->soundgenerator_type;
              if (sg_type < 2) {
-               auto preset_names = synth_return_presets(sg_type);
+               auto preset_names = GetSynthPresets(sg_type);
                int randy_int = rand() % preset_names.size();
                auto preset = preset_names[randy_int];
                auto preset_name =

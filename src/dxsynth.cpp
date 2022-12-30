@@ -220,7 +220,7 @@ StereoVal DXSynth::GenNext(mixer_timing_info tinfo) {
   calculate_pan_values(pan, &pan_left, &pan_right);
 
   StereoVal out = {.left = accum_out_left * volume * pan_left,
-                    .right = accum_out_right * volume * pan_right};
+                   .right = accum_out_right * volume * pan_right};
   out = Effector(out);
   return out;
 }
@@ -1545,8 +1545,10 @@ void DXSynth::SetParam(std::string name, double val) {
 }
 
 void DXSynth::ListPresets() {
-  // TODO - implement this properly!
-  synth_list_presets(DXSYNTH_TYPE);
+  auto preset_names = GetSynthPresets(DXSYNTH_TYPE);
+  for (const auto &n : preset_names) {
+    std::cout << n << std::endl;
+  }
 }
 
 }  // namespace SBAudio
