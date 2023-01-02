@@ -25,7 +25,7 @@ class FilterPass : public Fx {
   MoogLadder m_filter_;
 
   LFO m_lfo1_;  // route to freq
-  bool m_lfo1_active_{true};
+  bool m_lfo1_active_{false};
 
   LFO m_lfo2_;  // route to qv
   bool m_lfo2_active_{false};

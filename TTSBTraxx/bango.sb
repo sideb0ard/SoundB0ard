@@ -23,7 +23,7 @@ let arr_sizes = [2, 16, 4, 8, 16, 6, 8, 12, 4, 16];
 let arr_idx = 0;
 
 
-# let fnk = sample(TTUnreleaseProject/funkyGuitarLoop.wav);
+# let fnk = loop(TTUnreleaseProject/funkyGuitarLoop.wav); set fnk:grains_per_sec 15;
 # let bss = loop(TT-LIMELIFE-RIGHTONTIME/bassloop2.wav); set bss:grains_per_sec 20; set bss:len 0.5 // add delay
 # let bang = loop(TT-BANGO/BANGOLOOP.wav);
 

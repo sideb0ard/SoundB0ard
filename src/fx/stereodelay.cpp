@@ -19,33 +19,28 @@ void StereoDelay::SetDelayTimeMs(double delay_ms) {
   if (delay_ms >= 0 && delay_ms <= kMaxDelayLenSecs * 1000) {
     m_delay_time_ms_ = delay_ms;
     Update();
-  } else
-    std::cerr << "Delay time ms must be between 0 and "
-              << kMaxDelayLenSecs * 1000 << std::endl;
+  }
 }
 
 void StereoDelay::SetFeedbackPercent(double feedback_percent) {
   if (feedback_percent >= -100 && feedback_percent <= 100) {
     m_feedback_percent_ = feedback_percent;
     Update();
-  } else
-    printf("Feedback %% must be between -100 and 100\n");
+  }
 }
 
 void StereoDelay::SetDelayRatio(double delay_ratio) {
   if (delay_ratio > -1 && delay_ratio < 1) {
     m_delay_ratio_ = delay_ratio;
     Update();
-  } else
-    printf("Delay ratio must be between -1 and 1\n");
+  }
 }
 
 void StereoDelay::SetWetMix(double wet_mix) {
   if (wet_mix >= 0 && wet_mix <= 1) {
     m_wet_mix_ = wet_mix;
     Update();
-  } else
-    printf("Wetmix must be between 0 and 1\n");
+  }
 }
 
 void StereoDelay::Update() {

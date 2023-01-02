@@ -29,7 +29,7 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   incoming_grain_ = &grain_b_;
   reverse_mode_ = false;
 
-  SetGrainDensity(30);
+  SetGrainDensity(15);
 
   type = LOOPER_TYPE;
 

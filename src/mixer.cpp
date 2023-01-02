@@ -476,7 +476,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     int idx = 0;
     for (auto sg : sound_generators_) {
       soundgen_cur_val_[idx] = sg->GenNext(timing_info);
-      if (!soloed_sound_generator_idz.empty() ||
+      if (soloed_sound_generator_idz.empty() ||
           std::find(soloed_sound_generator_idz.begin(),
                     soloed_sound_generator_idz.end(),
                     idx) != soloed_sound_generator_idz.end()) {

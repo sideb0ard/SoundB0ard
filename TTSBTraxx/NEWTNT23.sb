@@ -1,0 +1,215 @@
+# let bc = loop(TTUnreleaseProject/bassCLAPloop.wav); set bc:len 2;
+# ^ add delay, filter and decimate
+
+# let bet = loop(TT-LIMELIFE-RIGHTONTIME/beatloop.wav);
+
+
+let bclah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [2, 2, 4, 3, 8, 1, 16];
+    let lx = 0;
+  }
+  run()
+  {
+    if (count % 8 == 0) {
+      set bc:plooplen lenz[lx];
+      set bet:plooplen lenz[lx];
+      #set notstay:plooplen lenz[lx];
+      lx = incr(lx, 0, len(lenz));
+    }
+    if (count % 7 == 0) {
+      set bc:poffset lenz[lx];
+      lx = incr(lx, 0, len(lenz));
+      set bet:poffset lenz[lx];
+    }
+    if (count % 4 == 0) {
+      set bc:poffset 0;
+      set bet:poffset 0;
+    }
+    if (count % 8 == 7) {
+      set bet:scramble 1;
+    }
+    if (count % 4 == 0) {
+      set bet:stutter 1;
+    }
+  }
+}
+
+# let notstay = loop(voices/notstayinghome.wav); set notstay:len 2; add_fx(notstay,"delay");
+let stayblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 16 < 4) {
+      set notstay:reverse 0;
+      if (count % 2 == 0) {
+        set notstay:on 1;
+      }
+      if (count % 4 == 0) {
+        set notstay:stutter 1;
+      }
+      if (count % 3 == 0) {
+        set notstay:scramble 1;
+      }
+      if (count % 8 == 7) {
+        set notstay:reverse 1;
+        play_array(notstay, rand_beat());
+      }
+    } else {
+      play_array(notstay, rand_beat());
+    }
+  }
+}
+
+
+# let laf1 = loop(TT-BANGO/laughLOOP.wav); set laf1:len 0.5; vol laf1 0;
+# let laf2 = loop(TT-BANGO/lafloop.wav); set laf2:len 0.5; vol laf2 0;
+# let gol = loop(TT-BANGO/BEATLOOP.wav); vol gol 0;
+let laf_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    unsolo();
+    set gol:on 1;
+    if (count % 8 == 6) {
+      solo(laf1, laf2);
+      set laf1:stutter 1;
+      set laf2:scramble 1;
+      let beat = rand_beat();
+      play_array(laf1, beat);
+      play_array(laf2, invert(beat));
+    }
+
+    # go easy on the gol - it takes over
+    if (count % 4 == 3) {
+      set gol:scramble 1;
+    }
+    set gol:reverse 0;
+    if (count % 8 == 7) {
+      set gol:reverse 1;
+    }
+  }
+}
+
+# let rap = loop(voices/back2basiccRAPAMP.wav); set rap:len 4;
+let rapmatrix_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 2) {
+      play_array(rap, rand_beat());
+    }
+    if (count % 8 == 7) {
+      set rap:on 1;
+      set rap:scramble 1;
+    }
+  }
+}
+
+
+# cut bc
+# cut bet
+
+# let snl = loop(TT-PARTYPEOPLE/snloop2.wav);
+# let fnk = loop(TTUnreleaseProject/funkyGuitarLoop.wav);
+# let bss = loop(TT-LIMELIFE-RIGHTONTIME/bassloop2.wav); set bss:len 0.5 // add delay
+
+
+let tntblah_gen = gen()
+{
+  setup()
+  {
+    let bt = rand_beat();
+    let ptz = [0.6, 1.2];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      set fnk:pitch ptz[px];
+      px = incr(px, 0, len(ptz));
+    }
+
+    set fnk:on 1;
+    if (count % 4 == 3) {
+      bt = rand_beat();
+    }
+
+    #set snl:stutter 1;
+    if (count % 4 == 0) {
+      #set snl:on 1;
+      #set snl:scramble 1;
+      set fnk:stutter 1;
+    }
+
+  }
+
+}
+
+
+let ploops = [1, 3, 2, 16, 4, 1, 3, 8, 16];
+let plx = 0;
+
+# let tb = loop(loops/toddterrybass1bar.aiff);
+let ploopblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set tb:on 1;
+    set tb:reverse 0;
+    if (rand(100) > 90) {
+      set tb:reverse 1;
+    }
+    if (count % 8 == 0) {
+      set tb:plooplen ploops[plx];
+      plx = incr(plx,0, len(ploops));
+    }
+  }
+}
+
+
+# dx TONIC riff 17? // o1rat 23
+#let rf = [11, 0, 0, 11, 0, 11, 0, 11, 0, 11, 0, 0, 11, 0, 11, 0];
+let rf = riff(11);
+let ddblah_gen = gen()
+{
+  setup()
+  {
+    let lx = 0;
+    let drr = 800;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, rf, lx, i, drr);
+        lx = incr(lx, 0, ploops[plx]);
+        drr = drr + 50;
+        if (drr > 1500) {
+          drr = 200;
+        }
+      }
+    }
+    if (count % 8 == 7) {
+      let bt = rand_beat();
+      play_array(tb, bt);
+      play_array(dx, invert(bt));
+    }
+
+  }
+}
+

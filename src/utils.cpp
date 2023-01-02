@@ -43,32 +43,33 @@ constexpr int kLocalBufferLen = 1024;
 namespace {
 void bjork(std::vector<std::vector<int>> &seqs,
            std::vector<std::vector<int>> &remainders) {
-  int i = 0;
+  if (remainders.size() < 2) return;
+  int seq_insert_count = 0;
   auto r_it = remainders.begin();
-  while (r_it != remainders.end()) {
-    i = 0;
-    for (auto &s : seqs) {
-      s.insert(s.end(), r_it->begin(), r_it->end());
-      r_it = remainders.erase(r_it);
-      if (r_it == remainders.end()) {
-        break;
-      }
-      i++;
+  for (auto &s : seqs) {
+    s.insert(s.end(), r_it->begin(), r_it->end());
+    seq_insert_count++;
+    r_it = remainders.erase(r_it);
+    if (r_it == remainders.end()) {
+      break;
     }
   }
-  int new_idx = i + 1;
-  std::copy(seqs.begin() + new_idx, seqs.end(), std::back_inserter(remainders));
-  seqs.erase(seqs.begin() + new_idx, seqs.end());
+
+  if (remainders.empty()) {
+    std::copy(seqs.begin() + seq_insert_count, seqs.end(),
+              std::back_inserter(remainders));
+    seqs.erase(seqs.begin() + seq_insert_count, seqs.end());
+  }
 
   if (remainders.size() > 1) bjork(seqs, remainders);
 }
 
-void print_vec_of_vec(std::vector<std::vector<int>> &vec) {
-  for (auto s : vec) {
-    for (auto n : s) std::cout << n;
-    std::cout << std::endl;
-  }
-}
+// void print_vec_of_vec(std::vector<std::vector<int>> &vec) {
+//   for (auto s : vec) {
+//     for (auto n : s) std::cout << n;
+//     std::cout << std::endl;
+//   }
+// }
 }  // namespace
 
 namespace utils {

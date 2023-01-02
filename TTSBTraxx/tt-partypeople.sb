@@ -1,4 +1,4 @@
-loadDir("TT-PARTYPEOPLE/");
+#load_dir("TT-PARTYPEOPLE/");
 
 let pitchz = [1, 2, 1.5, 0.7];
 let pidx = 0;
@@ -24,7 +24,7 @@ let vocz = gen()
   {
     let wurds = [waht, we, gon, do, votit, right, here, gon, back, orchordd];
     let wurds_idx = 0;
-    let beat = distrhythms_int();
+    let beat = rand_beat();
 
   }
   run()
@@ -33,12 +33,12 @@ let vocz = gen()
     if (count % 3 == 0 || count % 7 == 0) {
       for (i = 0; i < 16; ++i) {
         if (beat[i] == 1) {
-          noteOnDelayed(wurds[wurds_idx], 1, i*pp);
+          note_on_at(wurds[wurds_idx], 1, i*pp);
         }
         if (rand(100) > 70) {
           wurds_idx = incr(wurds_idx, 0, len(wurds));
           if (wurds_idx == 0) {
-            beat = distrhythms_int();
+            beat = rand_beat();
           }
         }
       }
@@ -46,8 +46,19 @@ let vocz = gen()
   }
 }
 
+let bblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set tdd:plooplen plenz;
+  }
+}
 
-let beat_gen = gen()
+
+let hbeat_gen = gen()
 {
   setup()
   {
@@ -59,13 +70,13 @@ let beat_gen = gen()
     if (rand(100) > 70) {
       let thh = 3840 / 2 / 3;
       let drift = rand(lpp);
-      noteOnDelayed(hatz[hix], 1, 3840 / 2 + 0);
-      noteOnDelayed(hatz[hix], 1, 3840 / 2 + thh + drift);
-      noteOnDelayed(hatz[hix], 1, 3840 / 2 + thh*2 + drift);
-      setPitch(hatz[hix], pitchz[pidx]);
-      setPitch(hhish, pitchz[pidx]);
-      setPitch(wahz[widx], pitchz[pidx]);
-      pidx = incr(pidx, 0, len(pitchz));
+      note_on_at(hatz[hix], 1, 3840 / 2 + 0);
+      note_on_at(hatz[hix], 1, 3840 / 2 + thh + drift);
+      note_on_at(hatz[hix], 1, 3840 / 2 + thh*2 + drift);
+      #set_pitch(hatz[hix], pitchz[pidx]);
+      #set_pitch(hhish, pitchz[pidx]);
+      #set_pitch(wahz[widx], pitchz[pidx]);
+      #pidx = incr(pidx, 0, len(pitchz));
       hix = incr(hix, 0, len(hatz));
     }
 
@@ -73,26 +84,26 @@ let beat_gen = gen()
 
       if (i % 2 == 0) {
         if (rand(100) > 80) {
-          noteOnDelayed(hatz[hix], 1, i * lpp);
+          note_on_at(hatz[hix], 1, i * lpp);
         } else {
-          noteOnDelayed(hhish, 1, i * lpp);
+          note_on_at(hhish, 1, i * lpp);
         }
       }
 
       if ( i == 0 ) {
-        noteOnDelayed(bdd2, 1, i * lpp);
+        note_on_at(bdd2, 1, i * lpp);
       }
       if ( i == 2 && rand(100) > 80 ) {
-        let vel = 90 + rand(38);
-        noteOnDelayed(bdd2, 1, i * lpp, vel);
+        let v = 90 + rand(38);
+        note_on_at(bdd2, 1, i * lpp, vel=v);
       }
       if ( i == plen / 2 && rand(100) > 80 ) {
-        let vel = 90 + rand(38);
-        noteOnDelayed(bdd2, 1, i * lpp, vel);
+        let v = 90 + rand(38);
+        note_on_at(bdd2, 1, i * lpp, vel =v);
       }
       if ( i == plen - 2  && rand(100) > 80 ) {
-        let vel = 50 + rand(38);
-        noteOnDelayed(bdd2, 1, i * lpp, vel);
+        let v = 50 + rand(38);
+        note_on_at(bdd2, 1, i * lpp, vel= v);
       }
 
       let divv = plen / 4;
@@ -102,94 +113,18 @@ let beat_gen = gen()
           # triplet
           let lllp = lpp / 3;
           for (j = 0; j < 3; ++j) {
-            let vel = 90 + rand(38);
+            let v = 90 + rand(38);
             let t = i * lpp + j * lllp;
-            noteOnDelayed(sn2, 1, i * lpp + lllp * j, vel);
-            noteOnDelayed(sn, 1, i * lpp + lllp * j, vel);
+            note_on_at(sn2, 1, i * lpp + lllp * j, vel=v);
+            note_on_at(sn, 1, i * lpp + lllp * j, vel=v);
             if (count % 7 == 0) {
-              noteOnDelayed(wahz[widx], 1, i * lpp, vel);
+              note_on_at(wahz[widx], 1, i * lpp, vel =v);
               widx = incr(widx, 0, len(wahz));
             }
           }
         } else {
-          let vel = 90 + rand(38);
-          noteOnDelayed(sn2, 1, i * lpp, vel);
-        }
-      }
-    }
-
-    if (count % 3 == 0 && rand(100) > 60) {
-      plidx = incr(plidx, 0, len(plenz));
-      plen = plenz[plidx];
-      lpp = 3840 / plen;
-    }
-  }
-}
-let beat2_gen = gen()
-{
-  setup()
-  {
-    let wahz = [bow, bap, snyo];
-    let widx = 0;
-  }
-  run()
-  {
-    #if (rand(100) > 70) {
-      #  let thh = 3840 / 2 / 3;
-      #  let drift = rand(lpp);
-      #  noteOnDelayed(hatz[hix], 1, 3840 / 2 + 0);
-      #  noteOnDelayed(hatz[hix], 1, 3840 / 2 + thh + drift);
-      #  noteOnDelayed(hatz[hix], 1, 3840 / 2 + thh*2 + drift);
-      #  setPitch(wahz[widx], pitchz[pidx]);
-      #  pidx = incr(pidx, 0, len(pitchz));
-      #  hix = incr(hix, 0, len(hatz));
-      #}
-
-    for (i = 0; i < plen; ++i) {
-
-      #if (i % 2 == 0) {
-        #  if (rand(100) > 80) {
-          #    noteOnDelayed(hatz[hix], 1, i * lpp);
-          #  } else {
-            #    noteOnDelayed(hhish, 1, i * lpp);
-            #  }
-        #}
-
-      if ( i == 0 ) {
-        noteOnDelayed(bdd, 1, i * lpp);
-      }
-      if ( i == 2 && rand(100) > 80 ) {
-        let vel = 90 + rand(38);
-        noteOnDelayed(bdd, 1, i * lpp, vel);
-      }
-      if ( i == plen / 2 && rand(100) > 80 ) {
-        let vel = 90 + rand(38);
-        noteOnDelayed(bdd, 1, i * lpp, vel);
-      }
-      if ( i == plen - 2  && rand(100) > 80 ) {
-        let vel = 50 + rand(38);
-        noteOnDelayed(bdd, 1, i * lpp, vel);
-      }
-
-      let divv = plen / 4;
-      if (i  == divv || i == divv *3) {
-        #puts("SNAREME:", i , " divv:", divv, " plen:", plen, " i:", i);
-        if (rand(100) > 10) {
-          # triplet
-          let lllp = lpp / 3;
-          for (j = 0; j < 3; ++j) {
-            let vel = 90 + rand(38);
-            let t = i * lpp + j * lllp;
-            noteOnDelayed(snyo, 1, i * lpp + lllp * j, vel);
-            noteOnDelayed(snbright, 1, i * lpp + lllp * j, vel);
-            if (count % 7 == 0) {
-              noteOnDelayed(wahz[widx], 1, i * lpp, vel);
-              widx = incr(widx, 0, len(wahz));
-            }
-          }
-        } else {
-          let vel = 90 + rand(38);
-          noteOnDelayed(snbright, 1, i * lpp, vel);
+          let v = 90 + rand(38);
+          note_on_at(sn2, 1, i * lpp, vel=v);
         }
       }
     }
@@ -206,7 +141,8 @@ let mel_gen = gen()
 {
   setup()
   {
-    let chordzzz = [ottdelayed, wah, waht, right, we, orchordd, hhchord];
+    #let chordzzz = [ottdelayed, wah, waht, right, we, orchordd, hhchord];
+    let chordzzz = [right, we, hhchord];
     let cidx = 0;
   }
   run()
@@ -216,9 +152,9 @@ let mel_gen = gen()
       for (i = 0; i < plen; ++i) {
         cidx = incr(cidx, 0, len(chordzzz));
         if (i % thrd == 0 ) {
-          noteOnDelayed(chordzzz[cidx], 1, i * lpp);
-          noteOnDelayed(chordzzz[cidx], 1, i * lpp + rand(100));
-          #setPitch(chordzzz[cidx], pitchz[pidx]);
+          note_on_at(chordzzz[cidx], 1, i * lpp);
+          note_on_at(chordzzz[cidx], 1, i * lpp + rand(100));
+          #set_pitch(chordzzz[cidx], pitchz[pidx]);
         }
       }
     }
@@ -229,23 +165,18 @@ let pa_gen = gen()
 {
   setup()
   {
-    let ppaz = [party1, party2, pa];
+    #let ppaz = [party1, party2 , pa];
+    let ppaz = [party1, party2];
     let pix = 0;
   }
   run()
   {
-    let beat = distrhythms_int();
-    for (i = 0; i < 16; ++i) {
-      if (beat[i] == 1) {
-        noteOnDelayed(ppaz[pidx], 1, i * pp);
-        pix = incr(pix, 0, len(ppaz));
-      }
-    }
-
+    let beat = rand_beat();
+    perky(beat, ppaz);
   }
 }
 
-vol hh2 0.5;
+#vol hh2 0.5;
 let hhah_gen = gen()
 {
   setup()
@@ -266,13 +197,13 @@ let hhah_gen = gen()
         timing = timing + swing;
       }
       if (rand(100) < 90) {
-        noteOnDelayed(hhz[hhidx], 1, timing);
+        note_on_at(hhz[hhidx], 1, timing);
       }
     }
-    if (count % 7 == 0) {
-      setPitch(hhz[hhidx], pitchz[pidx]);
-      pidx = incr(pidx, 0, len(pitchz));
-    }
+    #if (count % 7 == 0) {
+      #  set_pitch(hhz[hhidx], pitchz[pidx]);
+      #  pidx = incr(pidx, 0, len(pitchz));
+      #}
     if (count % 4 == 0) {
       hhidx = incr(hhidx, 0, hhlen);
       swincr = incr(swincr, 4, 9);
@@ -288,6 +219,33 @@ let hhah_gen = gen()
 
 }
 
-p10 < over 12 "0..100" "set ohs:idx %";
+# let notstay = loop(voices/notstayinghome.wav); set notstay:len 2; add_fx(notstay,"delay");
+let stayblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 16 < 12) {
+      set notstay:reverse 0;
+      if (count % 2 == 0) {
+        set notstay:on 1;
+      }
+      if (count % 4 == 0) {
+        set notstay:stutter 1;
+      }
+      if (count % 3 == 0) {
+        set notstay:scramble 1;
+      }
+      if (count % 8 == 7) {
+        set notstay:reverse 1;
+        play_array(notstay, rand_beat());
+      }
+    } else {
+      play_array(notstay, rand_beat());
+    }
+  }
+}
 
-
+#p10 < over 12 "0..100" "set ohs:idx %";

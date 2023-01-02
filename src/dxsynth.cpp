@@ -1159,7 +1159,6 @@ void DXSynth::SetOpWaveform(unsigned int op, unsigned int val) {
 
 void DXSynth::SetOpRatio(unsigned int op, double val) {
   if (val < 0.01 || val > 26) {
-    printf("val has to be [0.01-26]\n");
     return;
   }
   switch (op) {
@@ -1201,7 +1200,6 @@ void DXSynth::SetOpSustain(unsigned int op, bool val) {
 
 void DXSynth::SetOpDetune(unsigned int op, double val) {
   if (val < -100 || val > 100) {
-    printf("val has to be [-100-100]\n");
     return;
   }
   switch (op) {
@@ -1224,8 +1222,6 @@ void DXSynth::SetOpDetune(unsigned int op, double val) {
 
 void DXSynth::SetEGAttackMs(unsigned int eg, double val) {
   if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS) {
-    printf("val has to be [%d - %d] - you've given me %f\n", EG_MINTIME_MS,
-           EG_MAXTIME_MS, val);
     return;
   }
   switch (eg) {
@@ -1248,7 +1244,6 @@ void DXSynth::SetEGAttackMs(unsigned int eg, double val) {
 
 void DXSynth::SetEGDecayMs(unsigned int eg, double val) {
   if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS) {
-    printf("val has to be [%d - %d]\n", EG_MINTIME_MS, EG_MAXTIME_MS);
     return;
   }
   switch (eg) {
@@ -1271,7 +1266,6 @@ void DXSynth::SetEGDecayMs(unsigned int eg, double val) {
 
 void DXSynth::SetEGReleaseMs(unsigned int eg, double val) {
   if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS) {
-    printf("val has to be [%d - %d]\n", EG_MINTIME_MS, EG_MAXTIME_MS);
     return;
   }
   switch (eg) {
@@ -1294,7 +1288,6 @@ void DXSynth::SetEGReleaseMs(unsigned int eg, double val) {
 
 void DXSynth::SetEGSustainLevel(unsigned int eg, double val) {
   if (val < 0 || val > 1) {
-    printf("val has to be [0-1]\n");
     return;
   }
   switch (eg) {
@@ -1317,7 +1310,6 @@ void DXSynth::SetEGSustainLevel(unsigned int eg, double val) {
 
 void DXSynth::SetOpOutputLevel(unsigned int op, double val) {
   if (val < 0 || val > 99) {
-    printf("val has to be [0-99]\n");
     return;
   }
   switch (op) {
@@ -1377,15 +1369,11 @@ void DXSynth::SetResetToZero(bool b) { m_settings.m_reset_to_zero = b; }
 void DXSynth::SetLegatoMode(bool b) { m_settings.m_legato_mode = b; }
 
 void DXSynth::SetOp4Feedback(double val) {
-  if (val >= 0 && val <= 70)
-    m_settings.m_op4_feedback = val;
-  else
-    printf("Op4 feedback val has to be [0-70]\n");
+  if (val >= 0 && val <= 70) m_settings.m_op4_feedback = val;
 }
 
 void DXSynth::SetPitchbendFromREPL(double val) {
   if (val < -12 || val > 12) {
-    std::cout << "Val should be between -12 and +12\n";
     return;
   }
 
