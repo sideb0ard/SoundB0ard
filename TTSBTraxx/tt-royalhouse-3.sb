@@ -54,7 +54,7 @@ let bdz = gen()
     let pp = PPBAR / 16;
     for (i = 0; i < 16; ++i) {
       if (i == 0 || i == 10) {
-        noteOnDelayed(bd, 1, i*pp + offset);
+        note_on_at(bd, 1, i*pp + offset);
       }
     }
 
@@ -80,11 +80,11 @@ let snz = gen()
     let pp = PPBAR / 16;
     for (i = 0; i < 16; ++i) {
       if (i == 4 || i == 12) {
-        noteOnDelayed(sn, 1, i*pp);
+        note_on_at(sn, 1, i*pp);
       }
       if (i == 7 || i == 9) {
         if (rand(100) > 40) {
-          noteOnDelayed(percz[perc_idx], 1, i*pp);
+          note_on_at(percz[perc_idx], 1, i*pp);
           perc_idx = incr(perc_idx, 0, len(percz));
         }
       }
@@ -112,7 +112,7 @@ let htz = gen()
     let lenny = lenz[len_idx];
     let pp = PPBAR / lenny;
     for (i = 0; i < lenny; ++i) {
-      noteOnDelayed(hatz[htz_idx], 1, i*pp + offset);
+      note_on_at(hatz[htz_idx], 1, i*pp + offset);
       htz_idx = incr(htz_idx, 0, len(hatz));
     }
     for (i = 0; i < 16; ++i) {
@@ -121,7 +121,7 @@ let htz = gen()
         swing_off = PPSWING;
       }
       if (mo_hatz[i]) {
-        noteOnDelayed(ch, 1, i*pp + swing_off + offset, 80);
+        note_on_at(ch, 1, i*pp + swing_off + offset, 80);
       }
     }
     len_idx = incr(len_idx, 0, len(lenz));

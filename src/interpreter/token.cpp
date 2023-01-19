@@ -21,6 +21,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"gen", SLANG_GENERATOR},
     {"grain", SLANG_GRAIN},
     {"granular", SLANG_GRANULAR},
+    {"gran", SLANG_GRANULAR},
     {"help", SLANG_HELP},
     {"if", SLANG_IF},
     {"info", SLANG_INFO},

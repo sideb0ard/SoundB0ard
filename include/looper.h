@@ -102,7 +102,7 @@ class Looper : public SoundGenerator {
 
   bool scramble_pending_{false};
   bool scramble_mode_{false};
-  int scramble_idx_{0};
+  int current_sixteenth_{0};
 
   bool stutter_pending_{false};
   bool stutter_mode_{false};
@@ -119,6 +119,9 @@ class Looper : public SoundGenerator {
 
   double plooplen_{16};
   double poffset_{0};
+  int pinc_{1};
+  bool pbounce_{false};
+  bool preverse_{false};
 
  public:
   void ImportFile(std::string filename);
@@ -143,6 +146,7 @@ class Looper : public SoundGenerator {
 
   void SetPOffset(int poffset);
   void SetPlooplen(int plooplen);
+  void SetPinc(int pinc);
 };
 
 }  // namespace SBAudio

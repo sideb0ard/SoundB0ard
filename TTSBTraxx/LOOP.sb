@@ -1,0 +1,83 @@
+# bpm 120
+# let strl = loop(TT-LOOPS/partyStrings.aiff);
+# let ich = loop(TT-LOOPS/ichloop.aiff); add_fx(ich, "decimate");
+# let ich = loop(TT-LOOPS/ichloop.aiff); add_fx(ich, "decimate");
+
+let partyStringblah_gen = gen()
+{
+  setup()
+  {
+    let offsetsz = [0, 4, 8];
+    let ox = 0;
+    let pofflenz = [16, 4, 8, 2];
+    let pox = 0;
+  }
+  run()
+  {
+    #unsolo();
+    if (count % 4 == 0) {
+      set strl:poffset offsetsz[ox];
+      ox = incr(ox, 0, len(offsetsz));
+      set ich:poffset offsetsz[ox];
+    }
+    if (count % 3 == 0) {
+      set strl:plooplen pofflenz[pox];
+      pox = incr(pox, 0, len(pofflenz));
+      set ich:plooplen pofflenz[pox];
+    }
+
+    if (count % 8 == 7) {
+      set ich:stutter 1;
+      #solo(strl);
+    }
+  }
+}
+
+let bap = sample(TT-PARTYPEOPLE/bap.wav);
+let right = sample(TT-PARTYPEOPLE/right.wav);
+let izoh = sample(TT-PARTYPEOPLE/izoh.wav);
+let here = sample(TT-PARTYPEOPLE/here.wav);
+let uhh = sample(TT-LIMELIFE-RIGHTONTIME/uhh.wav);
+
+let pblah_gen = gen()
+{
+  setup()
+  {
+    let perz = [bap, right, izoh, here, uhh];
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      perky(rand_beat(), perz);
+    }
+  }
+}
+
+
+#let bd = sample(TTFUNKYG/thudKick.wav);
+let mk = sample(TT-BANGO/melodKICK.wav);
+let kfb = sample(TT-BANGO/kickFLUTE.wav);
+
+let cp = sample(TTFUNKYG/clapp.wav);
+let hh = sample(TT-LIMELIFE-RIGHTONTIME/hh.wav);
+let bbslah_gen = gen()
+{
+  setup()
+  {
+    let beat = rand_beat();
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      play_array(mk, beat);
+    }
+    if (count % 2 == 1) {
+      play_array(kfb, beat);
+      cbeat(cp);
+    }
+    if (count % 2 ==0) {
+      hhbeat(hh);
+    }
+  }
+}
+

@@ -219,33 +219,3 @@ let hhah_gen = gen()
 
 }
 
-# let notstay = loop(voices/notstayinghome.wav); set notstay:len 2; add_fx(notstay,"delay");
-let stayblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 16 < 12) {
-      set notstay:reverse 0;
-      if (count % 2 == 0) {
-        set notstay:on 1;
-      }
-      if (count % 4 == 0) {
-        set notstay:stutter 1;
-      }
-      if (count % 3 == 0) {
-        set notstay:scramble 1;
-      }
-      if (count % 8 == 7) {
-        set notstay:reverse 1;
-        play_array(notstay, rand_beat());
-      }
-    } else {
-      play_array(notstay, rand_beat());
-    }
-  }
-}
-
-#p10 < over 12 "0..100" "set ohs:idx %";

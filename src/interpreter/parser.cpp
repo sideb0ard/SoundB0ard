@@ -804,12 +804,21 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression() {
 
 std::shared_ptr<ast::Expression> Parser::ParseGranularExpression() {
   auto granular = std::make_shared<ast::GranularExpression>(cur_token_);
+  std::cout << "GOT a " << cur_token_.literal_ << " FROM " << cur_token_.type_
+            << std::endl;
+  std::cout << "__ LOOP MODE CUR SET TO " << granular->loop_mode_ << "\n";
+
   if (cur_token_.type_ == token::SLANG_LOOP) {
     std::cout << "GOT LOOP TOKEN\n";
     granular->loop_mode_ = 0;
   } else if (cur_token_.type_ == token::SLANG_GRAIN) {
     granular->loop_mode_ = 1;
+  } else if (cur_token_.type_ == token::SLANG_GRANULAR) {
+    granular->loop_mode_ = 2;
+    std::cout << "GOT GRAN TOKEN ! "
+              << " set to " << granular->loop_mode_ << "\n";
   }
+
   std::cout << "__ LOOP MODE SET TO " << granular->loop_mode_ << "\n";
 
   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;

@@ -1,0 +1,15 @@
+NEWTNT23.sb
+
+snarrr from:
+todd_nocera2.sb
+
+LOOP.sb
+
+23tnt.sb <- vblah, ichtblah and lfl // then hah_gen and yogen
+
+cut to lfl_gen hah_gen and yogen - no ich
+
+let bssl = loop(TT-LIMELIFE-RIGHTONTIME/bassloop.wav); add_fx(bssl, "decimate");
+
+bring in wbs // cut lfl_gen and hah_gen - only yogen bssl and wbs
+tntSHOW.sb <- weeblah

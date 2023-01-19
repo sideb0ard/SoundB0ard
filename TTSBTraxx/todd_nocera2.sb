@@ -11,6 +11,7 @@ let kr = sample(TT-NOCERA/kickr.wav);
 vol kr 0.5
 let kkl = sample(TT-NOCERA/klickKICK.wav);
 let bd = sample(TT-BANGO/kiCK.wav);
+vol bd 0.4;
 let ooh = sample(TT-NOCERA/ooh.wav);
 let pah = sample(TT-NOCERA/pah.wav);
 let sn = sample(TT-NOCERA/snarey.wav);
@@ -33,22 +34,15 @@ let wumpa = sample(TT-NOCERA/wumpAH.wav);
 vol wumpa 0.4;
 
 let kicksz = [kr, bd, bad, wumpa, wu ];
-let kicksz_names = ["kr", "bd", "bad", "wumpa"];
 
 let uhn = sample(TT-LIMELIFE-RIGHTONTIME/uhstrlastbeat.wav);
+
 let hatz = [tic, tsck, wwhm, uhn];
-#let pianoz = [ pah, sumr, oh ];
-#let piano_namez = [ "pah", "sumr", "pah", "pah", "oh", "oh", "~", "~", "~", "oh" ];
 let pianoz = [ ump, tme, pah];
-let piano_namez = [ "ump", "tme", "pah", "oh"];
 
 let tomz = [ sn, sn2, tom];
 
-#let gl = grain(TT-NOCERA/grainyloop2.wav);
-#p4 < over 128 "1 100" "set gl:idx %";
-
-
-# let bet = loop(TT-LIMELIFE-RIGHTONTIME/beatloop.wav);
+# let bet = loop(TT-LIMELIFE-RIGHTONTIME/beatloop.wav); add_fx(bet, "decimate");
 
 let kickrr = gen()
 {
@@ -66,15 +60,15 @@ let kickrr = gen()
   {
 
     if (count % 2 == 0 ) {
-      set bd:pitch 2
+      set bd:pitch 2;
     } else {
-      set bd:pitch 1
+      set bd:pitch 1;
     }
     if (count % 3 == 0 ) {
-      set kr:pitch 2
-        set bet:scramble 1;
+      set kr:pitch 2;
+      set bet:scramble 1;
     } else {
-      set kr:pitch 1
+      set kr:pitch 1;
     }
 
     set bet:on 1;
@@ -83,7 +77,6 @@ let kickrr = gen()
       set bet:stutter 1;
     } else {
       if (count % 7 == 0) {
-        # puts("BOOGIE!")
         let rh = rand_beat();
         play_array(bet, invert(rh));
         for (i = 0; i < len(rh); ++i) {
@@ -116,7 +109,6 @@ let nocera_hatz = gen()
     let arr_idx = 0;
     let hatz_idx = 0;
     let len_hatz = 2;
-    let count = 0
   }
 
   run()
@@ -138,14 +130,13 @@ let nocera_hatz = gen()
     for ( i = 0 ; i < len(arr) ;  ++i ) {
       let randy = rand(10);
       if ( randy < 8 ) {
-        note_on_at(hatz[hatz_idx], 1, i*inc)
+        note_on_at(hatz[hatz_idx], 1, i*inc);
       }
       if (randy < 6) {
-        hatz_idx = incr(hatz_idx, 0, len_hatz)
+        hatz_idx = incr(hatz_idx, 0, len_hatz):
       }
     }
-    len_hatz = incr(len_hatz, 2, len(hatz) + 1)
-      ++count;
+    len_hatz = incr(len_hatz, 2, len(hatz));
   }
 }
 
@@ -178,35 +169,16 @@ let nocera_pianoz = gen()
 {
   setup()
   {
-    let count = 0
-      let rhythm = ""
-      let piano_idx = 0;
+    let beat = rand_beat();
   }
 
   run()
   {
-    # if (count % 2 == 0 ) {
-      #  set tme:pitch 2
-      # } else {
-        #   set tme:pitch 1
-        # }
-    # if (count % 3 == 0 ) {
-      #  set ump:pitch 2
-      # } else {
-        #   set ump:pitch 1
-        # }
-    rhythm = distrhythms_string()
-      rhythm = rotate(rhythm, 8)
-      let trhythm = ""
-      for (i = 0; i < len(rhythm); ++i) {
-        if (rhythm[i] == "1") {
-          trhythm = trhythm + piano_namez[piano_idx];
-        } else {
-          trhythm = trhythm + rhythm[i];
-        }
-        piano_idx = incr(piano_idx, 0, len(piano_namez));
-      }
-    return trhythm
+    perky(beat, pianoz);
+
+    if (count % 8 == 6) {
+      beat = rand_beat();
+    }
   }
 }
 #
@@ -215,17 +187,22 @@ let snarrr = gen()
 {
   setup()
   {
-    let snz = [sn2, sn, sumr, stb, bad];
+    let snz = [sn, tme, sumr, an];
     let snx = 0;
+    let elz = [3, 5, 2, 7];
+    let ex = 0;
   }
 
   run()
   {
-    if (count % 3 == 0) {
-      cbeat(snz[snx]);
-    }
+
+    let beat = rotate(bjork(elz[ex], 16), 4);
+    perky(beat, snz);
+    #if (count % 3 == 0) {
+      #  cbeat(snz[snx]);
+      #}
     if (count % 4 == 0) {
-      snx = incr(snx, 0, len(snz));
+      ex = incr(ex, 0, len(elz));
     }
   }
 }

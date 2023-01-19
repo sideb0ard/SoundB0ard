@@ -253,7 +253,7 @@ class GranularExpression : public Expression {
 
  public:
   std::string path_;
-  bool loop_mode_{false};
+  int loop_mode_{0};  // 0 is loop, 1 is static grain, 2 is granular wash
 };
 
 class CallExpression : public Expression {

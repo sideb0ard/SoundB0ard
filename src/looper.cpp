@@ -79,9 +79,9 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
       int rel_pos_within_a_sixteenth =
           fmod(audio_buffer_read_idx_, size_of_sixteenth_);
 
-      if (scramble_mode_) {
-        audio_buffer_read_idx_ =
-            (scramble_idx_ * size_of_sixteenth_) + rel_pos_within_a_sixteenth;
+      if (scramble_mode_ || pinc_ != 1) {
+        audio_buffer_read_idx_ = (current_sixteenth_ * size_of_sixteenth_) +
+                                 rel_pos_within_a_sixteenth;
       } else if (stutter_mode_) {
         audio_buffer_read_idx_ =
             (stutter_idx_ * size_of_sixteenth_) + rel_pos_within_a_sixteenth;
@@ -110,16 +110,20 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   if (loop_num < 0) loop_num = 0;
 
   if (tinfo.is_sixteenth) {
+    if (pinc_ != 1) {
+      current_sixteenth_ = (current_sixteenth_ + pinc_) % 16;
+    } else {
+      current_sixteenth_ = tinfo.sixteenth_note_tick % 16;
+    }
     if (scramble_mode_) {
-      scramble_idx_ = tinfo.sixteenth_note_tick % 16;
-      if (scramble_idx_ % 2 != 0) {
+      if (current_sixteenth_ % 2 != 0) {
         int randy = rand() % 100;
         if (randy < 25)  // repeat the third 16th
-          scramble_idx_ = 3;
+          current_sixteenth_ = 3;
         else if (randy > 25 && randy < 50)  // repeat the 4th sixteenth
-          scramble_idx_ = 4;
+          current_sixteenth_ = 4;
         else if (randy > 50 && randy < 75)  // repeat the 7th sixteenth
-          scramble_idx_ = 7;
+          current_sixteenth_ = 7;
       }
     }
     if (stutter_mode_) {
@@ -253,7 +257,7 @@ std::string Looper::Info() {
      << "\ngrain_dur_ms:" << grain_duration_frames_
      << " grains_per_sec:" << grains_per_sec_
      << " quasi_grain_fudge:" << quasi_grain_fudge_ << " poffset:" << poffset_
-     << " plooplen:" << plooplen_
+     << " plooplen:" << plooplen_ << " pinc:" << pinc_
      << "\ngrain_spray_ms:" << granular_spray_frames_ / 44.1
      << " attack:" << eg_.m_attack_time_msec
      << " decay:" << eg_.m_decay_time_msec
@@ -432,6 +436,7 @@ void Looper::SetPlooplen(int plooplen) {
     plooplen_ = plooplen;
   }
 }
+void Looper::SetPinc(int pinc) { pinc_ = pinc; }
 
 void Looper::SetParam(std::string name, double val) {
   if (name == "on") {
@@ -455,6 +460,8 @@ void Looper::SetParam(std::string name, double val) {
     SetPOffset(val);
   else if (name == "plooplen")
     SetPlooplen(val);
+  else if (name == "pinc")
+    SetPinc(val);
   else if (name == "scramble")
     SetScramblePending();
   else if (name == "stutter")

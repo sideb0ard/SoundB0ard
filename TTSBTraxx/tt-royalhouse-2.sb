@@ -152,7 +152,7 @@ let hatz = gen()
     let velz_idx = 0;
     let swing_setting = 2;
     let smp_num = 1;
-    #let rhythm = distrhythms_int();
+    #let rhythm = rand_beat();
 
     let countz = [16, 16, 8, 4, 16, 3];
     let ct_idx = 0;
@@ -254,7 +254,7 @@ let itnot = gen()
     let vocz = [not, chw, it, tic, sw];
     let vocz_idx = 0;
     let voc_len = 1;
-    let pat = distrhythms_int();
+    let pat = rand_beat();
     let max = 0;
   }
   run()
@@ -271,7 +271,7 @@ let itnot = gen()
     if (max > 100) {
       max = 0;
     }
-    pat = distrhythms_int();
+    pat = rand_beat();
   }
 }
 

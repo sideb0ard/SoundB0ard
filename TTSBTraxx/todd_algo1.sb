@@ -1,26 +1,10 @@
-# # let count = 0;
-# sn = Sampler(TTFUNKYG/clik.wav) vol:0.70 pan:0.00 pitch:1.00
-#      fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
-#      lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
-# wah = Sampler(TTFUNKYG/wah.wav) vol:0.00 pan:0.00 pitch:1.00
-# cp = Sampler(TTUnreleaseProject/clap.wav) vol:0.70 pan:0.00 pitch:1.00
-# lp = TTUnreleaseProject/snareroll.wav vol:0.7 pan:0 pitch:1 idx:625 mode:LOOP(0) step:0 len:0.12
-# bd = Sampler(TTUnreleaseProject/BD.wav) vol:0.70 pan:0.00 pitch:1.00
-#      fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
-#      lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
-# snk = Sampler(TTFUNKYG/SNIK.wav) vol:0.70 pan:0.00 pitch:1.00
-# raw = Sampler(TTFUNKYG/rawRAK.wav) vol:0.70 pan:0.00 pitch:1.00
-# sll = TTUnreleaseProject/stringzzzLOOOP.wav vol:0.6 pan:0 pitch:1 idx:0 mode:SMUDGE(2) step:0 len:1
-#       fx0 inputgain:0.00 threshold:-36.00 attackms:1.00 releasems:55.00 ratio:2.50
-# outputgain:0.00 kneewidth:0.00 lookahead:0.00 sterolink:OFF(0)
-# type:COMP(0) mode:ANALOG(0) extsource:on(0)
+let bd = sample(TTUnreleaseProject/BD.wav);
+let sn = sample(TTFUNKYG/clik.wav);
+let cp = sample(TTUnreleaseProject/clap.wav);
+let wah = sample(TTFUNKYG/wah.wav);
+# let lp = loop(TTUnreleaseProject/snareroll.wav);
+# let sll = grain(TTUnreleaseProject/stringzzzLOOOP.wav);
 
-# let bd = sample(TTUnreleaseProject/BD.wav)
-# let sn = sample(TTFUNKYG/clik.wav)
-# let cp = sample(TTUnreleaseProject/clap.wav)
-# let wah = sample(TTFUNKYG/wah.wav)
-# let lp = loop(TTUnreleaseProject/snareroll.wav)
-# let sll = grain(TTUnreleaseProject/stringzzzLOOOP.wav)
 # p2 < every 3 "<0.8 1 1.25 1.5 2>" "set bd:pitch %"
 # p1 # primerrr bd
 # p3 # primerrr cp
@@ -39,70 +23,30 @@
 # p13 < every 3 "<1 1.2 1.5 2>" "set wah:pitch %"/fx0
 #
 # addFx(sll, "sidechain", bd)
-#
 # addFx(sn, "filter")
 # addFx(bn, "filter")
 
 # SB#> loadPreset(dxx, "TONIC")
 ##  SB#> loadPreset(dxx, "siiiiney")
 ##   loadPreset(dxx, "rocktagon")"rocktagon"
- # 
-##  inclusive of lower and upper vals
-let randy_array = fn(alen, lower, upper)
-{ 
-     let array = []
-     # blah = alen
-     if (alen > 0 && lower < upper) {
-     for (i = 0; i < alen; ++i)
-     {
-        let randy = rand(upper+1) + lower;
-        if ( randy > upper) {
-          puts("RANDY is:", randy, " more than ", upper);
-          randy = (randy % (upper - lower)) + lower;
-        }
-        array = push(array, randy);
-     }
-     } else {
-       puts("YO, SORT IT!");
-     }
-     return array;
-} 
- # 
+#
+
 let primerrr = gen()
-{ 
-   setup()
-   {
-     # let primerz = ["2, 3, 5, 7, 11, 13, 17, 19, 23]
-     let primerz = ["3", "5", "7", "11", "13"]
-     let prime_idx = 0
-   }
-   run()
+{
+  setup()
   {
-    let pat = "1(" + primerz[prime_idx] + ",8)"
+    # let primerz = ["2, 3, 5, 7, 11, 13, 17, 19, 23]
+    let primerz = ["3", "5", "7", "11", "13"];
+    let prime_idx = 0;
+  }
+  run()
+  {
+    let pat = "1(" + primerz[prime_idx] + ",8)";
     prime_idx = incr(prime_idx, 0, len(primerz));
     return pat
   }
 }
-# 
-# let counter = gen()
-# {
-#   setup()
-#   {
-#   }
-#   run()
-#   {
-#     count = count + 1;
-#     let 
-#     if (count % 16 == 0 )
-#     {
-#       
-#     }
-#     return ""
-#   }
-# }
-# 
-# let jobbie = 10
-# # 
+
 # let flipz = gen()
 # {
 #   setup()
@@ -126,8 +70,8 @@ let primerrr = gen()
 #       return rhythm;
 #    }
 # }
-# 
-# 
+#
+#
 # let nmapr = gen()
 # {
 #   setup()
@@ -140,7 +84,7 @@ let primerrr = gen()
 #     for (i = 0; i < len(pat); ++i)
 #     {
 #       #puts("PAT[", i, "] is ", pat[i]);
-#       if (notes[pat[i]]) 
+#       if (notes[pat[i]])
 #       {
 #         #puts("MAPPED TO ", mmmap[pat[i]]);
 #         let numz = rand(4) + 1;
@@ -151,13 +95,13 @@ let primerrr = gen()
 #     return rhythm;
 #   }
 # }
-# 
+#
 # # p2 < every 3 "1"  "pat = reverse(pat)"
 # # p3 < every 4 "1"  "pat = rotate(pat, 3)"
 # # p4 < every 8 "1"  "pat = randy_array(16, 0, 2)"
 # # p5 < every 7 "1"  "pat = randy_array(8, 0, 2)"
 # # p6 < every 13 "1"  "pat = randy_array(11, 0, 2)"
-# 
+#
 let mapr = gen()
 {
   setup()
@@ -170,17 +114,17 @@ let mapr = gen()
     for (i = 0; i < len(pat); ++i)
     {
       #puts("PAT[", i, "] is ", pat[i]);
-      if (mmmap[pat[i]]) 
+      if (mmmap[pat[i]])
       {
         #puts("MAPPED TO ", mmmap[pat[i]]);
         rhythm = rhythm + mmmap[pat[i]];
       }
       rhythm = rhythm + " ";
-     }
+    }
     return rhythm;
   }
 }
-# 
+#
 # let synco = gen()
 # {
 #   setup()
@@ -188,7 +132,7 @@ let mapr = gen()
 #     let bd_count = 11;
 #     let bd_max = 13;
 #   }
-# 
+#
 #   run()
 #   {
 #      let rhythm = "[bd*"
@@ -202,22 +146,22 @@ let mapr = gen()
 #      return rhythm
 #   }
 # }
-#  
-#  
+#
+#
 # let todd1 = gen()
 # {
 #     setup()
-#     { 
+#     {
 #       let melody = gimmeNotes()
 #       let melody_repeat = 1
 #       let melody_repeat_counter = 1
-# 
+#
 #       let rhythm = distrhythms()
 #       puts("RHYTHM IS ", rhythm)
 #       let rhythm_counter = 3;
 #       let rhythm_counter_max = 7;
 #     }
-# 
+#
 #     run()
 #     {
 #       melody = gimmeNotes()
@@ -230,42 +174,42 @@ let mapr = gen()
 #         #puts("DOING MA THANG");
 #         brak = 1;
 #       }
-#   
+#
 #       let pattern = apply_melody_to_rhythm(melody, rhythm, (count % 3) + rhythm_counter, brak);
-# 
+#
 #       rhythm_counter = incr(rhythm_counter, 3, rhythm_counter_max)
-# 
+#
 #       return pattern
 #     }
 # }
-# # 
-# # 
+# #
+# #
 # let apply_melody_to_rhythm = fn(melody, rhythm, num_times, brak)
 # {
 #     let pattern = ""
 #     let melody_len = len(melody);
 #     let melody_idx = 0;
 #     let num_times_idx = 0
-# 
-# 
+#
+#
 #     for (i = 0; i < len(rhythm); ++i)
 #     {
 #        if (rhythm[i] == "1")
 #        {
 #           let addition =  melody[melody_idx] + "*" + num_times;
-#           if (brak == 1  && i != 0)  
+#           if (brak == 1  && i != 0)
 #           {
 #             brak = 0;
 #             let wee = get_four_beat();
-#             addition = "[" + apply_melody_to_rhythm(melody[melody_idx], wee, 1, 0) + "]"; 
-#           } 
-# 
-#           if (rand(10) > 8) {
-# 	     addition = melody[melody_idx] + "(3,8)"
+#             addition = "[" + apply_melody_to_rhythm(melody[melody_idx], wee, 1, 0) + "]";
 #           }
-# 
+#
+#           if (rand(10) > 8) {
+#        addition = melody[melody_idx] + "(3,8)"
+#           }
+#
 #           pattern = pattern + addition;
-# 
+#
 #           if ( count % 2 == 0 ) {
 #             melody_idx = incr(melody_idx, 0, melody_len);
 #           }
@@ -278,102 +222,33 @@ let mapr = gen()
 #     }
 #     return pattern;
 # }
-# 
+#
 # let get_four_beat = fn()
 # {
 #     let rhythm = distrhythms()
-#     rhythm = rotate(rhythm, count % 4); 
+#     rhythm = rotate(rhythm, count % 4);
 #     let wee_pattern = ""
-#     
+#
 #     for (i = 0; i < len(rhythm)/4; ++i)
 #     {
 #        wee_pattern = wee_pattern + rhythm[i];
 #     }
 #     return wee_pattern;
 # }
-# 
-# let rhythms = [
-#   #shiko
-#   "1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
-#   #son
-#   "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
-#   #rumba
-#   "1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
-#   #soukous
-#   "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
-#   #gahu
-#   "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
-#   #bossa-nova
-#   "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
-# ]
-# 
-# let distrhythms = gen()
-# {
-#   setup() {}
-#   
-#   run() {
-#     let idx = rand(len(rhythms))
-#     #puts("IDX is ", idx, " - pattern is: ", rhythms[idx])
-#     return rhythms[idx]
-#   }
-# }
-#     
-# let rotr = gen()
-# {
-#   setup() {
-#     let rhythm = ["1", "~", "~", "~", "1", "~", "1", "~", "~", "~", "1", "~", "1", "~", "~", "~"]
-#   }
-#   
-#   run() {
-#     let pattern = ""
-#     for (i = 0; i < len(rhythm); ++i) {
-#       if (rhythm[i] == "1") {
-#          pattern = pattern + "1";
-#       } else {
-#          pattern = pattern + rhythm[i];
-#       }
-#       pattern = pattern + " "
-#     }
-#     rhythm = rotate(rhythm, 4)
-#     return pattern;
-#   }
-# }
-#     
-#   
-let teeigen = gen()
+
+let teeblah_gen = gen()
 {
-    setup()
-    {
-      let probs = [80, 60, 10]
-      let probs_idx = 0;
-    }
-
-    run()
-    {
-        let rhythm_string = ""
-
-        for (i = 0; i < 16; ++i)
-        {
-            if ( i > 7 && i < 12)
-            {
-                let prob = rand(100);
-                if (prob < probs[probs_idx]) {
-                  rhythm_string = rhythm_string + "1 "
-                }
-                else {
-                  rhythm_string = rhythm_string + "~ "
-                }
-            } 
-            else
-            {
-                rhythm_string = rhythm_string + "~ "
-            }
-        }
-        return rhythm_string
-  
-    }
+  setup()
+  {
+  }
+  run()
+  {
+    let beat = rand_array(8, 0, 0) + rand_array(4, 0, 1)  +rand_array(4, 0, 0);
+    return beat;
+  }
 }
-# 
+
+#
 # let higen = gen()
 # {
 #     setup()
@@ -383,14 +258,14 @@ let teeigen = gen()
 #        let hat_prob_idx = 0
 #        let hat_prob_num = 2
 #     }
-# 
+#
 #     run()
 #     {
 #         if (count % hat_prob_num == 0) {
 #           hat_prob_idx = incr(hat_prob_idx, 0, len(hat_probs));
 #         }
 #         let rhythm_string = ""
-# 
+#
 #         for (i = 0; i < 16; ++i)
 #         {
 #             let prob = rand(100)
@@ -398,11 +273,11 @@ let teeigen = gen()
 #             {
 #                 if (prob < skip_prob) {
 #                    rhythm_string = rhythm_string + "[ ~ ";
-#                 } 
+#                 }
 #                 rhythm_string = rhythm_string + "1 ";
 #                 if (prob < skip_prob) {
 #                    rhythm_string = rhythm_string + "] ";
-#                 } 
+#                 }
 #             }
 #             else
 #             {
@@ -410,21 +285,21 @@ let teeigen = gen()
 #             }
 #         }
 #         return rhythm_string
-#   
+#
 #     }
 # }
-# 
+#
 # let sngen = gen()
 # {
 #     setup()
-#     { 
+#     {
 #         let beat_probability = [0, 90, 0, 90];
-# 
+#
 #     }
-# 
+#
 #     run()
 #     {
-# 
+#
 #         let rhythm_string = "";
 #         for (i = 0; i < 4; ++i)
 #         {
@@ -447,20 +322,20 @@ let teeigen = gen()
 #         return rhythm_string
 #     }
 # }
-# 
+#
 # let th_switch = gen()
 # {
 #     setup()
-#     { 
+#     {
 #          # let ths = [th1, th2]
 #          th = th1
 #          let th_idx = 0;
 #          let th_num = 3;
 #     }
-# 
+#
 #     run()
 #     {
-# 
+#
 #         th = ths[th_idx]
 #         # puts("COUNT:", count, " TH", th_idx, " LEN:", len(ths))
 #         if (count % th_num == 0) {
@@ -469,7 +344,7 @@ let teeigen = gen()
 #         }
 #     }
 # }
-# 
+#
 # let hatpitch = gen()
 # {
 #    setup() {
@@ -491,23 +366,23 @@ let teeigen = gen()
 #      }
 #    }
 # }
-# # 
+# #
 # let drumgen = gen()
 # {
 #     setup()
-#     { 
+#     {
 #         let beat_probability = [90, 5, 5, 90,
 #                                 4, 20, 80, 5,
 #                                 90, 20, 50, 60,
 #                                 5, 30, 60, 9];
-# 
+#
 #     }
-# 
+#
 #     run()
 #     {
-# 
+#
 #         let rhythm_array = []
-# 
+#
 #         for (i = 0; i < 16; ++i)
 #         {
 #             let prob = rand(100)
@@ -520,7 +395,7 @@ let teeigen = gen()
 #               rhythm_array = push(rhythm_array, "~");
 #             }
 #         }
-# 
+#
 #         let notes  = gimmeNotes()
 #         let notes_len = len(notes)
 #         let new_rhythm = ""
@@ -533,21 +408,21 @@ let teeigen = gen()
 #           if (i % 4 == 0) {
 #             new_rhythm = new_rhythm + "[ ";
 #           }
-# 
+#
 #           if (rhythm_array[i] == "1")
 #           {
 #             if (i % 4 == 0 && ( rand(10) < 4 )) {
 #               new_rhythm = new_rhythm + notes[rand(notes_len)] + "(5,8)";
 #               i = i + 3;
-#             } else { 
+#             } else {
 #               new_rhythm = new_rhythm + notes[rand(notes_len)] + " ";
 #             }
 #           }
-#           else 
+#           else
 #           {
 #             new_rhythm = new_rhythm + "~ ";
 #           }
-# 
+#
 #           if (i == 15) {
 #             new_rhythm = new_rhythm + " ] ";
 #           }
@@ -555,4 +430,4 @@ let teeigen = gen()
 #         return new_rhythm;
 #     }
 # }
-# # 
+# #

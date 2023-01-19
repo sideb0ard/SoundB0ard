@@ -19,7 +19,7 @@ let sn3 = sample(TT-BANGO/howyeSNARE.wav);
 let sn4 = sample(TT-BANGO/KRK.wav);
 let snrz = [sn, sn2, sn3, sn4];
 
-let arr_sizes = [2, 16, 4, 8, 16, 6, 8, 12, 4, 16];
+let arr_sizes = [4, 8, 8, 2, 16];
 let arr_idx = 0;
 
 
