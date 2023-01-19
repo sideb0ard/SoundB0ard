@@ -395,7 +395,7 @@ class Sample : public SoundGenerator {
 
 class Granular : public SoundGenerator {
  public:
-  Granular(std::string Granular_path, bool loop_mode);
+  Granular(std::string Granular_path, int loop_mode);
   ~Granular() = default;
   ObjectType Type() override;
   std::string Inspect() override;

@@ -43,7 +43,7 @@ struct audio_action_queue_item {
   AudioAction type;
   int mixer_soundgen_idx{-1};
   std::shared_ptr<SBAudio::SoundGenerator> sg;
-  std::shared_ptr<Fx> fx;
+  std::vector<std::shared_ptr<Fx>> fx;
 
   std::string preset_name;
   std::map<std::string, double> preset;
@@ -63,8 +63,8 @@ struct audio_action_queue_item {
 
   // ADD varz
   unsigned int soundgenerator_type;
-  std::string filepath;   // used for sample and digisynth
-  bool loop_mode{false};  // for looper
+  std::string filepath;  // used for sample and digisynth
+  // bool loop_mode{false};  // ? NOT USED?
 
   // STATUS varz
   bool status_all{false};

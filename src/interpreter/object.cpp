@@ -23,7 +23,7 @@ extern Tsqueue<int> audio_reply_queue;
 
 namespace {
 int AddSoundGenerator(unsigned int type, std::string filepath = "",
-                      bool loop_mode = false) {
+                      int loop_mode = 0) {
   std::shared_ptr<SBAudio::SoundGenerator> sg;
   switch (type) {
     case (MINISYNTH_TYPE):
@@ -48,8 +48,8 @@ int AddSoundGenerator(unsigned int type, std::string filepath = "",
   audio_action_queue_item action_req{.type = AudioAction::ADD,
                                      .soundgenerator_type = type,
                                      .sg = sg,
-                                     .filepath = filepath,
-                                     .loop_mode = loop_mode};
+                                     .filepath = filepath};
+  //.loop_mode = loop_mode}; // ? NOT USED?
   audio_queue.push(action_req);
   auto sg_index = audio_reply_queue.pop();
   if (sg_index)
@@ -160,7 +160,7 @@ Sample::Sample(std::string sample_path) {
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
 
-Granular::Granular(std::string sample_path, bool loop_mode) {
+Granular::Granular(std::string sample_path, int loop_mode) {
   std::cout << "OBJECT! LOOPM ODE IS " << loop_mode << std::endl;
   soundgen_id_ = AddSoundGenerator(LOOPER_TYPE, sample_path, loop_mode);
   soundgenerator_type = LOOPER_TYPE;

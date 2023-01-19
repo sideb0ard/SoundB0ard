@@ -1036,7 +1036,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              if (soundgen && mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
                std::cout << "YO, VALID SG\n";
                auto fx = interpreter_sound_cmds::ParseFXCmd(args);
-               if (fx) {
+               if (fx.size() > 0) {
                  std::cout << "YO, GOT FX\n";
                  audio_action_queue_item action_req{
                      .type = AudioAction::ADD_FX,

@@ -642,8 +642,10 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
       AddSoundGenerator(action.sg);
     }
   } else if (action.type == AudioAction::ADD_FX) {
-    if (action.sg && action.fx) {
-      action.sg->AddFx(action.fx);
+    if (action.sg) {
+      for (auto fx : action.fx) {
+        action.sg->AddFx(fx);
+      }
     }
   } else if (action.type == AudioAction::BPM) {
     UpdateBpm(action.new_bpm);

@@ -20,55 +20,60 @@ extern Mixer *mixr;
 
 namespace interpreter_sound_cmds {
 
-std::shared_ptr<Fx> ParseFXCmd(
+std::vector<std::shared_ptr<Fx>> ParseFXCmd(
     std::vector<std::shared_ptr<object::Object>> &args) {
   int args_size = args.size();
+  std::vector<std::shared_ptr<Fx>> fx;
   if (args_size >= 2) {
     std::cout << "PARSEFX\n";
-    std::shared_ptr<object::String> str_obj =
-        std::dynamic_pointer_cast<object::String>(args[1]);
-    if (str_obj) {
-      if (str_obj->value_ == "bitcrush") {
-        return std::make_unique<BitCrush>();
-      } else if (str_obj->value_ == "compressor") {
-        return std::make_unique<DynamicsProcessor>();
-      } else if (str_obj->value_ == "delay") {
-        std::cout << "CREATING DELAY>>>\n";
-        return std::make_shared<StereoDelay>();
-      } else if (str_obj->value_ == "distort") {
-        std::cout << "BOOYA! Distortion all up in this kittycat!\n";
-        return std::make_shared<Distortion>();
-      } else if (str_obj->value_ == "decimate") {
-        return std::make_shared<Decimate>();
-      } else if (str_obj->value_ == "filter") {
-        return std::make_shared<FilterPass>();
-      } else if (str_obj->value_ == "genz") {
-        return std::make_shared<GenZ>();
-      } else if (str_obj->value_ == "reverb") {
-        return std::make_shared<Reverb>();
-      } else if (str_obj->value_ == "sidechain") {
-        if (args.size() > 2) {
-          std::cout << "Got a source!\n";
-          auto soundgen_sidechain_src =
-              std::dynamic_pointer_cast<object::SoundGenerator>(args[2]);
-          if (soundgen_sidechain_src &&
-              mixr->IsValidSoundgenNum(soundgen_sidechain_src->soundgen_id_)) {
-            auto dp = std::make_shared<DynamicsProcessor>();
-            dp->SetExternalSource(soundgen_sidechain_src->soundgen_id_);
-            dp->SetDefaultSidechainParams();
-            return dp;
+
+    std::shared_ptr<object::String> str_obj;
+    for (int i = 1; i < args.size(); i++) {
+      str_obj = std::dynamic_pointer_cast<object::String>(args[i]);
+      if (str_obj) {
+        if (str_obj->value_ == "bitcrush") {
+          fx.push_back(std::make_unique<BitCrush>());
+        } else if (str_obj->value_ == "compressor") {
+          fx.push_back(std::make_unique<DynamicsProcessor>());
+        } else if (str_obj->value_ == "delay") {
+          std::cout << "CREATING DELAY>>>\n";
+          fx.push_back(std::make_shared<StereoDelay>());
+        } else if (str_obj->value_ == "distort") {
+          std::cout << "BOOYA! Distortion all up in this kittycat!\n";
+          fx.push_back(std::make_shared<Distortion>());
+        } else if (str_obj->value_ == "decimate") {
+          fx.push_back(std::make_shared<Decimate>());
+        } else if (str_obj->value_ == "filter") {
+          fx.push_back(std::make_shared<FilterPass>());
+        } else if (str_obj->value_ == "genz") {
+          fx.push_back(std::make_shared<GenZ>());
+        } else if (str_obj->value_ == "reverb") {
+          fx.push_back(std::make_shared<Reverb>());
+        } else if (str_obj->value_ == "sidechain") {
+          if (args.size() > 2) {
+            std::cout << "Got a source!\n";
+            auto soundgen_sidechain_src =
+                std::dynamic_pointer_cast<object::SoundGenerator>(args[2]);
+            if (soundgen_sidechain_src &&
+                mixr->IsValidSoundgenNum(
+                    soundgen_sidechain_src->soundgen_id_)) {
+              auto dp = std::make_shared<DynamicsProcessor>();
+              dp->SetExternalSource(soundgen_sidechain_src->soundgen_id_);
+              dp->SetDefaultSidechainParams();
+              fx.push_back(dp);
+            }
           }
+        } else if (str_obj->value_ == "moddelay") {
+          fx.push_back(std::make_shared<ModDelay>());
+        } else if (str_obj->value_ == "modfilter") {
+          fx.push_back(std::make_shared<ModFilter>());
+        } else if (str_obj->value_ == "waveshape") {
+          fx.push_back(std::make_shared<WaveShaper>());
         }
-      } else if (str_obj->value_ == "moddelay") {
-        return std::make_shared<ModDelay>();
-      } else if (str_obj->value_ == "modfilter") {
-        return std::make_shared<ModFilter>();
-      } else if (str_obj->value_ == "waveshape") {
-        return std::make_shared<WaveShaper>();
       }
     }
   }
-  return nullptr;
+  return fx;
 }
 
 void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args) {
