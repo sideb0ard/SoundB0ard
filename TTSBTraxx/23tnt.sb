@@ -104,12 +104,12 @@ let lfl_gen = gen()
       }
       if (count % 3 == 0) {
         beat = rand_beat();
-        set itz:stutter 1;
+        #set itz:stutter 1;
 
       }
       if (count % 5 == 0) {
         play_array(cn, invert(beat));
-        set itz:scramble 1;
+        #set itz:scramble 1;
       }
     }
   }

@@ -4,6 +4,8 @@
 
 # let bet = loop(TT-LIMELIFE-RIGHTONTIME/beatloop.wav); vol bet 0;
 
+# p4 $ plopblah_gen
+
 let lenz = [2, 2, 4, 8, 3, 1, 16];
 let lx = 0;
 
@@ -14,17 +16,42 @@ let bclah_gen = gen()
   }
   run()
   {
+    set bc:poffset 0;
+    set bc:plooplen 16;
     if (count % 8 == 0) {
       set bc:plooplen lenz[lx];
       #lx = incr(lx, 0, len(lenz));
     }
-    if (count % 4 == 0) {
+    if (count % 4 == 3) {
       set bc:poffset lenz[lx];
       #lx = incr(lx, 0, len(lenz));
     }
     if (count % 7 == 0) {
-      set bc:poffset 0;
-      set bc:stutter 1;
+      set bc:scramble 1;
+    }
+  }
+}
+
+let betlah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set bet:poffset 0;
+      set bet:plooplen 16;
+    }
+    if (count % 8 == 7) {
+      set bet:scramble 1;
+    }
+    if (count % 4 == 0) {
+      set bet:stutter 1;
+    }
+    if (count % 3 == 0) {
+      set bet:poffset lenz[lx];
+      set bet:plooplen lenz[lx];
     }
   }
 }
@@ -43,20 +70,12 @@ let stayblah_gen = gen()
     if (count % 7 == 0) {
       #vol notstay 0.5;
     }
-    if (count % 8 == 7) {
-      set bet:scramble 1;
-    }
-    if (count % 4 == 0) {
-      set bet:stutter 1;
-    }
     if (count % 16 < 4) {
       set notstay:reverse 0;
     }
     if (count % 2 == 0) {
       set notstay:on 1;
-      #set bet:poffset lenz[lx];
     }
-    set bet:poffset 0;
     if (count % 4 == 0) {
       set notstay:stutter 1;
     }
@@ -67,7 +86,6 @@ let stayblah_gen = gen()
       set notstay:reverse 1;
       play_array(notstay, rand_beat());
     }
-    set bet:plooplen lenz[lx];
     set notstay:plooplen lenz[lx];
     play_array(notstay, rand_beat());
   }
@@ -116,7 +134,7 @@ let laf_gen = gen()
       set gol:scramble 1;
     }
     set gol:reverse 0;
-    if (count % 8 == 7) {
+    if (count % 16 == 15) {
       set gol:reverse 1;
     }
   }

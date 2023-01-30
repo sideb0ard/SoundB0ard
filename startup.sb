@@ -436,7 +436,7 @@ let perky = fn(beat_pattern, sample_array)
   }
 
   for (i = 0; i < len(beat_pattern); ++i) {
-    let v = rand(90) + 37;
+    let v = rand(90) + 17;
     if (type(beat_pattern[i]) == "ARRAY") {
       let larr = beat_pattern[i];
       let ppp = pp / len(larr);

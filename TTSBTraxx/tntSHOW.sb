@@ -28,10 +28,12 @@ let vblah_gen = gen()
     let beat = mask(rand_array(blen, 0, 7), "f0f0");
     let mpp = 3840 / blen;
     #let hpp = pp / 3;
+    let cntr = 1;
+    let cntr2 = 1;
   }
   run()
   {
-    if (count % 3 < 2 ){
+    if (count % 8 == 7 ){
       let offset = 0;
       for (i = 0; i < len(beat); ++i) {
         if (i % 2 == 0) {
@@ -40,11 +42,14 @@ let vblah_gen = gen()
         if (beat[i] < len(sampz)) {
           let on_at = i * mpp + offset;
           note_on_at(sampz[sx], 1, on_at);
-          sx = incr(sx, 0, len(sampz));
+          sx = incr(sx, 0, cntr);
         }
       }
     }
-    if (count % 7 < 4 ){
+    if (count % 2 == 0) {
+      cntr = incr(cntr, 1, len(sampz));
+    }
+    if (count % 16 == 13 ){
       let offset = 0;
       for (i = 0; i < len(beat); ++i) {
         if (i % 2 == 0) {
@@ -68,7 +73,38 @@ let sncp = sample(TT-BLACKRIOT-DAYINLIFE/sncp.wav);
 # let bssl = loop(TT-LIMELIFE-RIGHTONTIME/bassloop.wav); add_fx(bssl, "decimate");
 # let wbs = loop(TTUnreleaseProject/WURKBUTTSTOOOP.wav); set wbs:len 0.25;
 # ^ delay and decimate - osc the fb
+# add_fx(wbs, "decimate", "delay")
+
+# let chk = loop(TT-LOOPS/CheckThisOut.aiff); add_fx(chk, "decimate")
+
+
+let bbchblah_gen = gen()
+{
+  setup()
+  {
+    let pllenz = [16, 4, 16, 8, 8, 6, 16, 16];
+    let plx = 0;
+  }
+  run()
+  {
+    if (count % 8 == 0) {
+      set chk:on 1;
+    }
+    if (count % 8 == 4) {
+      play_array(chk, rand_beat());
+    }
+    set chk:plooplen pllenz[plx];
+    plx = incr(plx, 0, len(pllenz));
+    set bssl:plooplen pllenz[plx];
+    if (count % 3 == 2) {
+      set chk:stutter 1;
+    }
+  }
+}
+
+
 # let wbt = loop(TTUnreleaseProject/WORKBUTBETG.wav); add_fx(wbt, "decimate")
+# let hahlo = loop(TT-BANGO/hahahlaoop.wav); set hahlo:len 0.5;
 let weeblah_gen = gen()
 {
   setup()
@@ -87,10 +123,11 @@ let weeblah_gen = gen()
     if (count % 4 == 3) {
       set wbt:scramble 1;
     }
-    if (count % 8 == 6) {
-      #solo(bssl);
-    }
+    #if (count % 8 == 6) {
+      #  #solo(bssl);
+      #}
     if (count % 8 == 7) {
+      play_array(rand_beat(), hahlo);
       set wbs:scramble 1;
       set wbt:stutter 1;
       #solo(wbt, wbs);

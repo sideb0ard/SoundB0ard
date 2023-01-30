@@ -1,4 +1,5 @@
 let an = sample(TT-NOCERA/AHNAH.wav);
+vol an 0.5;
 let oh = sample(TT-NOCERA/OOHlong.wav);
 let tic = sample(TT-NOCERA/TICt.wav);
 let wu = sample(TT-NOCERA/WUMP.wav);
@@ -15,6 +16,7 @@ vol bd 0.4;
 let ooh = sample(TT-NOCERA/ooh.wav);
 let pah = sample(TT-NOCERA/pah.wav);
 let sn = sample(TT-NOCERA/snarey.wav);
+vol sn 0.5;
 let sn2 = sample(TT-NOCERA/snarez.wav);
 let stb = sample(TT-NOCERA/stab.wav);
 let sumr = sample(TT-NOCERA/sumr.wav);
@@ -32,6 +34,9 @@ vol ump 0.3;
 let wwhm = sample(TT-NOCERA/whhhum.wav);
 let wumpa = sample(TT-NOCERA/wumpAH.wav);
 vol wumpa 0.4;
+let aigh = sample(TT-BANGO/AIIGH.wav);
+
+let howya = sample(TT-BANGO/howYaALL.wav);
 
 let kicksz = [kr, bd, bad, wumpa, wu ];
 
@@ -144,24 +149,27 @@ let nocera_tomz = gen()
 {
   setup()
   {
-    let rhythm = rand_beat();
-    let tom_idx = 0;
+    let bjz = [3, 5, 7];
+    let bjx = 0;
+    #let tom_idx = 0;
   }
 
   run()
   {
 
-    rhythm = rotate(rhythm, 4);
-    for (i = 0; i < len(rhythm); ++i) {
-      if (rhythm[i] == 1) {
-        note_on_at(tomz[tom_idx], 1, i * pp);
-        tom_idx = incr(tom_idx, 0, len(tomz));
-      }
+    let beat = bjork(bjz[bjx], 16);
+    if (rand(100) > 80) {
+      bjx = incr(bjx, 0, len(bjz));
     }
+    perky(rotate(beat, 2), tomz);
+    #rhythm = rotate(rhythm, 4);
+    #for (i = 0; i < len(rhythm); ++i) {
+      #  if (rhythm[i] == 1) {
+        #    note_on_at(tomz[tom_idx], 1, i * pp);
+        #    tom_idx = incr(tom_idx, 0, len(tomz));
+        #  }
+      #}
 
-    if (count % 8 == 0) {
-      rhythm = rand_beat();
-    }
   }
 }
 
@@ -187,21 +195,73 @@ let snarrr = gen()
 {
   setup()
   {
-    let snz = [sn, tme, sumr, an];
+    let snz = [sn, tme, sumr, an, aigh];
     let snx = 0;
+    let snln = 1;
     let elz = [3, 5, 2, 7];
     let ex = 0;
+    let dz = [10, 20, 50, 110, 130, 150, 50, 45];
+    let dzx = 0;
   }
 
   run()
   {
 
     let beat = rotate(bjork(elz[ex], 16), 4);
-    perky(beat, snz);
+    if (count % 4 == 0) {
+      ex = incr(ex, 0, len(elz));
+    }
+    snln = incr(snln, 1, len(snz));
+
+    for (i = 0; i < 16; ++i) {
+      if (beat[i] == 1) {
+        note_on_at(snz[snx], 1, i * pp, dur = dz[dzx], vel = 80 + rand(30));
+        dzx = incr(dzx, 0, len(dz));
+        snx = incr(snx, 0, snln);
+      }
+    }
+
+    if (count % 8 == 7) {
+      let ofs = rand(4);
+      note_on_at(howya, 1, pp * (12 + ofs), vel=120, dur = dz[dzx]);
+      dzx = incr(dzx, 0, len(dz));
+    }
+  }
+}
+
+
+let jip = sample(TT-PARTYPEOPLE/jip.wav);
+let pa = sample(TT-PARTYPEOPLE/pa.wav);
+let clng = sample(TT-MAW-ALRIGHTALRIGHT/clng2.wav);
+let ja = sample(TT-MAW-ALRIGHTALRIGHT/ja.wav);
+let jack = sample(TT-MAW-ALRIGHTALRIGHT/jackhit.wav);
+
+let snarrr22 = gen()
+{
+  setup()
+  {
+    let snz = [jip, pa, clng, ja, jack];
+    let snx = 0;
+    let elz = [3, 5, 2, 7];
+    let ex = 0;
+    let dz = [100, 110, 130, 150, 50, 45];
+    let dzx = 0;
+    let rotz= [1, 2, 4, 0, 8, 12];
+    let rx = 0;
+  }
+
+  run()
+  {
+
+    if (count % 2 == 1) {
+      let beat = rotate(bjork(elz[ex], 16), rotz[rx]);
+      perky(beat, snz);
+      rx = incr(rx, 0, len(rotz));
+    }
     #if (count % 3 == 0) {
       #  cbeat(snz[snx]);
       #}
-    if (count % 4 == 0) {
+    if (count % 5 == 0) {
       ex = incr(ex, 0, len(elz));
     }
   }
