@@ -90,7 +90,6 @@ let hh_gen = gen()
     if (swing > 70) {
       swing = 40;
     }
-
   }
 }
 

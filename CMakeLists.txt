@@ -17,13 +17,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 ## MODIFY THESE TO YOUR PATHS
 
-set (AbletonLinkPath "/Users/sideboard/Code/link/")
-set (HomebrewIncDir "/Users/sideboard/homebrew/include")
-set (ReadlineIncDir "/Users/sideboard/homebrew/opt/readline/include")
-set (PerlinIncDir "/Users/sideboard/Code/PerlinNoise")
+set (AbletonLinkPath "/Users/thorstensideboard/Code/link/")
+set (HomebrewIncDir "/opt/homebrew/include/")
+set (ReadlineIncDir "/opt/homebrew/opt/readline/include")
+set (PerlinIncDir "/Users/thorstensideboard/Code/PerlinNoise")
 
-set (READLINE_LIB "/Users/sideboard/homebrew/opt/readline/lib/libreadline.dylib")
-set (HISTORY_LIB "/Users/sideboard/homebrew/opt/readline/lib/libhistory.dylib")
+set (READLINE_LIB "/opt/homebrew/opt/readline/lib/libreadline.dylib")
+set (HISTORY_LIB "/opt/homebrew/opt/readline/lib/libhistory.dylib")
 ######################################################################
 
 project(Sbsh VERSION 3.0

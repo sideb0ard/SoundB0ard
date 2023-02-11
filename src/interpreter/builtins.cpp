@@ -1372,6 +1372,57 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                   })},
+    {"gen_perc",
+     std::make_shared<
+         object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)
+                              -> std::shared_ptr<object::Object> {
+       (void)args;
+       std::string cmd =
+           "let prc0 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       eval_command_queue.push(cmd);
+       cmd = "pan prc0 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let prc1 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       eval_command_queue.push(cmd);
+       cmd = "pan prc1 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let prc2 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       eval_command_queue.push(cmd);
+       cmd = "pan prc2 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let prc3 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       eval_command_queue.push(cmd);
+       cmd = "pan prc3 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let prc4 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       eval_command_queue.push(cmd);
+       cmd = "pan prc4 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let prc5 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       eval_command_queue.push(cmd);
+       cmd = "pan prc5 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let prc6 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       eval_command_queue.push(cmd);
+       cmd = "pan prc6 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let prc7 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       eval_command_queue.push(cmd);
+       cmd = "pan prc7 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let percz = [prc0, prc1, prc2, prc3, prc4, prc5, prc6, prc7]";
+       eval_command_queue.push(cmd);
+
+       return evaluator::NULLL;
+     })},
     {"kit",
      std::make_shared<
          object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)

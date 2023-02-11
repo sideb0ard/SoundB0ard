@@ -351,13 +351,10 @@ void Looper::SetGrainDuration(int dur) {
 void Looper::SetGrainDensity(int gps) {
   grains_per_sec_ = gps;
   grain_duration_frames_ = (double)SAMPLE_RATE / grains_per_sec_;
-  std::cout << "GRAIN DUR FRAMES:" << grain_duration_frames_ << std::endl;
   grain_ramp_time_ = grain_duration_frames_ / 100. * 10;
   xfade_time_in_frames_ = grain_duration_frames_ / 100. * 20;
   xfader_.Reset(xfade_time_in_frames_);
-  std::cout << "XFADE TIME:" << xfade_time_in_frames_ << std::endl;
   grain_spacing_frames_ = grain_duration_frames_ - xfade_time_in_frames_;
-  std::cout << " TIME B4 NEXT GRAIN:" << grain_spacing_frames_ << std::endl;
 }
 
 void Looper::SetAudioBufferReadIdx(size_t pos) {
