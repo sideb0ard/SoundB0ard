@@ -1,0 +1,11 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+

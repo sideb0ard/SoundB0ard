@@ -1,0 +1,156 @@
+# change speed
+# reverse
+# shuffle
+# rhythmic 8 4 2 1
+# rhythmic 7 3 1 2
+# rhythmic 7 3 1 2
+#
+
+# BPM 96
+
+let bd = sample(bd/technotronBD.aiff);
+let sd = sample(sd/weekendSnare.aiff);
+let cp = sample(cp/technotron.aiff);
+
+let prc1 = sample(noises/crnchHar.aiff);
+let prc2 = sample(noises/Woodblock2_bip.aif);
+let prc3 = sample(garage/CabasaHiMPC6011.wav);
+let prc4 = sample(aesamples/steeldif07.WAV);
+
+let percz = [prc1, prc2, prc3, prc4];
+
+let primez = [11, 7, 5, 3, 2];
+
+let dn_fn = fn(x)
+{
+  x = x - 1;
+  if (x == 0) {
+    x = primez[rand(len(primez))];;
+  }
+  return x;
+}
+
+let xblah_gen = gen()
+{
+  setup()
+  {
+    let numz = [7, 5, 11, 3];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 8 > 5)  {
+      play_array(bd, bjork(numz[0], 16));
+    }
+    play_array(percz[px], bjork(numz[0], 16));
+    px = incr(px, 0, len(percz));
+    play_array(percz[px], bjork(numz[1], 16));
+    px = incr(px, 0, len(percz));
+    if (count % 4 == 3) {
+      play_array(cp, rotate(bjork(numz[1], 16), 2));
+    }
+    play_array(percz[px], bjork(numz[2], 16));
+    px = incr(px, 0, len(percz));
+
+    play_array(percz[px], bjork(numz[3], 16));
+    px = incr(px, 0, len(percz));
+
+    numz = map(numz, dn_fn);
+  }
+}
+
+# let maw2 = loop(TWMAWLoops/maw2.wav);
+let dbblah_gen = gen()
+{
+  setup()
+  {
+    let bitz = [6, 8, 12, 7];
+    let bx = 0;
+    let plenz = [2, 1, 3, 1, 4, 3];
+    let pz = 0;
+  }
+  run()
+  {
+    set maw2:fx1:bitdepth bitz[bx];
+    bx = incr(bx, 0, len(bitz));
+
+    set maw2:plooplen 16;
+    if (count % 8 == 7) {
+      set maw2:plooplen plenz[pz];
+      pz = incr(pz, 0, len(plenz));
+    }
+    if (count % 11 == 7 || count % 13 == 7) {
+      set maw2:scramble 1;
+    }
+    if (count % 8 == 7) {
+      solo(maw2, at=plenz[pz]*pp);
+    }
+  }
+}
+
+# p5 < every 2 "<6 3 7 4>"  "set dx:o1rat %"
+# dx = load_preset("rizzor"); # swuuush
+# risable ? whodunit ? sawawr ? surgefizz2 // dalekkk
+let dxxblah_gen = gen()
+{
+  setup()
+  {
+    let mel = [48, 0, 0, 52, 0, 0, 48, 60, 0, 48, 0, 0, 45, 0, 0, 0];
+    let maxx = 3;
+    let mx = 0;
+
+    let drz = [50, 75, 100, 250, 400, 600];
+    let drzx = 0;
+  }
+  run()
+  {
+    if (count % 4 < 3) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, down(mel, 24), mx, i, drz[drzx]);
+        mx = incr(mx, 0, maxx);
+        drzx = incr(drzx, 0, len(drz));
+      }
+      if (count % 4 == 0) {
+        for (i = 0; i < 16; ++i) {
+          stepper(dx2, down(mel, 24), mx, i, drz[drzx]);
+        }
+      }
+      maxx = incr(maxx, 2, len(mel));
+    }
+  }
+}
+
+# let mouth = loop(voices/mouthpiece.wav); set mouth:len 2; set mouth:pitch 1.4
+# dleay p6 < osc 12 "23 85"  "set mouth:fx0:fb %"
+let moublah_gen = gen()
+{
+  setup()
+  {
+    let pln = [1, 2, 8, 4, 12, 16];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 6 == 5) {
+      set mouth:off 1;
+      return;
+    }
+    set mouth:on 1;
+    set mouth:plooplen pln[px];
+    px = incr(px, 0, len(pln));
+    if (count % 13 == 11) {
+      solo(mouth, at=pln[px]*pp);
+    }
+  }
+}
+
+let moblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+

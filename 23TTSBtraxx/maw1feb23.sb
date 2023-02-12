@@ -1,0 +1,123 @@
+# let maw8 = loop(TWMAWLoops/maw8.wav); set maw8:len 2;
+# TWMAWLoops/maw9.wav
+
+# let rv = loop(dloops/raveBreakbeat.aiff); set rv:len 2
+
+# let rf = [26, 0, 30, 23, 0, 33, 0, 33, 0, 30, 33, 0, 33, 0, 33, 0]
+# razop
+
+let lenz = [16, 8, 4, 8, 1, 1, 16];
+let lx = 0;
+let lxx = 1;
+
+let offz = [0, 12, 10, 0, 4, 6, 12];
+let ox = 0;
+let pincz = [1, 2, 3];
+let pix = 0;
+
+let rfx = 0;
+
+let drz = [100, 200, 300, 500];
+let drx = 0;
+let maw1_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set maw8:plooplen lenz[lx];
+
+    set maw8:on 1;
+    if (count % 4 == 0) {
+      set maw8:poffset offz[ox];
+    }
+
+    if (count % 3 == 0) {
+      set maw8:pinc pincz[pix];
+      set maw8:scramble 1;
+    }
+
+    if (count % 4 == 3) {
+      pix= incr(pix, 0, len(pincz));
+      ox = incr(ox, 0, len(offz));
+      lx = incr(lx, 0, len(lenz));
+    }
+  }
+}
+
+# let maw9 = loop(TWMAWLoops/maw9.wav); set maw9:len 2
+let m2blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set maw9:pinc 1;
+    set maw9:poffset 0;
+    if (count % 3 == 0) {
+      set maw9:scramble 1;
+      set maw9:pinc pincz[pix];
+    }
+    if (count % 4 == 0) {
+      set maw9:poffset offz[ox];
+      set maw9:stutter 1;
+    }
+  }
+}
+
+# let maw5 = loop(TWMAWLoops/maw7.wav)
+let m3blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set maw5:pinc 1;
+    set maw5:poffset 0;
+    #unsolo();
+    if (count % 8 == 7) {
+      #if (rand(100) > 60) {
+        #  solo(maw5);
+        #} else {
+          #  solo(maw8);
+          #}
+      set maw5:scramble 1;
+      set maw5:pinc pincz[pix];
+      set maw5:poffset offz[ox];
+    }
+  }
+}
+
+
+
+# l0renzo4
+# lowx0r
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    let numz = [13, 17, 23];
+    let nx = 0;
+    let rf = riff(numz[nx]);
+    let durz = [100, 300, 70, 500];
+    let drx = 0;
+  }
+  run()
+  {
+    play_array(dx, rf, dur = durz[drx]);
+    drx = incr(drx, 0, len(durz));
+    if (count % 4 == 3) {
+      rf = riff(numz[nx]);
+      nx = incr(nx, 0, len(numz));
+    }
+
+    if (count % 3 == 0) {
+      nx = incr(nx, 0, len(numz));
+      play_array(dx, mask(rotate(down(rf, 1), 4), "ff00"), dur = durz[drx]);
+    }
+  }
+}
+

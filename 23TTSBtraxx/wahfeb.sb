@@ -1,0 +1,58 @@
+# let maw9 = loop(TWMAWLoops/maw9.wav) ; set maw9:len 2
+# let maw8 = loop(TWMAWLoops/maw3.wav); set maw8:len 2
+# let maw10 = loop(TWMAWLoops/maw10.wav);
+
+
+let mawblah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [1, 2, 1, 4, 5, 1, 7, 11, 16];
+    let lx = 0;
+
+    let mzw = [maw9, maw8, maw10];
+    let mzx = 0;
+
+    let moffsetz = [4, 8, 10, 11, 12, 14];
+    let mof = 0;
+    let mx = 0;
+
+    let mlenz = [1, 2];
+    let mlx = 0;
+  }
+  run()
+  {
+    set mzw[mzx]:len mlenz[mlx];
+    mlx = incr(mlx, 0, len(mlenz));
+    mzx = incr(mzx, 0, len(mzw));
+
+    set maw9:plooplen lenz[lx];
+    lx = incr(lx, 0 , len(lenz));
+
+    set maw8:plooplen lenz[lx];
+    lx = incr(lx, 0 , len(lenz));
+
+    set maw10:plooplen lenz[lx];
+
+    if (count % 4 == 3) {
+      solo(mawz[mwx], at=moffsetz[mof]*16);
+      mof = incr(mof, 0, len(moffsetz));
+    }
+  }
+}
+
+#p2 < osc 8 "0 70" "set maw9:fx0:fb %
+let mcblah_gen = gen()
+{
+  setup()
+  {
+    let plen = 16;
+  }
+  run()
+  {
+    #set mawc:len plen;
+    set mawc:plooplen plen;
+    plen = incr(plen, 1, 17)
+  }
+}
+
