@@ -306,7 +306,7 @@ void Process::EvalPattern(
           std::make_shared<pattern_parser::PatternLeaf>(leafy->value_);
 
       int spacing = target_len / euclidean_rhythm.size();
-      for (int i = 0, new_target_start = target_start;
+      for (unsigned long i = 0, new_target_start = target_start;
            i < euclidean_rhythm.size() && new_target_start < target_end;
            i++, new_target_start += spacing) {
         if (euclidean_rhythm[i]) {

@@ -42,6 +42,7 @@ enum AudioAction {
 struct audio_action_queue_item {
   AudioAction type;
   int mixer_soundgen_idx{-1};
+  std::vector<int> group_of_soundgens{};
   std::shared_ptr<SBAudio::SoundGenerator> sg;
   std::vector<std::shared_ptr<Fx>> fx;
 

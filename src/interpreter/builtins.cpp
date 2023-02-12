@@ -857,22 +857,40 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            return evaluator::NULLL;
          })},
-    {"solo", std::make_shared<object::BuiltIn>(
-                 [](std::vector<std::shared_ptr<object::Object>> args)
-                     -> std::shared_ptr<object::Object> {
-                   for (int i = 0; i < args.size(); i++) {
-                     auto soundgen =
-                         std::dynamic_pointer_cast<object::SoundGenerator>(
-                             args[i]);
-                     if (soundgen) {
-                       audio_action_queue_item action_req{
-                           .type = AudioAction::SOLO,
-                           .soundgen_num = soundgen->soundgen_id_};
-                       audio_queue.push(action_req);
-                     }
-                   }
-                   return evaluator::NULLL;
-                 })},
+    {"solo",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           auto at_obj = std::find_if(args.begin(), args.end(),
+                                      [](std::shared_ptr<object::Object> o) {
+                                        return o->Type() == object::AT_OBJ;
+                                      });
+           int delayed_by{0};
+           if (at_obj != args.end()) {
+             auto at = std::dynamic_pointer_cast<object::At>(*at_obj);
+             if (at) {
+               delayed_by = at->value_;
+               int dif_til_next_loop = (3840 - delayed_by) % 3840;
+               audio_action_queue_item action_req{
+                   .type = AudioAction::UNSOLO,
+                   .delayed_by = delayed_by + dif_til_next_loop};
+               audio_queue.push(action_req);
+             }
+           }
+
+           for (size_t i = 0; i < args.size(); i++) {
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[i]);
+             if (soundgen) {
+               audio_action_queue_item action_req{
+                   .type = AudioAction::SOLO,
+                   .soundgen_num = soundgen->soundgen_id_,
+                   .delayed_by = delayed_by};
+               audio_queue.push(action_req);
+             }
+           }
+           return evaluator::NULLL;
+         })},
     {"unsolo", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object> {
@@ -1034,10 +1052,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
              if (soundgen && mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
-               std::cout << "YO, VALID SG\n";
                auto fx = interpreter_sound_cmds::ParseFXCmd(args);
                if (fx.size() > 0) {
-                 std::cout << "YO, GOT FX\n";
                  audio_action_queue_item action_req{
                      .type = AudioAction::ADD_FX,
                      .sg = mixr->sound_generators_[soundgen->soundgen_id_],

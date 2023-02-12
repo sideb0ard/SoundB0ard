@@ -28,7 +28,7 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
     std::cout << "PARSEFX\n";
 
     std::shared_ptr<object::String> str_obj;
-    for (int i = 1; i < args.size(); i++) {
+    for (size_t i = 1; i < args.size(); i++) {
       str_obj = std::dynamic_pointer_cast<object::String>(args[i]);
       if (str_obj) {
         if (str_obj->value_ == "bitcrush") {

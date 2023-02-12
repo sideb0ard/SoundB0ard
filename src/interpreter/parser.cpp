@@ -508,6 +508,8 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p) {
 std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
   if (cur_token_.type_ == token::SLANG_IDENT)
     return ParseIdentifier();
+  else if (cur_token_.type_ == token::SLANG_AT)
+    return ParseAtExpression();
   else if (cur_token_.type_ == token::SLANG_NUMBER)
     return ParseNumberLiteral();
   else if (cur_token_.type_ == token::SLANG_INCREMENT)
@@ -1118,7 +1120,6 @@ std::vector<std::shared_ptr<ast::Expression>> Parser::ParseExpressionList(
     NextToken();
     listy.push_back(ParseExpression(Precedence::LOWEST));
   }
-
   if (!ExpectPeek(end)) {
     return std::vector<std::shared_ptr<ast::Expression>>();
   }
