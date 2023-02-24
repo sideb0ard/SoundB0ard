@@ -241,6 +241,25 @@ std::array<std::vector<int>, PPBAR> ScalePattern(
   return scaled_pattern;
 }
 
+void play_map_on(std::shared_ptr<object::Object> soundgen,
+                 std::shared_ptr<object::Object> pattern_map, int dur,
+                 int vel) {
+  auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(soundgen);
+  if (!sg) return;
+
+  auto play_map = std::dynamic_pointer_cast<object::Hash>(pattern_map);
+
+  if (play_map) {
+    for (const auto &[_, hv] : play_map->pairs_) {
+      auto k = std::dynamic_pointer_cast<object::Number>(hv.key_);
+      auto v = std::dynamic_pointer_cast<object::Number>(hv.value_);
+      if (k && v) {
+        note_on_at(sg->soundgen_id_, {int(v->value_)}, k->value_, vel, dur);
+      }
+    }
+  }
+}
+
 void play_array_on(std::shared_ptr<object::Object> soundgen,
                    std::shared_ptr<object::Object> pattern, float speed,
                    int dur, int vel) {
@@ -1953,6 +1972,38 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
            }
 
+           return evaluator::NULLL;
+         })},
+    {"play_map",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size < 1) {
+             std::cerr << "Need an map to play..\n";
+             return evaluator::NULLL;
+           }
+
+           int vel = 110 + (rand() % 17);
+           int dur = 240;
+
+           for (auto a : args) {
+             if (a->Type() == object::DURATION_OBJ) {
+               auto dur_obj = std::dynamic_pointer_cast<object::Duration>(a);
+               dur = dur_obj->value_;
+             } else if (a->Type() == object::VELOCITY_OBJ) {
+               auto vel_obj = std::dynamic_pointer_cast<object::Velocity>(a);
+               vel = vel_obj->value_;
+             }
+           }
+           auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+           if (sg) {
+             if (args_size > 1) {
+               play_map_on(args[0], args[1], dur, vel);
+             } else {
+               std::cerr << "OOFT, NEED A MAP TAE PLAY!\n";
+             }
+           }
            return evaluator::NULLL;
          })},
     {"type", std::make_shared<object::BuiltIn>(
