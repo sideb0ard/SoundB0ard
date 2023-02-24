@@ -1,46 +1,29 @@
 
 
-let golden_ratio = 1.61803398875;
-
-let golden_step = fn(last)
-{
-  return (last + golden_ratio) % 1.0;
-}
-
-let golden_seq = fn(num_beats)
-{
-  let circ_timez = [];
-  let cur = rand(1);
-  for (i = 0; i < num_beats; ++i) {
-    push(circ_timez, cur);
-    cur = golden_step(cur);
-  }
-  return sort(circ_timez);
-}
-
-let gmelody = fn(num_steps, root_key)
-{
-  let beat = golden_seq(num_steps);
-  let notez = notes_in_key(root_key);
-  let bmap = {};
-  for (i = 0; i < len(beat); ++i) {
-    let note = notez[rand(len(notez))];
-    if (i == 0 || i == len(beat) -1) {
-      note = root_key;
-    }
-    bmap[floor(beat[i]*3840)] = note;
-  }
-  return bmap;
-}
-
 let gdnblah_gen = gen()
 {
   setup()
   {
+    let numstepz = [7, 11, 13, 4, 3];
+    let nx = 0;
+
+    let mellenz = [1, 2, 3];
+    let mx = 0;
+
+    let key = 53;
+    let mel = gmelody(numstepz[nx], key, 3840 * mellenz[mx]);
   }
   run()
   {
-    play_map(mo, mel);
+
+    if (count % 8 == 0) {
+      mx = incr(mx, 0, len(mellenz));
+      nx = incr(nx, 0, len(numstepz));
+      mel = gmelody(numstepz[nx], key, 3840 * mellenz[mx]);
+    }
+    if (count % mellenz[mx] == 0) {
+      play_map(mo, mel);
+    }
   }
 }
 

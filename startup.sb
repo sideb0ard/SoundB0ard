@@ -606,3 +606,36 @@ let bassgen = fn()
   }
   return rhm;
 }
+
+let golden_ratio = 1.61803398875;
+
+let golden_step = fn(last)
+{
+  return (last + golden_ratio) % 1.0;
+}
+
+let golden_seq = fn(num_beats)
+{
+  let circ_timez = [];
+  let cur = rand(1);
+  for (i = 0; i < num_beats; ++i) {
+    push(circ_timez, cur);
+    cur = golden_step(cur);
+  }
+  return sort(circ_timez);
+}
+
+let gmelody = fn(num_steps, root_key, midi_len)
+{
+  let beat = golden_seq(num_steps);
+  let notez = notes_in_key(root_key);
+  let bmap = {};
+  for (i = 0; i < len(beat); ++i) {
+    let note = notez[rand(len(notez))];
+    if (i == 0 || i == len(beat) -1) {
+      note = root_key;
+    }
+    bmap[floor(beat[i]*midi_len)] = note;
+  }
+  return bmap;
+}
