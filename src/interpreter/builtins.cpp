@@ -1,4 +1,5 @@
 #include <audio_action_queue.h>
+#include <audioutils.h>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <utils.h>
@@ -1201,8 +1202,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            auto number = std::dynamic_pointer_cast<object::Number>(args[0]);
            if (number) {
-             int rand_number = 0;
-             if (number->value_ > 0) rand_number = rand() % (int)number->value_;
+             double rand_number = 0;
+             if (number->value_ == 1) {
+               rand_number = ((double)rand()) / RAND_MAX;
+             } else if (number->value_ > 0) {
+               rand_number = rand() % (int)number->value_;
+             }
              return std::make_shared<object::Number>(rand_number);
            }
 
@@ -1224,6 +1229,72 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      }
                      return evaluator::NULLL;
                    })},
+    {"sort",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           // only implemented for array of Numbers
+           if (args.size() == 1) {
+             auto array_obj = std::dynamic_pointer_cast<object::Array>(args[0]);
+
+             if (array_obj) {
+               std::vector<double> temp_nums;
+               for (const auto &e : array_obj->elements_) {
+                 auto number = std::dynamic_pointer_cast<object::Number>(e);
+                 if (number) {
+                   temp_nums.push_back(number->value_);
+                 }
+               }
+
+               std::sort(temp_nums.begin(), temp_nums.end());
+               for (size_t i = 0; i < temp_nums.size(); i++) {
+                 auto number = std::dynamic_pointer_cast<object::Number>(
+                     array_obj->elements_[i]);
+                 if (number) {
+                   number->value_ = temp_nums[i];
+                 }
+               }
+             }
+
+             return array_obj;
+           }
+
+           return evaluator::NULLL;
+         })},
+    {"shuffle",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           // only implemented for array of Numbers
+           if (args.size() == 1) {
+             auto array_obj = std::dynamic_pointer_cast<object::Array>(args[0]);
+
+             if (array_obj) {
+               std::vector<double> temp_nums;
+               for (const auto &e : array_obj->elements_) {
+                 auto number = std::dynamic_pointer_cast<object::Number>(e);
+                 if (number) {
+                   temp_nums.push_back(number->value_);
+                 }
+               }
+               std::random_device rd;
+               std::mt19937 g(rd());
+
+               std::shuffle(temp_nums.begin(), temp_nums.end(), g);
+               for (size_t i = 0; i < temp_nums.size(); i++) {
+                 auto number = std::dynamic_pointer_cast<object::Number>(
+                     array_obj->elements_[i]);
+                 if (number) {
+                   number->value_ = temp_nums[i];
+                 }
+               }
+             }
+
+             return array_obj;
+           }
+
+           return evaluator::NULLL;
+         })},
     {"sin", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> args)
                     -> std::shared_ptr<object::Object> {
@@ -1685,6 +1756,59 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    std::make_shared<object::Number>(notez[i]));
              }
              return return_array;
+           }
+           return evaluator::NULLL;
+         })},
+    {"tune_melody",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           std::cout << "TUUUUUUUUUNE MELODY\n";
+
+           if (args_size >= 2) {
+             auto array_to_tune =
+                 std::dynamic_pointer_cast<object::Array>(args[0]);
+
+             if (array_to_tune) {
+               std::cout << "HAVE ARRAY TO TUNE!\n";
+               auto root_num_obj =
+                   std::dynamic_pointer_cast<object::Number>(args[1]);
+               if (root_num_obj) {
+                 int scale_type = 0;  // MAJOR
+                 if (args_size == 3) {
+                   auto scale_type_obj =
+                       std::dynamic_pointer_cast<object::Number>(args[2]);
+
+                   if (scale_type_obj) {
+                     scale_type = scale_type_obj->value_;
+                   }
+                 }
+
+                 std::vector<int> orig_notes = {};
+
+                 for (const auto &n : array_to_tune->elements_) {
+                   auto numbj = std::dynamic_pointer_cast<object::Number>(n);
+                   if (numbj) {
+                     orig_notes.push_back(numbj->value_);
+                   }
+                 }
+
+                 std::cout << "CALLING TUNE MELODY TO KEY\n";
+                 std::vector<int> notez = TuneMelodyToKey(
+                     orig_notes, root_num_obj->value_, scale_type);
+                 std::cout << "BACK FROM TUNE MELODY TO KEY\n";
+
+                 auto return_tuned_array = std::make_shared<object::Array>(
+                     std::vector<std::shared_ptr<object::Object>>());
+
+                 for (unsigned long i = 0; i < notez.size(); i++) {
+                   return_tuned_array->elements_.push_back(
+                       std::make_shared<object::Number>(notez[i]));
+                 }
+                 return return_tuned_array;
+               }
+             }
            }
            return evaluator::NULLL;
          })},

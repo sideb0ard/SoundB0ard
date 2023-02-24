@@ -30,5 +30,8 @@ int GetStepsToNextDegree(int scale_index);
 int GetScaleIndex(int note, char key);
 int GetRootNote(int key, int index);
 int Scale(int midi_note, char key);
-bool IsMidiNoteInKey(int midi_note, char key);
+bool IsMidiNoteInKeyChar(int midi_note, char key);
+bool IsMidiNoteInKey(int midi_note, int key_midi_num);
 bool IsNote(std::string input);
+std::vector<int> TuneMelodyToKey(const std::vector<int> &melody_in,
+                                 int root_midi, int scale);

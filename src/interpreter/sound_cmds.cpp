@@ -126,6 +126,7 @@ std::vector<int> GetNotesInKey(int root, int scale_type) {
       notes.push_back(root + 7);
       notes.push_back(root + 9);
       notes.push_back(root + 11);
+      notes.push_back(root + 12);
       break;
     case (1):  // MINOR
       notes.push_back(root + 0);
@@ -135,6 +136,7 @@ std::vector<int> GetNotesInKey(int root, int scale_type) {
       notes.push_back(root + 7);
       notes.push_back(root + 8);
       notes.push_back(root + 10);
+      notes.push_back(root + 12);
       break;
     case (2):  // PHRYGIAN
       notes.push_back(root + 0);
@@ -144,6 +146,7 @@ std::vector<int> GetNotesInKey(int root, int scale_type) {
       notes.push_back(root + 7);
       notes.push_back(root + 8);
       notes.push_back(root + 10);
+      notes.push_back(root + 12);
       break;
   }
 

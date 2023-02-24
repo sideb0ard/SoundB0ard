@@ -1,0 +1,231 @@
+
+# let dubr = loop(dub/dubriffloop.aiff);
+
+let nomr = 16;
+let nm_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    nomr = incr(nomr, 4, 17);
+  }
+}
+
+
+let aablah_gen = gen()
+{
+  setup()
+  {
+    let gpsz = [15, 30, 10, 2, 50, 100];
+    let gx = 0;
+
+    let ofz = [0, 2, 4, 6, 8, 14, 11];
+    let ox = 0;
+  }
+
+  run()
+  {
+    set dubr:plooplen nomr;
+
+    if (count % 7 == 0) {
+      set dubr:poffset ofz[ox];
+      ox = incr(ox, 0, len(ofz));
+    }
+    if (count % 3 == 0) {
+      set dubr:grains_per_sec gpsz[gx];
+      gx = incr(gx, 0, len(gpsz));
+    }
+    if (count % 4 == 3) {
+      set dubr:stutter 1;
+    }
+    if (count % 16 == 14) {
+      set dubr:scramble 1;
+    }
+    if (count % 16 == 11) {
+      set dubr:plooplen 16;
+      set dubr:poffset 0;
+    }
+  }
+}
+
+# let bd = sample(bd/hes23bd2.aif);
+let bd = sample(bd/LOUkick.aiff);
+let bd2 = sample(aesamples/SH09_KIK.WAV);
+let bd3 = sample(bd/crUNCH.aiff);
+let bd4 = sample(TT-NOCERA/kickr.wav);
+let kikz = [bd, bd2, bd3, bd];
+let kx = 0;
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let msk = "f0f0";
+    let durz = [50, 100, 400, 1000];
+    let drx = 0;
+
+    let kxx = 0;
+    let kxxm = 3;
+  }
+  run()
+  {
+    let bt = bjork(nomr, 16);
+    if (count % 3 == 0) {
+      bt = mask(bt, msk);
+      msk = rotate(msk, 1);
+    }
+
+    for (i = 0; i < 16; ++i) {
+      stepper(kikz[kx], mask(bt, msk), kxx, i, durz[drx]);
+      kx = incr(kx, 0, len(kikz));
+      kxx = incr(kxx, 0, kxxm);
+      drx = incr(drx, 0, len(durz));
+      if (count % 2 > 1) {
+        stepper(kikz[kx], invert(mask(bt, msk)), kxx, i, durz[drx]);
+      }
+    }
+    kxxm = incr(kxxm, 2, 16);
+
+
+    #print(msk);
+    #print(bt);
+  }
+}
+
+
+# let hh = sample(ch/chezHat.aiff); add_fx(hh, "filter");
+let hblah_gen = gen()
+{
+  setup()
+  {
+    let msk = "ff00";
+    let frqz = [100, 1300, 500, 1000, 80, 5000, 300, 10000, 15000];
+    let frx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      let bt = mask(invert(bjork(nomr, 16)), msk);
+      play_array(hh, bt);
+      for (i = 0; i < 16; ++i) {
+        set hh:fx0:freq frqz[frx] at=i*pp;
+        frx = incr(frx, 0, len(frqz));
+      }
+    }
+  }
+}
+
+let sn1 = sample(cp/DR660ReverseClap.aif);
+let sn2 = sample(sd/rvrbSnr.aiff);
+let clp = sample(sd/delayedDubSnar.aiff);
+let mr = sample(sd/acidHatSnare.aiff);
+# p7 < osc 8 "23 88" "set mr:fx0:fb %"
+let snblah_gen = gen()
+{
+  setup()
+  {
+    let snpz = [sn1, mr, sn2, clp];
+    let snx = 0;
+
+    let cntz = [4, 8, 12, 15];
+    let cnx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      cbeat(snpz[snx]);
+      snx = incr(snx, 0, len(snpz));
+    }
+    if (count % 3 == 0) {
+      cbeat(snpz[snx]);
+    }
+    if (count % 8 == 7) {
+      #solo(snpz[snx], at=cntz[cnx]);
+      cnx = incr(cnx, 0, len(cntz));
+      #solo(bd, at=cntz[cnx]);
+      cnx = incr(cnx, 0, len(cntz));
+      #solo(hh, at=cntz[cnx]);
+    }
+  }
+}
+let chh = sample(ch/pumpDistortHH.wav);
+let chhhhblah_gen = gen()
+{
+  setup()
+  {
+    let hhcz = [16, 8, 12, 8, 4, 2];
+    let hhx = 0;
+
+    let drz = [10, 20, 50, 100];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      let pt = bjork(hhcz[hhx], 16);
+      play_array(chh, pt, dur = drz[drx]);
+      drx = incr(drx, 0, len(drz));
+    }
+
+  }
+}
+
+
+# p5 < osc 12 "23 88" "set hh:fx1:fb %"
+
+
+# add_fx(dubr, "delay", "distort");
+# p2 < osc 8 "23 80" "set dubr:fx0:fb %";
+
+let snr = sample(cp/front2WestClap.aiff);
+let snr2 = sample(cp/gaborClap.aiff);
+let snrblah_gen = gen()
+{
+  setup()
+  {
+    let bjz = [3, 5, 7, 11];
+    let bjx = 0;
+
+    let durz = [10, 20, 50, 100, 500];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 8 == 4) {
+      solo(snr, snr2, at=8*pp);
+      let bt = bjork(bjz[bjx], 16);
+      play_array(snr, bt, dur = durz[drx]);
+      drx = incr(drx, 0, len(durz));
+      play_array(snr2, invert(bt), dur = durz[drx]);
+      bjx = incr(bjx, 0, len(bjz));
+    }
+  }
+}
+
+
+# load_preset(dx, "rizzor");
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [0, 1, 3, 5, 7, 11, 0, 0];
+    let lx = 0;
+
+    let notz = [23];
+    let nx = 0;
+    let ratz = [8, 8, 8, 4, 11];
+    let rx = 0;
+  }
+  run()
+  {
+    let mel = combinor(bjork(lenz[lx], 16), notz);
+    lx = incr(lx, 0, len(lenz));
+    nx = incr(nx, 0, len(notz));
+    play_array(dx, mel);
+    set dx:o1rat ratz[rx];
+    rx = incr(rx, 0, len(ratz));
+  }
+}
+

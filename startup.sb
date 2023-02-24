@@ -313,7 +313,11 @@ let stepper = fn(sg, pat, read_idx, play_idx, d)
     note_on_at(sg, pat[read_idx][0], play_idx * pp);
   } else {
     if (pat[read_idx] > 0) {
-      note_on_at(sg, pat[read_idx], play_idx * pp, dur = d);
+      let v = 100 + rand(27);
+      if (play_idx % 2 == 0) {
+        v = 127;
+      }
+      note_on_at(sg, pat[read_idx], play_idx * pp, dur = d, vel = v);
     }
   }
 }

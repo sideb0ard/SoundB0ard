@@ -1,0 +1,58 @@
+
+
+let golden_ratio = 1.61803398875;
+
+let golden_step = fn(last)
+{
+  return (last + golden_ratio) % 1.0;
+}
+
+let gdnseq = fn(num_beats)
+{
+  let circ_timez = [];
+  let cur = rand(1);
+  for (i = 0; i < num_beats; ++i) {
+    push(circ_timez, cur);
+    cur = golden_step(cur);
+  }
+  return sort(circ_timez);
+}
+
+let gdnblah_gen = gen()
+{
+  setup()
+  {
+    let cb1 = 7;
+    let cb2 = 11;
+
+    let beat = gdnseq(cb1);
+    let cbeat = gdnseq(cb2);
+  }
+  run()
+  {
+    for (i = 0; i < len(beat); ++i) {
+      note_on_at(bd, 1, beat[i] * 3840);
+      #print(floor(beat[i] * 16));
+    }
+    for (i = 0; i < len(cbeat); ++i) {
+      note_on_at(chh, 1, cbeat[i] * 3840);
+    }
+
+    if (count % 8 == 0) {
+      cb1 = (cb1 + 3) % 12;
+      cb2 = (cb2 + 5) % 13;
+      beat = gdnseq(cb1);
+      cbeat = gdnseq(cb2);
+    }
+
+  }
+}
+
+
+let melody = fn(root_note)
+{
+  let notz = notes_in_key(root_note);
+  print(notz);
+  shuffle(notz);
+  print(notz);
+}

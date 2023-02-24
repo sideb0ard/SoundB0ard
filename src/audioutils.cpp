@@ -58,7 +58,7 @@ int GetRootNote(int key, int index) {
 }
 
 int GetScaleIndex(int note, char key) {
-  if (!IsMidiNoteInKey(note, key)) return -1;
+  if (!IsMidiNoteInKeyChar(note, key)) return -1;
   note = note % 12;
   int key_midi_num = GetMidiNumForKey(key);
   if (note == key_midi_num)
@@ -302,7 +302,7 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
 // returns an int to indicate midi num representing n'th
 // degree from input note. Returns -1 if note not in Key.
 int GetNthDegree(int note, int degree, char key) {
-  if (!IsMidiNoteInKey(note, key)) {
+  if (!IsMidiNoteInKeyChar(note, key)) {
     std::cout << "NOT IN KEY KEY YO\n";
     return -1;
   }
@@ -322,9 +322,13 @@ int GetNthDegree(int note, int degree, char key) {
 int GetThird(int note, char key) { return GetNthDegree(note, 2, key); }
 int GetFifth(int note, char key) { return GetNthDegree(note, 4, key); }
 
-bool IsMidiNoteInKey(int note, char key) {
-  note = note % 12;
+bool IsMidiNoteInKeyChar(int note, char key) {
   int key_midi_num = GetMidiNumForKey(key);
+  return IsMidiNoteInKey(note, key_midi_num);
+}
+
+bool IsMidiNoteInKey(int note, int key_midi_num) {
+  note = note % 12;
   if (note == key_midi_num)
     return true;
   else if (note == (key_midi_num + 2) % 12)
@@ -354,4 +358,17 @@ bool IsNote(std::string input) {
   }
 
   return false;
+}
+
+std::vector<int> TuneMelodyToKey(const std::vector<int> &melody_in,
+                                 int root_midi, int scale) {
+  std::vector<int> melody_out{};
+  int base_midi = root_midi % 12;
+  for (const auto &n : melody_in) {
+    if (IsMidiNoteInKey(n, base_midi))
+      melody_out.push_back(n);
+    else
+      melody_out.push_back(n - 1);
+  }
+  return melody_out;
 }

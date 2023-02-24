@@ -1,0 +1,133 @@
+
+let hh1 = sample(ch/timbaHat1.aiff);
+let hh2 = sample(ch/timabHat2.aiff);
+let hh3 = sample(ch/angelHat.aiff);
+# add_fx(hh1, "delay"); add_fx(hh2, "delay"); add_fx(hh3, "delay");
+
+# 3 delays and differing osc
+# p2 < osc 8 "23 45"  "set hh1:fx0:fb %"
+# p3 < osc 11 "42 77"  "set hh2:fx0:fb %"
+# p4 < osc 23 "0 23"  "set hh3:fx0:fb %"
+
+let bd1 = sample(bd/solid.aiff);
+let bd2 = sample(bd/LOUkick.aiff);
+let bd3 = sample(bd/garageKick.aiff);
+
+let kblah_gen = gen()
+{
+  setup()
+  {
+    let nomz = [5, 7, 4, 7, 11, 3];
+    let nx = 0;
+    let hatz = [hh1, hh2, hh3];
+    let hx = 0;
+    let beat = bjork(nomz[nx], 16);
+
+    let bdz = [bd1, bd2, bd3];
+    let bdx = 0;
+
+    let lx = 0;
+    let lmax = 3;
+
+    let dzz = [100, 50, 250, 50, 400];
+    let dzx = 0;
+  }
+  run()
+  {
+
+    if (count % 8 == 7) {
+      nx = incr(nx, 0, len(nomz));
+      beat = bjork(nomz[nx], 16);
+    }
+
+    if (count % 8 < 7) {
+      for (i = 0; i < 16; ++i) {
+        stepper(bdz[bdx], beat, lx, i, dzz[dzx]);
+        stepper(hatz[hx], invert(beat), lx, i, dzz[dzx]);
+        dzx = incr(dzx, 0, len(dzz));
+        bdx = incr(bdx, 0, len(bdz));
+        lx = incr(lx, 0, lmax);
+        hx = incr(hx, 0, len(hatz));
+      }
+      lmax = incr(lmax, 2, 16);
+    } else {
+      perky(invert(beat*2), bdz);
+      perky(beat*2, hatz);
+    }
+
+  }
+}
+
+let cp1 = sample(cp/hes23cp.aif);
+let cp2 = sample(cp/front2WestClap.aiff);
+let cp3 = sample(cp/clapLongReverb.aif);
+
+let sd1 = sample(sd/SBSNareHollow.aiff);
+# add_fx(sd1, "distort");
+let sd2 = sample(sd/mawhsnare2.aiff);
+
+# mo = morphy ?
+# dx = ? wuurpr
+let snnblah_gen = gen()
+{
+  setup()
+  {
+    let snrz = [sd1, sd2];
+    let sx = 0;
+    let cpz = [cp1, cp2, cp3];
+    let cx = 0;
+
+    let ntz = [13];
+    let ntx = 0;
+
+    let drrr = 500;
+
+    let bjz = [3, 5, 7, 11, 8];
+    let bjx = 0;
+
+    let ratz = [23, 30, 21, 22];
+    let rx = 0;
+    let lxx = 10;
+
+    let cnt =0;
+    let mcnt = 3;
+
+    let scnt =0;
+    let mscnt = 4;
+  }
+  run()
+  {
+
+
+    let bt = bjork(bjz[bjx], 16);
+
+    if (count % 8 == 7) {
+      bjx = incr(bjx, 0, len(bjz));
+      for (i = 0; i < 16; ++i) {
+        drrr = drrr + 50;
+        if (drrr > 1000) {
+          drrr = 50;
+        }
+        stepper(cpz[cx], bt, cnt, i, dur = drrr);
+        cnt = incr(cnt, 0, mcnt);
+        cx = incr(cx, 0, len(cpz));
+        stepper(snrz[sx], invert(bt), scnt, i, dur = drrr);
+        scnt = incr(scnt, 0, mscnt);
+        sx = incr(sx, 0, len(snrz));
+      }
+      mcnt = incr(mcnt, 3, len(cpz));
+      mscnt = incr(mscnt, 4, len(snrz));
+    }
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+
