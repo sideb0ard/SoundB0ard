@@ -1,0 +1,56 @@
+
+# F#
+let KEY = 54;
+let key_notes = [54, 56, 58, 59, 61, 63, 65, 66];
+
+# I-IV-V
+let chord_progz = [54, 59, 61];
+let cx = 0;
+
+# dx spacepiano
+
+# dx rSQer
+# map {240: 20, 960: 27, 2040: 20, 2760: 24, 3240: 27, 3840: 27, 4560: 20, 5040: 20, 5760: 20, 6840: 27, 7560: 20}
+
+
+# let mmap = gmelody(11, 20, 1);
+# {240: 20, 600: 24, 840: 31, 1200: 32, 1680: 27, 2040: 27, 2280: 32, 2640: 31, 3240: 22, 3600: 27, 3720: 20}
+let mblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      play_map(dx, mmap);
+    }
+    if (count % 3 == 0) {
+      play_map(dx2, mmap2);
+    }
+  }
+}
+
+let mahblah_gen = gen()
+{
+  setup()
+  {
+    let sz = [3, 4];
+    let sx = 0;
+    let mmel = gamelody(sz[sx], 12, 32);
+  }
+  run()
+  {
+    let pp = 3840 / 32;
+    for (i = 0; i < 32; ++i) {
+      if (mmel[i] > 0) {
+        note_on_at(dx, mmel[i], i * pp);
+      }
+    }
+    if (count % 8 == 0) {
+      mmel = gamelody(sz[sx], 12, 32);
+      sx = incr(sx, 0, len(sz));
+    }
+  }
+}
+
