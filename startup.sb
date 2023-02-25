@@ -625,17 +625,68 @@ let golden_seq = fn(num_beats)
   return sort(circ_timez);
 }
 
-let gmelody = fn(num_steps, root_key, midi_len)
+let gamelody = fn(num_steps, root_key, loop_len)
 {
   let beat = golden_seq(num_steps);
   let notez = notes_in_key(root_key);
-  let bmap = {};
+
+  let melody = rand_array(loop_len, 0, 0);
+
   for (i = 0; i < len(beat); ++i) {
     let note = notez[rand(len(notez))];
     if (i == 0 || i == len(beat) -1) {
       note = root_key;
     }
-    bmap[floor(beat[i]*midi_len)] = note;
+    let time_val = floor(beat[i]*loop_len);
+    melody[time_val] = note;
+  }
+
+  return melody;
+}
+
+
+let gmelody = fn(num_steps, root_key, loop_len)
+{
+  let beat = golden_seq(num_steps);
+  let notez = notes_in_key(root_key);
+  let bmap = {};
+
+  let midi_len = loop_len * 3840;
+
+  # TODO - make this quantization value global via mixer
+  let thirtysecnd = 3840 / 32;
+  for (i = 0; i < len(beat); ++i) {
+    let note = notez[rand(len(notez))];
+    if (i == 0 || i == len(beat) -1) {
+      note = root_key;
+    }
+    let time_val = floor(beat[i]*midi_len);
+    let quant_val = floor(time_val / thirtysecnd) * thirtysecnd;
+    bmap[quant_val] = note;
+  }
+  return bmap;
+}
+
+let garrmelody = fn(num_steps, notez, loop_len)
+{
+  if (len(notez) == 0) {
+    return [];
+  }
+  let beat = golden_seq(num_steps);
+  let bmap = {};
+
+  let midi_len = loop_len * 3840;
+
+  # TODO - make this quantization value global via mixer
+  let thirtysecnd = 3840 / 32;
+  for (i = 0; i < len(beat); ++i) {
+    let note = notez[rand(len(notez))];
+    if (i == 0 || i == len(beat) -1) {
+      note = notez[0];
+    }
+    let time_val = floor(beat[i]*midi_len);
+    let quant_val = floor(time_val / thirtysecnd) * thirtysecnd;
+    bmap[quant_val] = note;
   }
   return bmap;
 }

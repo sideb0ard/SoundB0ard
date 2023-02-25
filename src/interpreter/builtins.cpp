@@ -360,11 +360,115 @@ void play_array(std::shared_ptr<object::Object> pattern, float speed, int dur,
   }
 }
 
+std::array<int, 16> BitsFromNumber(int num) {
+  std::array<int, 16> bits{};
+  for (int i = 0; i < 16; i++) {
+    if (num & (1 << i)) {
+      bits[15 - i] = 1;
+    }
+  }
+  return bits;
+}
+
+std::string HexFromNumber(int num) {
+  std::string hex_val{};
+  const int mymask = 15;
+
+  // auto bits = BitsFromNumber(mymask);
+  // for (const auto &b : bits) {
+  //   std::cout << b << " ";
+  // }
+
+  for (int i = 0; i < 4; i++) {
+    int shiftr = 4 * (3 - i);
+    int nibble = (num & (mymask << (shiftr))) >> shiftr;
+    if (nibble == 0)
+      hex_val.append("0");
+    else if (nibble == 1)
+      hex_val.append("1");
+    else if (nibble == 2)
+      hex_val.append("2");
+    else if (nibble == 3)
+      hex_val.append("3");
+    else if (nibble == 4)
+      hex_val.append("4");
+    else if (nibble == 5)
+      hex_val.append("5");
+    else if (nibble == 6)
+      hex_val.append("6");
+    else if (nibble == 7)
+      hex_val.append("7");
+    else if (nibble == 8)
+      hex_val.append("8");
+    else if (nibble == 9)
+      hex_val.append("9");
+    else if (nibble == 10)
+      hex_val.append("A");
+    else if (nibble == 11)
+      hex_val.append("B");
+    else if (nibble == 12)
+      hex_val.append("C");
+    else if (nibble == 13)
+      hex_val.append("D");
+    else if (nibble == 14)
+      hex_val.append("E");
+    else if (nibble == 15)
+      hex_val.append("F");
+    else
+      hex_val.append("0");
+  }
+  return hex_val;
+}
+
 }  // namespace
 
 namespace builtin {
 
 std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
+    {"bits", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> input)
+                     -> std::shared_ptr<object::Object> {
+                   if (input.size() != 1)
+                     return evaluator::NewError(
+                         "Too many arguments for 'bits' - can only accept "
+                         "one");
+
+                   auto num_obj =
+                       std::dynamic_pointer_cast<object::Number>(input[0]);
+                   if (num_obj) {
+                     auto bits = BitsFromNumber(int(num_obj->value_));
+                     auto bit_array = std::make_shared<object::Array>(
+                         std::vector<std::shared_ptr<object::Object>>());
+                     auto zero = std::make_shared<object::Number>(0);
+                     auto one = std::make_shared<object::Number>(1);
+                     for (int i = 0; i < 16; i++) {
+                       if (bits[i] == 1) {
+                         bit_array->elements_.push_back(one);
+                       } else {
+                         bit_array->elements_.push_back(zero);
+                       }
+                     }
+                     return bit_array;
+                   }
+                   return evaluator::NULLL;
+                 })},
+    {"hex", std::make_shared<object::BuiltIn>(
+                [](std::vector<std::shared_ptr<object::Object>> input)
+                    -> std::shared_ptr<object::Object> {
+                  if (input.size() != 1)
+                    return evaluator::NewError(
+                        "Too many arguments for 'hex' - can only accept "
+                        "one");
+
+                  auto num_obj =
+                      std::dynamic_pointer_cast<object::Number>(input[0]);
+                  if (num_obj) {
+                    auto hex_val = HexFromNumber(int(num_obj->value_));
+                    auto hex_string = std::make_shared<object::String>(hex_val);
+                    return hex_string;
+                  }
+                  return evaluator::NULLL;
+                })},
     {"len",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
