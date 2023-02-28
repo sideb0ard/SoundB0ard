@@ -29,9 +29,9 @@ std::shared_ptr<ast::Program> Parser::ParseProgram() {
 }
 
 std::shared_ptr<ast::Statement> Parser::ParseStatement() {
-  if (cur_token_.type_.compare(token::SLANG_LET) == 0)
+  if (cur_token_.type_.compare(token::SLANG_LET) == 0) {
     return ParseLetStatement();
-  else if (cur_token_.type_.compare(token::SLANG_BREAK) == 0)
+  } else if (cur_token_.type_.compare(token::SLANG_BREAK) == 0)
     return ParseBreakStatement();
   else if (cur_token_.type_.compare(token::SLANG_RETURN) == 0)
     return ParseReturnStatement();
@@ -512,6 +512,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
     return ParseAtExpression();
   else if (cur_token_.type_ == token::SLANG_NUMBER)
     return ParseNumberLiteral();
+  else if (cur_token_.type_ == token::SLANG_BITOP)
+    return ParseBitOpExpression();
   else if (cur_token_.type_ == token::SLANG_INCREMENT)
     return ParsePrefixExpression();
   else if (cur_token_.type_ == token::SLANG_DECREMENT)
@@ -601,6 +603,30 @@ std::shared_ptr<ast::Expression> Parser::ParseHashLiteral() {
   }
 
   return hash_lit;
+}
+
+std::shared_ptr<ast::BitOpExpression> Parser::ParseBitOpExpression() {
+  std::shared_ptr<ast::BitOpExpression> exp =
+      std::make_shared<ast::BitOpExpression>(cur_token_);
+
+  if (!ExpectPeek(token::SLANG_LPAREN)) {
+    std::cerr << "BITOP - NO LPAREN! - returning nullptr \n";
+    return nullptr;
+  }
+  NextToken();
+
+  std::stringstream ss;
+  while (!CurTokenIs(token::SLANG_EOFF) && !CurTokenIs(token::SLANG_RPAREN)) {
+    ss << cur_token_.literal_;
+    NextToken();
+  }
+  if (!CurTokenIs(token::SLANG_RPAREN)) {
+    std::cerr << "OOFT! where ya PAREN?\n";
+    return nullptr;
+  }
+  exp->value_ = ss.str();
+
+  return exp;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseNumberLiteral() {

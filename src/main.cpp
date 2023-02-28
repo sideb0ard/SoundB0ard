@@ -89,7 +89,6 @@ void *process_worker_thread() {
           }
         }
       } else if (event->type == Event::PROCESS_UPDATE_EVENT) {
-        std::cout << "PROCESS UPDATE EVENT\n";
         if (event->target_process_id >= 0 &&
             event->target_process_id < MAX_NUM_PROC) {
           ProcessConfig config = {

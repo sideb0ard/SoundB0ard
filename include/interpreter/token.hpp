@@ -66,6 +66,7 @@ const TokenType SLANG_OR = "||";
 
 const TokenType SLANG_AT = "AT";
 const TokenType SLANG_BPM = "BPM";
+const TokenType SLANG_BITOP = "BITOP";
 const TokenType SLANG_DURATION = "DURATION";
 const TokenType SLANG_EVERY = "EVERY";
 const TokenType SLANG_HELP = "HELP";

@@ -89,6 +89,15 @@ class BooleanExpression : public Expression {
   bool value_;
 };
 
+class BitOpExpression : public Expression {
+ public:
+  explicit BitOpExpression(Token toke) : Expression(toke) {}
+  std::string String() const override;
+
+ public:
+  std::string value_;
+};
+
 class PrefixExpression : public Expression {
  public:
   PrefixExpression() {}

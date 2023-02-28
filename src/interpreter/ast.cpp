@@ -76,6 +76,15 @@ std::string InfoStatement::String() const {
   return ss.str();
 }
 
+std::string BitOpExpression::String() const {
+  std::stringstream ss;
+  ss << TokenLiteral();
+  ss << value_;
+  ss << ";";
+
+  return ss.str();
+}
+
 std::string BpmStatement::String() const {
   std::stringstream ss;
   ss << TokenLiteral();

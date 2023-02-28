@@ -625,6 +625,21 @@ let golden_seq = fn(num_beats)
   return sort(circ_timez);
 }
 
+let garmelody = fn(num_steps, notez, loop_len)
+{
+  let beat = golden_seq(num_steps);
+  let melody = rand_array(loop_len, 0, 0);
+
+  for (i = 0; i < len(beat); ++i) {
+    let note = notez[rand(len(notez))];
+    let time_val = floor(beat[i]*loop_len);
+    melody[time_val] = note;
+  }
+
+  return melody;
+}
+
+
 let gamelody = fn(num_steps, root_key, loop_len)
 {
   let beat = golden_seq(num_steps);

@@ -96,6 +96,9 @@ object::HashKey Number::HashKey() {
   return object::HashKey(Type(), (uint64_t)value_);
 }
 
+std::string BitOp::Inspect() { return bitop_; }
+std::string BitOp::Type() { return BITOP_OBJ; }
+
 std::string Boolean::Inspect() {
   std::stringstream val;
   val << (value_ ? "true" : "false");

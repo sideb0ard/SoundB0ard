@@ -205,6 +205,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     }
   }
 
+  auto bitop_stmt = std::dynamic_pointer_cast<ast::BitOpExpression>(node);
+  if (bitop_stmt) {
+    auto bitoo_obj = std::make_shared<object::BitOp>(bitop_stmt->value_);
+    return bitoo_obj;
+  }
+
   std::shared_ptr<ast::InfoStatement> info_stmt =
       std::dynamic_pointer_cast<ast::InfoStatement>(node);
   if (info_stmt) {

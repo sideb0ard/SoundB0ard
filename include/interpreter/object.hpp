@@ -20,6 +20,8 @@ constexpr char ERROR_OBJ[] = "ERROR";
 constexpr char NUMBER_OBJ[] = "NUMBER";
 constexpr char BOOLEAN_OBJ[] = "BOOLEAN";
 
+constexpr char BITOP_OBJ[] = "BITOP";
+
 constexpr char RETURN_VALUE_OBJ[] = "RETURN_VALUE";
 
 constexpr char BREAK_OBJ[] = "BREAK";
@@ -83,6 +85,16 @@ class Break : public Object {
   Break() = default;
   ObjectType Type() override;
   std::string Inspect() override;
+};
+
+class BitOp : public Object {
+ public:
+  BitOp(std::string bitop) : bitop_{bitop} {};
+  ObjectType Type() override;
+  std::string Inspect() override;
+
+ public:
+  std::string bitop_;
 };
 
 class Number : public Object {

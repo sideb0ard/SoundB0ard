@@ -71,6 +71,7 @@ class Parser {
 
   std::shared_ptr<ast::Statement> ParseExpressionStatement();
 
+  std::shared_ptr<ast::BitOpExpression> ParseBitOpExpression();
   std::shared_ptr<ast::Expression> ParseExpression(Precedence p);
   std::shared_ptr<ast::Expression> ParseIdentifier();
   std::shared_ptr<ast::Expression> ParseNumberLiteral();

@@ -6,6 +6,7 @@
 namespace token {
 const std::unordered_map<std::string, TokenType> keywords{
     {"at", SLANG_AT},
+    {"bitop", SLANG_BITOP},
     {"break", SLANG_BREAK},
     {"bpm", SLANG_BPM},
     {"digi", SLANG_DIGI_SYNTH},
