@@ -65,6 +65,9 @@ std::shared_ptr<object::Object> EvalMultiplyArrayExpression(
 std::shared_ptr<object::Object> EvalBangOperatorExpression(
     std::shared_ptr<object::Object> right);
 
+std::shared_ptr<object::Object> EvalNotOperatorExpression(
+    std::shared_ptr<object::Object> right);
+
 std::shared_ptr<object::Object> EvalMinusPrefixOperatorExpression(
     std::shared_ptr<object::Object> right);
 

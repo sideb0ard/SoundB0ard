@@ -520,6 +520,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
     return ParsePrefixExpression();
   else if (cur_token_.type_ == token::SLANG_BANG)
     return ParsePrefixExpression();
+  else if (cur_token_.type_ == token::SLANG_NOT)
+    return ParsePrefixExpression();
   else if (cur_token_.type_ == token::SLANG_MINUS)
     return ParsePrefixExpression();
   else if (cur_token_.type_ == token::SLANG_TRUE)

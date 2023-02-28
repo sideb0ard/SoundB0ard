@@ -786,6 +786,8 @@ std::shared_ptr<object::Object> EvalPrefixExpression(
     std::string op, std::shared_ptr<object::Object> right) {
   if (op.compare("!") == 0)
     return EvalBangOperatorExpression(right);
+  else if (op.compare("~") == 0)
+    return EvalNotOperatorExpression(right);
   else if (op.compare("-") == 0)
     return EvalMinusPrefixOperatorExpression(right);
   else if (op.compare("++") == 0)
@@ -996,6 +998,16 @@ std::shared_ptr<object::Object> EvalBangOperatorExpression(
     return TTRUE;
   else
     return FFALSE;
+}
+
+std::shared_ptr<object::Object> EvalNotOperatorExpression(
+    std::shared_ptr<object::Object> right) {
+  std::shared_ptr<object::Number> i =
+      std::dynamic_pointer_cast<object::Number>(right);
+  if (!i) {
+    return NewError("unknown operator: ~%s", right->Type());
+  }
+  return std::make_shared<object::Number>(~int(i->value_));
 }
 
 std::shared_ptr<object::Object> EvalMinusPrefixOperatorExpression(

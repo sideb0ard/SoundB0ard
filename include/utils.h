@@ -22,7 +22,8 @@ void strim(const char *input, char *result);
 void chordie(char *n);
 int conv_bitz(int num);
 bool IsValidFile(std::string filename);
-void related_notes(char root_note[4], double *second_note, double *third_note);
+// void related_notes(char root_note[4], double *second_note, double
+// *third_note);
 double pitch_shift_multiplier(double pitch_shift_semitones);
 double fast_pow(double a, double b);
 void calculate_pan_values(double pan_total, double *pan_left,
