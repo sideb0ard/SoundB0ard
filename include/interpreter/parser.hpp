@@ -16,8 +16,12 @@ enum class Precedence {
   _,
   LOWEST,
   LOGICALANDOR,
+  BITWISEOR,
+  BITWISEXOR,
+  BITWISEAND,
   EQUALS,
   LESSGREATER,
+  BITSHIFT,
   SUM,
   PRODUCT,
   PREFIX,
@@ -26,6 +30,11 @@ enum class Precedence {
 };
 
 const std::unordered_map<token::TokenType, Precedence> precedences{
+    {token::SLANG_BITWISE_AND, Precedence::BITWISEAND},
+    {token::SLANG_BITWISE_OR, Precedence::BITWISEOR},
+    {token::SLANG_BITWISE_XOR, Precedence::BITWISEXOR},
+    {token::SLANG_BITWISE_LEFTSHIFT, Precedence::BITSHIFT},
+    {token::SLANG_BITWISE_RIGHTSHIFT, Precedence::BITSHIFT},
     {token::SLANG_AND, Precedence::LOGICALANDOR},
     {token::SLANG_OR, Precedence::LOGICALANDOR},
     {token::SLANG_EQ, Precedence::EQUALS},

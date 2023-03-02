@@ -475,7 +475,10 @@ static bool IsInfixOperator(token::TokenType type) {
       type == token::SLANG_NOT_EQ || type == token::SLANG_LT ||
       type == token::SLANG_GT || type == token::SLANG_LPAREN ||
       type == token::SLANG_AND || type == token::SLANG_OR ||
-      type == token::SLANG_LBRACKET)
+      type == token::SLANG_LBRACKET || type == token::SLANG_BITWISE_AND ||
+      type == token::SLANG_BITWISE_OR || type == token::SLANG_BITWISE_XOR ||
+      type == token::SLANG_BITWISE_LEFTSHIFT ||
+      type == token::SLANG_BITWISE_RIGHTSHIFT)
     return true;
   return false;
 }
@@ -607,6 +610,7 @@ std::shared_ptr<ast::Expression> Parser::ParseHashLiteral() {
   return hash_lit;
 }
 
+// TODO - DELETE _ FAILED EXPERUMENT!
 std::shared_ptr<ast::BitOpExpression> Parser::ParseBitOpExpression() {
   std::shared_ptr<ast::BitOpExpression> exp =
       std::make_shared<ast::BitOpExpression>(cur_token_);

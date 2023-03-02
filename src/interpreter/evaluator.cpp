@@ -934,6 +934,21 @@ std::shared_ptr<object::Object> EvalNumberInfixExpression(
     return std::make_shared<object::Number>(left->value_ / right->value_);
   else if (op.compare("%") == 0)
     return std::make_shared<object::Number>(fmod(left->value_, right->value_));
+  else if (op.compare("&") == 0)
+    return std::make_shared<object::Number>(int(left->value_) &
+                                            int(right->value_));
+  else if (op.compare("|") == 0)
+    return std::make_shared<object::Number>(int(left->value_) |
+                                            int(right->value_));
+  else if (op.compare("^") == 0)
+    return std::make_shared<object::Number>(int(left->value_) ^
+                                            int(right->value_));
+  else if (op.compare("<<") == 0)
+    return std::make_shared<object::Number>(int(left->value_)
+                                            << int(right->value_));
+  else if (op.compare(">>") == 0)
+    return std::make_shared<object::Number>(int(left->value_) >>
+                                            int(right->value_));
   else if (op.compare("<") == 0)
     return NativeBoolToBooleanObject(left->value_ < right->value_);
   else if (op.compare(">") == 0)

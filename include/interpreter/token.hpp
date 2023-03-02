@@ -62,6 +62,12 @@ const TokenType SLANG_DECREMENT = "--";
 const TokenType SLANG_AND = "&&";
 const TokenType SLANG_OR = "||";
 
+const TokenType SLANG_BITWISE_AND = "&";
+const TokenType SLANG_BITWISE_OR = "|";
+const TokenType SLANG_BITWISE_XOR = "^";
+const TokenType SLANG_BITWISE_LEFTSHIFT = "<<";
+const TokenType SLANG_BITWISE_RIGHTSHIFT = ">>";
+
 // Soundb0ard specific //////////////////
 // /////////////////////////
 

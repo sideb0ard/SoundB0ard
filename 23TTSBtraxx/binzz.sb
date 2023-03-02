@@ -1,0 +1,112 @@
+let bd = sample(wavalc/dm02_909_kickdrum_005_clean.wav);
+let hh = sample(ch/pumpDistortHH.wav);
+let hhh = sample(ch/reggaHatz.aiff);
+let guh = sample(brandyvocalz/gu.wav);
+let kt = [bd, hh, hhh, guh];
+
+let bin_gen = gen()
+{
+  setup()
+  {
+    let t = 8191;
+    let ptz = [0.8, 1, 1.2, 1.5, 2];
+    let px = 0;
+    let bx = 0;
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      ((t/4)>>(t/4))>>(t>>(t/8))|t>>2;
+      ++t;
+      perky(bits(t), kt);
+      set kt[bx]:pitch ptz[px];
+      bx = incr(bx, 0, len(kt));
+      px = incr(px, 0, len(ptz));
+    }
+  }
+}
+
+let bd2 = sample(wavalc/dm02_909_kickdrum_006_drive.wav);
+let hh2 = sample(aesamples/SH09_HAT.WAV);
+let hh3 = sample(ch/acidHat3.aiff);
+let ksn = sample(perc/krushsn.wav);
+let hic = sample(perc/grit.aiff);
+let kt2 = [bd2, hh2, hh3, ksn, hic];
+
+let bin2_gen = gen()
+{
+  setup()
+  {
+    let t = 8194;
+    let bx = 0;
+    let ptz = [0.8, 1, 1.2, 1.5, 2];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 5 < 4) {
+      (( ((t*5)&(t>>7)) | ((t*3)&(t>>10)) ) & 255) / 127 - 1;
+      ++t;
+      perky(bits(t), kt2);
+      set kt2[bx]:pitch ptz[px];
+      bx = incr(bx, 0, len(kt2));
+      px = incr(px, 0, len(ptz));
+    }
+  }
+}
+
+let bddd = sample(bd/808kick.aif);
+let rm = sample(rims/hes23rim1.aif);
+let hau = sample(cp/haunterZ.aiff);
+let nyc = sample(cp/NYClap.aiff);
+let cpp = sample(cp/clap25.aif);
+let cppz = [rm, hau, nyc, cpp];
+# let awk = loop(hallow/awkardBEAT2.wav); add_fx(awk, "distort");
+let bablah_gen = gen()
+{
+  setup()
+  {
+    let bjz = [1, 3, 7, 5, 1];
+    let bx = 0;
+    let cpx = 0;
+  }
+  run()
+  {
+    play_array(bddd, bjork(bjz[bx], 16), dur=500);
+    bx = incr(bx, 0, len(bjz));
+    set awk:on 1;
+    if (count % 4 == 3) {
+      let bt = bjork(bjz[bx], 16);
+      play_array(cppz[cpx], bt, 16));
+      cpx = incr(cpx, 0, len(cppz));
+      play_array(awk, invert(bt), 16));
+    }
+    if (count % 3 == 0) {
+      set awk:stutter 1;
+    }
+  }
+}
+# let sh27 = loop(aesamples/shstr_27.WAV); set sh27:len 8;
+# let bsqw = loop(bombz/BSQWASPR13.wav); set bsqw:len 4;
+#  let bsqww = loop(bombz/BSQWASPR8.wav); set bsqww:len 12
+
+let rblah_gen = gen()
+{
+  setup()
+  {
+    let cfz = [2, 4, 8, 12, 14];
+    let cx = 0;
+  }
+  run()
+  {
+    set ralph:off 1;
+    if (count % 2) {
+      set ralph:on 1 at=cfz[cx]*pp;
+      cx = incr(cx, 0, len(cfz));
+    }
+  }
+
+
+
+}
+

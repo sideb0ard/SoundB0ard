@@ -123,12 +123,24 @@ token::Token Lexer::NextToken() {
       tok.literal_ = current_char_;
       break;
     case ('<'):
-      tok.type_ = token::SLANG_LT;
-      tok.literal_ = current_char_;
+      if (PeekChar() == '<') {
+        ReadChar();
+        tok.type_ = token::SLANG_BITWISE_LEFTSHIFT;
+        tok.literal_ = "<<";
+      } else {
+        tok.type_ = token::SLANG_LT;
+        tok.literal_ = current_char_;
+      }
       break;
     case ('>'):
-      tok.type_ = token::SLANG_GT;
-      tok.literal_ = current_char_;
+      if (PeekChar() == '>') {
+        ReadChar();
+        tok.type_ = token::SLANG_BITWISE_LEFTSHIFT;
+        tok.literal_ = ">>";
+      } else {
+        tok.type_ = token::SLANG_GT;
+        tok.literal_ = current_char_;
+      }
       break;
     case (','):
       tok.type_ = token::SLANG_COMMA;
@@ -166,13 +178,17 @@ token::Token Lexer::NextToken() {
       tok.type_ = token::SLANG_COLON;
       tok.literal_ = current_char_;
       break;
+    case ('^'):
+      tok.type_ = token::SLANG_BITWISE_XOR;
+      tok.literal_ = current_char_;
+      break;
     case ('|'):
       if (PeekChar() == '|') {
         ReadChar();
         tok.type_ = token::SLANG_OR;
         tok.literal_ = "||";
       } else {
-        tok.type_ = token::SLANG_PIPE;
+        tok.type_ = token::SLANG_BITWISE_OR;
         tok.literal_ = current_char_;
       }
       break;
@@ -181,6 +197,9 @@ token::Token Lexer::NextToken() {
         ReadChar();
         tok.type_ = token::SLANG_AND;
         tok.literal_ = "&&";
+      } else {
+        tok.type_ = token::SLANG_BITWISE_AND;
+        tok.literal_ = current_char_;
       }
       break;
     case ('"'):

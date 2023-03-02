@@ -592,7 +592,7 @@ void DXSynth::randomize() {
   m_settings.m_eg1_decay_ms = rand() % 300;
   m_settings.m_eg1_sustain_lvl = ((float)rand()) / RAND_MAX;
   m_settings.m_eg1_release_ms = rand() % 300;
-  // m_settings.m_op1_output_lvl = (rand() % 55) + 35;
+  m_settings.m_op1_output_lvl = 90 + (rand() % 5);
 
   m_settings.m_op2_waveform = rand() % MAX_OSC;
   m_settings.m_op2_ratio = GetRandRatio();
@@ -601,7 +601,7 @@ void DXSynth::randomize() {
   m_settings.m_eg2_decay_ms = rand() % 400;
   m_settings.m_eg2_sustain_lvl = ((float)rand()) / RAND_MAX;
   m_settings.m_eg2_release_ms = rand() % 400;
-  m_settings.m_op2_output_lvl = (rand() % 55) + 15;
+  m_settings.m_op2_output_lvl = (rand() % 55) + 40;
 
   m_settings.m_op3_waveform = rand() % MAX_OSC;
   m_settings.m_op3_ratio = GetRandRatio();
@@ -610,7 +610,7 @@ void DXSynth::randomize() {
   m_settings.m_eg3_decay_ms = rand() % 400;
   m_settings.m_eg3_sustain_lvl = ((float)rand()) / RAND_MAX;
   m_settings.m_eg3_release_ms = rand() % 400;
-  m_settings.m_op3_output_lvl = (rand() % 55) + 15;
+  m_settings.m_op3_output_lvl = (rand() % 55) + 40;
 
   m_settings.m_op4_waveform = rand() % MAX_OSC;
   m_settings.m_op4_ratio = GetRandRatio();
@@ -619,7 +619,7 @@ void DXSynth::randomize() {
   m_settings.m_eg4_decay_ms = rand() % 500;
   m_settings.m_eg4_sustain_lvl = ((float)rand()) / RAND_MAX;
   m_settings.m_eg4_release_ms = rand() % 500;
-  m_settings.m_op4_output_lvl = (rand() % 55) + 15;
+  m_settings.m_op4_output_lvl = (rand() % 55) + 40;
   m_settings.m_op4_feedback = rand() % 70;
 
   Update();

@@ -1,0 +1,72 @@
+# dx = distrucjk
+# dx2 = frond
+# let mel = [14, 0, 14, 28, 0, 13, 17, 0, 26, 0, 0, 13, 0, 13, 0, 17];
+let pblah_gen = gen()
+{
+  setup()
+  {
+    let mx = 0;
+    let mmx = 3;
+
+    let dr = 70;
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, mel, mx, i, dr);
+        dr = dr + 10;
+        if (dr > 300) {
+          dr = 70;
+        }
+        mx = incr(mx, 0, mmx);
+      }
+    }
+
+    if (count % 3 == 0) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx2, combinor(invert(mel), [13, 17, 13, 14]), mx, i, dr);
+        mx = incr(mx, 0, mmx);
+      }
+    }
+    mmx = incr(mmx, 2, len(mel));
+  }
+}
+
+# p2 < osc 8 "23 200"  "set dx:e1att %";
+# p3 < osc 7 "23 170"  "set dx:e2att %";
+# p4 < osc 12 "0 77"  "set dx:fx0:fb %";
+
+# let mel = [28, 13, 0, 26, 0, 13, 0, 0, 26, 0, 0, 0, 0, 0, 0, 17];
+let pppblah_gen = gen()
+{
+  setup()
+  {
+    let mx = 0;
+    let mmx = 3;
+
+    let dr = 70;
+  }
+  run()
+  {
+    if (count % 4 < 3) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, mel, mx, i, dr);
+        dr = dr + 10;
+        if (dr > 300) {
+          dr = 70;
+        }
+        mx = incr(mx, 0, mmx);
+      }
+    }
+
+    if (count % 4 == 3) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx2, combinor(invert(mel), [13, 17, 13, 14]), mx, i, dr);
+        mx = incr(mx, 0, mmx);
+      }
+    }
+    mmx = incr(mmx, 2, len(mel));
+  }
+}
+

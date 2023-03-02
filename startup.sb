@@ -642,66 +642,61 @@ let garmelody = fn(num_steps, notez, loop_len)
 
 let gamelody = fn(num_steps, root_key, loop_len)
 {
-  let beat = golden_seq(num_steps);
+  let melody = [];
+  if (num_steps > 16) {
+    return melody;
+  }
+
   let notez = notes_in_key(root_key);
 
-  let melody = rand_array(loop_len, 0, 0);
+  let rn = rand(num_steps) + 2;
+  let rn2 = num_steps - rn;
 
-  for (i = 0; i < len(beat); ++i) {
-    let note = notez[rand(len(notez))];
-    if (i == 0 || i == len(beat) -1) {
-      note = root_key;
+  if (rn < 8) {
+    melody = bjork(rn, 8) + bjork(rn2, 8);
+  } else {
+    melody = bjork(num_steps, 16);
+  }
+
+  for (i = 0; i < len(melody); ++i) {
+    if (melody[i] == 1) {
+      let note = notez[rand(len(notez))];
+      if (i == 0 || i == len(melody) -1) {
+        note = root_key;
+      }
+      melody[i] = note;
     }
-    let time_val = floor(beat[i]*loop_len);
-    melody[time_val] = note;
   }
 
   return melody;
 }
 
 
-let gmelody = fn(num_steps, root_key, loop_len)
+let gcmelody = fn(num_steps, notez, loop_len)
 {
-  let beat = golden_seq(num_steps);
-  let notez = notes_in_key(root_key);
-  let bmap = {};
+  let melody = [];
+  if (num_steps > 16) {
+    return melody;
+  }
 
-  let midi_len = loop_len * 3840;
+  let rn = rand(num_steps) + 2;
+  let rn2 = num_steps - rn;
 
-  # TODO - make this quantization value global via mixer
-  let thirtysecnd = 3840 / 32;
-  for (i = 0; i < len(beat); ++i) {
-    let note = notez[rand(len(notez))];
-    if (i == 0 || i == len(beat) -1) {
-      note = root_key;
+  if (rn < 8) {
+    melody = bjork(rn, 8) + bjork(rn2, 8);
+  } else {
+    melody = bjork(num_steps, 16);
+  }
+
+  for (i = 0; i < len(melody); ++i) {
+    if (melody[i] == 1) {
+      let note = notez[rand(len(notez))];
+      if (i == 0 || i == len(melody) -1) {
+        note = notez[0];
+      }
+      melody[i] = note;
     }
-    let time_val = floor(beat[i]*midi_len);
-    let quant_val = floor(time_val / thirtysecnd) * thirtysecnd;
-    bmap[quant_val] = note;
   }
-  return bmap;
-}
 
-let garrmelody = fn(num_steps, notez, loop_len)
-{
-  if (len(notez) == 0) {
-    return [];
-  }
-  let beat = golden_seq(num_steps);
-  let bmap = {};
-
-  let midi_len = loop_len * 3840;
-
-  # TODO - make this quantization value global via mixer
-  let thirtysecnd = 3840 / 32;
-  for (i = 0; i < len(beat); ++i) {
-    let note = notez[rand(len(notez))];
-    if (i == 0 || i == len(beat) -1) {
-      note = notez[0];
-    }
-    let time_val = floor(beat[i]*midi_len);
-    let quant_val = floor(time_val / thirtysecnd) * thirtysecnd;
-    bmap[quant_val] = note;
-  }
-  return bmap;
+  return melody;
 }
