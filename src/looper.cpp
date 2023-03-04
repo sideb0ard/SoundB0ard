@@ -36,7 +36,7 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   filename_ = filename;
   ImportFile(filename_);
 
-  eg_.m_attack_time_msec = 10;
+  eg_.m_attack_time_msec = 20;
   eg_.m_release_time_msec = 50;
 
   degrade_by_ = 0;

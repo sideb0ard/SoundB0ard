@@ -4,8 +4,10 @@
 #include <drumsampler.h>
 #include <dxsynth.h>
 #include <event_queue.h>
+#include <fx/distortion.h>
 #include <fx/envelope.h>
 #include <fx/fx.h>
+#include <fx/reverb.h>
 #include <looper.h>
 #include <math.h>
 #include <minisynth.h>
@@ -78,6 +80,10 @@ Mixer::Mixer() {
     processes_[i] = std::make_shared<Process>();
   proc_initialized_ = true;
 
+  fx_[0] = std::make_shared<StereoDelay>();
+  fx_[1] = std::make_shared<Reverb>();
+  fx_[2] = std::make_shared<Distortion>();
+
   // the lifetime of these booleans is a single sample
   timing_info.cur_sample = -1;
   timing_info.midi_tick = -1;
@@ -109,6 +115,13 @@ std::string Mixer::StatusMixr() {
      << COOL_COLOR_GREEN << " midi_device:" << ANSI_COLOR_WHITE
      << (have_midi_controller ? "true" : "false") << COOL_COLOR_GREEN
      << " ::::::::::::::::::::::\n";
+  ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
+     << "delay: " << fx_[0]->Status() << std::endl;
+  ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
+     << "reverb: " << fx_[1]->Status() << std::endl;
+  ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
+     << "distort: " << fx_[2]->Status() << std::endl;
+  ss << ANSI_COLOR_WHITE;
   // clang-format on
 
   return ss.str();
@@ -129,7 +142,6 @@ std::string Mixer::StatusProcz(bool all) {
 
   return ss.str();
 }
-
 std::string Mixer::StatusEnv() {
   std::stringstream ss;
   ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Varz"
@@ -430,6 +442,9 @@ void Mixer::MidiTick() {
   CheckForDelayedEvents();
 }
 
+// The number of microseconds that elapse between samples
+constexpr auto microsPerSample = 1e6 / SAMPLE_RATE;
+
 int Mixer::GenNext(float *out, int frames_per_buffer,
                    ableton::Link::SessionState &sessionState,
                    const double quantum,
@@ -441,9 +456,6 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     return_bpm = bpm_to_be_updated;
     bpm_to_be_updated = 0;
   }
-
-  // The number of microseconds that elapse between samples
-  const auto microsPerSample = 1e6 / SAMPLE_RATE;
 
   for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2) {
     double output_left = 0.0;
@@ -697,6 +709,11 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     if (IsValidSoundgenNum(action.soundgen_num)) {
       auto sg = sound_generators_[action.soundgen_num];
       sg->allNotesOff();
+    }
+  } else if (action.type == AudioAction::MIXER_UPDATE) {
+    if (action.mixer_fx_id != -1) {
+      double param_val = std::stod(action.param_val);
+      fx_[action.mixer_fx_id]->SetParam(action.param_name, param_val);
     }
   } else if (action.type == AudioAction::UPDATE) {
     if (IsValidSoundgenNum(action.mixer_soundgen_idx)) {

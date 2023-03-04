@@ -75,6 +75,8 @@ struct audio_action_queue_item {
   std::string param_name{};
   std::string param_val{0};
 
+  int mixer_fx_id{-1};
+
   // NOTE_ON varz
   std::vector<std::shared_ptr<object::Object>> args;
   int soundgen_num{-1};

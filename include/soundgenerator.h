@@ -50,6 +50,12 @@ class SoundGenerator {
   void SetPan(double val);
   double GetPan();
 
+  void SetFxSend(int fx_num, double intensity) {
+    if (fx_num < kMixerNumSendFx && intensity >= 0 && intensity <= 1) {
+      mixer_fx_send_intensity_[fx_num] = intensity;
+    }
+  }
+
  public:
   sound_generator_type type;
 
@@ -59,6 +65,9 @@ class SoundGenerator {
 
   double volume{0.7};  // between 0 and 1.0
   double pan{0.};      // between -1(hard left) and 1(hard right)
+
+  // hard coded - 0: delay 1: reverb 2: distortion
+  std::array<double, kMixerNumSendFx> mixer_fx_send_intensity_{};
 
   int note_duration_ms_{100};
 

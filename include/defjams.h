@@ -63,6 +63,8 @@ static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
 #define DEFAULT_FILTER_KEYTRACK_INTENSITY 0.5
 #define DEFAULT_PORTAMENTO_TIME_MSEC 0.0
 
+// 0:delay 1:reverb 2:distortion
+constexpr int kMixerNumSendFx = 3;
 constexpr int kMaxNumSoundGenFx = 20;
 
 constexpr int kMaxDelayLenSecs = 10;

@@ -59,6 +59,8 @@ struct Mixer {
 
   std::vector<std::shared_ptr<SBAudio::SoundGenerator>> sound_generators_ = {};
 
+  std::array<std::shared_ptr<Fx>, kMixerNumSendFx> fx_;
+
   std::vector<DelayedMidiEvent> _action_items =
       {};  // TODO get rid of this version
   std::vector<audio_action_queue_item> _delayed_action_items = {};

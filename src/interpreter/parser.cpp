@@ -185,14 +185,11 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
   } else if (ExpectPeek(token::SLANG_PROC_ID)) {
     return ParseProcessSetStatement();
   } else {
-    // std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_ <<
-    // std::endl;
+    std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_ << std::endl;
     return nullptr;
   }
 
   if (!ExpectPeek(token::SLANG_COLON)) {
-    // std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_ <<
-    // std::endl;
     return nullptr;
   }
 
@@ -200,7 +197,29 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
     std::cerr << "NOT GOT PARAM ! Peek token is " << peek_token_ << std::endl;
     return nullptr;
   }
-  if (cur_token_.literal_.rfind("fx", 0) == 0) {
+  if (stmt->target_->String() == "mixer") {
+    std::cout << "Setting Mixer component\n";
+    stmt->is_mixer_component_ = true;
+    if (cur_token_.literal_.rfind("delay", 0) == 0) {
+      stmt->mixer_fx_num_ = 0;
+    } else if (cur_token_.literal_.rfind("reverb", 0) == 0) {
+      stmt->mixer_fx_num_ = 1;
+    } else if (cur_token_.literal_.rfind("distort", 0) == 0) {
+      stmt->mixer_fx_num_ = 2;
+    }
+    if (stmt->mixer_fx_num_ == -1) {
+      std::cerr
+          << "Needs to be one of [delay, reverb, distort] for mixer param."
+          << std::endl;
+      return nullptr;
+    }
+
+    if (!ExpectPeek(token::SLANG_COLON)) {
+      std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_ << std::endl;
+      return nullptr;
+    }
+    NextToken();
+  } else if (cur_token_.literal_.rfind("fx", 0) == 0) {
     if (cur_token_.literal_.size() > 2) {
       int fx_num = std::stoi(cur_token_.literal_.substr(2));
       stmt->fx_num_ = fx_num;
