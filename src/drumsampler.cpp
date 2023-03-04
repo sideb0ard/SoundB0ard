@@ -50,6 +50,11 @@ StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
   double right_val = 0;
   if (!is_playing) return {left_val, right_val};
 
+  if (stop_pending_ && eg.m_state == OFFF) {
+    is_playing = false;
+    return {left_val, right_val};
+  }
+
   double amp_env = eg.DoEnvelope(NULL);
   if (amp_env == 0) {
     is_playing = false;
@@ -135,9 +140,13 @@ void DrumSampler::noteOn(midi_event ev) {
   if (reverse_mode) play_idx = bufsize - 2;
   velocity = ev.data2;
   eg.StartEg();
+  stop_pending_ = false;
 }
 
-void DrumSampler::noteOff(midi_event ev) { eg.StopEg(); }
+void DrumSampler::noteOff(midi_event ev) {
+  eg.Release();
+  stop_pending_ = true;
+}
 
 void DrumSampler::pitchBend(midi_event ev) {
   float pitch_val = ev.data1 / 10.;

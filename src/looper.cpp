@@ -103,6 +103,11 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
       stutter_pending_ = false;
     } else
       stutter_mode_ = false;
+    if (reverse_pending_) {
+      reverse_mode_ = true;
+      reverse_pending_ = false;
+    } else
+      reverse_mode_ = false;
   }
 
   // used to track which 16th we're on if loop != 1 bar
@@ -400,6 +405,7 @@ void Looper::SetLoopMode(unsigned int m) {
 void Looper::SetScramblePending() { scramble_pending_ = true; }
 
 void Looper::SetStutterPending() { stutter_pending_ = true; }
+void Looper::SetReversePending() { reverse_pending_ = true; }
 
 void Looper::SetLoopLen(double bars) {
   if (bars != 0) {
@@ -464,7 +470,7 @@ void Looper::SetParam(std::string name, double val) {
   else if (name == "stutter")
     SetStutterPending();
   else if (name == "reverse")
-    SetReverseMode(val);
+    SetReversePending();
   else if (name == "grain_dur_ms")
     SetGrainDuration(val);
   else if (name == "grains_per_sec")

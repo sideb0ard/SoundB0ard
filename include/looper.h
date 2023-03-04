@@ -84,6 +84,7 @@ class Looper : public SoundGenerator {
   double grain_pitch_{1};
 
   bool reverse_mode_{false};
+  bool reverse_pending_{false};
 
   Ramp xfader_;
   void SwitchXFadeGrains();
@@ -100,12 +101,12 @@ class Looper : public SoundGenerator {
   double loop_len_{1};  // bars
   int loop_counter_{-1};
 
-  bool scramble_pending_{false};
   bool scramble_mode_{false};
+  bool scramble_pending_{false};
   int current_sixteenth_{0};
 
-  bool stutter_pending_{false};
   bool stutter_mode_{false};
+  bool stutter_pending_{false};
   int stutter_idx_{0};
 
   bool stop_pending_{false};  // allow eg to stop
@@ -138,6 +139,7 @@ class Looper : public SoundGenerator {
   void SetLoopLen(double bars);
   void SetScramblePending();
   void SetStutterPending();
+  void SetReversePending();
 
   void LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo);
 

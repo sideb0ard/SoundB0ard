@@ -71,7 +71,7 @@ let dbblah_gen = gen()
   }
   run()
   {
-    set maw2:fx1:bitdepth bitz[bx];
+    set maw2:fx0:bitdepth bitz[bx];
     bx = incr(bx, 0, len(bitz));
 
     set maw2:plooplen 16;
@@ -91,11 +91,16 @@ let dbblah_gen = gen()
 # p5 < every 2 "<6 3 7 4>"  "set dx:o1rat %"
 # dx = load_preset("rizzor"); # swuuush
 # risable ? whodunit ? sawawr ? surgefizz2 // dalekkk
+# p2 < osc 0.5 "0 99" "set dx:op2out %"
+# p3 < osc 2 "0 99" "set dx:op3out %"
+# p4 < osc 3 "0 99" "set dx:op4out %"
+
 let dxxblah_gen = gen()
 {
   setup()
   {
-    let mel = [48, 0, 0, 52, 0, 0, 48, 60, 0, 48, 0, 0, 45, 0, 0, 0];
+    #let mel = [48, 0, 0, 52, 0, 0, 48, 60, 0, 48, 0, 0, 45, 0, 0, 0];
+    let mel =  [44, 0, 44, 44, 0, 44, 0, 44, 0, 44, 44, 0, 44, 47, 44, 48];
     let maxx = 3;
     let mx = 0;
 
@@ -110,15 +115,13 @@ let dxxblah_gen = gen()
         mx = incr(mx, 0, maxx);
         drzx = incr(drzx, 0, len(drz));
       }
-      if (count % 4 == 0) {
-        for (i = 0; i < 16; ++i) {
-          stepper(dx2, down(mel, 24), mx, i, drz[drzx]);
-        }
-      }
       maxx = incr(maxx, 2, len(mel));
     }
   }
 }
+
+# play bombz/BSQWASPR13.wav
+# play bombz/BSQWASPR8.wav
 
 # let mouth = loop(voices/mouthpiece.wav); set mouth:len 2; set mouth:pitch 1.4
 # dleay p6 < osc 12 "23 85"  "set mouth:fx0:fb %"
@@ -144,13 +147,6 @@ let moublah_gen = gen()
   }
 }
 
-let moblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-  }
-}
+# let jan = loop(loops/stringpercloopJANETLIKEabit.aiff); set jan:pitch 2;
+# add_fx(jan, "distort", "delay")
 

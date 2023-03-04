@@ -528,13 +528,61 @@ let moog_midi_assign = fn()
 let dx_midi_assign = fn()
 {
   midi_map(1, "dx:algo");
-  midi_map(2, "dx:o1wav");
-  midi_map(3, "dx:o1rat");
-  midi_map(4, "dx:o1det");
+  midi_map(2, "dx:vol");
+  midi_map(3, "dx:porta");
+  midi_map(4, "dx:op4fb");
+  midi_map(5, "dx:op1out");
+  midi_map(6, "dx:op2out");
+  midi_map(7, "dx:op3out");
+  midi_map(8, "dx:op4out");
+}
+
+let dx_midi_op1 = fn()
+{
+  midi_map(1, "dx:o1wav");
+  midi_map(2, "dx:o1rat");
+  midi_map(3, "dx:o1det");
+  #  midi_map(4, "dx:o1sus");
   midi_map(5, "dx:e1att");
   midi_map(6, "dx:e1dec");
   midi_map(7, "dx:e1sus");
-  midi_map(8, "dx:r1rel");
+  midi_map(8, "dx:e1rel");
+}
+
+let dx_midi_op2 = fn()
+{
+  midi_map(1, "dx:o2wav");
+  midi_map(2, "dx:o2rat");
+  midi_map(3, "dx:o2det");
+  #  midi_map(4, "dx:o2sus");
+  midi_map(5, "dx:e2att");
+  midi_map(6, "dx:e2dec");
+  midi_map(7, "dx:e2sus");
+  midi_map(8, "dx:e2rel");
+}
+
+let dx_midi_op3 = fn()
+{
+  midi_map(1, "dx:o3wav");
+  midi_map(2, "dx:o3rat");
+  midi_map(3, "dx:o3det");
+  #  midi_map(4, "dx:o1sus");
+  midi_map(5, "dx:e3att");
+  midi_map(6, "dx:e3dec");
+  midi_map(7, "dx:e3sus");
+  midi_map(8, "dx:e3rel");
+}
+
+let dx_midi_op4 = fn()
+{
+  midi_map(1, "dx:o4wav");
+  midi_map(2, "dx:o4rat");
+  midi_map(3, "dx:o4det");
+  #  midi_map(4, "dx:o1sus");
+  midi_map(5, "dx:e4att");
+  midi_map(6, "dx:e4dec");
+  midi_map(7, "dx:e4sus");
+  midi_map(8, "dx:e4rel");
 }
 
 let play_sub = fn(instrument, start_idx, sub_range, arr)

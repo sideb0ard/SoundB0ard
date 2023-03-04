@@ -49,6 +49,7 @@ std::pair<double, double> GetBoundaries(std::string param) {
   if (param.find("algo") != std::string::npos) return std::make_pair(0, 7);
   if (param.find("grain") != std::string::npos) return std::make_pair(0, 100);
   if (param.find("wav") != std::string::npos) return std::make_pair(0, 7);
+  if (param.find("porta") != std::string::npos) return std::make_pair(0, 5000);
   if (param.find("delayms") != std::string::npos)
     return std::make_pair(0, 2000);
   if (param.find("fb") != std::string::npos) return std::make_pair(0, 99);

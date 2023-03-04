@@ -32,6 +32,7 @@ class DrumSampler : public SoundGenerator {
   bool glitch_mode{false};
   int glitch_rand_factor{20};
 
+  bool stop_pending_{false};
   bool is_playing{false};
   float play_idx{0};
   int velocity{127};
