@@ -252,7 +252,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     }
 
     if (set_stmt->target_->token_.literal_ == ("mixer")) {
-      std::cout << "MIXER LITERAL!\n";
       audio_action_queue_item action{.type = AudioAction::MIXER_UPDATE,
                                      .mixer_fx_id = set_stmt->mixer_fx_num_,
                                      .param_name = set_stmt->param_,
