@@ -20,6 +20,8 @@ let briff = fn(root)
   return beat;
 }
 
+set mixer:delay:sync 1;
+
 
 let riff = fn(root)
 {

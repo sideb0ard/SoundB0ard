@@ -198,7 +198,6 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
     return nullptr;
   }
   if (stmt->target_->String() == "mixer") {
-    std::cout << "Setting Mixer component\n";
     stmt->is_mixer_component_ = true;
     if (cur_token_.literal_.rfind("delay", 0) == 0) {
       stmt->mixer_fx_num_ = 0;

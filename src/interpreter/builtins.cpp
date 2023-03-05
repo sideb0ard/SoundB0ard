@@ -954,7 +954,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          return evaluator::NULLL;
        }
 
-       double intensity_val = 1;
+       double intensity_val = 0.4;
        if (input.size() == 3) {
          auto intensity_obj =
              std::dynamic_pointer_cast<object::Number>(input[2]);
