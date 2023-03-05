@@ -269,6 +269,18 @@ struct StereoVal {
     res.right = right + obj.right;
     return res;
   }
+  StereoVal operator*(double const &val) {
+    StereoVal res;
+    res.left = left * val;
+    res.right = right * val;
+    return res;
+  }
+
+  StereoVal &operator+=(StereoVal const &rhs) {
+    left += rhs.left;
+    right += rhs.right;
+    return *this;
+  }
 };
 
 enum {

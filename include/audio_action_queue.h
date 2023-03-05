@@ -26,6 +26,7 @@ enum AudioAction {
   MIDI_MAP,
   MIDI_MAP_SHOW,
   MIXER_UPDATE,
+  MIXER_FX_UPDATE,
   MONITOR,
   NO_ACTION,
   PREVIEW,
@@ -75,7 +76,9 @@ struct audio_action_queue_item {
   std::string param_name{};
   std::string param_val{0};
 
+  // MIXER FX VARZ
   int mixer_fx_id{-1};
+  double fx_intensity{0};
 
   // NOTE_ON varz
   std::vector<std::shared_ptr<object::Object>> args;

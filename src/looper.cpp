@@ -50,6 +50,7 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   SoundGenerator::EventNotify(event, tinfo);
 
   if (!started_ && tinfo.is_start_of_loop) {
+    eg_.StartEg();
     started_ = true;
     LaunchGrain(active_grain_, tinfo);
   }
@@ -273,7 +274,6 @@ std::string Looper::Info() {
 }
 
 void Looper::start() {
-  eg_.StartEg();
   active = true;
   stop_pending_ = false;
 }

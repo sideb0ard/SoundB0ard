@@ -901,6 +901,83 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            return evaluator::NULLL;
          })},
+    {"send",
+     std::make_shared<
+         object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> input)
+                              -> std::shared_ptr<object::Object> {
+       std::cout << "SEND FX!\n";
+       // fx - either string or number
+       // source - either sg or array of sgs
+       // intensity - either number or default of 1
+       if (input.size() < 2)
+         return evaluator::NewError(
+             "`send` requires at least two args - destination fx and sources");
+
+       int destination_fx = -1;
+       auto fx_number_obj = std::dynamic_pointer_cast<object::Number>(input[0]);
+       if (fx_number_obj) {
+         destination_fx = fx_number_obj->value_;
+         std::cout << "NUMV AL:" << destination_fx << std::endl;
+       } else {
+         auto fx_string_obj =
+             std::dynamic_pointer_cast<object::String>(input[0]);
+         if (fx_string_obj) {
+           std::string dest = fx_string_obj->value_;
+           std::cout << "HAVE DEST:" << dest << std::endl;
+           if (dest == "delay")
+             destination_fx = 0;
+           else if (dest == "reverb")
+             destination_fx = 1;
+           else if (dest == "distort")
+             destination_fx = 2;
+         }
+       }
+       if (destination_fx < 0 || destination_fx > 2) {
+         std::cerr << "FX NUM:" << destination_fx
+                   << " isnae valid - whit's going on?" << std::endl;
+         return evaluator::NULLL;
+       }
+
+       std::cout << "WOOP ALL GOOD SO FAR, GOT DEST FX:" << destination_fx
+                 << std::endl;
+
+       audio_action_queue_item action_req{.type = AudioAction::MIXER_FX_UPDATE,
+                                          .mixer_fx_id = destination_fx};
+
+       auto sg_array = std::dynamic_pointer_cast<object::Array>(input[1]);
+       if (sg_array) {
+         std::cout << "WOOP, GOT ARRAY!\n";
+         for (auto const &e : sg_array->elements_) {
+           auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(e);
+           if (sg) {
+             std::cout << "YAS< GOT SG!\n";
+             action_req.group_of_soundgens.push_back(sg->soundgen_id_);
+           }
+         }
+       } else {
+         auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(input[1]);
+         if (sg) {
+           std::cout << "YAS< GOT SINGLE SG!\n";
+           action_req.group_of_soundgens.push_back(sg->soundgen_id_);
+         }
+       }
+       if (action_req.group_of_soundgens.size() == 0) {
+         std::cout << "NO SOUNDGENS FOUND, RETURNING..\n";
+         return evaluator::NULLL;
+       }
+
+       double intensity_val = 1;
+       if (input.size() == 3) {
+         auto intensity_obj =
+             std::dynamic_pointer_cast<object::Number>(input[2]);
+         if (intensity_obj) {
+           intensity_val = intensity_obj->value_;
+         }
+       }
+       action_req.fx_intensity = intensity_val;
+       audio_queue.push(action_req);
+       return evaluator::NULLL;
+     })},
     {"is_array", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> input)
                          -> std::shared_ptr<object::Object> {

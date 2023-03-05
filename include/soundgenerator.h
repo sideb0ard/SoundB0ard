@@ -5,7 +5,9 @@
 #include <fx/fx.h>
 #include <stdbool.h>
 
+#include <array>
 #include <atomic>
+#include <iostream>
 #include <map>
 
 namespace SBAudio {
@@ -50,11 +52,7 @@ class SoundGenerator {
   void SetPan(double val);
   double GetPan();
 
-  void SetFxSend(int fx_num, double intensity) {
-    if (fx_num < kMixerNumSendFx && intensity >= 0 && intensity <= 1) {
-      mixer_fx_send_intensity_[fx_num] = intensity;
-    }
-  }
+  void SetFxSend(int fx_num, double intensity);
 
  public:
   sound_generator_type type;
@@ -67,7 +65,7 @@ class SoundGenerator {
   double pan{0.};      // between -1(hard left) and 1(hard right)
 
   // hard coded - 0: delay 1: reverb 2: distortion
-  std::array<double, kMixerNumSendFx> mixer_fx_send_intensity_{};
+  std::array<double, kMixerNumSendFx> mixer_fx_send_intensity_{0};
 
   int note_duration_ms_{100};
 

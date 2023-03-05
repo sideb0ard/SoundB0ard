@@ -28,6 +28,12 @@ void SoundGenerator::SetVolume(double val) {
   if (val >= 0.0 && val <= 1.0) volume = val;
 }
 
+void SoundGenerator::SetFxSend(int fx_num, double intensity) {
+  if (fx_num < kMixerNumSendFx && intensity >= 0 && intensity <= 1) {
+    mixer_fx_send_intensity_[fx_num] = intensity;
+  }
+}
+
 void SoundGenerator::start() { active = true; }
 void SoundGenerator::stop() { active = false; }
 

@@ -486,21 +486,39 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
       }
     }
 
+    StereoVal fx_delay_send{};
+    StereoVal fx_reverb_send{};
+    StereoVal fx_distort_send{};
     int idx = 0;
     for (auto sg : sound_generators_) {
       soundgen_cur_val_[idx] = sg->GenNext(timing_info);
 
-      if (soloed_sound_generator_idz.empty()) {
+      bool collect_value = false;
+      if (soloed_sound_generator_idz.empty() ||
+          std::find(soloed_sound_generator_idz.begin(),
+                    soloed_sound_generator_idz.end(),
+                    idx) != soloed_sound_generator_idz.end()) {
+        collect_value = true;
+      }
+
+      if (collect_value) {
         output_left += soundgen_cur_val_[idx].left;
         output_right += soundgen_cur_val_[idx].right;
-      } else if (std::find(soloed_sound_generator_idz.begin(),
-                           soloed_sound_generator_idz.end(),
-                           idx) != soloed_sound_generator_idz.end()) {
-        output_left += soundgen_cur_val_[idx].left;
-        output_right += soundgen_cur_val_[idx].right;
+        fx_delay_send +=
+            soundgen_cur_val_[idx] * sg->mixer_fx_send_intensity_[0];
+        fx_reverb_send +=
+            soundgen_cur_val_[idx] * sg->mixer_fx_send_intensity_[1];
+        fx_distort_send +=
+            soundgen_cur_val_[idx] * sg->mixer_fx_send_intensity_[2];
       }
       idx++;
     }
+
+    auto delay_val = fx_[0]->Process(fx_delay_send);
+    auto reverb_val = fx_[1]->Process(fx_reverb_send);
+    auto distort_val = fx_[2]->Process(fx_distort_send);
+    output_left += (delay_val.left + reverb_val.left + distort_val.left);
+    output_right += (delay_val.right + reverb_val.right + distort_val.right);
 
     out[j] = volume * (output_left / 1.53);
     out[j + 1] = volume * (output_right / 1.53);
@@ -714,6 +732,15 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     if (action.mixer_fx_id != -1) {
       double param_val = std::stod(action.param_val);
       fx_[action.mixer_fx_id]->SetParam(action.param_name, param_val);
+    }
+  } else if (action.type == AudioAction::MIXER_FX_UPDATE) {
+    for (const auto &soundgen_num : action.group_of_soundgens) {
+      if (IsValidSoundgenNum(soundgen_num)) {
+        auto sg = sound_generators_[soundgen_num];
+        if (sg) {
+          sg->SetFxSend(action.mixer_fx_id, action.fx_intensity);
+        }
+      }
     }
   } else if (action.type == AudioAction::UPDATE) {
     if (IsValidSoundgenNum(action.mixer_soundgen_idx)) {
