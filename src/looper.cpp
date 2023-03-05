@@ -47,13 +47,14 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
 }
 
 void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
-  SoundGenerator::EventNotify(event, tinfo);
+  // SoundGenerator::EventNotify(event, tinfo);
 
   if (!started_ && tinfo.is_start_of_loop) {
     eg_.StartEg();
     started_ = true;
     LaunchGrain(active_grain_, tinfo);
   }
+  if (!started_) return;
 
   double decimal_percent_of_loop = 0;
   if (tinfo.is_midi_tick) {
