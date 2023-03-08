@@ -120,6 +120,26 @@ let dxxblah_gen = gen()
   }
 }
 
+let fxblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    send(0, [bd, cp, sd, prc3, maw2], 0);
+    send(2, [bd, cp, sd, prc3, maw2], 0);
+
+    if (count % 4 == 3) {
+      send(0, [bd, cp, sd, prc3, maw2], 0.5, at=8*pp);
+    }
+    if (count % 8 == 7) {
+      send(2, maw2, 0.1);
+    }
+  }
+}
+
+
 # play bombz/BSQWASPR13.wav
 # play bombz/BSQWASPR8.wav
 

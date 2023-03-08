@@ -751,16 +751,6 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
         std::cerr << "WHOE NELLY! Naw SG! bailing out!\n";
         return;
       }
-      if (action.delayed_by > 0) {
-        // // TODO - this is hardcoded for pitch - should add an
-        // // ENUM to be able to do others
-        // midi_event event =
-        //     new_midi_event(MIDI_PITCHBEND, param_val * 10, 0);
-
-        // _action_items.push_back(DelayedMidiEvent(
-        //     timing_info.midi_tick + action->delayed_by, event, sg));
-        // return;
-      }
       if (action.param_name == "volume")
         sg->SetVolume(param_val);
       else if (action.param_name == "pan")

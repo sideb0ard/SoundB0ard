@@ -35,6 +35,10 @@ let hic = sample(perc/grit.aiff);
 let kt2 = [bd2, hh2, hh3, ksn, hic];
 
 # let bsqw = loop(bombz/BSQWASPR13.wav); set bsqw:len 4;
+# add_fx(bsqw, "reverb", "filter");
+# p7 < osc 4  "300 15000" "set bsqw:fx1:freq %";
+# p8 < osc 13  "10 86" "set bsqw:fx0:wetmx %";
+
 let bin2_gen = gen()
 {
   setup()
@@ -95,5 +99,6 @@ let bablah_gen = gen()
     }
   }
 }
-# let sh27 = loop(aesamples/shstr_27.WAV); set sh27:len 8;
-#  let bsqww = loop(bombz/BSQWASPR8.wav); set bsqww:len 12
+# let bsqww = loop(bombz/BSQWASPR8.wav); set bsqww:len 12
+
+

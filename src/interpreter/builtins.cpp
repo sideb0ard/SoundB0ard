@@ -909,6 +909,18 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          return evaluator::NewError(
              "`send` requires at least two args - destination fx and sources");
 
+       auto at_obj = std::find_if(input.begin(), input.end(),
+                                  [](std::shared_ptr<object::Object> o) {
+                                    return o->Type() == object::AT_OBJ;
+                                  });
+       int delayed_by{0};
+       if (at_obj != input.end()) {
+         auto at = std::dynamic_pointer_cast<object::At>(*at_obj);
+         if (at) {
+           delayed_by = at->value_;
+         }
+       }
+
        int destination_fx = -1;
        auto fx_number_obj = std::dynamic_pointer_cast<object::Number>(input[0]);
        if (fx_number_obj) {
@@ -933,7 +945,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
        }
 
        audio_action_queue_item action_req{.type = AudioAction::MIXER_FX_UPDATE,
-                                          .mixer_fx_id = destination_fx};
+                                          .mixer_fx_id = destination_fx,
+                                          .delayed_by = delayed_by};
 
        auto sg_array = std::dynamic_pointer_cast<object::Array>(input[1]);
        if (sg_array) {
