@@ -1,0 +1,29 @@
+
+# glitchedVinyl/gltichguitarLOOP.wav
+
+# legowelt/Synth-ShetlandTones.wav
+
+let b = bassgen();
+
+let bd = sample(bd/808kick.aif);
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let bx = 0;
+    let bbx = 2;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+
+      for (i = 0; i < 16; ++i) {
+        stepper(bd, b, bx, i*2, 300);
+        bx = incr(bx, 0, bbx);
+      }
+      bbx = incr(bbx, 3, len(b));
+    }
+  }
+}
+

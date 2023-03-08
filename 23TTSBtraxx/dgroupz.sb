@@ -1,0 +1,28 @@
+
+let dgblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    #send(1, [um, rvb], 0);
+    #send(2, [um, rvb], 0);
+
+    if (count % 4 == 3) {
+      set xn:stutter 1;
+      hhbeat(hh);
+    }
+    #send(0, [um, rvb], 1);
+
+    if (count % 3 == 0) {
+      set st:stutter 1;
+      #send(1, [um, rvb], 0.4, at=12*pp);
+    }
+    if (count % 7 == 0) {
+
+      #send(2, [um, rvb], 0.1, at=12*pp);
+    }
+  }
+}
+

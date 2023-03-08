@@ -1,0 +1,59 @@
+# let skc = loop(glitchedVinyl/skipstep2BASS.wav); add_fx(skc, "distort"); set skc:len 2
+# p1 < osc 8 "0 15"  "set skc:poffset %"
+let bdrop = sample(bombz/BSQ_BASSDROP.wav);
+let skcblah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [15, 14, 12, 16];
+    let lx = 0;
+  }
+  run()
+  {
+    if (count % 8 == 7) {
+      set skc:reverse 1;
+    }
+    if (count % 16 == 15) {
+      set skc:scramble 1;
+    }
+    if (count % 16 == 14) {
+      set skc:plooplen lenz[lx];
+      lx = incr(lx, 0, len(lenz));
+    }
+    if (count % 16 == 0) {
+      note_on(bdrop, 1);
+    }
+  }
+}
+
+# let bsqr = loop(bombz/BSQWASPR8.wav); set bsqr:len 6; add_fx(bsqr, "filter");
+# p5 < osc 12 "300 16000" "set bsqr:fx0:freq %"
+# llasticx2
+let hh = sample(ch/hh13.aif);
+
+let mel = [23, 0, 23, 17, 0, 14, 0, 0, 0, 13, 0, 0, 7, 24, 24, 0];
+let dhhblah_gen = gen()
+{
+  setup()
+  {
+    let mx = 0;
+    let mmax = 3;
+    let durz = [60, 90, 100, 150, 200, 250, 300];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, mel, mx, i, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        mx = incr(mx, 0, mmax);
+      }
+      mmax = incr(mmax, 3, 16);
+    }
+  }
+}
+# p7 < osc 2 "0 95" "set dx:op2out %"
+# p8 < osc 3 "0 95" "set dx:op3out %"
+# p9 < osc 7 "0 95" "set dx:op4out %"
+
