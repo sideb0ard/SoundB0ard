@@ -61,7 +61,7 @@ class SoundGenerator {
 
   bool active;
 
-  double volume{0.7};  // between 0 and 1.0
+  double volume{1.0};  // between 0 and 1.0
   double pan{0.};      // between -1(hard left) and 1(hard right)
 
   // hard coded - 0: delay 1: reverb 2: distortion
