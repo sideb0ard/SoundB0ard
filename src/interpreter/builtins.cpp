@@ -1965,14 +1965,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
-           std::cout << "TUUUUUUUUUNE MELODY\n";
 
            if (args_size >= 2) {
              auto array_to_tune =
                  std::dynamic_pointer_cast<object::Array>(args[0]);
 
              if (array_to_tune) {
-               std::cout << "HAVE ARRAY TO TUNE!\n";
                auto root_num_obj =
                    std::dynamic_pointer_cast<object::Number>(args[1]);
                if (root_num_obj) {
@@ -1995,10 +1993,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    }
                  }
 
-                 std::cout << "CALLING TUNE MELODY TO KEY\n";
                  std::vector<int> notez = TuneMelodyToKey(
                      orig_notes, root_num_obj->value_, scale_type);
-                 std::cout << "BACK FROM TUNE MELODY TO KEY\n";
 
                  auto return_tuned_array = std::make_shared<object::Array>(
                      std::vector<std::shared_ptr<object::Object>>());

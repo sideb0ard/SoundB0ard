@@ -520,8 +520,10 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     output_left += (delay_val.left + reverb_val.left + distort_val.left);
     output_right += (delay_val.right + reverb_val.right + distort_val.right);
 
-    out[j] = volume * (output_left / 1.53);
-    out[j + 1] = volume * (output_right / 1.53);
+    // out[j] = volume * (output_left / 1.53);
+    // out[j + 1] = volume * (output_right / 1.53);
+    out[j] = volume * output_left;
+    out[j + 1] = volume * output_right;
   }
 
   return return_bpm;

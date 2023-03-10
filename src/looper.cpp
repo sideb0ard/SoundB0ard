@@ -389,7 +389,7 @@ void Looper::SetLoopMode(unsigned int m) {
       loop_mode_ = LoopMode::loop_mode;
       quasi_grain_fudge_ = 0;
       granular_spray_frames_ = 0;
-      volume = 0.7;
+      volume = 1;
       break;
     case (1):
       loop_mode_ = LoopMode::static_mode;

@@ -21,7 +21,10 @@ let briff = fn(root)
 }
 
 set mixer:delay:sync 1;
-
+set mixer:delay:wetmx 1;
+set mixer:delay:fb 65;
+set mixer:reverb:wetmx 100;
+set mixer:reverb:reverbtime 2000;
 
 let riff = fn(root)
 {
