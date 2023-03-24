@@ -23,6 +23,8 @@ let kblah_gen = gen()
     let hx = 0;
     let beat = bjork(nomz[nx], 16);
 
+    let hs = 0.01;
+
     let bdz = [bd1, bd2, bd3];
     let bdx = 0;
 
@@ -38,6 +40,11 @@ let kblah_gen = gen()
     if (count % 8 == 7) {
       nx = incr(nx, 0, len(nomz));
       beat = bjork(nomz[nx], 16);
+    }
+    send(0, hatz, hs);
+    hs = hs + 0.01;
+    if (hs == 0.05) {
+      hs = 0;
     }
 
     if (count % 8 < 7) {
@@ -58,13 +65,14 @@ let kblah_gen = gen()
   }
 }
 
-let cp1 = sample(cp/hes23cp.aif);
-let cp2 = sample(cp/front2WestClap.aiff);
-let cp3 = sample(cp/clapLongReverb.aif);
+let cp1 = sample(qebo/QEBO-LOCKDOWNFM-28FMPERCUSSION5.wav);
+let cp2 = sample(sd/NZ.aiff);
+let cp3 = sample(wavalc/dm02_909_kickdrum_006_clean.wav);
 
-let sd1 = sample(sd/SBSNareHollow.aiff);
-# add_fx(sd1, "distort");
-let sd2 = sample(sd/mawhsnare2.aiff);
+let sd1 = sample(noises/sndCrunchHit.aiff);
+let sd2 = sample(noises/Woodblock2_bip.aif);
+#vol sd1 0.5;
+#vol sd2 0.5;
 
 # mo = morphy ?
 # dx = ? wuurpr
@@ -80,7 +88,7 @@ let snnblah_gen = gen()
     let ntz = [13];
     let ntx = 0;
 
-    let drrr = 500;
+    let drrr = 50;
 
     let bjz = [3, 5, 7, 11, 8];
     let bjx = 0;
@@ -94,40 +102,119 @@ let snnblah_gen = gen()
 
     let scnt =0;
     let mscnt = 4;
+
+    let se = 0.1;
   }
   run()
   {
 
-
-    let bt = bjork(bjz[bjx], 16);
-
-    if (count % 8 == 7) {
+    send(0, snrz, se);
+    se = se + 0.1;
+    if (se > 0.6) {
+      se = 0;
+    }
+    send(1, snrz, 0);
+    if (count % 2 == 0) {
+      let bt = bjork(bjz[bjx], 16);
       bjx = incr(bjx, 0, len(bjz));
       for (i = 0; i < 16; ++i) {
-        drrr = drrr + 50;
-        if (drrr > 1000) {
-          drrr = 50;
-        }
-        stepper(cpz[cx], bt, cnt, i, dur = drrr);
+        stepper(snrz[sx], bt, cnt, i, drrr);
         cnt = incr(cnt, 0, mcnt);
-        cx = incr(cx, 0, len(cpz));
-        stepper(snrz[sx], invert(bt), scnt, i, dur = drrr);
-        scnt = incr(scnt, 0, mscnt);
-        sx = incr(sx, 0, len(snrz));
       }
-      mcnt = incr(mcnt, 3, len(cpz));
-      mscnt = incr(mscnt, 4, len(snrz));
+      mcnt = incr(mcnt, 3, 16);
+    }
+    if (count % 3 == 0) {
+      send(1, snrz, 50);
+      send(0, snrz, 0);
+      let bt = bjork(bjz[bjx], 16);
+      bjx = incr(bjx, 0, len(bjz));
+      sx = incr(sx, 0, len(snrz));
+      for (i = 0; i < 16; ++i) {
+        stepper(snrz[sx], bt, cnt, i, drrr);
+        cnt = incr(cnt, 0, mcnt);
+      }
+      mcnt = incr(mcnt, 3, 16);
+    }
+    drrr = drrr + 5;
+    if (drrr > 100) {
+      drrr = 10;
     }
   }
 }
 
-let dblah_gen = gen()
+# let sv = loop(legowelt/Synth-Valkery.wav); set sv:len 5;
+# add_fx(sv, "filter", "reverb", "delay")
+#p3 < osc 8 "0 80"  "set mixer:delay:fb %"
+#p4 < osc 8 "20 90"  "set sv:fx1:wetmx %"
+#p5 < osc 7 "20 90"  "set sv:fx2:fb %"
+#p6 < osc 12 "80 300"  "set sv:fx0:freq %"
+
+#let shr = loop(strings/shadesofrhythm4bar.aiff); set shr:len 12
+#p7 < osc 8 "20 90"  "set shr:fx1:wetmx %"
+#p8 < osc 7 "20 90"  "set shr:fx2:fb %"
+#p9 < osc 12 "80 300"  "set shr:fx0:freq %"
+
+let sblah_gen = gen()
 {
   setup()
   {
+
+    let pxz = [1, 1.5, 1, 1.5, 2., 2];
+    let px = 0;
   }
   run()
   {
+    set shr:pitch pxz[px];
+    px = incr(px, 0, len(pxz));
+    if (count % 15 == 0) {
+      set shr:scramble 1;
+    }
+    if (count % 21 == 0) {
+      set shr:reverse 1;
+    }
+    if (count % 13 == 0) {
+      set shr:stutter 1;
+      set sv:stutter 1;
+    }
+  }
+}
+
+
+let ov = sample(hallow/ovalNOTE.wav);
+let gub = sample(hallow/gub.wav);
+let tuf = sample(hallow/tuff.wav);
+let tzat = sample(hallow/tzat.wav);
+
+let percz = [ov, gub, tuf, tzat];
+
+let ppblah_gen = gen()
+{
+  setup()
+  {
+    let pat = rand_array(16, 0, 5);
+    let dr = 100;
+    let vr = 110;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] < len(percz)) {
+          note_on_at(percz[pat[i]], 1, i*pp, dur = dr, vel = vr);
+          vr = vr + 7;
+          if (vr > 125) {
+            vr = 50 + rand(20);
+          }
+          dr = dr + 7;
+          if (dr > 225) {
+            dr = 50 + rand(20);
+          }
+        }
+      }
+    }
+    if (count % 11 == 0) {
+      pat = rand_array(16, 0, 5);
+    }
   }
 }
 

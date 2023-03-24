@@ -100,6 +100,8 @@ void EnvelopeGenerator::SetSustainLevel(double level) {
   if (m_state != RELEASE) CalculateReleaseTime();
 }
 
+void EnvelopeGenerator::SetRampMode(bool b) { ramp_mode = b; }
+
 void EnvelopeGenerator::SetSustainOverride(bool b) {
   m_sustain_override = b;
   if (m_release_pending && !m_sustain_override) {
@@ -216,7 +218,6 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output) {
       break;
     }
     case SUSTAIN: {
-      // std::cout << "SUSTAIN!!\n";
       m_envelope_output = m_sustain_level;
       break;
     }
@@ -225,16 +226,11 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output) {
         m_envelope_output = m_sustain_level;
         break;
       } else {
-        // std::cout << "ELSE:offset:" << m_release_offset
-        //          << " env_out:" << m_envelope_output
-        //          << " * m_release_coeff:" << m_release_coeff <<
-        //          std::endl;
         m_envelope_output =
             m_release_offset + m_envelope_output * m_release_coeff;
       }
 
       if (m_envelope_output <= 0.0 || m_release_time_msec <= 0.0) {
-        // std::cout << "*** WOW LESS THAN **!\n";
         m_envelope_output = 0.0;
         m_state = OFFF;
         break;

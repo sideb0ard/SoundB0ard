@@ -1,0 +1,80 @@
+#let NTz = [23, 22, 25, 45];
+# rubberrrd
+let NTz = [45];
+let nx = 0;
+
+
+#let bd = drum();
+#let dx = fm();
+# dx // kruts
+
+
+let wahblah_gen = gen()
+{
+  setup()
+  {
+    let t = 34444764;
+    let pat = bits((t >> 4 & t >>8 )/( t >> 16&t));
+    let dr = 100;
+
+    let lenner = 16;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      pat = bits((t >> 4 & t >>8 )/( t >> 16&t));
+      ++t;
+
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1) {
+          note_on_at(bd, NTz[nx], i * pp, dur = dr);
+          note_on_at(dx, NTz[nx], i * pp, dur = dr);
+          dr = dr + 10;
+          if (dr > 400) {
+            dr = 100;
+          }
+        }
+      }
+    } else {
+      let pp = 3840 / lenner;
+      for (i = 0; i < lenner; ++i) {
+        if (pat[i] == 1) {
+          note_on_at(bd, NTz[nx], i * pp, dur = dr);
+          note_on_at(dx, NTz[nx], i * pp, dur = dr);
+          nx = incr(nx, 0, len(NTz));
+        }
+      }
+      lenner = lenner - 1;
+      if (lenner < 2) {
+        lenner = 16;
+      }
+    }
+
+    if (count % 4 == 0) {
+    }
+  }
+}
+
+let kb = sample(TTUnreleaseProject/BD3.wav);
+let ch = sample(TT-PARTYPEOPLE/ch.wav);
+let sn = sample(TT-NOCERA/tsck.wav);
+
+let autoblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      hhbeat(ch);
+    }
+    if (count % 2 == 0) {
+      dbeat(kb);
+    }
+    if (count % 4 == 0) {
+      cbeat(sn);
+    }
+  }
+}
+

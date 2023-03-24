@@ -81,3 +81,18 @@ let dxblah_gen = gen()
   }
 }
 
+#let hh1 = sample(TT-LIMELIFE-RIGHTONTIME/hhclean.wav);
+let hh1 = sample(ch/angelHat.aiff);
+let hhblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      hhbeat(hh1);
+    }
+  }
+}
+

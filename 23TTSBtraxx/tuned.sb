@@ -1,0 +1,108 @@
+# C - [24, 26, 28, 29, 31, 33, 35, 36] - notes_in_key(24);
+# dx wururrrp
+let bass_gen = gen()
+{
+  setup()
+  {
+    let b1 = [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0];
+    let b2 = [1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0];
+    # tune_melody(notes_in_chord(26), 24);
+    #let bnotes = [31, 28, 33];
+    #let bnotes2 = [29, 26, 31, 33];
+    let bnotes = [24, 31];
+    let bnotes2 = [28];
+    let bx = 0;
+    let bx2 = 0;
+    let nomz1 = [2, 4, 8];
+    let nx1 = 0;
+    let nomz2 = [3, 7, 1, 5];
+    let nx2 = 0;
+
+    let bt = combinor(bjork(nomz1[nx1], 8), [bnotes[bx]]) + combinor(bjork(nomz2[nx2], 8), [bnotes2[bx2]]);
+    let duz = 200;
+  }
+  run()
+  {
+
+    if (count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (bt[i] > 0) {
+          note_on_at(dx, bt[i], i*pp*2, dur = duz);
+        }
+      }
+      duz = duz - 10;
+      if (duz < 50) {
+        duz = 200;
+      }
+    }
+    if (count % 16 == 0) {
+      set gl:stutter 1;
+      nx1 = incr(nx1, 0, len(nomz1));
+      nx2 = incr(nx2, 0, len(nomz2));
+      #  bx = incr(bx, 0, len(bnotes));
+      #  bx2 = incr(bx2, 0, len(bnotes2));
+      bt = combinor(bjork(nomz1[nx1], 8), [bnotes[bx]]) + combinor(bjork(nomz2[nx2], 8), [bnotes2[bx2]]);
+    }
+  }
+}
+
+let rm1 = sample(rims/5manrim.aiff);
+let rm2 = sample(rims/timbaRim.aiff);
+let rm3 = sample(perc/DUT.aiff);
+let rm4 = sample(aesamples/steeldif01.WAV);
+
+let rmz = [rm1, rm3, rm2, rm4];
+let rx = 0;
+
+
+let glt = sample(perc/glotcjh.aiff);
+let sf = sample(perc/surfaceFalle.aiff);
+let dbt = sample(perc/dubTic.aiff);
+let msh = sample(perc/sf2fxmartialsnare.aiff);
+
+let fxxx = [glt, sf, dbt, msh];
+let fxix = 0;
+
+let tttblah_gen = gen()
+{
+  setup()
+  {
+    let t = 505033;
+    let se = 0.05;
+    let imax = 1;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      let pat = bits((t*t)/(t>>13 ^ t>>8));
+      ++t;
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1) {
+          note_on_at(rmz[rx], 1, i*pp*4, dur = 1);
+          rx = incr(rx, 0, imax);
+        }
+      }
+      imax = incr(imax, 1, len(rmz));
+    }
+    send(0, rmz, se);
+    se = se + 0.01;
+    if (se > 0.2) {
+      se = 0.01;
+    }
+    send(1, rmz, se*100);
+
+    if (count % 11 == 0) {
+      send(0, fxxx, se);
+      send(1, fxxx, se * 10);
+      let pat = bits((t*t)/(t>>13 ^ t>>8));
+      ++t;
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1) {
+          note_on_at(fxxx[fxix], 1, i*pp*4, dur = 1);
+          fxix = incr(fxix, 0, len(fxxx));
+        }
+      }
+    }
+  }
+}
+

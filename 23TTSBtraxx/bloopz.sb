@@ -1,29 +1,229 @@
 
 # glitchedVinyl/gltichguitarLOOP.wav
 
+# let bh = loop(glitchedVinyl/brutalHOP.wav); set bh:len 2; add_fx(bh,"sidechain", bd);
+
 # legowelt/Synth-ShetlandTones.wav
+
 
 let b = bassgen();
 
 let bd = sample(bd/808kick.aif);
+# add_fx(bd, "filter");
+# p2 < osc 8 "80 10000"  "set bd:fx0:freq %";
 
-let blah_gen = gen()
+let sd = sample(sd/delayedDubSnar.aiff);
+let bdlah_gen = gen()
 {
   setup()
   {
     let bx = 0;
     let bbx = 2;
+    let dr = 50;
   }
   run()
   {
     if (count % 2 == 0) {
 
       for (i = 0; i < 16; ++i) {
-        stepper(bd, b, bx, i*2, 300);
+        stepper(bd, b, bx, i*2, dr);
         bx = incr(bx, 0, bbx);
+        dr = dr + 10;
+        if (dr > 300) {
+          dr = 50;
+        }
       }
       bbx = incr(bbx, 3, len(b));
     }
+    if (count % 3 == 0) {
+      set cliop:stutter 1;
+    }
+    if (count % 4 == 3) {
+      cbeat(sd);
+    }
   }
+}
+
+let hh1 = sample(wavalc/dm02_909_closedhat_006.wav);
+let hh2 = sample(wavalc/dm02_909_closedhat_005.wav);
+let oh = sample(wavalc/dm02_909_openhat_002.wav);
+vol hh1 0.3;
+vol hh2 0.4;
+vol oh 0.3;
+#
+let hhz = [hh1, hh2, oh];
+let hx= 0;
+
+let gblah_gen = gen()
+{
+  setup()
+  {
+    let t = 43434;
+    let se = 0.01;
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      let num = bits(t>>(8/((t/32)%3)));
+      ++t;
+
+      for (i = 0; i < 16; ++i) {
+        if (num[i] == 1) {
+          note_on_at(hhz[hx], 1, i*pp);
+          hx = incr(hx, 0, len(hhz));
+        }
+      }
+      send(0, hhz, se);
+      se = se + 0.01;
+      if (se > 0.3) {
+        se = 0.01;
+      }
+    }
+  }
+}
+
+# c# - [25, 27, 29, 30, 32, 34, 36, 37]
+# loweeeerrr
+# p8 < osc 5 "23 90"  "set dx:op3out %"
+# p9 < osc 7 "23 40"  "set dx:op4out %"
+# p10 < osc 19 "56 87" "set dx:op2out %"
+
+let ddx2blah_gen = gen()
+{
+  setup()
+  {
+    let mel2 = [41, 42, 48, 0, 0, 46, 36, 40, 0, 49, 0, 43, 0, 0, 0, 38];
+    let mx = 0;
+    let mmax = 3;
+    let dr = 100;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, mel2, mx, i, dr);
+        mx = incr(mx, 0, mmax);
+      }
+      mmax = incr(mmax, 3, 16);
+      dr = dr + 50;
+      if (dr > 600) {
+        dr = 100;
+      }
+    }
+  }
+}
+
+let ddxblah_gen = gen()
+{
+  setup()
+  {
+    let mel = [0, 27, 0, 29, 0, 0, 32, 0, 0, [25, 37], 0, 0, 0, 36, 27, 0];
+    let mel2 = [37, 0, 25, 0, 0, 0, 30, 30, 0, 37, 0, 0, 0, 0, 37, 36];
+    let mx = 0;
+    let mmax = 3;
+
+    let dr = 50;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+
+      let m = mel;
+      let mul = 2;
+      if (count % 3 == 0) {
+        m = mel2;
+      }
+      if (count % 6 == 0) {
+        mul = 3;
+      }
+      if (count % 4 == 0) {
+        mul = 1;
+      }
+      for (i = 0; i < 16; ++i) {
+        if (m[i] > 0) {
+          note_on_at(dx, m[i], i*pp*mul, dur = dr);
+          dr = dr + 50;
+          if (dr > 500) {
+            dr = 100;
+          }
+        }
+      }
+    }
+
+    if (count % 8 == 7) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, up(mel2, 5), mx, i, dr);
+        mx = incr(mx, 0, mmax);
+      }
+      mmax = incr(mmax, 3, 16);
+    }
+  }
+}
+
+# let stopp = loop(glitchedVinyl/stOP.wav); set stopp:len 4;
+
+# let sql = loop(glitchedVinyl/sqellwheelmeloddel.wav); set sql:len 4
+# add_fx(sql, "filter", "reverb", "delay")
+
+# p11 < osc 6 "0 66" "set sql:fx2:fb %";
+# p12 < osc 8 "20 80" "set sql:fx1:wetmx %";
+
+let pbd = sample(bd/avalinoKick.aiff);
+let pcp = sample(cp/mawClapDelayed.aiff);
+let phc = sample(legowelt/Synth-HouseChord.wav);
+# p14 < osc 11 "10 1000" "set phc:release_ms %";
+# p16 < osc 5 "20 70" "set phc:fx1:fb %";
+
+let presetblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    dbeat(pbd);
+    if (count % 3 == 0) {
+      #dbeat(phc);
+      #note_on_at(phc, 1, 0, dur=30);
+    }
+    cbeat(pcp);
+  }
+}
+
+let tm1 = sample(wavalc/dm02_909_hitom_001.wav);
+let tm2 = sample(wavalc/dm02_909_hitom_002.wav);
+let tm3 =sample(wavalc/dm02_909_hitom_003.wav);
+let tm4 = sample(wavalc/dm02_909_hitom_007.wav);
+let tm5 = sample(wavalc/dm02_909_hitom_011.wav);
+let tm6 = sample(mt/Tom_Mid_B_808_C.wav);
+
+let tmz = [tm6, tm1, tm2, tm3, tm4, tm5];
+let tmx = 0;
+
+let bss = sample(notes/2stepbass.aiff);
+
+let tomblah_gen = gen()
+{
+  setup()
+  {
+    let t = 3400343;
+  }
+  run()
+  {
+    let num = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
+    ++t;
+    if (count % 3 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (num[i] == 1) {
+          note_on_at(tmz[tmx], 1, i*pp*3);
+          tmx = incr(tmx, 0, len(tmz));
+        }
+      }
+    }
+    #if (count  % 2 == 0) {
+      #  play_array(bss, num);
+      #}
+  }
+
 }
 

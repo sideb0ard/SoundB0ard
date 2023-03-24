@@ -1,10 +1,11 @@
 #pragma once
 
-#include <defjams.h>
 #include <math.h>
 #include <stdbool.h>
 
 #include <map>
+
+#include "defjams.h"
 
 struct GlobalOscillatorParams {
   // --- common

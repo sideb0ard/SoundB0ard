@@ -107,6 +107,7 @@ class EnvelopeGenerator {
 
   void SetSustainLevel(double level);
   void SetSustainOverride(bool b);
+  void SetRampMode(bool b);
 
   void StartEg();
   void StopEg();

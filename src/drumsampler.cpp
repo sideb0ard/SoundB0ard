@@ -32,11 +32,11 @@ DrumSampler::DrumSampler(std::string filename) {
 
   eg.SetEgMode(ANALOG);
   eg.SetAttackTimeMsec(0);
-  eg.SetDecayTimeMsec(3000);
-  eg.SetSustainLevel(0);
-  eg.SetReleaseTimeMsec(3000);
+  eg.SetDecayTimeMsec(30);
+  eg.SetSustainLevel(1);
+  eg.SetReleaseTimeMsec(20);
   eg.m_output_eg = true;
-  eg.ramp_mode = true;
+  // eg.ramp_mode = true;
   eg.m_reset_to_zero = true;
 
   active = true;

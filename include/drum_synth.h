@@ -29,11 +29,10 @@ class DrumSynth : public SoundGenerator {
 
   std::string patch_name{};
 
-  // used for exponential detune
-  double modulo_{0};
-  double inc_{0};
-  double frames_per_midi_tick_{0};
+  int pitch_range_{4};
   double starting_frequency_{0};
+  double base_frequency_{0};
+  double frequency_diff_{0};
 
   QBLimitedOscillator osc1;
   float osc1_amp{1};
@@ -42,6 +41,8 @@ class DrumSynth : public SoundGenerator {
   float osc2_amp{0};
 
   EnvelopeGenerator m_eg;
+
+  MoogLadder filter_;
 
   DCA m_dca;
 };

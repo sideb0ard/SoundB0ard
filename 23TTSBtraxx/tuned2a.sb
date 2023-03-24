@@ -1,0 +1,65 @@
+# let gto = loop(glitchedVinyl/guitarone.wav); set gto:len 2;
+# add_fx(gto, "distort", "filter", "reverb", "delay");
+# p1 < osc 7 "20 70" "set gto:fx2:wetmx %";
+# p2 < osc 8 "0 56" "set gto:fx3:fb %"
+# set gto:fx1:lfo1_active 1;
+# let intr =loop(legowelt/Synth-InterBellumAtmo.wav); set intr:len 6; set intr:pitch 1.02;
+# add_fx(intr, "filter", "reverb", "delay");
+# p3 < osc 7 "20 80" "set intr:fx1:wetmx %"
+# p4 < osc 6 "2 70" "set intr:fx2:fb %";
+# set intr:fx2:delayms 200;
+# let shs = loop(aesamples/SHISTASample06PP.WAV); set shs:len 2; set shs:pitch 1.05;
+#add_fx(shs, "delay"); vol shs 0.4
+
+# let walk = loop(noises/walkinRain.aiff); set walk:len 4; vol gto 0
+
+# vol walk 0; ^ shs
+let bdrop = sample(bombz/BSQ_BASSDROP.wav);
+
+let gblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      #note_on(bdrop, 1);
+      set gto:scramble 1;
+      set shs:stutter 1;
+    }
+
+    set gto:on 1;
+    set shs:on 1;
+
+    if (count % 8 == 0) {
+      set gto:stutter 1;
+      let beat = rand_beat();
+      play_array(gto, beat);
+      play_array(shs, invert(beat));
+    }
+  }
+}
+
+# let morr = loop(glitchedVinyl/morrbfleis.wav); set morr:len 2;
+# add_fx(morr, "reverb", "delay", "distort");
+# p10 < osc 8 "20 70" "set morr:fx0:wetmx %";
+# p11 < osc 7 "2 70" "set morr:fx1:fb %";
+# set morr:fx1:delayms 150;
+let mblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      set morr:stutter 1;
+    }
+    if (count % 7 == 0) {
+      set morr:scramble 1;
+    }
+  }
+
+}
+

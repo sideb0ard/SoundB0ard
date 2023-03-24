@@ -50,11 +50,11 @@ DrumSynth::DrumSynth() {
 
   m_eg.SetEgMode(ANALOG);
   m_eg.SetAttackTimeMsec(1);
-  m_eg.SetDecayTimeMsec(100);
-  m_eg.SetSustainLevel(0.7);
-  m_eg.SetReleaseTimeMsec(50);
+  m_eg.SetDecayTimeMsec(0);
+  m_eg.SetSustainLevel(1);
+  m_eg.SetReleaseTimeMsec(20);
   m_eg.m_output_eg = true;
-  // m_eg.ramp_mode = true;
+  m_eg.SetRampMode(true);
   m_eg.m_reset_to_zero = true;
   m_eg.Update();
 
@@ -64,29 +64,20 @@ DrumSynth::DrumSynth() {
 }
 
 StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
-  frames_per_midi_tick_ = tinfo.frames_per_midi_tick;
   StereoVal out = {.left = 0, .right = 0};
   if (!active) return out;
 
   if (osc1.m_note_on) {
-    // m_eg.Update();
-    // double m_eg_val = 0.0;
-    // double eg_out = m_eg.DoEnvelope(&m_eg_val);
+    m_eg.Update();
+    double m_eg_val = 0.0;
+    double eg_out = m_eg.DoEnvelope(&m_eg_val);
 
-    double concav = concave_inverted_transform(modulo_);
-    if (concav < 0) {
-      osc1.m_note_on = false;
-    }
-    osc1.m_osc_fo = concav * starting_frequency_;
-    modulo_ += inc_;
+    osc1.m_osc_fo = base_frequency_ + eg_out * frequency_diff_;
+    osc1.Update();
 
-    m_dca.SetEgMod(concav);
+    m_dca.SetEgMod(eg_out);
     m_dca.Update();
 
-    osc1.Update();
-    // std::cout << "CONCA:" << concav << " MOD:" << modulo_
-    //           << " FOOO:" << osc1.m_fo << " (INC:" << inc_ << ")" <<
-    //           std::endl;
     double osc1_out = osc1.DoOscillate(nullptr);
 
     double out_left = 0.0;
@@ -98,11 +89,12 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     out = Effector(out);
   }
 
-  // if (m_eg.GetState() == OFFF) {
-  //   osc1.StopOscillator();
-  //   osc2.StopOscillator();
-  //   m_eg.StopEg();
-  // }
+  if (m_eg.GetState() == OFFF) {
+    osc1.StopOscillator();
+    osc2.StopOscillator();
+    m_eg.StopEg();
+    osc1.m_note_on = false;
+  }
 
   return out;
 }
@@ -166,20 +158,15 @@ void DrumSynth::noteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
 
-  osc1.m_note_on = true;
-  osc1.m_osc_fo = get_midi_freq(midinote);
+  base_frequency_ = get_midi_freq(midinote);
+  starting_frequency_ = get_midi_freq(midinote + pitch_range_);
+  frequency_diff_ = starting_frequency_ - base_frequency_;
 
-  starting_frequency_ = osc1.m_osc_fo;
-  modulo_ = 0;
-  double duration_in_frames = frames_per_midi_tick_ * ev.dur;
-  inc_ = 1. / duration_in_frames;
+  osc1.m_note_on = true;
+  osc1.m_osc_fo = starting_frequency_;
 
   osc1.Update();
   osc1.StartOscillator();
-
-  // osc2.m_note_on = true;
-  // osc2.m_osc_fo = get_midi_freq(midinote);
-  // osc2.StartOscillator();
 
   m_eg.StartEg();
 }

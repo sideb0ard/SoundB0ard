@@ -931,9 +931,13 @@ std::shared_ptr<object::Object> EvalNumberInfixExpression(
     return std::make_shared<object::Number>(left->value_ - right->value_);
   else if (op.compare("*") == 0)
     return std::make_shared<object::Number>(left->value_ * right->value_);
-  else if (op.compare("/") == 0)
-    return std::make_shared<object::Number>(left->value_ / right->value_);
-  else if (op.compare("%") == 0)
+  else if (op.compare("/") == 0) {
+    auto val = left->value_ / right->value_;
+    if (std::isinf(val)) {
+      val = 0;
+    }
+    return std::make_shared<object::Number>(val);
+  } else if (op.compare("%") == 0)
     return std::make_shared<object::Number>(fmod(left->value_, right->value_));
   else if (op.compare("&") == 0)
     return std::make_shared<object::Number>(int(left->value_) &
@@ -944,13 +948,19 @@ std::shared_ptr<object::Object> EvalNumberInfixExpression(
   else if (op.compare("^") == 0)
     return std::make_shared<object::Number>(int(left->value_) ^
                                             int(right->value_));
-  else if (op.compare("<<") == 0)
-    return std::make_shared<object::Number>(int(left->value_)
-                                            << int(right->value_));
-  else if (op.compare(">>") == 0)
-    return std::make_shared<object::Number>(int(left->value_) >>
-                                            int(right->value_));
-  else if (op.compare("<") == 0)
+  else if (op.compare("<<") == 0) {
+    auto val = int(left->value_) << int(right->value_);
+    if (std::isinf(val)) {
+      val = 0;
+    }
+    return std::make_shared<object::Number>(val);
+  } else if (op.compare(">>") == 0) {
+    auto val = int(left->value_) >> int(right->value_);
+    if (std::isinf(val)) {
+      val = 0;
+    }
+    return std::make_shared<object::Number>(val);
+  } else if (op.compare("<") == 0)
     return NativeBoolToBooleanObject(left->value_ < right->value_);
   else if (op.compare(">") == 0)
     return NativeBoolToBooleanObject(left->value_ > right->value_);
