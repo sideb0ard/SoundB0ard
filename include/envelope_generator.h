@@ -11,6 +11,7 @@
 
 enum { ANALOG, DIGITAL };
 
+// TODO - enum class and namespace
 enum {
   OFFF,  // name clash in defjams
   ATTACK,
@@ -48,6 +49,9 @@ class EnvelopeGenerator {
   bool m_output_eg{false};  // i.e. this instance is going direct to output,
                             // rather than into an intermediatery
   bool ramp_mode{false};    // used for no sustain
+
+  double hold_time_ms_{0};
+  double hold_timer_{0};
 
   // double m_eg1_osc_intensity;
   double m_envelope_output{0};
@@ -104,6 +108,7 @@ class EnvelopeGenerator {
   void SetDecayTimeMsec(double time);
   void SetReleaseTimeMsec(double time);
   void SetShutdownTimeMsec(double time_msec);
+  void SetHoldTimeMsec(double time);
 
   void SetSustainLevel(double level);
   void SetSustainOverride(bool b);

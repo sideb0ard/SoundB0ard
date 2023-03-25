@@ -28,6 +28,7 @@ void EnvelopeGenerator::Reset() {
   m_decay_time_scalar = 1.0;
   m_state = OFFF;
   m_release_pending = false;
+  hold_timer_ = hold_time_ms_ * 44.1;
   SetEgMode(m_eg_mode);
 
   CalculateReleaseTime();
@@ -79,6 +80,8 @@ void EnvelopeGenerator::SetAttackTimeMsec(double time) {
   m_attack_time_msec = time;
   CalculateAttackTime();
 }
+
+void EnvelopeGenerator::SetHoldTimeMsec(double time) { hold_time_ms_ = time; }
 
 void EnvelopeGenerator::SetDecayTimeMsec(double time) {
   m_decay_time_msec = time;
@@ -211,14 +214,21 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output) {
         m_envelope_output = m_sustain_level;
         if (ramp_mode) {
           NoteOff();
-        } else
+        } else {
           m_state = SUSTAIN;
+        }
         break;
       }
       break;
     }
     case SUSTAIN: {
       m_envelope_output = m_sustain_level;
+      if (hold_time_ms_ > 0) {
+        --hold_timer_;
+        if (hold_timer_ <= 0) {
+          m_state = RELEASE;
+        }
+      }
       break;
     }
     case RELEASE: {

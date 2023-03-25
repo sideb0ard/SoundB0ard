@@ -112,6 +112,7 @@ void DrumSynth::SetParam(std::string name, double val) {
   if (name == "eg_decay") m_eg.SetDecayTimeMsec(val);
   if (name == "eg_sustain") m_eg.SetSustainLevel(val);
   if (name == "eg_release") m_eg.SetReleaseTimeMsec(val);
+  if (name == "pitch_range") pitch_range_ = val;
 }
 
 std::string DrumSynth::Status() {
@@ -119,14 +120,28 @@ std::string DrumSynth::Status() {
   if (!active || volume == 0)
     ss << ANSI_COLOR_RESET;
   else
-    ss << ANSI_COLOR_CYAN;
-  ss << "DrumSynth osc1:" << GetOscType(osc1.m_waveform)
-     << " o1amp:" << osc1_amp << " osc2:" << GetOscType(osc2.m_waveform)
-     << " o2amp:" << osc2_amp << std::endl;
+    //    ss << ANSI_COLOR_CYAN;
+    ss << COOL_COLOR_YELLOW_MELLOW;
+  ss << "DrumZynth  // pitch_range:" << pitch_range_ << std::endl;
+  ss << "     osc1:" << GetOscType(osc1.m_waveform) << " o1amp:" << osc1_amp
+     << " filter1_fc:" << filter1_.m_fc << " filter1_q:" << filter1_.m_q
+     << std::endl;
+  ss << "     osc2:" << GetOscType(osc2.m_waveform) << " o2amp:" << osc2_amp
+     << " filter2_fc:" << filter2_.m_fc << " filter2_q:" << filter2_.m_q
+     << std::endl;
   ss << "     eg_attack:" << m_eg.m_attack_time_msec
      << " eg_decay:" << m_eg.m_decay_time_msec
      << " eg_sustain:" << m_eg.m_sustain_level
-     << " eg_release:" << m_eg.m_release_time_msec;
+     << " eg_release:" << m_eg.m_release_time_msec
+     << " eg_hold:" << m_eg.hold_time_ms_ << " ramp:" << m_eg.ramp_mode
+     << std::endl;
+  ss << "     eg_o1_ptch:" << eg_o1_pitch_
+     << " eg1_o1_ptch_int:" << eg_o1_pitch_int_
+     << " eg_o2_ptch:" << eg_o2_pitch_;
+  ss << " eg_o2_ptch_int:" << eg_o2_pitch_int_ << std::endl;
+  ss << "     eg_f1_fc:" << eg_f1_fc_ << " eg_f1_fc_int:" << eg_f1_fc_int_
+     << " eg_f1_q:" << eg_f1_q_ << " eg_f2_fc:" << eg_f2_fc_
+     << " eg_f2_q:" << eg_f2_q_ << std::endl;
 
   return ss.str();
 }
