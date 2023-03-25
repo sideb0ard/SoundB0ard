@@ -43,22 +43,22 @@ std::string GetOscType(int type) {
 namespace SBAudio {
 
 DrumSynth::DrumSynth() {
-  osc1.m_waveform = SINE;
-  osc1_amp = 1;
-  osc2.m_waveform = NOISE;
-  osc2_amp = 0;
+  osc1_.m_waveform = SINE;
+  osc1_amp_ = 1;
+  osc2_.m_waveform = NOISE;
+  osc2_amp_ = 0;
 
-  m_eg.SetEgMode(ANALOG);
-  m_eg.SetAttackTimeMsec(1);
-  m_eg.SetDecayTimeMsec(0);
-  m_eg.SetSustainLevel(1);
-  m_eg.SetReleaseTimeMsec(20);
-  m_eg.m_output_eg = true;
-  m_eg.SetRampMode(true);
-  m_eg.m_reset_to_zero = true;
-  m_eg.Update();
+  eg_.SetEgMode(ANALOG);
+  eg_.SetAttackTimeMsec(1);
+  eg_.SetDecayTimeMsec(0);
+  eg_.SetSustainLevel(1);
+  eg_.SetReleaseTimeMsec(20);
+  eg_.m_output_eg = true;
+  eg_.SetRampMode(true);
+  eg_.m_reset_to_zero = true;
+  eg_.Update();
 
-  m_dca.m_mod_source_eg = DEST_DCA_EG;
+  dca_.m_mod_source_eg = DEST_DCA_EG;
 
   active = true;
 }
@@ -67,33 +67,33 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   StereoVal out = {.left = 0, .right = 0};
   if (!active) return out;
 
-  if (osc1.m_note_on) {
-    m_eg.Update();
-    double m_eg_val = 0.0;
-    double eg_out = m_eg.DoEnvelope(&m_eg_val);
+  if (osc1_.m_note_on) {
+    eg_.Update();
+    double eg_val = 0.0;
+    double eg_out = eg_.DoEnvelope(&eg_val);
 
-    osc1.m_osc_fo = base_frequency_ + eg_out * frequency_diff_;
-    osc1.Update();
+    osc1_.m_osc_fo = base_frequency_ + eg_out * frequency_diff_;
+    osc1_.Update();
 
-    m_dca.SetEgMod(eg_out);
-    m_dca.Update();
+    dca_.SetEgMod(eg_out);
+    dca_.Update();
 
-    double osc1_out = osc1.DoOscillate(nullptr);
+    double osc1_out = osc1_.DoOscillate(nullptr);
 
     double out_left = 0.0;
     double out_right = 0.0;
 
-    m_dca.DoDCA(osc1_out, osc1_out, &out_left, &out_right);
+    dca_.DoDCA(osc1_out, osc1_out, &out_left, &out_right);
 
     out = {.left = out_left * volume, .right = out_right * volume};
     out = Effector(out);
   }
 
-  if (m_eg.GetState() == OFFF) {
-    osc1.StopOscillator();
-    osc2.StopOscillator();
-    m_eg.StopEg();
-    osc1.m_note_on = false;
+  if (eg_.GetState() == OFFF) {
+    osc1_.StopOscillator();
+    osc2_.StopOscillator();
+    eg_.StopEg();
+    osc1_.m_note_on = false;
   }
 
   return out;
@@ -101,17 +101,17 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 
 void DrumSynth::SetParam(std::string name, double val) {
   if (name == "osc1")
-    osc1.m_waveform = val;
+    osc1_.m_waveform = val;
   else if (name == "osc2")
-    osc2.m_waveform = val;
+    osc2_.m_waveform = val;
   else if (name == "o1amp")
-    osc1_amp = val;
+    osc1_amp_ = val;
   else if (name == "o2amp")
-    osc2_amp = val;
-  if (name == "eg_attack") m_eg.SetAttackTimeMsec(val);
-  if (name == "eg_decay") m_eg.SetDecayTimeMsec(val);
-  if (name == "eg_sustain") m_eg.SetSustainLevel(val);
-  if (name == "eg_release") m_eg.SetReleaseTimeMsec(val);
+    osc2_amp_ = val;
+  if (name == "eg_attack") eg_.SetAttackTimeMsec(val);
+  if (name == "eg_decay") eg_.SetDecayTimeMsec(val);
+  if (name == "eg_sustain") eg_.SetSustainLevel(val);
+  if (name == "eg_release") eg_.SetReleaseTimeMsec(val);
   if (name == "pitch_range") pitch_range_ = val;
 }
 
@@ -122,18 +122,19 @@ std::string DrumSynth::Status() {
   else
     //    ss << ANSI_COLOR_CYAN;
     ss << COOL_COLOR_YELLOW_MELLOW;
-  ss << "DrumZynth  // pitch_range:" << pitch_range_ << std::endl;
-  ss << "     osc1:" << GetOscType(osc1.m_waveform) << " o1amp:" << osc1_amp
+  ss << "DrumZynth - " << patch_name_ << "  // pitch_range:" << pitch_range_
+     << std::endl;
+  ss << "     osc1:" << GetOscType(osc1_.m_waveform) << " o1amp:" << osc1_amp_
      << " filter1_fc:" << filter1_.m_fc << " filter1_q:" << filter1_.m_q
      << std::endl;
-  ss << "     osc2:" << GetOscType(osc2.m_waveform) << " o2amp:" << osc2_amp
+  ss << "     osc2:" << GetOscType(osc2_.m_waveform) << " o2amp:" << osc2_amp_
      << " filter2_fc:" << filter2_.m_fc << " filter2_q:" << filter2_.m_q
      << std::endl;
-  ss << "     eg_attack:" << m_eg.m_attack_time_msec
-     << " eg_decay:" << m_eg.m_decay_time_msec
-     << " eg_sustain:" << m_eg.m_sustain_level
-     << " eg_release:" << m_eg.m_release_time_msec
-     << " eg_hold:" << m_eg.hold_time_ms_ << " ramp:" << m_eg.ramp_mode
+  ss << "     eg_attack:" << eg_.m_attack_time_msec
+     << " eg_decay:" << eg_.m_decay_time_msec
+     << " eg_sustain:" << eg_.m_sustain_level
+     << " eg_release:" << eg_.m_release_time_msec
+     << " eg_hold:" << eg_.hold_time_ms_ << " ramp:" << eg_.ramp_mode
      << std::endl;
   ss << "     eg_o1_ptch:" << eg_o1_pitch_
      << " eg1_o1_ptch_int:" << eg_o1_pitch_int_
@@ -167,7 +168,7 @@ void DrumSynth::stop() {
   active = false;
 }
 
-void DrumSynth::noteOff(midi_event ev) { m_eg.NoteOff(); }
+void DrumSynth::noteOff(midi_event ev) { eg_.NoteOff(); }
 
 void DrumSynth::noteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
@@ -177,13 +178,13 @@ void DrumSynth::noteOn(midi_event ev) {
   starting_frequency_ = get_midi_freq(midinote + pitch_range_);
   frequency_diff_ = starting_frequency_ - base_frequency_;
 
-  osc1.m_note_on = true;
-  osc1.m_osc_fo = starting_frequency_;
+  osc1_.m_note_on = true;
+  osc1_.m_osc_fo = starting_frequency_;
 
-  osc1.Update();
-  osc1.StartOscillator();
+  osc1_.Update();
+  osc1_.StartOscillator();
 
-  m_eg.StartEg();
+  eg_.StartEg();
 }
 
 void DrumSynth::Save(std::string new_preset_name) {
@@ -203,29 +204,29 @@ void DrumSynth::Save(std::string new_preset_name) {
     return;
   }
 
-  patch_name = new_preset_name;
+  patch_name_ = new_preset_name;
   int settings_count = 0;
 
   fprintf(presetzzz, "::name=%s", preset_name);
   settings_count++;
 
-  fprintf(presetzzz, "::osc1=%d", osc1.m_waveform);
+  fprintf(presetzzz, "::osc1=%d", osc1_.m_waveform);
   settings_count++;
-  fprintf(presetzzz, "::o1amp=%f", osc1_amp);
-  settings_count++;
-
-  fprintf(presetzzz, "::osc2=%d", osc2.m_waveform);
-  settings_count++;
-  fprintf(presetzzz, "::o2amp=%f", osc2_amp);
+  fprintf(presetzzz, "::o1amp=%f", osc1_amp_);
   settings_count++;
 
-  fprintf(presetzzz, "::eg_attack=%f", m_eg.m_attack_time_msec);
+  fprintf(presetzzz, "::osc2=%d", osc2_.m_waveform);
   settings_count++;
-  fprintf(presetzzz, "::eg_decay=%f", m_eg.m_decay_time_msec);
+  fprintf(presetzzz, "::o2amp=%f", osc2_amp_);
   settings_count++;
-  fprintf(presetzzz, "::eg_sustain=%f", m_eg.m_sustain_level);
+
+  fprintf(presetzzz, "::eg_attack=%f", eg_.m_attack_time_msec);
   settings_count++;
-  fprintf(presetzzz, "::eg_release=%f", m_eg.m_release_time_msec);
+  fprintf(presetzzz, "::eg_decay=%f", eg_.m_decay_time_msec);
+  settings_count++;
+  fprintf(presetzzz, "::eg_sustain=%f", eg_.m_sustain_level);
+  settings_count++;
+  fprintf(presetzzz, "::eg_release=%f", eg_.m_release_time_msec);
   settings_count++;
 
   fprintf(presetzzz, ":::\n");
@@ -262,7 +263,7 @@ void DrumSynth::Load(std::string preset_name) {
       sscanf(setting_val, "%lf", &scratch_val);
       if (strcmp(setting_key, "name") == 0) {
         if (strcmp(setting_val, preset_to_load) != 0) break;
-        patch_name = setting_val;
+        patch_name_ = setting_val;
         settings_count++;
       } else {
         SetParam(setting_key, scratch_val);

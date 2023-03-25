@@ -1,6 +1,8 @@
 #pragma once
 
 #include <dca.h>
+// #include <distortion.h>
+// #include <dynamics_processor.h>
 #include <envelope_generator.h>
 #include <filter_moogladder.h>
 #include <qblimited_oscillator.h>
@@ -27,26 +29,29 @@ class DrumSynth : public SoundGenerator {
   void Save(std::string name) override;
   void ListPresets() override;
 
-  std::string patch_name{};
+  std::string patch_name_{"Default"};
 
   int pitch_range_{30};
   double starting_frequency_{0};
   double base_frequency_{0};
   double frequency_diff_{0};
 
-  QBLimitedOscillator osc1;
-  float osc1_amp{1};
+  QBLimitedOscillator osc1_;
+  float osc1_amp_{1};
   MoogLadder filter1_;
-  bool filter1_en{true};
+  bool filter1_en_{true};
 
-  QBLimitedOscillator osc2;
-  float osc2_amp{0};
+  QBLimitedOscillator osc2_;
+  float osc2_amp_{0};
   MoogLadder filter2_;
-  bool filter2_en{true};
+  bool filter2_en_{true};
 
-  EnvelopeGenerator m_eg;
+  EnvelopeGenerator eg_;
 
-  DCA m_dca;
+  // DynamicsProcessor dynamicsp_;
+  // Distortion distortion_;
+
+  DCA dca_;
 
   // Modulations and intentsities.
   bool eg_amp_{true};
