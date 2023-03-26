@@ -8,6 +8,7 @@
 #include <qblimited_oscillator.h>
 
 #include <array>
+#include <memory>
 #include <string>
 
 #include "defjams.h"
@@ -95,16 +96,16 @@ class DrumSynth : public SoundGenerator {
   double base_frequency_{0};
   double frequency_diff_{0};
 
-  QBLimitedOscillator osc1_;
+  std::unique_ptr<QBLimitedOscillator> osc1_;
   float osc1_amp_{1};
 
-  MoogLadder filter1_;
+  std::unique_ptr<MoogLadder> filter1_;
   bool filter1_en_{false};
 
-  QBLimitedOscillator osc2_;
+  std::unique_ptr<QBLimitedOscillator> osc2_;
   float osc2_amp_{0};
 
-  MoogLadder filter2_;
+  std::unique_ptr<MoogLadder> filter2_;
   bool filter2_en_{false};
 
   EnvelopeGenerator eg_;

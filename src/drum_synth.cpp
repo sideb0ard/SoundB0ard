@@ -24,8 +24,19 @@ DrumSynth::DrumSynth() {
   eg_.m_reset_to_zero = true;
   dca_.m_mod_source_eg = DEST_DCA_EG;
 
+  osc1_ = std::make_unique<QBLimitedOscillator>();
+  osc2_ = std::make_unique<QBLimitedOscillator>();
+  filter1_ = std::make_unique<MoogLadder>();
+  filter2_ = std::make_unique<MoogLadder>();
+
   // default
   LoadSettings(DrumSettings());
+
+  for (const auto &b : modulations_) {
+    for (const auto &e : b) {
+      std::cout << "VAL:L" << e << std::endl;
+    }
+  }
 
   active = true;
 }
@@ -34,7 +45,7 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   StereoVal out = {.left = 0, .right = 0};
   if (!active) return out;
 
-  if (osc1_.m_note_on) {
+  if (osc1_->m_note_on) {
     lfo_.Update();
     double lfo_out = lfo_.DoOscillate(0);
     double eg_out = eg_.DoEnvelope(nullptr);
@@ -44,78 +55,71 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 
     ///////////
 
+    // TODO - note, currently doesnt work to use both LFO and ENV on filter
+    // only works here for Osc Pitch
     double osc1_mod_val = 0;
     double osc2_mod_val = 0;
-    double filter1_fc_mod_val = 0;
-    double filter1_q_mod_val = 0;
-    double filter2_fc_mod_val = 0;
-    double filter2_q_mod_val = 0;
 
     if (modulations_[ENVI][OSC1_PITCHD] && modulations_[LFOI][OSC1_PITCHD])
       osc1_mod_val = eg_out * lfo_out;
-    else
-      osc1_mod_val = std::max(eg_out, lfo_out);
+    else if (modulations_[ENVI][OSC1_PITCHD])
+      osc1_mod_val = eg_out;
+    else if (modulations_[LFOI][OSC1_PITCHD])
+      osc1_mod_val = lfo_out;
 
     if (modulations_[ENVI][OSC2_PITCHD] && modulations_[LFOI][OSC2_PITCHD])
       osc2_mod_val = eg_out * lfo_out;
-    else
-      osc2_mod_val = std::max(eg_out, lfo_out);
+    else if (modulations_[ENVI][OSC2_PITCHD])
+      osc2_mod_val = eg_out;
+    else if (modulations_[LFOI][OSC2_PITCHD])
+      osc2_mod_val = lfo_out;
 
-    if (modulations_[ENVI][FILTER1_FCD] && modulations_[LFOI][FILTER1_FCD])
-      filter1_fc_mod_val = eg_out * lfo_out;
-    else
-      filter1_fc_mod_val = std::max(eg_out, lfo_out);
-
-    if (modulations_[ENVI][FILTER1_QD] && modulations_[LFOI][FILTER1_QD])
-      filter1_q_mod_val = eg_out * lfo_out;
-    else
-      filter1_q_mod_val = std::max(eg_out, lfo_out);
-
-    if (modulations_[ENVI][FILTER2_FCD] && modulations_[LFOI][FILTER2_FCD])
-      filter2_fc_mod_val = eg_out * lfo_out;
-    else
-      filter2_fc_mod_val = std::max(eg_out, lfo_out);
-
-    if (modulations_[ENVI][FILTER2_QD] && modulations_[LFOI][FILTER2_QD])
-      filter2_q_mod_val = eg_out * lfo_out;
-    else
-      filter2_q_mod_val = std::max(eg_out, lfo_out);
-
-    ////////////////////////////////////
-    if (filter1_fc_mod_val) {
-      filter1_.m_fc_control +=
-          (filter1_fc_mod_val * freq_range_) - freq_range_ / 2;
-      filter1_.Update();
+    if (modulations_[ENVI][FILTER1_FCD]) {
+      filter1_->SetFcMod(eg_out * pitch_range_);
+      filter1_->Update();
+    }
+    if (modulations_[ENVI][FILTER1_QD]) {
+      filter1_->m_q_control += (eg_out * q_range_) - q_range_ / 2;
+      filter1_->Update();
+    }
+    if (modulations_[ENVI][FILTER2_FCD]) {
+      filter2_->SetFcMod(eg_out * pitch_range_);
+      filter2_->Update();
+    }
+    if (modulations_[ENVI][FILTER2_QD]) {
+      filter2_->m_q_control += (eg_out * q_range_) - q_range_ / 2;
+      filter2_->Update();
     }
 
-    if (filter1_q_mod_val) {
-      filter1_.m_q_control += (filter1_q_mod_val * q_range_) - q_range_ / 2;
-      filter1_.Update();
+    if (modulations_[LFOI][FILTER1_FCD]) {
+      filter1_->SetFcMod(lfo_out * pitch_range_);
+      filter1_->Update();
+    }
+    if (modulations_[LFOI][FILTER1_QD]) {
+      filter1_->m_q_control += (lfo_out * q_range_) - q_range_ / 2;
+      filter1_->Update();
+    }
+    if (modulations_[LFOI][FILTER2_FCD]) {
+      filter2_->SetFcMod(lfo_out * pitch_range_);
+      filter2_->Update();
+    }
+    if (modulations_[LFOI][FILTER2_QD]) {
+      filter2_->m_q_control += (lfo_out * q_range_) - q_range_ / 2;
+      filter2_->Update();
     }
 
-    if (filter2_fc_mod_val) {
-      filter2_.m_fc_control +=
-          (filter2_fc_mod_val * freq_range_) - freq_range_ / 2;
-      filter2_.Update();
-    }
-
-    if (filter2_q_mod_val) {
-      filter2_.m_q_control += (filter2_q_mod_val * q_range_) - q_range_ / 2;
-      filter2_.Update();
-    }
-
-    osc1_.m_osc_fo = base_frequency_ + osc1_mod_val * frequency_diff_;
-    osc1_.Update();
-    double osc1_out = osc1_.DoOscillate(nullptr) * osc1_amp_;
+    osc1_->m_osc_fo = base_frequency_ + osc1_mod_val * frequency_diff_;
+    osc1_->Update();
+    double osc1_out = osc1_->DoOscillate(nullptr) * osc1_amp_;
     if (filter1_en_) {
-      osc1_out = filter1_.DoFilter(osc1_out);
+      osc1_out = filter1_->DoFilter(osc1_out);
     }
 
-    osc2_.m_osc_fo = base_frequency_ + osc2_mod_val * frequency_diff_;
-    osc2_.Update();
-    double osc2_out = osc2_.DoOscillate(nullptr) * osc2_amp_;
+    osc2_->m_osc_fo = base_frequency_ + osc2_mod_val * frequency_diff_;
+    osc2_->Update();
+    double osc2_out = osc2_->DoOscillate(nullptr) * osc2_amp_;
     if (filter2_en_) {
-      osc2_out = filter2_.DoFilter(osc2_out);
+      osc2_out = filter2_->DoFilter(osc2_out);
     }
 
     //////////////////////////////
@@ -131,10 +135,10 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   }
 
   if (eg_.GetState() == OFFF) {
-    osc1_.StopOscillator();
-    osc2_.StopOscillator();
+    osc1_->StopOscillator();
+    osc2_->StopOscillator();
     eg_.StopEg();
-    osc1_.m_note_on = false;
+    osc1_->m_note_on = false;
   }
 
   return out;
@@ -151,26 +155,30 @@ void DrumSynth::SetParam(std::string name, double val) {
     q_range_ = val;
 
   else if (name == "osc1")
-    osc1_.m_waveform = val;
+    osc1_->m_waveform = val;
   else if (name == "o1amp")
     osc1_amp_ = val;
 
+  else if (name == "filter1_type")
+    filter1_->SetType(val);
   else if (name == "filter1_fc")
-    filter1_.SetFcControl(val);
+    filter1_->SetFcControl(val);
   else if (name == "filter1_q")
-    filter1_.SetQControl(val);
+    filter1_->SetQControl(val);
   else if (name == "filter1_en")
     filter1_en_ = val;
 
   else if (name == "osc2")
-    osc2_.m_waveform = val;
+    osc2_->m_waveform = val;
   else if (name == "o2amp")
     osc2_amp_ = val;
 
+  else if (name == "filter2_type")
+    filter2_->SetType(val);
   else if (name == "filter2_fc")
-    filter2_.SetFcControl(val);
+    filter2_->SetFcControl(val);
   else if (name == "filter2_q")
-    filter2_.SetQControl(val);
+    filter2_->SetQControl(val);
   else if (name == "filter2_en")
     filter2_en_ = val;
 
@@ -218,10 +226,10 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "lfo_filter2_q")
     modulations_[LFOI][FILTER2_QD] = val;
 
-  osc1_.Update();
-  osc2_.Update();
-  filter1_.Update();
-  filter2_.Update();
+  osc1_->Update();
+  osc2_->Update();
+  filter1_->Update();
+  filter2_->Update();
   eg_.Update();
   lfo_.Update();
 }
@@ -238,16 +246,18 @@ std::string DrumSynth::Status() {
      << " distort:" << distortion_.m_threshold_
      << " pitch_range:" << pitch_range_ << " freq_range:" << freq_range_
      << " q_range:" << q_range_ << std::endl;
-  ss << "     osc1:" << GetOscType(osc1_.m_waveform) << " o1amp:" << osc1_amp_
-     << " filter1_type:" << k_filter_type_names[filter1_.m_filter_type] << "("
-     << filter1_.m_filter_type << ")"
-     << " filter1_fc:" << filter1_.m_fc << " filter1_q:" << filter1_.m_q
-     << " filter1_en:" << filter1_en_ << std::endl;
-  ss << "     osc2:" << GetOscType(osc2_.m_waveform) << " o2amp:" << osc2_amp_
-     << " filter2_type:" << k_filter_type_names[filter1_.m_filter_type] << "("
-     << filter1_.m_filter_type << ")"
-     << " filter2_fc:" << filter2_.m_fc << " filter2_q:" << filter2_.m_q
-     << " filter2_en:" << filter2_en_ << std::endl;
+  ss << "     osc1:" << GetOscType(osc1_->m_waveform) << " o1amp:" << osc1_amp_
+     << " filter1_type:" << k_filter_type_names[filter1_->m_filter_type] << "("
+     << filter1_->m_filter_type << ")"
+     << " filter1_fc:" << filter1_->m_fc_control
+     << " filter1_q:" << filter1_->m_q_control << " filter1_en:" << filter1_en_
+     << std::endl;
+  ss << "     osc2:" << GetOscType(osc2_->m_waveform) << " o2amp:" << osc2_amp_
+     << " filter2_type:" << k_filter_type_names[filter1_->m_filter_type] << "("
+     << filter1_->m_filter_type << ")"
+     << " filter2_fc:" << filter2_->m_fc_control
+     << " filter2_q:" << filter2_->m_q_control << " filter2_en:" << filter2_en_
+     << std::endl;
   ss << COOL_COLOR_PINK2 << "     eg_attack:" << eg_.m_attack_time_msec
      << " eg_decay:" << eg_.m_decay_time_msec
      << " eg_sustain:" << eg_.m_sustain_level
@@ -308,15 +318,15 @@ void DrumSynth::noteOn(midi_event ev) {
   starting_frequency_ = get_midi_freq(midinote + pitch_range_);
   frequency_diff_ = starting_frequency_ - base_frequency_;
 
-  osc1_.m_note_on = true;
-  osc1_.m_osc_fo = starting_frequency_;
-  osc1_.Update();
-  osc1_.StartOscillator();
+  osc1_->m_note_on = true;
+  osc1_->m_osc_fo = starting_frequency_;
+  osc1_->Update();
+  osc1_->StartOscillator();
 
-  osc2_.m_note_on = true;
-  osc2_.m_osc_fo = starting_frequency_;
-  osc2_.Update();
-  osc2_.StartOscillator();
+  osc2_->m_note_on = true;
+  osc2_->m_osc_fo = starting_frequency_;
+  osc2_->Update();
+  osc2_->StartOscillator();
 
   lfo_.m_note_on = true;
   lfo_.Update();
@@ -348,12 +358,12 @@ void DrumSynth::Save(std::string new_preset_name) {
   fprintf(presetzzz, "::name=%s", preset_name);
   settings_count++;
 
-  fprintf(presetzzz, "::osc1=%d", osc1_.m_waveform);
+  fprintf(presetzzz, "::osc1=%d", osc1_->m_waveform);
   settings_count++;
   fprintf(presetzzz, "::o1amp=%f", osc1_amp_);
   settings_count++;
 
-  fprintf(presetzzz, "::osc2=%d", osc2_.m_waveform);
+  fprintf(presetzzz, "::osc2=%d", osc2_->m_waveform);
   settings_count++;
   fprintf(presetzzz, "::o2amp=%f", osc2_amp_);
   settings_count++;
@@ -380,11 +390,11 @@ void DrumSynth::LoadSettings(DrumSettings settings) {
   freq_range_ = settings.freq_range;
   q_range_ = settings.q_range;
 
-  osc1_.m_waveform = settings.osc1_wav;
+  osc1_->m_waveform = settings.osc1_wav;
   osc1_amp_ = settings.osc1_amp;
   filter1_en_ = settings.filter1_en;
 
-  osc2_.m_waveform = settings.osc2_wav;
+  osc2_->m_waveform = settings.osc2_wav;
   osc2_amp_ = settings.osc2_amp;
   filter2_en_ = settings.filter2_en;
 
