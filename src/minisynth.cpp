@@ -19,18 +19,6 @@ extern const char *s_dest_enum_to_name[];
 const char *S_VOICES[] = {"SAW3",    "SQR3",    "SAW2SQR",
                           "TRI2SAW", "TRI2SQR", "SIN2SQR"};
 
-char *s_waveform_names[] = {
-    (char *)"SINE",  (char *)"SAW1",   (char *)"SAW2",
-    (char *)"SAW3",  (char *)"TRI",    (char *)"SQUARE",
-    (char *)"NOISE", (char *)"PNOISE", (char *)"MAX_OSC"};
-// defined in oscillator.h
-const char *s_lfo_mode_names[] = {"sync", "shot", "free"};
-const char *s_lfo_wave_names[] = {"sine", "usaw", "dsaw", "tri ",
-                                  "squa", "expo", "rsh ", "qrsh"};
-
-const char *s_filter_type_names[] = {"lpf1", "hpf1", "lpf2", "hpf2", "bpf2",
-                                     "bsf2", "lpf4", "hpf4", "bpf4"};
-
 MiniSynth::MiniSynth() {
   type = MINISYNTH_TYPE;
   std::cout << "Added, MiniMoog, yo!\n";
@@ -111,28 +99,28 @@ std::string MiniSynth::Info() {
      << " vol:" << volume << " pan:" << pan << "\n"
      << COOL_COLOR_YELLOW << "voice:" << S_VOICES[m_settings.m_voice_mode]
      << "(" << m_settings.m_voice_mode << ")\n"
-     << "osc1:" << s_waveform_names[m_global_synth_params.osc1_params.waveform]
+     << "osc1:" << k_waveform_names[m_global_synth_params.osc1_params.waveform]
      << "(" << m_global_synth_params.osc1_params.waveform << ")"
      << " o1amp:" << m_global_synth_params.osc1_params.amplitude
      << " o1oct:" << m_global_synth_params.osc1_params.octave
      << " o1semi:" << m_global_synth_params.osc1_params.semitones
      << " o1cents:" << m_global_synth_params.osc1_params.cents << "\n"
 
-     << "osc2:" << s_waveform_names[m_global_synth_params.osc2_params.waveform]
+     << "osc2:" << k_waveform_names[m_global_synth_params.osc2_params.waveform]
      << "(" << m_global_synth_params.osc2_params.waveform << ")"
      << " o2amp:" << m_global_synth_params.osc2_params.amplitude
      << " o2oct:" << m_global_synth_params.osc2_params.octave
      << " o2semi:" << m_global_synth_params.osc2_params.semitones
      << " o2cents:" << m_global_synth_params.osc2_params.cents << "\n"
 
-     << "osc3:" << s_waveform_names[m_global_synth_params.osc3_params.waveform]
+     << "osc3:" << k_waveform_names[m_global_synth_params.osc3_params.waveform]
      << "(" << m_global_synth_params.osc3_params.waveform << ")"
      << " o3amp:" << m_global_synth_params.osc3_params.amplitude
      << " o3oct:" << m_global_synth_params.osc3_params.octave
      << " o3semi:" << m_global_synth_params.osc3_params.semitones
      << " o3cents:" << m_global_synth_params.osc3_params.cents << "\n"
 
-     << "osc4:" << s_waveform_names[m_global_synth_params.osc4_params.waveform]
+     << "osc4:" << k_waveform_names[m_global_synth_params.osc4_params.waveform]
      << "(" << m_global_synth_params.osc4_params.waveform << ")"
      << " o4amp:" << m_global_synth_params.osc4_params.amplitude
      << " o4oct:" << m_global_synth_params.osc4_params.octave
@@ -156,9 +144,9 @@ std::string MiniSynth::Info() {
      << " zero:" << m_settings.m_reset_to_zero << "\n"
 
      << COOL_COLOR_YELLOW
-     << "l1wave:" << s_lfo_wave_names[m_settings.m_lfo1_waveform] << "("
+     << "l1wave:" << k_lfo_wave_names[m_settings.m_lfo1_waveform] << "("
      << m_settings.m_lfo1_waveform << ")"
-     << " l1mode:" << s_lfo_mode_names[m_settings.m_lfo1_mode] << "("
+     << " l1mode:" << k_lfo_mode_names[m_settings.m_lfo1_mode] << "("
      << m_settings.m_lfo1_mode << ")"
      << " l1rate:" << m_settings.m_lfo1_rate
      << " l1amp:" << m_settings.m_lfo1_amplitude << COOL_COLOR_ORANGE
@@ -177,9 +165,9 @@ std::string MiniSynth::Info() {
      << "\n"
 
      << COOL_COLOR_YELLOW
-     << "l2wave:" << s_lfo_wave_names[m_settings.m_lfo2_waveform] << "("
+     << "l2wave:" << k_lfo_wave_names[m_settings.m_lfo2_waveform] << "("
      << m_settings.m_lfo2_waveform << ")"
-     << " l2mode:" << s_lfo_mode_names[m_settings.m_lfo2_mode] << "("
+     << " l2mode:" << k_lfo_mode_names[m_settings.m_lfo2_mode] << "("
      << m_settings.m_lfo2_mode << ")"
      << " l2rate:" << m_settings.m_lfo2_rate
      << " l2amp:" << m_settings.m_lfo2_amplitude << COOL_COLOR_PINK
@@ -222,7 +210,7 @@ std::string MiniSynth::Info() {
      << "\neg2_sustain_override:" << m_settings.m_eg2_sustain_override << "\n"
 
      << COOL_COLOR_ORANGE
-     << "filter:" << s_filter_type_names[m_settings.m_filter_type] << "("
+     << "filter:" << k_filter_type_names[m_settings.m_filter_type] << "("
      << m_settings.m_filter_type << ") fc:" << m_settings.m_fc_control
      << " fq:" << m_settings.m_q_control
      << " kt_int:" << m_settings.m_filter_keytrack_intensity
@@ -1996,31 +1984,6 @@ void MiniSynth::SetResetToZero(unsigned int val) {
 
 void MiniSynth::SetMonophonic(bool b) { m_settings.m_monophonic = b; }
 void MiniSynth::SetGenerate(bool b) { m_settings.m_generate_active = b; }
-
-// void MiniSynth::SetOscType(int osc, unsigned int osc_type)
-//{
-//    if (osc > 0 && osc < 4 && osc_type < MAX_OSC)
-//    {
-//        printf("Setting OSC %d to %s(%d)\n", osc,
-//        s_waveform_names[osc_type],
-//               osc_type);
-//        switch (osc)
-//        {
-//        case (1):
-//            m_settings.osc1_wave = osc_type;
-//            break;
-//        case (2):
-//            m_settings.osc2_wave = osc_type;
-//            break;
-//        case (3):
-//            m_settings.osc3_wave = osc_type;
-//            break;
-//        case (4):
-//            m_settings.osc4_wave = osc_type;
-//            break;
-//        }
-//    }
-//}
 
 void MiniSynth::SetOscSemitones(unsigned int osc, int semitones) {
   if (osc > 0 && osc < 4 && semitones > -100 && semitones < 100) {

@@ -25,13 +25,6 @@ static const float dx_ratios[] = {
     19.78, 20.41, 20.76, 21.20, 21.98, 22.49, 23.53, 24.22, 25.95};
 static const int NUM_RATIOS = 64;
 
-std::vector<std::string> waveform_names = {"SINE",  "SAW1",   "SAW2",
-                                           "SAW3",  "TRI",    "SQUARE",
-                                           "NOISE", "PNOISE", "MAX_OSC"};
-
-std::vector<std::string> lfo_wave_names = {"sine", "usaw", "dsaw", "tri ",
-                                           "squa", "expo", "rsh ", "qrsh"};
-
 namespace {
 float GetRandRatio() { return dx_ratios[rand() % NUM_RATIOS]; }
 }  // namespace
@@ -125,7 +118,7 @@ std::string DXSynth::Info() {
   ss << ANSI_COLOR_WHITE
      << "## Operator 1 ####################################\n";
   ss << INSTRUMENT_COLOR_B;
-  ss << "   o1wav: " << waveform_names[m_settings.m_op1_waveform] << "("
+  ss << "   o1wav: " << k_waveform_names[m_settings.m_op1_waveform] << "("
      << m_settings.m_op1_waveform << ") "
      << " o1rat:" << m_settings.m_op1_ratio
      << " o1det:" << m_settings.m_op1_detune_cents
@@ -139,7 +132,7 @@ std::string DXSynth::Info() {
   ss << ANSI_COLOR_WHITE
      << "## Operator 2 ####################################\n";
   ss << INSTRUMENT_COLOR_B;
-  ss << "   o2wav: " << waveform_names[m_settings.m_op2_waveform] << "("
+  ss << "   o2wav: " << k_waveform_names[m_settings.m_op2_waveform] << "("
      << m_settings.m_op2_waveform << ") "
      << " o2rat:" << m_settings.m_op2_ratio
      << " o2det:" << m_settings.m_op2_detune_cents
@@ -153,7 +146,7 @@ std::string DXSynth::Info() {
   ss << ANSI_COLOR_WHITE
      << "## Operator 3 ####################################\n";
   ss << INSTRUMENT_COLOR_B;
-  ss << "   o3wav: " << waveform_names[m_settings.m_op3_waveform] << "("
+  ss << "   o3wav: " << k_waveform_names[m_settings.m_op3_waveform] << "("
      << m_settings.m_op3_waveform << ") "
      << " o3rat:" << m_settings.m_op3_ratio
      << " o3det:" << m_settings.m_op3_detune_cents
@@ -167,7 +160,7 @@ std::string DXSynth::Info() {
   ss << ANSI_COLOR_WHITE
      << "## Operator 4 ####################################\n";
   ss << INSTRUMENT_COLOR_B;
-  ss << "   o4wav: " << waveform_names[m_settings.m_op4_waveform] << "("
+  ss << "   o4wav: " << k_waveform_names[m_settings.m_op4_waveform] << "("
      << m_settings.m_op4_waveform << ") "
      << " o4rat:" << m_settings.m_op4_ratio
      << " o4det:" << m_settings.m_op4_detune_cents
@@ -181,7 +174,7 @@ std::string DXSynth::Info() {
   ss << ANSI_COLOR_WHITE
      << "## LFO Routing ####################################\n";
   ss << INSTRUMENT_COLOR_A;
-  ss << "   l1_wav:" << lfo_wave_names[m_settings.m_lfo1_waveform] << "("
+  ss << "   l1_wav:" << k_lfo_wave_names[m_settings.m_lfo1_waveform] << "("
      << m_settings.m_lfo1_waveform << ")"
      << " l1_int:" << m_settings.m_lfo1_intensity
      << " l1_rate:" << m_settings.m_lfo1_rate << "\n";

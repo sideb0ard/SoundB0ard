@@ -8,9 +8,6 @@
 
 #include <sstream>
 
-const char *filtertype_to_name[] = {"LPF1", "HPF1", "LPF2", "HPF2", "BPF2",
-                                    "BSF2", "LPF4", "HPF4", "BPF4"};
-
 FilterPass ::FilterPass() {
   type_ = BASICFILTER;
   enabled_ = true;
@@ -27,7 +24,7 @@ std::string FilterPass::Status() {
   std::stringstream ss;
   ss << "freq:" << m_filter_.m_fc_control;
   ss << " q:" << m_filter_.m_q_control;
-  ss << " type:" << filtertype_to_name[m_filter_.m_filter_type];
+  ss << " type:" << k_filter_type_names[m_filter_.m_filter_type];
   ss << " lfo1_active:" << m_lfo1_active_;
   ss << " lfo1_type:" << m_lfo1_.m_waveform;
   ss << " lfo1_amp:" << m_lfo1_.m_amplitude << "\n";
@@ -86,7 +83,6 @@ void FilterPass::SetParam(std::string name, double val) {
   else if (name == "lfo2_rate")
     SetLfoRate(2, val);
 }
-
 
 void FilterPass::SetLfoType(int lfo_num, unsigned int type) {
   if (type >= MAX_LFO_OSC) {

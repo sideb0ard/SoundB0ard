@@ -15,6 +15,6 @@ class Distortion : public Fx {
   void Init();
   void SetThreshold(double val);
 
- private:
+ public:
   double m_threshold_;
 };

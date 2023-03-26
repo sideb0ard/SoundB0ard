@@ -74,7 +74,7 @@ void Oscillator::Update() {
   }
 
   // --- ignore LFO mode for noise sources
-  if (m_waveform == rsh || m_waveform == qrsh) m_lfo_mode = LFORFREE;
+  if (m_waveform == rsh || m_waveform == qrsh) m_lfo_mode = LFOFREE;
 
   // --- get from matrix Sources
   if (modmatrix) {

@@ -108,6 +108,22 @@ enum {
   MIDI_PITCHBEND = 224,
 };
 
+enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };
+const std::vector<std::string> k_waveform_names = {
+    "SINE",   "SAW1",  "SAW2",   "SAW3",   "TRI",
+    "SQUARE", "NOISE", "PNOISE", "MAX_OSC"};
+
+enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };
+const std::vector<std::string> k_lfo_wave_names = {
+    "sine", "usaw", "dsaw", "tri ", "squa", "expo", "rsh ", "qrsh"};
+
+enum { LFOSYNC, LFOSHOT, LFOFREE, LFO_MAX_MODE };
+const std::vector<std::string> k_lfo_mode_names = {"SYNC", "ONESHOT", "FREE"};
+
+enum { LPF1, HPF1, LPF2, HPF2, BPF2, BSF2, LPF4, HPF4, BPF4, NUM_FILTER_TYPES };
+const std::vector<std::string> k_filter_type_names = {
+    "LPF1", "HPF1", "LPF2", "HPF2", "BPF2", "BSF2", "LPF4", "HPF4", "BPF4"};
+
 enum {
   MIDI_KNOB_MODE_ONE,
   MIDI_KNOB_MODE_TWO,
