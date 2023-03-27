@@ -101,6 +101,20 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args) {
   }
 }
 
+void DrumSynthLoadPreset(std::shared_ptr<object::Object> &obj,
+                         SBAudio::DrumSettings &preset) {
+  auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(obj);
+  if (soundgen) {
+    if (mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+      auto sg = mixr->sound_generators_[soundgen->soundgen_id_];
+      auto drumsynth = std::dynamic_pointer_cast<SBAudio::DrumSynth>(sg);
+      if (drumsynth) {
+        drumsynth->LoadSettings(preset);
+      }
+    }
+  }
+}
+
 void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
                      const std::string &preset_name,
                      const std::map<std::string, double> &preset) {
@@ -108,7 +122,6 @@ void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
   if (soundgen) {
     if (mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
       auto sg = mixr->sound_generators_[soundgen->soundgen_id_];
-
       sg->LoadPreset(preset_name, preset);
     }
   }

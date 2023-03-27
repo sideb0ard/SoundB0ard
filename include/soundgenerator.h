@@ -29,12 +29,17 @@ class SoundGenerator {
   virtual void noteOn(midi_event ev) { (void)ev; };
   virtual void noteOff(midi_event ev) { (void)ev; };
   virtual void Load(std::string preset_name);
+  virtual void Save(std::string preset_name);
   virtual void LoadPreset(std::string preset_name,
                           std::map<std::string, double> preset) {
     (void)preset_name;
     (void)preset;
   }
-  virtual void Save(std::string preset_name);
+  virtual void SavePreset(std::string preset_name,
+                          std::map<std::string, double> preset) {
+    (void)preset_name;
+    (void)preset;
+  }
   virtual void ListPresets();
 
   virtual void control(midi_event ev) { (void)ev; };

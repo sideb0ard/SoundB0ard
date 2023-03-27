@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "drum_synth.h"
 #include "evaluator.hpp"
 #include "object.hpp"
 
@@ -16,6 +17,9 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args);
 void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
                      const std::string &preset_name,
                      const std::map<std::string, double> &preset);
+
+void DrumSynthLoadPreset(std::shared_ptr<object::Object> &obj,
+                         SBAudio::DrumSettings &preset);
 
 std::vector<int> GetNotesInKey(int root, int scale_type = 0);
 

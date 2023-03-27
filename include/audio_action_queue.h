@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include "drum_synth.h"
+
 enum AudioAction {
   ADD,
   ADD_FX,
@@ -49,6 +51,8 @@ struct audio_action_queue_item {
 
   std::string preset_name;
   std::map<std::string, double> preset;
+  bool is_drum_preset{false};
+  SBAudio::DrumSettings drum_settings;
 
   std::vector<double> buffer;
   AudioBufferDetails audio_buffer_details;

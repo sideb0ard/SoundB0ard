@@ -1,5 +1,6 @@
 #include <drum_synth.h>
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
@@ -31,13 +32,6 @@ DrumSynth::DrumSynth() {
 
   // default
   LoadSettings(DrumSettings());
-
-  for (const auto &b : modulations_) {
-    for (const auto &e : b) {
-      std::cout << "VAL:L" << e << std::endl;
-    }
-  }
-
   active = true;
 }
 
@@ -55,70 +49,77 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 
     ///////////
 
-    // TODO - note, currently doesnt work to use both LFO and ENV on filter
-    // only works here for Osc Pitch
     double osc1_mod_val = 0;
     double osc2_mod_val = 0;
 
-    if (modulations_[ENVI][OSC1_PITCHD] && modulations_[LFOI][OSC1_PITCHD])
+    if (settings_.modulations[ENVI][OSC1_PITCHD] &&
+        settings_.modulations[LFOI][OSC1_PITCHD])
       osc1_mod_val = eg_out * lfo_out;
-    else if (modulations_[ENVI][OSC1_PITCHD])
+    else if (settings_.modulations[ENVI][OSC1_PITCHD])
       osc1_mod_val = eg_out;
-    else if (modulations_[LFOI][OSC1_PITCHD])
+    else if (settings_.modulations[LFOI][OSC1_PITCHD])
       osc1_mod_val = lfo_out;
 
-    if (modulations_[ENVI][OSC2_PITCHD] && modulations_[LFOI][OSC2_PITCHD])
+    if (settings_.modulations[ENVI][OSC2_PITCHD] &&
+        settings_.modulations[LFOI][OSC2_PITCHD])
       osc2_mod_val = eg_out * lfo_out;
-    else if (modulations_[ENVI][OSC2_PITCHD])
+    else if (settings_.modulations[ENVI][OSC2_PITCHD])
       osc2_mod_val = eg_out;
-    else if (modulations_[LFOI][OSC2_PITCHD])
+    else if (settings_.modulations[LFOI][OSC2_PITCHD])
       osc2_mod_val = lfo_out;
 
-    if (modulations_[ENVI][FILTER1_FCD]) {
-      filter1_->SetFcMod(eg_out * pitch_range_);
+    if (settings_.modulations[ENVI][FILTER1_FCD]) {
+      filter1_->SetFcMod(eg_out * settings_.pitch_range);
       filter1_->Update();
     }
-    if (modulations_[ENVI][FILTER1_QD]) {
-      filter1_->m_q_control += (eg_out * q_range_) - q_range_ / 2;
+    if (settings_.modulations[ENVI][FILTER1_QD]) {
+      filter1_->m_q_control +=
+          (eg_out * settings_.q_range) - settings_.q_range / 2;
       filter1_->Update();
     }
-    if (modulations_[ENVI][FILTER2_FCD]) {
-      filter2_->SetFcMod(eg_out * pitch_range_);
+    if (settings_.modulations[ENVI][FILTER2_FCD]) {
+      filter2_->SetFcMod(eg_out * settings_.pitch_range);
       filter2_->Update();
     }
-    if (modulations_[ENVI][FILTER2_QD]) {
-      filter2_->m_q_control += (eg_out * q_range_) - q_range_ / 2;
-      filter2_->Update();
-    }
-
-    if (modulations_[LFOI][FILTER1_FCD]) {
-      filter1_->SetFcMod(lfo_out * pitch_range_);
-      filter1_->Update();
-    }
-    if (modulations_[LFOI][FILTER1_QD]) {
-      filter1_->m_q_control += (lfo_out * q_range_) - q_range_ / 2;
-      filter1_->Update();
-    }
-    if (modulations_[LFOI][FILTER2_FCD]) {
-      filter2_->SetFcMod(lfo_out * pitch_range_);
-      filter2_->Update();
-    }
-    if (modulations_[LFOI][FILTER2_QD]) {
-      filter2_->m_q_control += (lfo_out * q_range_) - q_range_ / 2;
+    if (settings_.modulations[ENVI][FILTER2_QD]) {
+      filter2_->m_q_control +=
+          (eg_out * settings_.q_range) - settings_.q_range / 2;
       filter2_->Update();
     }
 
-    osc1_->m_osc_fo = base_frequency_ + osc1_mod_val * frequency_diff_;
+    // note - if ENV and LFO are enabled, LFO mod will overwrite ENV
+    if (settings_.modulations[LFOI][FILTER1_FCD]) {
+      filter1_->SetFcMod(lfo_out * settings_.pitch_range);
+      filter1_->Update();
+    }
+    if (settings_.modulations[LFOI][FILTER1_QD]) {
+      filter1_->m_q_control +=
+          (lfo_out * settings_.q_range) - settings_.q_range / 2;
+      filter1_->Update();
+    }
+    if (settings_.modulations[LFOI][FILTER2_FCD]) {
+      filter2_->SetFcMod(lfo_out * settings_.pitch_range);
+      filter2_->Update();
+    }
+    if (settings_.modulations[LFOI][FILTER2_QD]) {
+      filter2_->m_q_control +=
+          (lfo_out * settings_.q_range) - settings_.q_range / 2;
+      filter2_->Update();
+    }
+
+    osc1_->m_osc_fo =
+        settings_.base_frequency + osc1_mod_val * settings_.frequency_diff;
     osc1_->Update();
-    double osc1_out = osc1_->DoOscillate(nullptr) * osc1_amp_;
-    if (filter1_en_) {
+    double osc1_out = osc1_->DoOscillate(nullptr) * settings_.osc1_amp;
+    if (settings_.filter1_en) {
       osc1_out = filter1_->DoFilter(osc1_out);
     }
 
-    osc2_->m_osc_fo = base_frequency_ + osc2_mod_val * frequency_diff_;
+    osc2_->m_osc_fo =
+        settings_.base_frequency + osc2_mod_val * settings_.frequency_diff;
     osc2_->Update();
-    double osc2_out = osc2_->DoOscillate(nullptr) * osc2_amp_;
-    if (filter2_en_) {
+    double osc2_out = osc2_->DoOscillate(nullptr) * settings_.osc2_amp;
+    if (settings_.filter2_en) {
       osc2_out = filter2_->DoFilter(osc2_out);
     }
 
@@ -145,86 +146,105 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 }
 
 void DrumSynth::SetParam(std::string name, double val) {
-  if (name == "distort")
+  if (name == "distort") {
+    settings_.distortion_threshold = val;
     distortion_.SetParam("threshold", val);
-  else if (name == "pitch_range")
-    pitch_range_ = val;
-  else if (name == "freq_range")
-    freq_range_ = val;
-  else if (name == "q_range")
-    q_range_ = val;
+  } else if (name == "pitch_range") {
+    settings_.pitch_range = val;
+  } else if (name == "q_range") {
+    settings_.q_range = val;
+  }
 
-  else if (name == "osc1")
+  else if (name == "osc1") {
+    settings_.osc1_wav = val;
     osc1_->m_waveform = val;
-  else if (name == "o1amp")
-    osc1_amp_ = val;
-
-  else if (name == "filter1_type")
+  } else if (name == "o1amp") {
+    settings_.osc1_amp = val;
+  } else if (name == "filter1_type") {
+    settings_.filter1_type = val;
     filter1_->SetType(val);
-  else if (name == "filter1_fc")
+  } else if (name == "filter1_fc") {
+    settings_.filter1_fc = val;
     filter1_->SetFcControl(val);
-  else if (name == "filter1_q")
+  } else if (name == "filter1_q") {
+    settings_.filter1_q = val;
     filter1_->SetQControl(val);
-  else if (name == "filter1_en")
-    filter1_en_ = val;
+  } else if (name == "filter1_en") {
+    settings_.filter1_en = val;
+  }
 
-  else if (name == "osc2")
+  else if (name == "osc2") {
+    settings_.osc2_wav = val;
     osc2_->m_waveform = val;
-  else if (name == "o2amp")
-    osc2_amp_ = val;
+  } else if (name == "o2amp") {
+    settings_.osc2_amp = val;
+  }
 
-  else if (name == "filter2_type")
+  else if (name == "filter2_type") {
+    settings_.filter2_type = val;
     filter2_->SetType(val);
-  else if (name == "filter2_fc")
+  } else if (name == "filter2_fc") {
+    settings_.filter2_fc = val;
     filter2_->SetFcControl(val);
-  else if (name == "filter2_q")
+  } else if (name == "filter2_q") {
+    settings_.filter2_q = val;
     filter2_->SetQControl(val);
-  else if (name == "filter2_en")
-    filter2_en_ = val;
+  } else if (name == "filter2_en") {
+    settings_.filter2_en = val;
+  }
 
-  else if (name == "eg_attack")
+  else if (name == "eg_attack") {
+    settings_.eg_attack_ms = val;
     eg_.SetAttackTimeMsec(val);
-  else if (name == "eg_decay")
+  } else if (name == "eg_decay") {
+    settings_.eg_decay_ms = val;
     eg_.SetDecayTimeMsec(val);
-  else if (name == "eg_sustain")
+  } else if (name == "eg_sustain") {
+    settings_.eg_sustain_level = val;
     eg_.SetSustainLevel(val);
-  else if (name == "eg_release")
+  } else if (name == "eg_release") {
+    settings_.eg_release_ms = val;
     eg_.SetReleaseTimeMsec(val);
+  }
 
-  else if (name == "lfowav")
+  else if (name == "lfowav") {
+    settings_.lfo_wave = val;
     lfo_.m_waveform = val;
-  else if (name == "lfomode")
+  } else if (name == "lfomode") {
+    settings_.lfo_mode = val;
     lfo_.m_lfo_mode = val;
-  else if (name == "lforate")
+  } else if (name == "lforate") {
+    settings_.lfo_rate = val;
     lfo_.m_osc_fo = val;
-  else if (name == "lfoamp")
-    lfo_.m_amplitude = val;
+  }
 
-  else if (name == "eg_o1_ptch")
-    modulations_[ENVI][OSC1_PITCHD] = val;
-  else if (name == "eg_o2_ptch")
-    modulations_[ENVI][OSC2_PITCHD] = val;
-  else if (name == "eg_f1_fc")
-    modulations_[ENVI][FILTER1_FCD] = val;
-  else if (name == "eg_f1_q")
-    modulations_[ENVI][FILTER1_QD] = val;
-  else if (name == "eg_f2_fc")
-    modulations_[ENVI][FILTER2_FCD] = val;
-  else if (name == "eg_f2_q")
-    modulations_[ENVI][FILTER2_QD] = val;
+  else if (name == "eg_o1_ptch") {
+    settings_.modulations[ENVI][OSC1_PITCHD] = val;
+  } else if (name == "eg_o2_ptch") {
+    settings_.modulations[ENVI][OSC2_PITCHD] = val;
+  } else if (name == "eg_f1_fc") {
+    settings_.modulations[ENVI][FILTER1_FCD] = val;
+  } else if (name == "eg_f1_q") {
+    settings_.modulations[ENVI][FILTER1_QD] = val;
+  } else if (name == "eg_f2_fc") {
+    settings_.modulations[ENVI][FILTER2_FCD] = val;
+  } else if (name == "eg_f2_q") {
+    settings_.modulations[ENVI][FILTER2_QD] = val;
+  }
 
-  else if (name == "lfo_osc1")
-    modulations_[LFOI][OSC1_PITCHD] = val;
-  else if (name == "lfo_osc2")
-    modulations_[LFOI][OSC2_PITCHD] = val;
-  else if (name == "lfo_filter1_fc")
-    modulations_[LFOI][FILTER1_FCD] = val;
-  else if (name == "lfo_filter1_q")
-    modulations_[LFOI][FILTER1_QD] = val;
-  else if (name == "lfo_filter2_fc")
-    modulations_[LFOI][FILTER2_FCD] = val;
-  else if (name == "lfo_filter2_q")
-    modulations_[LFOI][FILTER2_QD] = val;
+  else if (name == "lfo_osc1") {
+    settings_.modulations[LFOI][OSC1_PITCHD] = val;
+  } else if (name == "lfo_osc2") {
+    settings_.modulations[LFOI][OSC2_PITCHD] = val;
+  } else if (name == "lfo_filter1_fc") {
+    settings_.modulations[LFOI][FILTER1_FCD] = val;
+  } else if (name == "lfo_filter1_q") {
+    settings_.modulations[LFOI][FILTER1_QD] = val;
+  } else if (name == "lfo_filter2_fc") {
+    settings_.modulations[LFOI][FILTER2_FCD] = val;
+  } else if (name == "lfo_filter2_q") {
+    settings_.modulations[LFOI][FILTER2_QD] = val;
+  }
 
   osc1_->Update();
   osc2_->Update();
@@ -241,48 +261,53 @@ std::string DrumSynth::Status() {
   else
     //    ss << ANSI_COLOR_CYAN;
     ss << COOL_COLOR_YELLOW_MELLOW;
-  ss << "DrumZynth - " << COOL_COLOR_PINK2 << patch_name_
+  ss << "DrumZynth - " << COOL_COLOR_PINK2 << settings_.name
      << COOL_COLOR_YELLOW_MELLOW << " - vol:" << volume
-     << " distort:" << distortion_.m_threshold_
-     << " pitch_range:" << pitch_range_ << " freq_range:" << freq_range_
-     << " q_range:" << q_range_ << std::endl;
-  ss << "     osc1:" << GetOscType(osc1_->m_waveform) << " o1amp:" << osc1_amp_
-     << " filter1_type:" << k_filter_type_names[filter1_->m_filter_type] << "("
-     << filter1_->m_filter_type << ")"
-     << " filter1_fc:" << filter1_->m_fc_control
-     << " filter1_q:" << filter1_->m_q_control << " filter1_en:" << filter1_en_
-     << std::endl;
-  ss << "     osc2:" << GetOscType(osc2_->m_waveform) << " o2amp:" << osc2_amp_
-     << " filter2_type:" << k_filter_type_names[filter1_->m_filter_type] << "("
-     << filter1_->m_filter_type << ")"
-     << " filter2_fc:" << filter2_->m_fc_control
-     << " filter2_q:" << filter2_->m_q_control << " filter2_en:" << filter2_en_
-     << std::endl;
-  ss << COOL_COLOR_PINK2 << "     eg_attack:" << eg_.m_attack_time_msec
-     << " eg_decay:" << eg_.m_decay_time_msec
-     << " eg_sustain:" << eg_.m_sustain_level
-     << " eg_release:" << eg_.m_release_time_msec
-     << " eg_hold:" << eg_.hold_time_ms_ << " ramp:" << eg_.ramp_mode
-     << std::endl;
+     << " distort:" << settings_.distortion_threshold
+     << " pitch_range:" << settings_.pitch_range
+     << " q_range:" << settings_.q_range << std::endl;
+  ss << "     osc1:" << GetOscType(settings_.osc1_wav) << "("
+     << settings_.osc1_wav << ")"
+     << " o1amp:" << settings_.osc1_amp
+     << " filter1_type:" << k_filter_type_names[settings_.filter1_type] << "("
+     << settings_.filter1_type << ")"
+     << " filter1_fc:" << settings_.filter1_fc
+     << " filter1_q:" << settings_.filter1_q
+     << " filter1_en:" << settings_.filter1_en << std::endl;
+  ss << "     osc2:" << GetOscType(settings_.osc2_wav) << "("
+     << settings_.osc2_wav << ")"
+     << " o2amp:" << settings_.osc2_amp
+     << " filter2_type:" << k_filter_type_names[settings_.filter2_type] << "("
+     << settings_.filter2_type << ")"
+     << " filter2_fc:" << settings_.filter2_fc
+     << " filter2_q:" << settings_.filter2_q
+     << " filter2_en:" << settings_.filter2_en << std::endl;
+  ss << COOL_COLOR_PINK2 << "     eg_attack:" << settings_.eg_attack_ms
+     << " eg_decay:" << settings_.eg_decay_ms
+     << " eg_sustain:" << settings_.eg_sustain_level
+     << " eg_release:" << settings_.eg_release_ms
+     << " eg_hold:" << settings_.eg_hold_time_ms
+     << " ramp:" << settings_.eg_ramp_mode << std::endl;
   ss << COOL_COLOR_YELLOW_MELLOW
-     << "     eg_o1_ptch:" << modulations_[ENVI][OSC1_PITCHD]
-     << " eg_o2_ptch:" << modulations_[ENVI][OSC1_PITCHD]
-     << " eg_f1_fc:" << modulations_[ENVI][FILTER1_FCD]
-     << " eg_f1_q:" << modulations_[ENVI][FILTER1_QD]
-     << " eg_f2_fc:" << modulations_[ENVI][FILTER2_FCD]
-     << " eg_f2_q:" << modulations_[ENVI][FILTER2_QD] << std::endl;
-  ss << COOL_COLOR_PINK2 << "     lfowav:" << k_lfo_wave_names[lfo_.m_waveform]
-     << "(" << lfo_.m_waveform << ")"
-     << " lfomode:" << k_lfo_mode_names[lfo_.m_lfo_mode] << "("
-     << lfo_.m_lfo_mode << ")"
-     << " lforate:" << lfo_.m_osc_fo << " lfoamp:" << lfo_.m_amplitude
-     << COOL_COLOR_YELLOW_MELLOW
-     << " lfo_osc1:" << modulations_[LFOI][OSC1_PITCHD]
-     << " lfo_osc2:" << modulations_[LFOI][OSC2_PITCHD] << std::endl;
-  ss << "     lfo_filter1_fc:" << modulations_[LFOI][FILTER1_FCD]
-     << " lfo_filter1_q:" << modulations_[LFOI][FILTER1_QD]
-     << " lfo_filter2_fc:" << modulations_[LFOI][FILTER2_FCD]
-     << " lfo_filter2_q:" << modulations_[LFOI][FILTER2_QD] << std::endl;
+     << "     eg_o1_ptch:" << settings_.modulations[ENVI][OSC1_PITCHD]
+     << " eg_o2_ptch:" << settings_.modulations[ENVI][OSC1_PITCHD]
+     << " eg_f1_fc:" << settings_.modulations[ENVI][FILTER1_FCD]
+     << " eg_f1_q:" << settings_.modulations[ENVI][FILTER1_QD]
+     << " eg_f2_fc:" << settings_.modulations[ENVI][FILTER2_FCD]
+     << " eg_f2_q:" << settings_.modulations[ENVI][FILTER2_QD] << std::endl;
+  ss << COOL_COLOR_PINK2
+     << "     lfowav:" << k_lfo_wave_names[settings_.lfo_wave] << "("
+     << settings_.lfo_wave << ")"
+     << " lfomode:" << k_lfo_mode_names[settings_.lfo_mode] << "("
+     << settings_.lfo_mode << ")"
+     << " lforate:" << settings_.lfo_rate << COOL_COLOR_YELLOW_MELLOW
+     << " lfo_osc1:" << settings_.modulations[LFOI][OSC1_PITCHD]
+     << " lfo_osc2:" << settings_.modulations[LFOI][OSC2_PITCHD] << std::endl;
+  ss << "     lfo_filter1_fc:" << settings_.modulations[LFOI][FILTER1_FCD]
+     << " lfo_filter1_q:" << settings_.modulations[LFOI][FILTER1_QD]
+     << " lfo_filter2_fc:" << settings_.modulations[LFOI][FILTER2_FCD]
+     << " lfo_filter2_q:" << settings_.modulations[LFOI][FILTER2_QD]
+     << std::endl;
 
   return ss.str();
 }
@@ -314,17 +339,19 @@ void DrumSynth::noteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
 
-  base_frequency_ = get_midi_freq(midinote);
-  starting_frequency_ = get_midi_freq(midinote + pitch_range_);
-  frequency_diff_ = starting_frequency_ - base_frequency_;
+  settings_.base_frequency = get_midi_freq(midinote);
+  settings_.starting_frequency =
+      get_midi_freq(midinote + settings_.pitch_range);
+  settings_.frequency_diff =
+      settings_.starting_frequency - settings_.base_frequency;
 
   osc1_->m_note_on = true;
-  osc1_->m_osc_fo = starting_frequency_;
+  osc1_->m_osc_fo = settings_.starting_frequency;
   osc1_->Update();
   osc1_->StartOscillator();
 
   osc2_->m_note_on = true;
-  osc2_->m_osc_fo = starting_frequency_;
+  osc2_->m_osc_fo = settings_.starting_frequency;
   osc2_->Update();
   osc2_->StartOscillator();
 
@@ -336,79 +363,93 @@ void DrumSynth::noteOn(midi_event ev) {
 }
 
 void DrumSynth::Save(std::string new_preset_name) {
+  std::cout << "DRUMSYNTH -- saving new preset '" << new_preset_name << "'"
+            << std::endl;
   if (new_preset_name.empty()) {
-    printf(
-        "Play tha game, pal, need a name to save yer synth settings "
-        "with\n");
+    std::cerr << "Play tha game, pal, need a name to save yer synth settings"
+              << std::endl;
     return;
   }
-  const char *preset_name = new_preset_name.c_str();
+  settings_.name = new_preset_name;
 
-  printf("Saving '%s' settings for Minisynth to file %s\n", preset_name,
-         DRUM_SYNTH_PATCHES);
-  FILE *presetzzz = fopen(DRUM_SYNTH_PATCHES, "a+");
-  if (presetzzz == NULL) {
-    printf("Couldn't save settings!!\n");
-    return;
+  std::ofstream presetzzz;
+  const std::string kSEP = "::";
+  presetzzz.open(DRUM_SYNTH_PATCHES, std::ios::app);
+  presetzzz << "name:" << settings_.name << kSEP;
+  presetzzz << "distortion_threshold:" << settings_.distortion_threshold
+            << kSEP;
+  presetzzz << "pitch_range:" << settings_.pitch_range << kSEP;
+  presetzzz << "q_range:" << settings_.q_range << kSEP;
+  presetzzz << "starting_frequency:" << settings_.starting_frequency << kSEP;
+  presetzzz << "base_frequency:" << settings_.base_frequency << kSEP;
+  presetzzz << "frequency_diff:" << settings_.frequency_diff << kSEP;
+  presetzzz << "osc1_wav:" << settings_.osc1_wav << kSEP;
+  presetzzz << "osc1_amp:" << settings_.osc1_amp << kSEP;
+  presetzzz << "filter1_en:" << settings_.filter1_en << kSEP;
+  presetzzz << "filter1_type:" << settings_.filter1_type << kSEP;
+  presetzzz << "filter1_fc:" << settings_.filter1_fc << kSEP;
+  presetzzz << "filter1_fq:" << settings_.filter1_q << kSEP;
+  presetzzz << "osc2_wav:" << settings_.osc2_wav << kSEP;
+  presetzzz << "osc2_amp:" << settings_.osc2_amp << kSEP;
+  presetzzz << "filter2_en:" << settings_.filter2_en << kSEP;
+  presetzzz << "filter2_type:" << settings_.filter2_type << kSEP;
+  presetzzz << "filter2_fc:" << settings_.filter2_fc << kSEP;
+  presetzzz << "filter2_q:" << settings_.filter2_q << kSEP;
+  presetzzz << "eg_attack_ms:" << settings_.eg_attack_ms << kSEP;
+  presetzzz << "eg_decay_ms:" << settings_.eg_decay_ms << kSEP;
+  presetzzz << "eg_susytain_level:" << settings_.eg_sustain_level << kSEP;
+  presetzzz << "eg_release_ms:" << settings_.eg_release_ms << kSEP;
+  presetzzz << "eg_hold_time_ms:" << settings_.eg_hold_time_ms << kSEP;
+  presetzzz << "eg_ramp_mode:" << settings_.eg_ramp_mode << kSEP;
+  presetzzz << "lfo_wave:" << settings_.lfo_wave << kSEP;
+  presetzzz << "lfo_mode:" << settings_.lfo_mode << kSEP;
+  presetzzz << "lfo_rate:" << settings_.lfo_rate << kSEP;
+  presetzzz << "env_routes:";
+  for (const auto &v : settings_.modulations[ENVI]) presetzzz << v;
+  presetzzz << kSEP;
+  presetzzz << "lfo_routes:";
+  for (const auto &v : settings_.modulations[LFOI]) presetzzz << v;
+  presetzzz << kSEP;
+  presetzzz << std::endl;
+  presetzzz.close();
+  std::cout << "DRUMSYNTH -- saving -- DONE" << std::endl;
+}
+void DrumSynth::Load(std::string preset_name) {
+  std::cout << "DRUMSYNTH -- loading preset '" << preset_name << "'"
+            << std::endl;
+
+  std::ifstream presetzzz;
+  const std::string kSEP = "::";
+  presetzzz.open(DRUM_SYNTH_PATCHES);
+  for (std::string line; getline(presetzzz, line);) {
+    std::cout << "LINE:" << line << std::endl;
   }
-
-  patch_name_ = new_preset_name;
-  int settings_count = 0;
-
-  fprintf(presetzzz, "::name=%s", preset_name);
-  settings_count++;
-
-  fprintf(presetzzz, "::osc1=%d", osc1_->m_waveform);
-  settings_count++;
-  fprintf(presetzzz, "::o1amp=%f", osc1_amp_);
-  settings_count++;
-
-  fprintf(presetzzz, "::osc2=%d", osc2_->m_waveform);
-  settings_count++;
-  fprintf(presetzzz, "::o2amp=%f", osc2_amp_);
-  settings_count++;
-
-  fprintf(presetzzz, "::eg_attack=%f", eg_.m_attack_time_msec);
-  settings_count++;
-  fprintf(presetzzz, "::eg_decay=%f", eg_.m_decay_time_msec);
-  settings_count++;
-  fprintf(presetzzz, "::eg_sustain=%f", eg_.m_sustain_level);
-  settings_count++;
-  fprintf(presetzzz, "::eg_release=%f", eg_.m_release_time_msec);
-  settings_count++;
-
-  fprintf(presetzzz, ":::\n");
-  fclose(presetzzz);
-  printf("Wrote %d settings\n", settings_count);
+  presetzzz.close();
 }
 
 void DrumSynth::LoadSettings(DrumSettings settings) {
-  patch_name_ = settings.name;
-  distortion_.SetParam("threshold", settings.distortion_threshold);
+  settings_ = settings;
 
-  pitch_range_ = settings.pitch_range;
-  freq_range_ = settings.freq_range;
-  q_range_ = settings.q_range;
+  distortion_.SetParam("threshold", settings_.distortion_threshold);
 
-  osc1_->m_waveform = settings.osc1_wav;
-  osc1_amp_ = settings.osc1_amp;
-  filter1_en_ = settings.filter1_en;
+  osc1_->m_waveform = settings_.osc1_wav;
+  osc2_->m_waveform = settings_.osc2_wav;
 
-  osc2_->m_waveform = settings.osc2_wav;
-  osc2_amp_ = settings.osc2_amp;
-  filter2_en_ = settings.filter2_en;
+  filter1_->SetFcControl(settings_.filter1_fc);
+  filter1_->SetQControl(settings_.filter1_q);
 
-  eg_.SetAttackTimeMsec(settings.eg_attack_ms);
-  eg_.SetDecayTimeMsec(settings.eg_decay_ms);
-  eg_.SetSustainLevel(settings.eg_sustain_level);
-  eg_.SetReleaseTimeMsec(settings.eg_release_ms);
-  eg_.SetRampMode(settings.eg_ramp_mode);
+  filter2_->SetFcControl(settings_.filter2_fc);
+  filter2_->SetQControl(settings_.filter2_q);
 
-  lfo_.m_waveform = settings.lfo_wave;
-  lfo_.m_lfo_mode = settings.lfo_mode;
-  lfo_.m_fo = settings.lfo_rate;
+  eg_.SetAttackTimeMsec(settings_.eg_attack_ms);
+  eg_.SetDecayTimeMsec(settings_.eg_decay_ms);
+  eg_.SetSustainLevel(settings_.eg_sustain_level);
+  eg_.SetReleaseTimeMsec(settings_.eg_release_ms);
+  eg_.SetRampMode(settings_.eg_ramp_mode);
 
-  modulations_ = settings.modulations;
+  lfo_.m_waveform = settings_.lfo_wave;
+  lfo_.m_lfo_mode = settings_.lfo_mode;
+  lfo_.m_fo = settings_.lfo_rate;
 }
 
 void DrumSynth::ListPresets() {
@@ -421,6 +462,104 @@ void DrumSynth::ListPresets() {
   }
 
   fclose(presetzzz);
+}
+
+DrumSettings GetDrumSettings(std::string preset_name) {
+  DrumSettings preset;
+  std::ifstream presetzzz;
+  const std::string kSEP = "::";
+  const std::string ktoken_SEP = ":";
+  presetzzz.open(DRUM_SYNTH_PATCHES);
+  for (std::string line; getline(presetzzz, line);) {
+    std::cout << "LINE:" << line << std::endl;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = line.find(kSEP)) != std::string::npos) {
+      token = line.substr(0, pos);
+      bool preset_found{false};
+      size_t token_pos = token.find(ktoken_SEP);
+      auto key = token.substr(0, token_pos);
+      auto val = token.substr(token_pos + ktoken_SEP.size(), std::string::npos);
+
+      std::cout << "KEY:" << key << " VAL:" << val << std::endl;
+      if (key == "name" && val != preset_name) {
+        std::cout << "NOT THIS ONE, next.." << std::endl;
+        break;
+      }
+
+      double dval = 0;
+      if (key != "name") dval = std::stod(val);
+
+      if (key == "name")
+        preset.name = val;
+      else if (key == "distortion_threshold")
+        preset.distortion_threshold = dval;
+      else if (key == "pitch_range")
+        preset.pitch_range = dval;
+      else if (key == "q_range")
+        preset.q_range = dval;
+      else if (key == "starting_frequency")
+        preset.starting_frequency = dval;
+      else if (key == "base_frequency")
+        preset.base_frequency = dval;
+      else if (key == "frequency_diff")
+        preset.frequency_diff = dval;
+      else if (key == "osc1_wav")
+        preset.osc1_wav = dval;
+      else if (key == "osc1_amp")
+        preset.osc1_amp = dval;
+      else if (key == "filter1_en")
+        preset.filter1_en = dval;
+      else if (key == "filter1_type")
+        preset.filter1_type = dval;
+      else if (key == "filter1_fc")
+        preset.filter1_fc = dval;
+      else if (key == "filter1_q")
+        preset.filter1_q = dval;
+      else if (key == "osc2_wav")
+        preset.osc2_wav = dval;
+      else if (key == "osc2_amp")
+        preset.osc2_amp = dval;
+      else if (key == "filter2_en")
+        preset.filter2_en = dval;
+      else if (key == "filter2_type")
+        preset.filter2_type = dval;
+      else if (key == "filter2_fc")
+        preset.filter2_fc = dval;
+      else if (key == "filter2_q")
+        preset.filter2_q = dval;
+      else if (key == "eg_attack_ms")
+        preset.eg_attack_ms = dval;
+      else if (key == "eg_decay_ms")
+        preset.eg_decay_ms = dval;
+      else if (key == "eg_sustain_level")
+        preset.eg_sustain_level = dval;
+      else if (key == "eg_release_ms")
+        preset.eg_release_ms = dval;
+      else if (key == "eg_hold_time_ms")
+        preset.eg_hold_time_ms = dval;
+      else if (key == "eg_ramp_mode")
+        preset.eg_ramp_mode = dval;
+      else if (key == "lfo_wave")
+        preset.lfo_wave = dval;
+      else if (key == "lfo_mode")
+        preset.lfo_mode = dval;
+      else if (key == "lfo_rate")
+        preset.lfo_rate = dval;
+
+      else if (key == "env_routes") {
+        std::cout << "ENV ROUTES:" << val;
+      } else if (key == "lfo_routes") {
+        std::cout << "LFO ROUTES:" << val;
+      }
+
+      std::cout << token << std::endl;
+      line.erase(0, pos + kSEP.length());
+    }
+  }
+
+  presetzzz.close();
+  return preset;
 }
 
 }  // namespace SBAudio

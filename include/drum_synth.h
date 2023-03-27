@@ -16,7 +16,6 @@
 
 namespace SBAudio {
 
-// routing
 enum SourceIdx { ENVI, LFOI, NUM_SRCI };
 enum DestIdx {
   OSC1_PITCHD,
@@ -35,23 +34,34 @@ struct DrumSettings {
 
   // MOD RANGES
   double pitch_range{30};
-  double freq_range{1000};
   double q_range{3};
+
+  // used for pitch modulation
+  double starting_frequency{0};
+  double base_frequency{0};
+  double frequency_diff{0};
 
   // OSCILLATORS
   int osc1_wav{SINE};
   float osc1_amp{1};
   bool filter1_en{false};
+  unsigned int filter1_type{6};
+  double filter1_fc;
+  double filter1_q;
 
   int osc2_wav{NOISE};
   float osc2_amp{0};
-  bool filter2_en{false};
+  bool filter2_en{true};
+  unsigned int filter2_type{6};
+  double filter2_fc;
+  double filter2_q;
 
   // ENV //////////////////////////
   int eg_attack_ms{1};
   int eg_decay_ms{0};
   int eg_sustain_level{1};
   int eg_release_ms{70};
+  int eg_hold_time_ms{0};
   bool eg_ramp_mode{true};
 
   // LFO //////////////////////////
@@ -64,7 +74,6 @@ struct DrumSettings {
 
   std::array<std::array<int, NUM_DESTD>, NUM_SRCI> modulations{{}};
 };
-
 static const char DRUM_SYNTH_PATCHES[] = "settings/drumpresets.dat";
 
 class DrumSynth : public SoundGenerator {
@@ -81,32 +90,17 @@ class DrumSynth : public SoundGenerator {
   void noteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
   void LoadSettings(DrumSettings settings);
+  void Load(std::string name) override;
   void Save(std::string name) override;
   void ListPresets() override;
 
-  std::string patch_name_{"Default"};
-
-  // oscillation ranges
-  double pitch_range_{30};
-  double freq_range_{1000};
-  double q_range_{3};
-
-  // only used for pitch
-  double starting_frequency_{0};
-  double base_frequency_{0};
-  double frequency_diff_{0};
+  DrumSettings settings_;
 
   std::unique_ptr<QBLimitedOscillator> osc1_;
-  float osc1_amp_{1};
-
   std::unique_ptr<MoogLadder> filter1_;
-  bool filter1_en_{false};
 
   std::unique_ptr<QBLimitedOscillator> osc2_;
-  float osc2_amp_{0};
-
   std::unique_ptr<MoogLadder> filter2_;
-  bool filter2_en_{false};
 
   EnvelopeGenerator eg_;
   LFO lfo_;
@@ -114,8 +108,7 @@ class DrumSynth : public SoundGenerator {
   Distortion distortion_;
 
   DCA dca_;
-
-  std::array<std::array<int, NUM_DESTD>, NUM_SRCI> modulations_{{}};
 };
 
+DrumSettings GetDrumSettings(std::string name);
 }  // namespace SBAudio

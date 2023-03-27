@@ -784,8 +784,13 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
              action.type == AudioAction ::LIST_PRESETS) {
     interpreter_sound_cmds::ParseSynthCmd(action.args);
   } else if (action.type == AudioAction::LOAD_PRESET) {
-    interpreter_sound_cmds::SynthLoadPreset(action.args[0], action.preset_name,
-                                            action.preset);
+    if (action.is_drum_preset) {
+      interpreter_sound_cmds::DrumSynthLoadPreset(action.args[0],
+                                                  action.drum_settings);
+    } else {
+      interpreter_sound_cmds::SynthLoadPreset(
+          action.args[0], action.preset_name, action.preset);
+    }
   } else if (action.type == AudioAction::RAND) {
     sound_generators_[action.mixer_soundgen_idx]->randomize();
   } else if (action.type == AudioAction::PREVIEW) {

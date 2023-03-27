@@ -1312,15 +1312,21 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto preset_name =
                  std::dynamic_pointer_cast<object::String>(args[1]);
              if (soundgen && preset_name) {
-               std::cout << "BUILTIN! " << preset_name->value_ << std::endl;
                audio_action_queue_item action_req{
                    .type = AudioAction::LOAD_PRESET,
                    .args = args,
                };
-               // read its preset file
+               if (soundgen->soundgenerator_type == DRUMSYNTH_TYPE) {
+                 std::cout << "OH< DRUM SYNTH!\n";
+                 action_req.is_drum_preset = true;
+                 action_req.drum_settings =
+                     SBAudio::GetDrumSettings(preset_name->value_);
+               } else {
+                 // read its preset file
+                 action_req.preset = GetPreset(soundgen->soundgenerator_type,
+                                               preset_name->value_);
+               }
                action_req.preset_name = preset_name->value_;
-               action_req.preset = GetPreset(soundgen->soundgenerator_type,
-                                             preset_name->value_);
 
                audio_queue.push(action_req);
              }
