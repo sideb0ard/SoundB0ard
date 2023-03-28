@@ -31,6 +31,7 @@ struct DrumSettings {
   std::string name{"Default"};
 
   double distortion_threshold{0.5};
+  double amplitude{1};
 
   // MOD RANGES
   double pitch_range{30};
@@ -108,6 +109,10 @@ class DrumSynth : public SoundGenerator {
   Distortion distortion_;
 
   DCA dca_;
+
+ private:
+  // gets updated and used for calculating dur
+  double ms_per_midi_tick_{0};
 };
 
 DrumSettings GetDrumSettings(std::string name);

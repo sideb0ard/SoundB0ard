@@ -38,6 +38,7 @@ DrumSynth::DrumSynth() {
 StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   StereoVal out = {.left = 0, .right = 0};
   if (!active) return out;
+  ms_per_midi_tick_ = tinfo.ms_per_midi_tick;
 
   if (osc1_->m_note_on) {
     lfo_.Update();
@@ -130,7 +131,8 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 
     dca_.DoDCA(osc1_out + osc2_out, osc1_out + osc2_out, &out_left, &out_right);
 
-    out = {.left = out_left * volume, .right = out_right * volume};
+    out = {.left = out_left * volume * settings_.amplitude,
+           .right = out_right * volume * settings_.amplitude};
     out = distortion_.Process(out);
     out = Effector(out);
   }
@@ -338,6 +340,11 @@ void DrumSynth::noteOff(midi_event ev) { eg_.NoteOff(); }
 void DrumSynth::noteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
+  settings_.amplitude = scaleybum(0, 127, 0, 1, velocity);
+
+  if (ev.dur != 240) {
+    settings_.eg_release_ms = ms_per_midi_tick_ * ev.dur;
+  }
 
   settings_.base_frequency = get_midi_freq(midinote);
   settings_.starting_frequency =
