@@ -46,15 +46,15 @@ struct DrumSettings {
   float osc1_amp{1};
   bool filter1_en{false};
   unsigned int filter1_type{6};
-  double filter1_fc;
-  double filter1_q;
+  double filter1_fc{10000};
+  double filter1_q{1};
 
   int osc2_wav{NOISE};
   float osc2_amp{0};
   bool filter2_en{true};
   unsigned int filter2_type{6};
-  double filter2_fc;
-  double filter2_q;
+  double filter2_fc{10000};
+  double filter2_q{1};
 
   // ENV //////////////////////////
   int eg_attack_ms{1};

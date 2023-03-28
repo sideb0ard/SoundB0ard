@@ -418,6 +418,7 @@ void DrumSynth::Load(std::string preset_name) {
   std::cout << "DRUMSYNTH -- loading preset '" << preset_name << "'"
             << std::endl;
 
+  std::cout << "WAIIIT A SEC?!\n\n";
   std::ifstream presetzzz;
   const std::string kSEP = "::";
   presetzzz.open(DRUM_SYNTH_PATCHES);
@@ -470,26 +471,24 @@ DrumSettings GetDrumSettings(std::string preset_name) {
   const std::string kSEP = "::";
   const std::string ktoken_SEP = ":";
   presetzzz.open(DRUM_SYNTH_PATCHES);
+  bool preset_found{false};
   for (std::string line; getline(presetzzz, line);) {
-    std::cout << "LINE:" << line << std::endl;
+    if (preset_found) return preset;
     size_t pos = 0;
     std::string token;
     while ((pos = line.find(kSEP)) != std::string::npos) {
       token = line.substr(0, pos);
-      bool preset_found{false};
       size_t token_pos = token.find(ktoken_SEP);
       auto key = token.substr(0, token_pos);
       auto val = token.substr(token_pos + ktoken_SEP.size(), std::string::npos);
 
-      std::cout << "KEY:" << key << " VAL:" << val << std::endl;
       if (key == "name" && val != preset_name) {
-        std::cout << "NOT THIS ONE, next.." << std::endl;
         break;
       }
+      preset_found = true;
 
       double dval = 0;
       if (key != "name") dval = std::stod(val);
-
       if (key == "name")
         preset.name = val;
       else if (key == "distortion_threshold")
@@ -548,9 +547,28 @@ DrumSettings GetDrumSettings(std::string preset_name) {
         preset.lfo_rate = dval;
 
       else if (key == "env_routes") {
-        std::cout << "ENV ROUTES:" << val;
+        if (val.size() == preset.modulations[ENVI].size()) {
+          for (int i = 0; i < val.size(); ++i) {
+            char c = val[i];
+            if (c == '1') {
+              preset.modulations[ENVI][i] = 1;
+            }
+          }
+        } else {
+          std::cerr << "WOW< YOU GOT BIG PROBLEMS BUDDY!\n";
+        }
+
       } else if (key == "lfo_routes") {
-        std::cout << "LFO ROUTES:" << val;
+        if (val.size() == preset.modulations[LFOI].size()) {
+          for (int i = 0; i < val.size(); ++i) {
+            char c = val[i];
+            if (c == '1') {
+              preset.modulations[LFOI][i] = 1;
+            }
+          }
+        } else {
+          std::cerr << "WOW< YOU GOT BIG LFOPROBLEMS BUDDY!\n";
+        }
       }
 
       std::cout << token << std::endl;
