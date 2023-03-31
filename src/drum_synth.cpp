@@ -71,42 +71,37 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 
     if (settings_.modulations[ENVI][FILTER1_FCD]) {
       filter1_->SetFcMod(eg_out * settings_.pitch_range);
-      filter1_->Update();
     }
     if (settings_.modulations[ENVI][FILTER1_QD]) {
       filter1_->m_q_control +=
           (eg_out * settings_.q_range) - settings_.q_range / 2;
-      filter1_->Update();
     }
     if (settings_.modulations[ENVI][FILTER2_FCD]) {
       filter2_->SetFcMod(eg_out * settings_.pitch_range);
-      filter2_->Update();
     }
     if (settings_.modulations[ENVI][FILTER2_QD]) {
       filter2_->m_q_control +=
           (eg_out * settings_.q_range) - settings_.q_range / 2;
-      filter2_->Update();
     }
 
     // note - if ENV and LFO are enabled, LFO mod will overwrite ENV
     if (settings_.modulations[LFOI][FILTER1_FCD]) {
       filter1_->SetFcMod(lfo_out * settings_.pitch_range);
-      filter1_->Update();
     }
     if (settings_.modulations[LFOI][FILTER1_QD]) {
       filter1_->m_q_control +=
           (lfo_out * settings_.q_range) - settings_.q_range / 2;
-      filter1_->Update();
     }
     if (settings_.modulations[LFOI][FILTER2_FCD]) {
       filter2_->SetFcMod(lfo_out * settings_.pitch_range);
-      filter2_->Update();
     }
     if (settings_.modulations[LFOI][FILTER2_QD]) {
       filter2_->m_q_control +=
           (lfo_out * settings_.q_range) - settings_.q_range / 2;
-      filter2_->Update();
     }
+
+    filter1_->Update();
+    filter2_->Update();
 
     osc1_->m_osc_fo =
         settings_.base_frequency + osc1_mod_val * settings_.frequency_diff;
@@ -352,19 +347,21 @@ void DrumSynth::noteOn(midi_event ev) {
   settings_.frequency_diff =
       settings_.starting_frequency - settings_.base_frequency;
 
-  osc1_->m_note_on = true;
-  osc1_->m_osc_fo = settings_.starting_frequency;
-  osc1_->Update();
-  osc1_->StartOscillator();
+  if (!osc1_->m_note_on) {
+    osc1_->m_note_on = true;
+    osc1_->m_osc_fo = settings_.starting_frequency;
+    osc1_->Update();
+    osc1_->StartOscillator();
 
-  osc2_->m_note_on = true;
-  osc2_->m_osc_fo = settings_.starting_frequency;
-  osc2_->Update();
-  osc2_->StartOscillator();
+    osc2_->m_note_on = true;
+    osc2_->m_osc_fo = settings_.starting_frequency;
+    osc2_->Update();
+    osc2_->StartOscillator();
 
-  lfo_.m_note_on = true;
-  lfo_.Update();
-  lfo_.StartOscillator();
+    lfo_.m_note_on = true;
+    lfo_.Update();
+    lfo_.StartOscillator();
+  }
 
   eg_.StartEg();
 }

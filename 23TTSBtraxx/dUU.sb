@@ -1,0 +1,42 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let t = 3040503;
+  }
+  run()
+  {
+    let rhm = bits( (t>>34)*(7<<t) / t ^ t*3);
+    ++t;
+    #print(rhm);
+
+    for (i = 0; i < 16; ++i) {
+      let r = 10 + i * 10;
+      let rat = 3 + i%4;
+      set dx:o1rat rat at=i*pp;
+      set bd:eg_release r at=i*pp;
+      if (rhm[i] == 1) {
+        note_on_at(bd, 34, i*pp);
+      } else {
+        note_on_at(dx, 34 , i*pp, dur = 180);
+      }
+    }
+  }
+}
+
+let ddblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (i % 4 == 0) {
+        note_on_at(bd, 53, i*pp);
+      }
+    }
+  }
+}
+

@@ -120,8 +120,9 @@ void MoogLadder::Reset() {
 }
 
 double MoogLadder::DoFilter(double xn) {
-  if (m_filter_type == BSF2 || m_filter_type == LPF1 || m_filter_type == HPF1)
+  if (m_filter_type == BSF2 || m_filter_type == LPF1 || m_filter_type == HPF1) {
     return xn;
+  }
 
   double sigma = m_LPF1.GetFeedbackOutput() + m_LPF2.GetFeedbackOutput() +
                  m_LPF3.GetFeedbackOutput() + m_LPF4.GetFeedbackOutput();
