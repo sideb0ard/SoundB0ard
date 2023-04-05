@@ -15,29 +15,29 @@
 #define FILTER_TYPE_DEFAULT LPF4
 
 struct Filter {
-  Filter();
+  Filter() = default;
   virtual ~Filter() = default;
 
   ModulationMatrix *modmatrix{nullptr};
   GlobalFilterParams *global_filter_params{nullptr};
 
   // sources
-  unsigned m_mod_source_fc;
-  unsigned m_mod_source_fc_control;
+  unsigned m_mod_source_fc{DEST_NONE};
+  unsigned m_mod_source_fc_control{DEST_NONE};
 
   // GUI controls
-  double m_fc_control;   // filter cut-off
-  double m_q_control;    // 'qualvity factor' 1-10
-  double m_aux_control;  // a spare control, used in SEM and ladder filters
+  double m_fc_control{FILTER_FC_DEFAULT};  // filter cut-off
+  double m_q_control{1};                   // 'qualvity factor' 1-10
+  double m_aux_control{0};  // a spare control, used in SEM and ladder filters
 
-  unsigned m_nlp;            // Non Linear Processing on/off switch
-  double m_saturation{100};  // used in NLP
+  unsigned m_nlp{0};       // Non Linear Processing on/off switch
+  double m_saturation{1};  // used in NLP
 
-  unsigned m_filter_type;
+  unsigned m_filter_type{0};
 
-  double m_fc;      // current filter cut-off val
-  double m_q;       // current q value
-  double m_fc_mod;  // frequency cutoff modulation input
+  double m_fc{FILTER_FC_DEFAULT};  // current filter cut-off val
+  double m_q{FILTER_Q_DEFAULT};    // current q value
+  double m_fc_mod{0};              // frequency cutoff modulation input
 
   virtual void SetFcMod(double d);
   virtual void SetQControl(double d);

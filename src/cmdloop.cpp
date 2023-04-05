@@ -46,8 +46,7 @@ int event_hook() {
               std::error_code ec;
               auto ftime = fs::last_write_time(func_path, ec);
               if (!ec) {
-                std::time_t cftime = decltype(ftime)::clock::to_time_t(ftime);
-                if (cftime > f.function_file_filepath_last_write_time) {
+                if (ftime > f.function_file_filepath_last_write_time) {
                   std::string contents =
                       ReadFileContents(f.function_file_filepath);
                   eval_command_queue.push(contents);
@@ -55,7 +54,7 @@ int event_hook() {
                   std::cout << "UPdatin' " << f.function_file_filepath
                             << std::endl;
 
-                  f.function_file_filepath_last_write_time = cftime;
+                  f.function_file_filepath_last_write_time = ftime;
                   rl_line_buffer[0] = '\0';
                   rl_done = 1;
                 }

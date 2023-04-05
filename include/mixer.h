@@ -13,6 +13,7 @@
 
 #include <ableton/Link.hpp>
 #include <array>
+#include <filesystem>
 #include <process.hpp>
 #include <string>
 #include <unordered_map>
@@ -32,7 +33,7 @@ struct PreviewBuffer {
 
 struct file_monitor {
   std::string function_file_filepath;
-  std::time_t function_file_filepath_last_write_time{0};
+  std::filesystem::file_time_type function_file_filepath_last_write_time;
 };
 
 struct DelayedMidiEvent {

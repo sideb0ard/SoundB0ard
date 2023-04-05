@@ -8,15 +8,15 @@ struct MoogLadder : public Filter {
   MoogLadder();
   ~MoogLadder() = default;
 
-  double m_k;
-  double m_gamma;
-  double m_alpha_0;
+  double m_k{0};
+  double m_gamma{0};
+  double m_alpha_0{0};
 
-  double m_a;
-  double m_b;
-  double m_c;
-  double m_d;
-  double m_e;
+  double m_a{0};
+  double m_b{0};
+  double m_c{0};
+  double m_d{0};
+  double m_e{0};
 
   OnePole m_LPF1;
   OnePole m_LPF2;
