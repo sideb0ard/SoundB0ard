@@ -25,18 +25,3 @@ let blah_gen = gen()
   }
 }
 
-let ddblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    for (i = 0; i < 16; ++i) {
-      if (i % 4 == 0) {
-        note_on_at(bd, 53, i*pp);
-      }
-    }
-  }
-}
-
