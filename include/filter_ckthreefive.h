@@ -5,17 +5,17 @@
 #include "filter_onepole.h"
 
 struct CKThreeFive : public Filter {
-  CKThreeFive();
+  CKThreeFive() = default;
   ~CKThreeFive() = default;
-  double m_k;
-  double m_alpha0;
+  double m_k{0.1};
+  double m_alpha0{0};
 
-  unsigned int m_filter_type;
+  unsigned int m_filter_type{LPF2};
 
-  OnePole m_LPF1;
-  OnePole m_LPF2;
-  OnePole m_HPF1;
-  OnePole m_HPF2;
+  OnePole m_LPF1{LPF1};
+  OnePole m_LPF2{LPF2};
+  OnePole m_HPF1{HPF1};
+  OnePole m_HPF2{HPF2};
 
   void Update() override;
   void SetQControl(double qcontrol) override;

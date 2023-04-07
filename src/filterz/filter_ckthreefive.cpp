@@ -8,21 +8,6 @@
 #include "filter.h"
 #include "filter_onepole.h"
 
-CKThreeFive::CKThreeFive() {
-  m_LPF1.m_filter_type = LPF1;
-  m_LPF2.m_filter_type = LPF2;
-
-  m_HPF1.m_filter_type = HPF1;
-  m_HPF2.m_filter_type = HPF2;
-
-  m_filter_type = LPF2;  // default
-
-  m_k = 0.1;
-  m_alpha0 = 0;
-
-  Reset();
-}
-
 void CKThreeFive::SetQControl(double qcontrol) {
   m_k = (2.0 - 0.01) * (qcontrol - 1.0) / (10.0 - 1.0) + 0.01;
 }

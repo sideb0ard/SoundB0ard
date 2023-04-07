@@ -1,6 +1,5 @@
 #include "filter.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <iostream>
@@ -19,6 +18,7 @@ void Filter::SetFcControl(double val) {
 }
 
 void Filter::SetFcMod(double val) { m_fc_mod = val; }
+
 void Filter::SetType(unsigned int type) {
   if (type < NUM_FILTER_TYPES) {
     m_filter_type = type;

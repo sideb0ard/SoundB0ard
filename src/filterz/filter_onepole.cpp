@@ -6,8 +6,6 @@
 
 #include "defjams.h"
 
-OnePole::OnePole() { m_filter_type = LPF1; }
-
 void OnePole::Update() {
   Filter::Update();
   double wd = 2.0 * M_PI * m_fc;

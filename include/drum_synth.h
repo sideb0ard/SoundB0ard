@@ -3,6 +3,7 @@
 #include <dca.h>
 #include <distortion.h>
 #include <envelope_generator.h>
+#include <filter_ckthreefive.h>
 #include <filter_moogladder.h>
 #include <lfo.h>
 #include <qblimited_oscillator.h>
@@ -98,10 +99,12 @@ class DrumSynth : public SoundGenerator {
   DrumSettings settings_;
 
   std::unique_ptr<QBLimitedOscillator> osc1_;
-  std::unique_ptr<MoogLadder> filter1_;
+  // std::unique_ptr<MoogLadder> filter1_;
+  std::unique_ptr<CKThreeFive> filter1_;
 
   std::unique_ptr<QBLimitedOscillator> osc2_;
-  std::unique_ptr<MoogLadder> filter2_;
+  // std::unique_ptr<MoogLadder> filter2_;
+  std::unique_ptr<CKThreeFive> filter2_;
 
   EnvelopeGenerator eg_;
   LFO lfo_;

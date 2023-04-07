@@ -27,8 +27,10 @@ DrumSynth::DrumSynth() {
 
   osc1_ = std::make_unique<QBLimitedOscillator>();
   osc2_ = std::make_unique<QBLimitedOscillator>();
-  filter1_ = std::make_unique<MoogLadder>();
-  filter2_ = std::make_unique<MoogLadder>();
+  // filter1_ = std::make_unique<MoogLadder>();
+  // filter2_ = std::make_unique<MoogLadder>();
+  filter1_ = std::make_unique<CKThreeFive>();
+  filter2_ = std::make_unique<CKThreeFive>();
 
   // default
   LoadSettings(DrumSettings());

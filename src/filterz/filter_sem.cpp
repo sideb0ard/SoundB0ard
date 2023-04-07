@@ -34,6 +34,7 @@ void FilterSem::Update() {
   double T = 1.0 / SAMPLE_RATE;
   double wa = (2 / T) * tan(wd * T / 2);
   double g = wa * T / 2;
+
   double R = 1.0 / (2.0 * m_q);
   m_alpha0 = 1.0 / (1.0 + 2.0 * R * g + g * g);
   m_alpha = g;

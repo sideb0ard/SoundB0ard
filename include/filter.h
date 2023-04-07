@@ -16,6 +16,7 @@
 
 struct Filter {
   Filter() = default;
+  Filter(unsigned int ftype) : m_filter_type{ftype} {};
   virtual ~Filter() = default;
 
   ModulationMatrix *modmatrix{nullptr};
@@ -30,10 +31,10 @@ struct Filter {
   double m_q_control{1};                   // 'qualvity factor' 1-10
   double m_aux_control{0};  // a spare control, used in SEM and ladder filters
 
-  unsigned m_nlp{0};       // Non Linear Processing on/off switch
-  double m_saturation{1};  // used in NLP
+  unsigned m_nlp{1};        // Non Linear Processing on/off switch
+  double m_saturation{10};  // used in NLP
 
-  unsigned m_filter_type{0};
+  unsigned m_filter_type{LPF1};
 
   double m_fc{FILTER_FC_DEFAULT};  // current filter cut-off val
   double m_q{FILTER_Q_DEFAULT};    // current q value
