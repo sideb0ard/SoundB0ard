@@ -343,9 +343,8 @@ void DrumSynth::noteOn(midi_event ev) {
     settings_.eg_release_ms = ms_per_midi_tick_ * ev.dur;
   }
 
-  settings_.base_frequency = get_midi_freq(midinote);
-  settings_.starting_frequency =
-      get_midi_freq(midinote + settings_.pitch_range);
+  settings_.base_frequency = Midi2Freq(midinote);
+  settings_.starting_frequency = Midi2Freq(midinote + settings_.pitch_range);
   settings_.frequency_diff =
       settings_.starting_frequency - settings_.base_frequency;
 

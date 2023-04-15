@@ -1,7 +1,9 @@
 #include "midi_freq_table.h"
 
+#include <iostream>
+
 // taken from http://www.willpirkle.com/synthbook/
-const float midi_freq_table[128] = {
+const float kMidiFreqTable[128] = {
     8.1757993698120117,     8.6619567871093750,     9.1770238876342773,
     9.7227182388305664,     10.3008613586425780,    10.9133825302124020,
     11.5623254776000980,    12.2498569488525390,    12.9782714843750000,
@@ -46,7 +48,31 @@ const float midi_freq_table[128] = {
     9956.0634765625000000,  10548.0820312500000000, 11175.3037109375000000,
     11839.8212890625000000, 12543.8535156250000000};
 
-float get_midi_freq(int midinum) {
+float Midi2Freq(int midinum) {
   if (midinum < 0 || midinum > 127) midinum = 0;
-  return midi_freq_table[midinum];
+  return kMidiFreqTable[midinum];
+}
+
+int Freq2Midi(float freq) {
+  if (freq < kMidiFreqTable[0] || freq > kMidiFreqTable[127]) return 0;
+  if (kMidiFreqTable[0] == freq) return 0;
+  if (kMidiFreqTable[127] == freq) return 127;
+
+  int start_idx = 0;
+  int end_idx = 127;
+  int closest_idx = 0;
+  while ((end_idx - start_idx) > 1) {
+    closest_idx = start_idx + (end_idx - start_idx);
+    if (kMidiFreqTable[closest_idx] == freq) return closest_idx;
+
+    if (kMidiFreqTable[closest_idx] < freq)
+      start_idx = closest_idx;
+    else
+      end_idx = closest_idx;
+  }
+
+  std::cout << "STart IDX:" << start_idx << " END IDX:" << end_idx
+            << " CLOSEST:" << closest_idx << std::endl;
+
+  return closest_idx;
 }

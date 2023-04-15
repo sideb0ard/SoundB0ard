@@ -410,9 +410,8 @@ void MiniSynth::noteOn(midi_event ev) {
 
   if (m_settings.m_monophonic) {
     auto msv = voices_[0];
-    msv->NoteOn(midinote, velocity, get_midi_freq(midinote),
-                m_last_note_frequency);
-    m_last_note_frequency = get_midi_freq(midinote);
+    msv->NoteOn(midinote, velocity, Midi2Freq(midinote), m_last_note_frequency);
+    m_last_note_frequency = Midi2Freq(midinote);
     return;
   }
 
@@ -421,10 +420,9 @@ void MiniSynth::noteOn(midi_event ev) {
   for (auto v : voices_) {
     if (!v->m_note_on) {
       IncrementVoiceTimestamps();
-      v->NoteOn(midinote, velocity, get_midi_freq(midinote),
-                m_last_note_frequency);
+      v->NoteOn(midinote, velocity, Midi2Freq(midinote), m_last_note_frequency);
 
-      m_last_note_frequency = get_midi_freq(midinote);
+      m_last_note_frequency = Midi2Freq(midinote);
       steal_note = false;
       break;
     }
@@ -435,10 +433,10 @@ void MiniSynth::noteOn(midi_event ev) {
     auto msv = GetOldestVoice();
     if (msv) {
       IncrementVoiceTimestamps();
-      msv->NoteOn(midinote, velocity, get_midi_freq(midinote),
+      msv->NoteOn(midinote, velocity, Midi2Freq(midinote),
                   m_last_note_frequency);
     }
-    m_last_note_frequency = get_midi_freq(midinote);
+    m_last_note_frequency = Midi2Freq(midinote);
   }
 }
 

@@ -161,7 +161,7 @@ void ModulationMatrix::DoModMatrix(unsigned layer) {
         src = midi_to_bipolar(src);
         break;
       case TRANSFORM_NOTE_NUMBER_TO_FREQUENCY:
-        src = get_midi_freq(src);
+        src = Midi2Freq(src);
         break;
       case TRANSFORM_MIDI_NORMALIZE:
         src /= 127.0;
@@ -265,8 +265,8 @@ void ModulationMatrix::DoModMatrix(unsigned layer) {
   }
 }
 
-std::vector<std::shared_ptr<ModMatrixRow>>
-    &ModulationMatrix::GetModMatrixCore() {
+std::vector<std::shared_ptr<ModMatrixRow>> &
+ModulationMatrix::GetModMatrixCore() {
   return matrix_core;
 }
 

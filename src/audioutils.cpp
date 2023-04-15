@@ -360,8 +360,8 @@ bool IsNote(std::string input) {
   return false;
 }
 
-std::vector<int> TuneMelodyToKey(const std::vector<int> &melody_in,
-                                 int root_midi, int scale) {
+std::vector<int> ScaleMelodyToKey(const std::vector<int> &melody_in,
+                                  int root_midi, int scale) {
   std::vector<int> melody_out{};
   int base_midi = root_midi % 12;
   for (const auto &n : melody_in) {

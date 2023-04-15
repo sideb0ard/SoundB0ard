@@ -5,27 +5,43 @@ let bsslah_gen = gen()
 {
   setup()
   {
-    let bline = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0];
+    #let bline = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0];
+    let t = 43433;
+
+    let num = 3;
+
   }
   run()
   {
 
+    let p = bits( (3 << t) ^ ( 4 << t) / t * 7);
+    ++t;
+
+    # FRUMk
     if (count % 8 < 7) {
       for (i = 0; i < 16; ++i) {
-        if (bline[i] == 1) {
-          note_on_at(bd, 13, i * pp);
+        if (p[i] == 1) {
+          note_on_at(bd, 33, i * pp);
         }
       }
     }
-    if (count % 2 < 1) {
+    # frond
+    if (count % 11 < 7) {
       for (i = 0; i < 16; ++i) {
-        if (bline[i] == 1) {
-          note_on_at(mo, 13, i * pp, dur = drx);
+        if (p[i] == 0) {
+          note_on_at(dx, 33, i * pp);
         }
       }
     }
   }
 }
+
+# p3 < osc 8 "50 120"  "set bd:eg_release %"
+# p4 < osc 5 "1 25"  "set bd:eg_attack %"
+# p5 < osc 6 "0.5 17"  "set bd:lforate %"
+
+# p4 < osc 7 "43 99"  "set dx:op2out %"
+# p5 < osc 17 "43 99"  "set dx:op3out %"
 
 let pcp = sample(cp/procClap.aiff);
 # spurbp // scarlet // SCUFX ?
@@ -84,9 +100,6 @@ let hhblah_gen = gen()
 
 # p1 $ "bsslah_gen"
 # p2 $ "dxblah_gen"
-# p3 < osc 8 "50 120"  "set bd:eg_release %"
-# p4 < osc 7 "43 99"  "set dx:op2out %"
-# p5 < osc 17 "43 99"  "set dx:op3out %"
 # p6 $ "hhblah_gen"
 # p7 < osc 8 " 20 100"  "set hh:eg_release %"
 # p8 < osc 5 "0. 0.1"  "vol cl %"

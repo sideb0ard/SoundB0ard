@@ -154,11 +154,11 @@ void SBSynth::noteOn(midi_event ev) {
   unsigned int velocity = ev.data2;
 
   m_car_osc.m_note_on = true;
-  m_car_osc.m_osc_fo = get_midi_freq(midinote);
+  m_car_osc.m_osc_fo = Midi2Freq(midinote);
   m_car_osc.StartOscillator();
 
   m_mod_osc.m_note_on = true;
-  m_mod_osc.m_osc_fo = get_midi_freq(midinote) * cm_ratio;
+  m_mod_osc.m_osc_fo = Midi2Freq(midinote) * cm_ratio;
   m_mod_osc.StartOscillator();
 
   m_eg1.StartEg();

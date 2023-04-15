@@ -1966,7 +1966,45 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            return evaluator::NULLL;
          })},
-    {"tune_melody",
+    {"scale_note",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+
+           if (args_size >= 2) {
+             auto note_to_tune =
+                 std::dynamic_pointer_cast<object::Number>(args[0]);
+
+             if (note_to_tune) {
+               auto root_num_obj =
+                   std::dynamic_pointer_cast<object::Number>(args[1]);
+               if (root_num_obj) {
+                 int scale_type = 0;  // MAJOR
+                 if (args_size == 3) {
+                   auto scale_type_obj =
+                       std::dynamic_pointer_cast<object::Number>(args[2]);
+
+                   if (scale_type_obj) {
+                     scale_type = scale_type_obj->value_;
+                   }
+                 }
+
+                 std::vector<int> notez =
+                     ScaleMelodyToKey({static_cast<int>(note_to_tune->value_)},
+                                      root_num_obj->value_, scale_type);
+
+                 if (notez.size() > 0) {
+                   auto return_number =
+                       std::make_shared<object::Number>(notez[0]);
+                   return return_number;
+                 }
+               }
+             }
+           }
+           return evaluator::NULLL;
+         })},
+    {"scale_melody",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
@@ -1999,7 +2037,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    }
                  }
 
-                 std::vector<int> notez = TuneMelodyToKey(
+                 std::vector<int> notez = ScaleMelodyToKey(
                      orig_notes, root_num_obj->value_, scale_type);
 
                  auto return_tuned_array = std::make_shared<object::Array>(
@@ -2460,6 +2498,57 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        }
                        return evaluator::NULLL;
                      })},
+    {"midi2note",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           auto midi_val = std::dynamic_pointer_cast<object::Number>(args[0]);
+           if (midi_val) {
+             std::string note_string = GetNoteFromMidiNum(midi_val->value_);
+             std::cout << "GOT MIDI VAL:" << midi_val->value_ << " "
+                       << note_string << std::endl;
+             auto note_return = std::make_shared<object::String>(note_string);
+           }
+           return evaluator::NULLL;
+         })},
+    {"midi2freq",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 2) {
+             auto id = std::dynamic_pointer_cast<object::Number>(args[0]);
+             auto param = std::dynamic_pointer_cast<object::String>(args[1]);
+             if (id && param) {
+               std::cout << "GOT ID AND PARAM:" << id->value_ << " "
+                         << param->value_ << std::endl;
+               SendMidiMapping(id->value_, param->value_);
+             }
+           } else {
+             std::cout << "DUMP MIXER MAP\n";
+             SendMidiMappingShow();
+           }
+           return evaluator::NULLL;
+         })},
+    {"freq2midi",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 2) {
+             auto id = std::dynamic_pointer_cast<object::Number>(args[0]);
+             auto param = std::dynamic_pointer_cast<object::String>(args[1]);
+             if (id && param) {
+               std::cout << "GOT ID AND PARAM:" << id->value_ << " "
+                         << param->value_ << std::endl;
+               SendMidiMapping(id->value_, param->value_);
+             }
+           } else {
+             std::cout << "DUMP MIXER MAP\n";
+             SendMidiMappingShow();
+           }
+           return evaluator::NULLL;
+         })},
     {"signal_from", std::make_shared<object::BuiltIn>(
                         [](std::vector<std::shared_ptr<object::Object>> args)
                             -> std::shared_ptr<object::Object> {

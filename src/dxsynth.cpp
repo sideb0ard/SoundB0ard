@@ -243,10 +243,9 @@ void DXSynth::noteOn(midi_event ev) {
   for (auto v : voices_) {
     if (!v->m_note_on) {
       IncrementVoiceTimestamps();
-      v->NoteOn(ev.data1, ev.data2, get_midi_freq(ev.data1),
-                m_last_note_frequency);
+      v->NoteOn(ev.data1, ev.data2, Midi2Freq(ev.data1), m_last_note_frequency);
 
-      m_last_note_frequency = get_midi_freq(ev.data1);
+      m_last_note_frequency = Midi2Freq(ev.data1);
       steal_note = false;
       break;
     }
@@ -255,10 +254,9 @@ void DXSynth::noteOn(midi_event ev) {
     auto v = GetOldestVoice();
     if (v) {
       IncrementVoiceTimestamps();
-      v->NoteOn(ev.data1, ev.data2, get_midi_freq(ev.data1),
-                m_last_note_frequency);
+      v->NoteOn(ev.data1, ev.data2, Midi2Freq(ev.data1), m_last_note_frequency);
     }
-    m_last_note_frequency = get_midi_freq(ev.data1);
+    m_last_note_frequency = Midi2Freq(ev.data1);
   }
 }
 

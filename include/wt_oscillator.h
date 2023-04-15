@@ -3,8 +3,8 @@
 
 #include "oscillator.h"
 
-constexpr unsigned kWavetableLength = 1024;
-constexpr unsigned kNumTables = 9;
+constexpr int kWavetableLength = 1024;
+constexpr int kNumTables = 9;
 
 struct WTOscillator : public Oscillator {
   WTOscillator();
