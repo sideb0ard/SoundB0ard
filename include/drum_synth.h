@@ -50,6 +50,7 @@ struct DrumSettings {
   unsigned int filter1_type{6};
   double filter1_fc{10000};
   double filter1_q{1};
+  float osc1_ratio{1};
 
   int osc2_wav{NOISE};
   float osc2_amp{0};
@@ -57,6 +58,7 @@ struct DrumSettings {
   unsigned int filter2_type{6};
   double filter2_fc{10000};
   double filter2_q{1};
+  float osc2_ratio{1};
 
   // ENV //////////////////////////
   int eg_attack_ms{1};
@@ -88,28 +90,32 @@ class DrumSynth : public SoundGenerator {
   StereoVal GenNext(mixer_timing_info tinfo) override;
   void start() override;
   void stop() override;
+  void randomize() override;
   void noteOn(midi_event ev) override;
   void noteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
   void LoadSettings(DrumSettings settings);
+  void PrintSettings(DrumSettings settings);
   void Load(std::string name) override;
   void Save(std::string name) override;
   void ListPresets() override;
+  void Update();
 
   DrumSettings settings_;
 
   std::unique_ptr<QBLimitedOscillator> osc1_;
-  // std::unique_ptr<MoogLadder> filter1_;
-  std::unique_ptr<CKThreeFive> filter1_;
+  std::unique_ptr<MoogLadder> filter1_;
+  // std::unique_ptr<CKThreeFive> filter1_;
 
   std::unique_ptr<QBLimitedOscillator> osc2_;
-  // std::unique_ptr<MoogLadder> filter2_;
-  std::unique_ptr<CKThreeFive> filter2_;
+  std::unique_ptr<MoogLadder> filter2_;
+  // std::unique_ptr<CKThreeFive> filter2_;
 
   EnvelopeGenerator eg_;
   LFO lfo_;
 
   Distortion distortion_;
+  std::unique_ptr<MoogLadder> combo_filter_;
 
   DCA dca_;
 

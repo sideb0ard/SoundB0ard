@@ -91,9 +91,9 @@ double QBLimitedOscillator::DoSawtooth(double modulo, double inc) {
   double trivial_saw = 0.0;
   double out = 0.0;
 
-  if (m_waveform == SAW1)
+  if (m_waveform == SAW1) {
     trivial_saw = unipolar_to_bipolar(modulo);
-  else if (m_waveform == SAW2)
+  } else if (m_waveform == SAW2)
     trivial_saw = 2.0 * (tanh(1.5 * modulo) / tanh(1.5)) - 1.0;
   else if (m_waveform == SAW3) {
     trivial_saw = unipolar_to_bipolar(modulo);

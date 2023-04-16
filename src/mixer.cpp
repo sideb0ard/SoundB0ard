@@ -796,6 +796,7 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
           action.args[0], action.preset_name, action.preset);
     }
   } else if (action.type == AudioAction::RAND) {
+    std::cout << "MIXER GOT RAND CALL\n";
     sound_generators_[action.mixer_soundgen_idx]->randomize();
   } else if (action.type == AudioAction::PREVIEW) {
     PreviewAudio(action);

@@ -14,11 +14,13 @@
 #define FILTER_Q_MOD_RANGE 10    // dunno if this will work!
 #define FILTER_TYPE_DEFAULT LPF4
 
-struct Filter {
+class Filter {
+ public:
   Filter() = default;
   Filter(unsigned int ftype) : m_filter_type{ftype} {};
   virtual ~Filter() = default;
 
+ public:
   ModulationMatrix *modmatrix{nullptr};
   GlobalFilterParams *global_filter_params{nullptr};
 
