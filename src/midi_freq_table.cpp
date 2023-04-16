@@ -48,31 +48,29 @@ const float kMidiFreqTable[128] = {
     9956.0634765625000000,  10548.0820312500000000, 11175.3037109375000000,
     11839.8212890625000000, 12543.8535156250000000};
 
-float Midi2Freq(int midinum) {
-  if (midinum < 0 || midinum > 127) midinum = 0;
+float Midi2Freq(const int midinum) {
+  if (midinum < 0 || midinum > 127) return 0;
   return kMidiFreqTable[midinum];
 }
 
-int Freq2Midi(float freq) {
+int Freq2Midi(const float freq) {
   if (freq < kMidiFreqTable[0] || freq > kMidiFreqTable[127]) return 0;
   if (kMidiFreqTable[0] == freq) return 0;
   if (kMidiFreqTable[127] == freq) return 127;
 
   int start_idx = 0;
   int end_idx = 127;
-  int closest_idx = 0;
-  while ((end_idx - start_idx) > 1) {
-    closest_idx = start_idx + (end_idx - start_idx);
-    if (kMidiFreqTable[closest_idx] == freq) return closest_idx;
+  int mid_idx = 0;
 
-    if (kMidiFreqTable[closest_idx] < freq)
-      start_idx = closest_idx;
+  while ((end_idx - start_idx) > 1) {
+    mid_idx = start_idx + ((end_idx - start_idx) / 2);
+    if (kMidiFreqTable[mid_idx] == freq) return mid_idx;
+
+    if (kMidiFreqTable[mid_idx] < freq)
+      start_idx = mid_idx;
     else
-      end_idx = closest_idx;
+      end_idx = mid_idx;
   }
 
-  std::cout << "STart IDX:" << start_idx << " END IDX:" << end_idx
-            << " CLOSEST:" << closest_idx << std::endl;
-
-  return closest_idx;
+  return mid_idx;
 }

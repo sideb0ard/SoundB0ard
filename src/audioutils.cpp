@@ -132,29 +132,29 @@ std::string GetNoteFromMidiNum(int midi_num) {
   int base_midi_num = midi_num % 12;
   switch (base_midi_num) {
     case (0):
-      return "c";
+      return "C";
     case (1):
-      return "c#";
+      return "C#";
     case (2):
-      return "d";
+      return "D";
     case (3):
-      return "d#";
+      return "D#";
     case (4):
-      return "e";
+      return "E";
     case (5):
-      return "f";
+      return "F";
     case (6):
-      return "f#";
+      return "F#";
     case (7):
-      return "g";
+      return "G";
     case (8):
-      return "g#";
+      return "G#";
     case (9):
-      return "a";
+      return "A";
     case (10):
-      return "a#";
+      return "A#";
     case (11):
-      return "b";
+      return "B";
     default:
       return "error";
   }

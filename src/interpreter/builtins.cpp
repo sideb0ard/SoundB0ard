@@ -20,6 +20,7 @@
 
 #include "PerlinNoise.hpp"
 #include "midi_device.h"
+#include "midi_freq_table.h"
 
 namespace fs = std::filesystem;
 
@@ -2502,12 +2503,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
-           auto midi_val = std::dynamic_pointer_cast<object::Number>(args[0]);
-           if (midi_val) {
-             std::string note_string = GetNoteFromMidiNum(midi_val->value_);
-             std::cout << "GOT MIDI VAL:" << midi_val->value_ << " "
-                       << note_string << std::endl;
-             auto note_return = std::make_shared<object::String>(note_string);
+           if (args.size() == 1) {
+             auto midi_val = std::dynamic_pointer_cast<object::Number>(args[0]);
+             if (midi_val) {
+               std::string note_string = GetNoteFromMidiNum(midi_val->value_);
+               return std::make_shared<object::String>(note_string);
+             }
            }
            return evaluator::NULLL;
          })},
@@ -2515,40 +2516,28 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
-           int args_size = args.size();
-           if (args_size == 2) {
-             auto id = std::dynamic_pointer_cast<object::Number>(args[0]);
-             auto param = std::dynamic_pointer_cast<object::String>(args[1]);
-             if (id && param) {
-               std::cout << "GOT ID AND PARAM:" << id->value_ << " "
-                         << param->value_ << std::endl;
-               SendMidiMapping(id->value_, param->value_);
+           if (args.size() == 1) {
+             auto midi_val = std::dynamic_pointer_cast<object::Number>(args[0]);
+             if (midi_val) {
+               float freq = Midi2Freq(midi_val->value_);
+               return std::make_shared<object::Number>(freq);
              }
-           } else {
-             std::cout << "DUMP MIXER MAP\n";
-             SendMidiMappingShow();
            }
            return evaluator::NULLL;
          })},
-    {"freq2midi",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
-           int args_size = args.size();
-           if (args_size == 2) {
-             auto id = std::dynamic_pointer_cast<object::Number>(args[0]);
-             auto param = std::dynamic_pointer_cast<object::String>(args[1]);
-             if (id && param) {
-               std::cout << "GOT ID AND PARAM:" << id->value_ << " "
-                         << param->value_ << std::endl;
-               SendMidiMapping(id->value_, param->value_);
-             }
-           } else {
-             std::cout << "DUMP MIXER MAP\n";
-             SendMidiMappingShow();
-           }
-           return evaluator::NULLL;
-         })},
+    {"freq2midi", std::make_shared<object::BuiltIn>(
+                      [](std::vector<std::shared_ptr<object::Object>> args)
+                          -> std::shared_ptr<object::Object> {
+                        if (args.size() == 1) {
+                          auto freq = std::dynamic_pointer_cast<object::Number>(
+                              args[0]);
+                          if (freq) {
+                            int midi = Freq2Midi(freq->value_);
+                            return std::make_shared<object::Number>(midi);
+                          }
+                        }
+                        return evaluator::NULLL;
+                      })},
     {"signal_from", std::make_shared<object::BuiltIn>(
                         [](std::vector<std::shared_ptr<object::Object>> args)
                             -> std::shared_ptr<object::Object> {
