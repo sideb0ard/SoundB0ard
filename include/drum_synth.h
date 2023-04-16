@@ -38,11 +38,6 @@ struct DrumSettings {
   double pitch_range{30};
   double q_range{3};
 
-  // used for pitch modulation
-  double starting_frequency{0};
-  double base_frequency{0};
-  double frequency_diff{0};
-
   // OSCILLATORS
   int osc1_wav{SINE};
   float osc1_amp{1};
@@ -102,6 +97,11 @@ class DrumSynth : public SoundGenerator {
   void Update();
 
   DrumSettings settings_;
+
+  // used for pitch modulation
+  double starting_frequency_{0};
+  double base_frequency_{0};
+  double frequency_diff_{0};
 
   std::unique_ptr<QBLimitedOscillator> osc1_;
   std::unique_ptr<MoogLadder> filter1_;

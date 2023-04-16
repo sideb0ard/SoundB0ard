@@ -105,16 +105,16 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     filter1_->Update();
     filter2_->Update();
 
-    osc1_->m_osc_fo = settings_.base_frequency * settings_.osc1_ratio +
-                      osc1_mod_val * settings_.frequency_diff;
+    osc1_->m_osc_fo =
+        base_frequency_ * settings_.osc1_ratio + osc1_mod_val * frequency_diff_;
     osc1_->Update();
     double osc1_out = osc1_->DoOscillate(nullptr) * settings_.osc1_amp;
     if (settings_.filter1_en) {
       osc1_out = filter1_->DoFilter(osc1_out);
     }
 
-    osc2_->m_osc_fo = settings_.base_frequency * settings_.osc1_ratio +
-                      osc2_mod_val * settings_.frequency_diff;
+    osc2_->m_osc_fo =
+        base_frequency_ * settings_.osc1_ratio + osc2_mod_val * frequency_diff_;
     osc2_->Update();
     double osc2_out = osc2_->DoOscillate(nullptr) * settings_.osc2_amp;
     if (settings_.filter2_en) {
@@ -346,16 +346,15 @@ void DrumSynth::noteOn(midi_event ev) {
     settings_.eg_release_ms = ms_per_midi_tick_ * ev.dur;
   }
 
-  settings_.base_frequency = Midi2Freq(midinote);
-  settings_.starting_frequency = Midi2Freq(midinote + settings_.pitch_range);
-  settings_.frequency_diff =
-      settings_.starting_frequency - settings_.base_frequency;
+  base_frequency_ = Midi2Freq(midinote);
+  starting_frequency_ = Midi2Freq(midinote + settings_.pitch_range);
+  frequency_diff_ = starting_frequency_ - base_frequency_;
 
   if (!osc1_->m_note_on) {
-    osc1_->m_osc_fo = settings_.starting_frequency;
+    osc1_->m_osc_fo = starting_frequency_;
     osc1_->StartOscillator();
 
-    osc2_->m_osc_fo = settings_.starting_frequency;
+    osc2_->m_osc_fo = starting_frequency_;
     osc2_->StartOscillator();
 
     lfo_.StartOscillator();
@@ -382,9 +381,6 @@ void DrumSynth::Save(std::string new_preset_name) {
             << kSEP;
   presetzzz << "pitch_range:" << settings_.pitch_range << kSEP;
   presetzzz << "q_range:" << settings_.q_range << kSEP;
-  presetzzz << "starting_frequency:" << settings_.starting_frequency << kSEP;
-  presetzzz << "base_frequency:" << settings_.base_frequency << kSEP;
-  presetzzz << "frequency_diff:" << settings_.frequency_diff << kSEP;
   presetzzz << "osc1_wav:" << settings_.osc1_wav << kSEP;
   presetzzz << "osc1_amp:" << settings_.osc1_amp << kSEP;
   presetzzz << "osc1_ratio:" << settings_.osc1_ratio << kSEP;
@@ -441,7 +437,6 @@ void DrumSynth::Update() {
 }
 
 void DrumSynth::LoadSettings(DrumSettings settings) {
-  std::cout << "NEW SEETINGS for " << settings.name << std::endl;
   settings_ = settings;
 
   distortion_.SetParam("threshold", settings_.distortion_threshold);
@@ -449,30 +444,22 @@ void DrumSynth::LoadSettings(DrumSettings settings) {
   osc1_->m_waveform = settings_.osc1_wav;
   osc2_->m_waveform = settings_.osc2_wav;
 
-  std::cout << "SET FC1" << std::endl;
   filter1_->SetFcControl(settings_.filter1_fc);
-  std::cout << "SET Q1" << std::endl;
   filter1_->SetQControl(settings_.filter1_q);
 
-  std::cout << "SET FC2" << std::endl;
   filter2_->SetFcControl(settings_.filter2_fc);
-  std::cout << "SET Q2" << std::endl;
   filter2_->SetQControl(settings_.filter2_q);
 
-  std::cout << "SET ATTACK" << std::endl;
   eg_.SetAttackTimeMsec(settings_.eg_attack_ms);
-  std::cout << "SET DECAY" << std::endl;
   eg_.SetDecayTimeMsec(settings_.eg_decay_ms);
-  std::cout << "SET SUS" << std::endl;
   eg_.SetSustainLevel(settings_.eg_sustain_level);
-  std::cout << "SET RELEASER" << std::endl;
   eg_.SetReleaseTimeMsec(settings_.eg_release_ms);
-  std::cout << "SET RAMP" << std::endl;
   eg_.SetRampMode(settings_.eg_ramp_mode);
 
   lfo_.m_waveform = settings_.lfo_wave;
   lfo_.m_lfo_mode = settings_.lfo_mode;
   lfo_.m_fo = settings_.lfo_rate;
+
   Update();
 }
 
@@ -491,14 +478,10 @@ void DrumSynth::PrintSettings(DrumSettings settingz) {
   std::cout << "AAIIGht, settings for" << settingz.name << std::endl;
 
   std::cout << "dist:" << settingz.distortion_threshold << std::endl;
-  std::cout << "" << settingz.amplitude << std::endl;
+  std::cout << "amp:" << settingz.amplitude << std::endl;
 
   std::cout << "pitch range:" << settingz.pitch_range << std::endl;
   std::cout << "q range" << settingz.q_range << std::endl;
-
-  std::cout << "start freq" << settingz.starting_frequency << std::endl;
-  std::cout << "base_freq" << settingz.base_frequency << std::endl;
-  std::cout << "freq diff" << settingz.frequency_diff << std::endl;
 
   std::cout << "osc1wave:" << settingz.osc1_wav << std::endl;
   std::cout << "osc1amp:" << settingz.osc1_amp << std::endl;
@@ -529,21 +512,14 @@ void DrumSynth::PrintSettings(DrumSettings settingz) {
 }
 
 void DrumSynth::randomize() {
-  std::cout << "WOOOOOF!\n";
   DrumSettings rand_settings;
-  rand_settings.name = "WOOF";
+  rand_settings.name = "RANDWOOF";
 
   rand_settings.distortion_threshold = 0.7;
   rand_settings.amplitude = 1;
 
   rand_settings.pitch_range = rand() % 30 + 10;
-  std::cout << "PITCH:" << rand_settings.pitch_range << std::endl;
   rand_settings.q_range = rand() % 7 + 1;
-  std::cout << "Q_RANGE:" << rand_settings.q_range << std::endl;
-
-  rand_settings.starting_frequency = 0;
-  rand_settings.base_frequency = 0;
-  rand_settings.frequency_diff = 0;
 
   rand_settings.osc1_wav = rand() % MAX_OSC;
   rand_settings.osc1_amp = (float)rand() / RAND_MAX;
@@ -608,12 +584,6 @@ DrumSettings GetDrumSettings(std::string preset_name) {
         preset.pitch_range = dval;
       else if (key == "q_range")
         preset.q_range = dval;
-      else if (key == "starting_frequency")
-        preset.starting_frequency = dval;
-      else if (key == "base_frequency")
-        preset.base_frequency = dval;
-      else if (key == "frequency_diff")
-        preset.frequency_diff = dval;
       else if (key == "osc1_wav")
         preset.osc1_wav = dval;
       else if (key == "osc1_amp")
