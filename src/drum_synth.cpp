@@ -110,7 +110,8 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     osc1_->Update();
     double osc1_out = osc1_->DoOscillate(nullptr) * settings_.osc1_amp;
     if (settings_.filter1_en) {
-      osc1_out = filter1_->DoFilter(osc1_out);
+      double filter1_out = filter1_->DoFilter(osc1_out);
+      osc1_out = filter1_out;
     }
 
     osc2_->m_osc_fo =
@@ -118,7 +119,8 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     osc2_->Update();
     double osc2_out = osc2_->DoOscillate(nullptr) * settings_.osc2_amp;
     if (settings_.filter2_en) {
-      osc2_out = filter2_->DoFilter(osc2_out);
+      double filter2_out = filter2_->DoFilter(osc2_out);
+      osc2_out = filter2_out;
     }
 
     //////////////////////////////
@@ -342,9 +344,9 @@ void DrumSynth::noteOn(midi_event ev) {
   unsigned int velocity = ev.data2;
   settings_.amplitude = scaleybum(0, 127, 0, 1, velocity);
 
-  if (ev.dur != 240) {
-    settings_.eg_release_ms = ms_per_midi_tick_ * ev.dur;
-  }
+  // if (ev.dur != 240) {
+  //   settings_.eg_release_ms = ms_per_midi_tick_ * ev.dur;
+  // }
 
   base_frequency_ = Midi2Freq(midinote);
   starting_frequency_ = Midi2Freq(midinote + settings_.pitch_range);
@@ -387,7 +389,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "filter1_en:" << settings_.filter1_en << kSEP;
   presetzzz << "filter1_type:" << settings_.filter1_type << kSEP;
   presetzzz << "filter1_fc:" << settings_.filter1_fc << kSEP;
-  presetzzz << "filter1_fq:" << settings_.filter1_q << kSEP;
+  presetzzz << "filter1_q:" << settings_.filter1_q << kSEP;
   presetzzz << "osc2_wav:" << settings_.osc2_wav << kSEP;
   presetzzz << "osc2_amp:" << settings_.osc2_amp << kSEP;
   presetzzz << "osc2_ratio:" << settings_.osc2_ratio << kSEP;
@@ -397,7 +399,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "filter2_q:" << settings_.filter2_q << kSEP;
   presetzzz << "eg_attack_ms:" << settings_.eg_attack_ms << kSEP;
   presetzzz << "eg_decay_ms:" << settings_.eg_decay_ms << kSEP;
-  presetzzz << "eg_susytain_level:" << settings_.eg_sustain_level << kSEP;
+  presetzzz << "eg_sustain_level:" << settings_.eg_sustain_level << kSEP;
   presetzzz << "eg_release_ms:" << settings_.eg_release_ms << kSEP;
   presetzzz << "eg_hold_time_ms:" << settings_.eg_hold_time_ms << kSEP;
   presetzzz << "eg_ramp_mode:" << settings_.eg_ramp_mode << kSEP;

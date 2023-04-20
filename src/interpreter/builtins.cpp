@@ -535,13 +535,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                   })},
-    {"takeN",
+    {"take_n",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
              -> std::shared_ptr<object::Object> {
            if (input.size() != 2)
              return evaluator::NewError(
-                 "`takeN` requires two args - an array "
+                 "`take_n` requires two args - an array "
                  "plus a number of values to return.");
 
            auto number = std::dynamic_pointer_cast<object::Number>(input[1]);
@@ -561,6 +561,70 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
 
              return return_array;
+           }
+
+           return evaluator::NULLL;
+         })},
+    {"take_random_n",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() != 2)
+             return evaluator::NewError(
+                 "`take_random_n` requires two args - an array "
+                 "plus a number of values to return.");
+
+           auto number = std::dynamic_pointer_cast<object::Number>(input[1]);
+
+           std::shared_ptr<object::Array> array_obj =
+               std::dynamic_pointer_cast<object::Array>(input[0]);
+           if (array_obj && number) {
+             auto num_to_take =
+                 std::min(static_cast<unsigned long>(number->value_),
+                          array_obj->elements_.size());
+
+             auto return_array = std::make_shared<object::Array>(
+                 std::vector<std::shared_ptr<object::Object>>());
+
+             int num_taken = 0;
+             while (num_taken < num_to_take) {
+               auto idx = rand() % array_obj->elements_.size();
+               auto it = find(return_array->elements_.begin(),
+                              return_array->elements_.end(),
+                              array_obj->elements_[idx]);
+               if (it != return_array->elements_.end()) {
+                 continue;
+               }
+               return_array->elements_.push_back(array_obj->elements_[idx]);
+               ++num_taken;
+             }
+
+             return return_array;
+           }
+
+           return evaluator::NULLL;
+         })},
+    {"is_in",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() != 2)
+             return evaluator::NewError(
+                 "`is_in` requires two args - an array "
+                 "plus an item to find. It will return a boolean to answer if "
+                 "item is in array.");
+
+           auto item = input[1];
+
+           std::shared_ptr<object::Array> array_obj =
+               std::dynamic_pointer_cast<object::Array>(input[0]);
+
+           if (item && array_obj) {
+             for (const auto &e : array_obj->elements_) {
+               if (item->Inspect() == e->Inspect())
+                 return std::make_shared<object::Boolean>(true);
+             }
+             return std::make_shared<object::Boolean>(false);
            }
 
            return evaluator::NULLL;

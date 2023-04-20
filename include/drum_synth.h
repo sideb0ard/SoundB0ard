@@ -36,31 +36,31 @@ struct DrumSettings {
 
   // MOD RANGES
   double pitch_range{30};
-  double q_range{3};
+  double q_range{7};
 
   // OSCILLATORS
   int osc1_wav{SINE};
   float osc1_amp{1};
+  float osc1_ratio{1};
   bool filter1_en{false};
   unsigned int filter1_type{6};
   double filter1_fc{10000};
   double filter1_q{1};
-  float osc1_ratio{1};
 
   int osc2_wav{NOISE};
   float osc2_amp{0};
+  float osc2_ratio{1};
   bool filter2_en{true};
   unsigned int filter2_type{6};
   double filter2_fc{10000};
   double filter2_q{1};
-  float osc2_ratio{1};
 
   // ENV //////////////////////////
-  int eg_attack_ms{1};
-  int eg_decay_ms{0};
-  int eg_sustain_level{1};
-  int eg_release_ms{70};
-  int eg_hold_time_ms{0};
+  double eg_attack_ms{1};
+  double eg_decay_ms{0};
+  double eg_sustain_level{1};
+  double eg_release_ms{70};
+  double eg_hold_time_ms{0};
   bool eg_ramp_mode{true};
 
   // LFO //////////////////////////
