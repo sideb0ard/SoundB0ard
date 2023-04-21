@@ -71,7 +71,20 @@ struct DrumSettings {
   // ROUTINGS /////////////////////
   //////////////////////////////////////
 
-  std::array<std::array<int, NUM_DESTD>, NUM_SRCI> modulations{{}};
+  // EG ->
+  bool eg_osc1_pitch_enable{false};
+  bool eg_osc2_pitch_enable{false};
+  bool eg_filter1_freq_enable{false};
+  bool eg_filter1_q_enable{false};
+  bool eg_filter2_freq_enable{false};
+  bool eg_filter2_q_enable{false};
+  // LFO ->
+  bool lfo_osc1_pitch_enable{false};
+  bool lfo_osc2_pitch_enable{false};
+  bool lfo_filter1_freq_enable{false};
+  bool lfo_filter1_q_enable{false};
+  bool lfo_filter2_freq_enable{false};
+  bool lfo_filter2_q_enable{false};
 };
 static const char DRUM_SYNTH_PATCHES[] = "settings/drumpresets.dat";
 
