@@ -42,7 +42,7 @@ struct DrumSettings {
   int osc1_wav{SINE};
   float osc1_amp{1};
   float osc1_ratio{1};
-  bool filter1_en{false};
+  bool filter1_enable{false};
   unsigned int filter1_type{6};
   double filter1_fc{10000};
   double filter1_q{1};
@@ -50,10 +50,16 @@ struct DrumSettings {
   int osc2_wav{NOISE};
   float osc2_amp{0};
   float osc2_ratio{1};
-  bool filter2_en{true};
+  bool filter2_enable{true};
   unsigned int filter2_type{6};
   double filter2_fc{10000};
   double filter2_q{1};
+
+  // MASTER FILTER -> OUT
+  bool master_filter_enable{false};
+  unsigned int master_filter_type{6};
+  double master_filter_fc{10000};
+  double master_filter_q{1};
 
   // ENV //////////////////////////
   double eg_attack_ms{1};
@@ -78,6 +84,8 @@ struct DrumSettings {
   bool eg_filter1_q_enable{false};
   bool eg_filter2_freq_enable{false};
   bool eg_filter2_q_enable{false};
+  bool eg_master_filter_freq_enable{false};
+  bool eg_master_filter_q_enable{false};
   // LFO ->
   bool lfo_osc1_pitch_enable{false};
   bool lfo_osc2_pitch_enable{false};
@@ -85,6 +93,9 @@ struct DrumSettings {
   bool lfo_filter1_q_enable{false};
   bool lfo_filter2_freq_enable{false};
   bool lfo_filter2_q_enable{false};
+  bool lfo_master_filter_freq_enable{false};
+  bool lfo_master_filter_q_enable{false};
+  bool lfo_master_amp_enable{false};
 };
 static const char DRUM_SYNTH_PATCHES[] = "settings/drumpresets.dat";
 
@@ -128,7 +139,7 @@ class DrumSynth : public SoundGenerator {
   LFO lfo_;
 
   Distortion distortion_;
-  std::unique_ptr<MoogLadder> combo_filter_;
+  std::unique_ptr<MoogLadder> master_filter_;
 
   DCA dca_;
 

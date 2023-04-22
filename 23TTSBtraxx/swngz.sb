@@ -1,0 +1,117 @@
+# bd = NUURF // cp = WURPZ
+#
+
+let kei = 27;
+let progz = [27, 31, 32];
+let prx = 0;
+
+let danote = 27;
+
+let tblah_gen = gen()
+{
+  setup()
+  {
+    let mybeat = rand_beat();
+  }
+  run()
+  {
+    #if (count % 1 == 0) {
+      #  note_on(badum, 72);
+      #}
+
+    if (count % 18 < 17) {
+      let b = mybeat;
+      let masked = false;
+      if (count % 8 == 7) {
+        masked = true;
+        b = mask(mybeat, rand_array(16, 0, 1));
+      }
+
+      for (i = 0; i < 16; ++i) {
+        let v = 100 + rand(27);
+        let offset = rand(100) - 50;
+        if (i == 0 || i == 8 ) {
+          v = 127;
+          offset = 0;
+        }
+        if (b[i] == 1) {
+          #note_on_at(bd, progz[prx] + 12, i * pp + offset, vel = v);
+          note_on_at(bd, danote, i * pp + offset, vel = v);
+        }
+
+
+        if (count % 2 && !masked) {
+          if (i > 8 && b[i] == 0) {
+            #note_on_at(cp, progz[prx], i * pp);
+            note_on_at(pow, danote, i * pp);
+          }
+        }
+
+        if (count % 7) {
+          if (i < 4 && b[i] == 0) {
+            #note_on_at(cp, progz[px] + 12, i * pp);
+            note_on_at(pow, danote + 12, i * pp);
+          }
+        }
+
+      }
+    }
+
+    if (count % 8 == 0) {
+      mybeat = rand_beat();
+    }
+
+  }
+}
+
+let pppblah_gen = gen()
+{
+  setup()
+  {
+    let t = 0.01;
+    let v = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      let new_v = perlin(t);
+      let duff = abs(new_v - v);
+
+      v = new_v;
+      t = t + 0.1;
+
+
+      danote = 20 + scale_note(floor(scale(v, -1, 1, 0, 20)), kei);
+    }
+  }
+}
+
+let percblah_gen = gen()
+{
+  setup()
+  {
+    let t = 835774745;
+    let percz = [cp, cl, cb];
+    let px = 0;
+    let addonz = [12, 0, 24, 12];
+    let adx = 0;
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      # let p = bits( t  << ( (t >> 1 | t>>8 ) ^  ( t >> 13 ) ) );
+      let p = bits(t%(t>>10&t));
+      ++t;
+      # print(p);
+      for (i = 0; i < 16; ++i) {
+        if (p[i] == 1) {
+          note_on_at(percz[px], danote + addonz[adx], i * pp);
+          #note_on_at(percz[px], 45, i * pp);
+          px = incr(px, 0, len(percz));
+        }
+        adx = incr(0, len(addonz));
+      }
+    }
+  }
+}
+

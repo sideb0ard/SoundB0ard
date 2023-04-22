@@ -5,7 +5,7 @@ let soukous = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0];
 let gahu = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
 let bossa = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0];
 
-let rhythms_int = [ shiko, son, rumba, soukous, gahu, bossa, bjork(3, 16), bjork(7, 16), bjork(5, 16), bjork(11, 16) ];
+let rhythms_int = [ shiko, son, rumba, soukous, gahu, bossa, bjork(3, 16), bjork(5, 16)];
 
 let briff = fn(root)
 {
