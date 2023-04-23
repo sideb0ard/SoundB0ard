@@ -4,6 +4,7 @@
 
 static const char DX_PRESET_FILENAME[] = "settings/dxpresets.dat";
 static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
+static const char DRUM_PRESET_FILENAME[] = "settings/drumpresets.dat";
 
 #include <array>
 #include <string>

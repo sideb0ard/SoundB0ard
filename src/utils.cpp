@@ -925,6 +925,9 @@ std::vector<std::string> GetSynthPresets(unsigned int synthtype) {
     case (DXSYNTH_TYPE):
       preset_file_name = DX_PRESET_FILENAME;
       break;
+    case (DRUMSYNTH_TYPE):
+      preset_file_name = DRUM_PRESET_FILENAME;
+      break;
   }
 
   std::vector<std::string> preset_names{};

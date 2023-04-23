@@ -31,6 +31,9 @@ enum DestIdx {
 struct DrumSettings {
   std::string name{"Default"};
 
+  DrumSettings() = default;
+  DrumSettings(std::string, std::map<std::string, double>);
+
   double distortion_threshold{0.5};
   double amplitude{1};
 
@@ -97,7 +100,9 @@ struct DrumSettings {
   bool lfo_master_filter_q_enable{false};
   bool lfo_master_amp_enable{false};
 };
-static const char DRUM_SYNTH_PATCHES[] = "settings/drumpresets.dat";
+
+DrumSettings Map2DrumSettings(std::string name,
+                              std::map<std::string, double> &preset_vals);
 
 class DrumSynth : public SoundGenerator {
  public:
@@ -113,12 +118,14 @@ class DrumSynth : public SoundGenerator {
   void noteOn(midi_event ev) override;
   void noteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
-  void LoadSettings(DrumSettings settings);
   void PrintSettings(DrumSettings settings);
-  void Load(std::string name) override;
+  void LoadPreset(std::string name,
+                  std::map<std::string, double> preset_vals) override;
   void Save(std::string name) override;
   void ListPresets() override;
   void Update();
+
+  void LoadSettings(DrumSettings settings);
 
   DrumSettings settings_;
 

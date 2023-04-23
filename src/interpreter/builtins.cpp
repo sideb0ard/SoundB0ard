@@ -34,6 +34,13 @@ const std::vector<std::string> FILES_TO_IGNORE = {".DS_Store"};
 
 namespace {
 
+bool HasPresets(int sg_type) {
+  if (sg_type == MINISYNTH_TYPE || sg_type == DXSYNTH_TYPE ||
+      sg_type == DRUMSYNTH_TYPE)
+    return true;
+  return false;
+}
+
 double GetRandomBetweenNegativeOneAndOne() {
   double f = (double)rand() / RAND_MAX;
   double val = -1 + (f * 2);
@@ -1381,16 +1388,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    .type = AudioAction::LOAD_PRESET,
                    .args = args,
                };
-               if (soundgen->soundgenerator_type == DRUMSYNTH_TYPE) {
-                 std::cout << "OH< DRUM SYNTH!\n";
-                 action_req.is_drum_preset = true;
-                 action_req.drum_settings =
-                     SBAudio::GetDrumSettings(preset_name->value_);
-               } else {
-                 // read its preset file
-                 action_req.preset = GetPreset(soundgen->soundgenerator_type,
-                                               preset_name->value_);
-               }
+               // read its preset file
+               action_req.preset = GetPreset(soundgen->soundgenerator_type,
+                                             preset_name->value_);
                action_req.preset_name = preset_name->value_;
 
                audio_queue.push(action_req);
@@ -1403,11 +1403,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
+
+           std::cout << "YO TAND\n";
            if (args_size >= 1) {
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
              auto sg_type = soundgen->soundgenerator_type;
-             if (sg_type < 2) {
+             std::cout << "SG YTYPE:" << sg_type << std::endl;
+             if (HasPresets(sg_type)) {
+               std::cout << "YO SG TYPE IS GOOGD\n";
                auto preset_names = GetSynthPresets(sg_type);
                int randy_int = rand() % preset_names.size();
                auto preset = preset_names[randy_int];

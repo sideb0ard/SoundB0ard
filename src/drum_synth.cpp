@@ -411,7 +411,7 @@ void DrumSynth::Save(std::string new_preset_name) {
 
   std::ofstream presetzzz;
   const std::string kSEP = "::";
-  presetzzz.open(DRUM_SYNTH_PATCHES, std::ios::app);
+  presetzzz.open(DRUM_PRESET_FILENAME, std::ios::app);
   presetzzz << "name:" << settings_.name << kSEP;
   presetzzz << "distortion_threshold:" << settings_.distortion_threshold
             << kSEP;
@@ -476,19 +476,6 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz.close();
   std::cout << "DRUMSYNTH -- saving -- DONE" << std::endl;
 }
-void DrumSynth::Load(std::string preset_name) {
-  std::cout << "DRUMSYNTH -- loading preset '" << preset_name << "'"
-            << std::endl;
-
-  std::cout << "WAIIIT A SEC?!\n\n";
-  std::ifstream presetzzz;
-  const std::string kSEP = "::";
-  presetzzz.open(DRUM_SYNTH_PATCHES);
-  for (std::string line; getline(presetzzz, line);) {
-    std::cout << "LINE:" << line << std::endl;
-  }
-  presetzzz.close();
-}
 
 void DrumSynth::Update() {
   filter1_->Update();
@@ -531,7 +518,7 @@ void DrumSynth::LoadSettings(DrumSettings settings) {
 }
 
 void DrumSynth::ListPresets() {
-  FILE *presetzzz = fopen(DRUM_SYNTH_PATCHES, "r+");
+  FILE *presetzzz = fopen(DRUM_PRESET_FILENAME, "r+");
   if (presetzzz == NULL) return;
 
   char line[256];
@@ -678,138 +665,118 @@ void DrumSynth::randomize() {
   LoadSettings(rand_settings);
 }
 
-DrumSettings GetDrumSettings(std::string preset_name) {
+void DrumSynth::LoadPreset(std::string name,
+                           std::map<std::string, double> preset_vals) {
+  DrumSettings settings = Map2DrumSettings(name, preset_vals);
+  LoadSettings(settings);
+}
+
+DrumSettings Map2DrumSettings(std::string name,
+                              std::map<std::string, double> &preset_vals) {
   DrumSettings preset;
-  std::ifstream presetzzz;
-  const std::string kSEP = "::";
-  const std::string ktoken_SEP = ":";
-  presetzzz.open(DRUM_SYNTH_PATCHES);
-  bool preset_found{false};
-  for (std::string line; getline(presetzzz, line);) {
-    if (preset_found) return preset;
-    size_t pos = 0;
-    std::string token;
-    while ((pos = line.find(kSEP)) != std::string::npos) {
-      token = line.substr(0, pos);
-      size_t token_pos = token.find(ktoken_SEP);
-      auto key = token.substr(0, token_pos);
-      auto val = token.substr(token_pos + ktoken_SEP.size(), std::string::npos);
+  preset.name = name;
 
-      if (key == "name" && val != preset_name) {
-        break;
-      }
-      preset_found = true;
+  for (auto &[key, dval] : preset_vals) {
+    std::cout << "KEY:" << key << " VAL:" << dval << std::endl;
+    if (key == "distortion_threshold")
+      preset.distortion_threshold = dval;
+    else if (key == "pitch_range")
+      preset.pitch_range = dval;
+    else if (key == "q_range")
+      preset.q_range = dval;
+    else if (key == "osc1_wav")
+      preset.osc1_wav = dval;
+    else if (key == "osc1_amp")
+      preset.osc1_amp = dval;
+    else if (key == "osc1_ratio")
+      preset.osc1_ratio = dval;
+    else if (key == "filter1_enable")
+      preset.filter1_enable = dval;
+    else if (key == "filter1_type")
+      preset.filter1_type = dval;
+    else if (key == "filter1_fc")
+      preset.filter1_fc = dval;
+    else if (key == "filter1_q")
+      preset.filter1_q = dval;
+    else if (key == "osc2_wav")
+      preset.osc2_wav = dval;
+    else if (key == "osc2_amp")
+      preset.osc2_amp = dval;
+    else if (key == "osc2_ratio")
+      preset.osc2_ratio = dval;
+    else if (key == "filter2_enable")
+      preset.filter2_enable = dval;
+    else if (key == "filter2_type")
+      preset.filter2_type = dval;
+    else if (key == "filter2_fc")
+      preset.filter2_fc = dval;
+    else if (key == "filter2_q")
+      preset.filter2_q = dval;
+    else if (key == "eg_attack_ms")
+      preset.eg_attack_ms = dval;
+    else if (key == "eg_decay_ms")
+      preset.eg_decay_ms = dval;
+    else if (key == "eg_sustain_level")
+      preset.eg_sustain_level = dval;
+    else if (key == "eg_release_ms")
+      preset.eg_release_ms = dval;
+    else if (key == "eg_hold_time_ms")
+      preset.eg_hold_time_ms = dval;
+    else if (key == "eg_ramp_mode")
+      preset.eg_ramp_mode = dval;
+    else if (key == "lfo_wave")
+      preset.lfo_wave = dval;
+    else if (key == "lfo_mode")
+      preset.lfo_mode = dval;
+    else if (key == "lfo_rate")
+      preset.lfo_rate = dval;
 
-      double dval = 0;
-      if (key != "name") dval = std::stod(val);
-      if (key == "name")
-        preset.name = val;
-      else if (key == "distortion_threshold")
-        preset.distortion_threshold = dval;
-      else if (key == "pitch_range")
-        preset.pitch_range = dval;
-      else if (key == "q_range")
-        preset.q_range = dval;
-      else if (key == "osc1_wav")
-        preset.osc1_wav = dval;
-      else if (key == "osc1_amp")
-        preset.osc1_amp = dval;
-      else if (key == "osc1_ratio")
-        preset.osc1_ratio = dval;
-      else if (key == "filter1_enable")
-        preset.filter1_enable = dval;
-      else if (key == "filter1_type")
-        preset.filter1_type = dval;
-      else if (key == "filter1_fc")
-        preset.filter1_fc = dval;
-      else if (key == "filter1_q")
-        preset.filter1_q = dval;
-      else if (key == "osc2_wav")
-        preset.osc2_wav = dval;
-      else if (key == "osc2_amp")
-        preset.osc2_amp = dval;
-      else if (key == "osc2_ratio")
-        preset.osc2_ratio = dval;
-      else if (key == "filter2_enable")
-        preset.filter2_enable = dval;
-      else if (key == "filter2_type")
-        preset.filter2_type = dval;
-      else if (key == "filter2_fc")
-        preset.filter2_fc = dval;
-      else if (key == "filter2_q")
-        preset.filter2_q = dval;
-      else if (key == "eg_attack_ms")
-        preset.eg_attack_ms = dval;
-      else if (key == "eg_decay_ms")
-        preset.eg_decay_ms = dval;
-      else if (key == "eg_sustain_level")
-        preset.eg_sustain_level = dval;
-      else if (key == "eg_release_ms")
-        preset.eg_release_ms = dval;
-      else if (key == "eg_hold_time_ms")
-        preset.eg_hold_time_ms = dval;
-      else if (key == "eg_ramp_mode")
-        preset.eg_ramp_mode = dval;
-      else if (key == "lfo_wave")
-        preset.lfo_wave = dval;
-      else if (key == "lfo_mode")
-        preset.lfo_mode = dval;
-      else if (key == "lfo_rate")
-        preset.lfo_rate = dval;
+    else if (key == "eg_osc1_pitch_enable")
+      preset.eg_osc1_pitch_enable = dval;
+    else if (key == "eg_osc2_pitch_enable")
+      preset.eg_osc2_pitch_enable = dval;
+    else if (key == "eg_filter1_freq_enable")
+      preset.eg_filter1_freq_enable = dval;
+    else if (key == "eg_filter1_q_enable")
+      preset.eg_filter1_q_enable = dval;
+    else if (key == "eg_filter2_freq_enable")
+      preset.eg_filter2_freq_enable = dval;
+    else if (key == "eg_filter2_q_enable")
+      preset.eg_filter2_q_enable = dval;
+    else if (key == "eg_master_filter_freq_enable")
+      preset.eg_master_filter_freq_enable = dval;
+    else if (key == "eg_master_filter_q_enable")
+      preset.eg_master_filter_q_enable = dval;
 
-      else if (key == "eg_osc1_pitch_enable")
-        preset.eg_osc1_pitch_enable = dval;
-      else if (key == "eg_osc2_pitch_enable")
-        preset.eg_osc2_pitch_enable = dval;
-      else if (key == "eg_filter1_freq_enable")
-        preset.eg_filter1_freq_enable = dval;
-      else if (key == "eg_filter1_q_enable")
-        preset.eg_filter1_q_enable = dval;
-      else if (key == "eg_filter2_freq_enable")
-        preset.eg_filter2_freq_enable = dval;
-      else if (key == "eg_filter2_q_enable")
-        preset.eg_filter2_q_enable = dval;
-      else if (key == "eg_master_filter_freq_enable")
-        preset.eg_master_filter_freq_enable = dval;
-      else if (key == "eg_master_filter_q_enable")
-        preset.eg_master_filter_q_enable = dval;
+    else if (key == "lfo_master_amp_enable")
+      preset.lfo_master_amp_enable = dval;
+    else if (key == "lfo_osc1_pitch_enable")
+      preset.lfo_osc1_pitch_enable = dval;
+    else if (key == "lfo_osc2_pitch_enable")
+      preset.lfo_osc2_pitch_enable = dval;
+    else if (key == "lfo_filter1_freq_enable")
+      preset.lfo_filter1_freq_enable = dval;
+    else if (key == "lfo_filter1_q_enable")
+      preset.lfo_filter1_q_enable = dval;
+    else if (key == "lfo_filter2_freq_enable")
+      preset.lfo_filter2_freq_enable = dval;
+    else if (key == "lfo_filter2_q_enable")
+      preset.lfo_filter2_q_enable = dval;
+    else if (key == "lfo_master_filter_freq_enable")
+      preset.lfo_master_filter_freq_enable = dval;
+    else if (key == "lfo_master_filter_q_enable")
+      preset.lfo_master_filter_q_enable = dval;
 
-      else if (key == "lfo_master_amp_enable")
-        preset.lfo_master_amp_enable = dval;
-      else if (key == "lfo_osc1_pitch_enable")
-        preset.lfo_osc1_pitch_enable = dval;
-      else if (key == "lfo_osc2_pitch_enable")
-        preset.lfo_osc2_pitch_enable = dval;
-      else if (key == "lfo_filter1_freq_enable")
-        preset.lfo_filter1_freq_enable = dval;
-      else if (key == "lfo_filter1_q_enable")
-        preset.lfo_filter1_q_enable = dval;
-      else if (key == "lfo_filter2_freq_enable")
-        preset.lfo_filter2_freq_enable = dval;
-      else if (key == "lfo_filter2_q_enable")
-        preset.lfo_filter2_q_enable = dval;
-      else if (key == "lfo_master_filter_freq_enable")
-        preset.lfo_master_filter_freq_enable = dval;
-      else if (key == "lfo_master_filter_q_enable")
-        preset.lfo_master_filter_q_enable = dval;
-
-      else if (key == "master_filter_enable")
-        preset.master_filter_enable = dval;
-      else if (key == "master_filter_type")
-        preset.master_filter_type = dval;
-      else if (key == "master_filter_fc")
-        preset.master_filter_fc = dval;
-      else if (key == "master_filter_q")
-        preset.master_filter_q = dval;
-
-      std::cout << token << std::endl;
-      line.erase(0, pos + kSEP.length());
-    }
+    else if (key == "master_filter_enable")
+      preset.master_filter_enable = dval;
+    else if (key == "master_filter_type")
+      preset.master_filter_type = dval;
+    else if (key == "master_filter_fc")
+      preset.master_filter_fc = dval;
+    else if (key == "master_filter_q")
+      preset.master_filter_q = dval;
   }
 
-  presetzzz.close();
-  std::cout << "FOUND YER PRESET OSC1 ENABLE:" << preset.eg_osc1_pitch_enable
-            << std::endl;
   return preset;
 }
 

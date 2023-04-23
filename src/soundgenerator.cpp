@@ -37,10 +37,6 @@ void SoundGenerator::SetFxSend(int fx_num, double intensity) {
 void SoundGenerator::start() { active = true; }
 void SoundGenerator::stop() { active = false; }
 
-void SoundGenerator::Load(std::string preset_name) {
-  std::cout << "BASE CLASS LOAD " << preset_name << " - NO OP!" << std::endl;
-}
-
 void SoundGenerator::Save(std::string preset_name) {
   std::cout << "BASE CLASS SAVE " << preset_name << " - NO OP!" << std::endl;
 }
@@ -108,7 +104,8 @@ StereoVal SoundGenerator::Effector(StereoVal val) {
 }
 
 bool SoundGenerator::IsSynth() {
-  if (type == MINISYNTH_TYPE || type == DXSYNTH_TYPE) return true;
+  if (type == MINISYNTH_TYPE || type == DXSYNTH_TYPE == type == DRUMSYNTH_TYPE)
+    return true;
 
   return false;
 }

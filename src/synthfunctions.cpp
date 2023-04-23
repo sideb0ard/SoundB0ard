@@ -1,6 +1,24 @@
 #include <synthfunctions.h>
 
+#include <fstream>
 #include <iostream>
+#include <sstream>
+
+namespace {
+std::vector<std::string> tokenize(std::string const &str, std::string delim) {
+  size_t start;
+  size_t end = 0;
+
+  std::vector<std::string> tokens;
+
+  while ((start = str.find_first_not_of(delim, end)) != std::string::npos) {
+    end = str.find(delim, start);
+    tokens.push_back(str.substr(start, end - start));
+  }
+  return tokens;
+}
+
+}  // namespace
 
 double midi_to_pan_value(unsigned int midi_val) {
   // see MMA DLS Level 2 Spec; controls are asymmetrical
@@ -36,10 +54,11 @@ double calculate_dx_amp(double dx_level) {
 }
 
 std::map<std::string, double> GetPreset(int id, std::string preset_name) {
-  std::map<std::string, double> preset_vals;
-
   std::cout << "YO, GET PRESET!" << preset_name << " for id:" << id << "\n";
 
+  std::map<std::string, double> preset_vals;
+
+  std::ifstream preset_file;
   if (preset_name.empty()) {
     printf(
         "Play tha game, pal, need a name to LOAD yer synth settings "
@@ -47,45 +66,57 @@ std::map<std::string, double> GetPreset(int id, std::string preset_name) {
     return preset_vals;
   }
 
-  const char *preset_to_load = preset_name.c_str();
+  if (id == DXSYNTH_TYPE)
+    preset_file.open(DX_PRESET_FILENAME, std::ifstream::in);
+  else if (id == MINISYNTH_TYPE)
+    preset_file.open(MOOG_PRESET_FILENAME, std::ifstream::in);
+  else if (id == DRUMSYNTH_TYPE)
+    preset_file.open(DRUM_PRESET_FILENAME, std::ifstream::in);
 
-  char line[4096];
-  char setting_key[1024];
-  char setting_val[1024];
-  double scratch_val = 0.;
-
-  FILE *presetzzz;
-
-  if (id == DXSYNTH_TYPE) {
-    presetzzz = fopen(DX_PRESET_FILENAME, "r+");
-  } else if (id == MINISYNTH_TYPE) {
-    presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
-  } else {
+  if (!preset_file.is_open()) {
+    std::cerr << "WOOF, COULDNT OPEN " << preset_name << std::endl;
     return preset_vals;
   }
 
-  if (presetzzz == NULL) return preset_vals;
+  bool found_preset{false};
+  std::string line;
+  std::string field_delim{"::"};
 
-  char *tok, *last_tok;
-  char const *sep = "::";
+  while (getline(preset_file, line) && !found_preset) {
+    std::vector<std::string> tokens = tokenize(line, field_delim);
 
-  while (fgets(line, sizeof(line), presetzzz)) {
-    size_t n = strlen(line);
-    if (line[n - 1] == '\n') line[n - 1] = '\0';
+    for (const auto &t : tokens) {
+      std::stringstream ss{t};
+      std::string key;
+      std::string val;
 
-    int settings_count = 0;
+      std::string tmp;
+      int tokecount = 0;
+      while (getline(ss, tmp, '=')) {
+        if (tokecount == 0) {
+          key = tmp;
+        } else {
+          val = tmp;
+        }
+        tokecount++;
+      }
 
-    for (tok = strtok_r(line, sep, &last_tok); tok;
-         tok = strtok_r(NULL, sep, &last_tok)) {
-      sscanf(tok, "%[^=]=%s", setting_key, setting_val);
-      sscanf(setting_val, "%lf", &scratch_val);
-      if (strcmp(setting_key, "name") == 0) {
-        if (strcmp(setting_val, preset_to_load) != 0) break;
-      } else {
-        preset_vals[setting_key] = scratch_val;
+      if (tokecount == 2) {
+        if (key == "name" && val == preset_name) {
+          found_preset = true;
+        }
+      }
+      if (!found_preset) continue;
+
+      try {
+        double dval = std::stod(val);
+        preset_vals[key] = dval;
+      } catch (std::invalid_argument) {
+        // no-op - ignore name which is a string
       }
     }
   }
-  fclose(presetzzz);
+
+  preset_file.close();
   return preset_vals;
 }
