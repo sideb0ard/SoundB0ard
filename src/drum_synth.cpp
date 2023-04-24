@@ -285,7 +285,7 @@ void DrumSynth::SetParam(std::string name, double val) {
   Update();
 }
 
-std::string DrumSynth::Status() {
+std::string DrumSynth::Info() {
   std::stringstream ss;
   if (!active || volume == 0)
     ss << ANSI_COLOR_RESET;
@@ -350,13 +350,14 @@ std::string DrumSynth::Status() {
   return ss.str();
 }
 
-std::string DrumSynth::Info() {
+std::string DrumSynth::Status() {
   std::stringstream ss;
   if (!active || volume == 0)
     ss << ANSI_COLOR_RESET;
   else
-    ss << ANSI_COLOR_CYAN;
-  ss << "Drumsynth~!";
+    ss << COOL_COLOR_YELLOW_MELLOW;
+  ss << "DrumZynth - " << COOL_COLOR_PINK2 << settings_.name
+     << COOL_COLOR_YELLOW_MELLOW << " - vol:" << volume;
 
   return ss.str();
 }
