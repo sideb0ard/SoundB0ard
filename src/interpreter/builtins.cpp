@@ -1791,56 +1791,50 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)
                               -> std::shared_ptr<object::Object> {
        (void)args;
-       std::string cmd =
-           "let bd = sample(" + GetRandomSampleNameFromDir("bd") + ")";
+       std::string cmd = "let bd = drum();";
        eval_command_queue.push(cmd);
 
-       cmd = "let sd = sample(" + GetRandomSampleNameFromDir("sd") + ")";
+       cmd = "let sd = drum();";
        eval_command_queue.push(cmd);
 
-       cmd = "let cp = sample(" + GetRandomSampleNameFromDir("cp") + ")";
+       cmd = "let cp = drum(); vol cp 0.5;";
        eval_command_queue.push(cmd);
        cmd = "pan cp " + std::to_string(GetRandomBetweenNegativeOneAndOne());
        eval_command_queue.push(cmd);
 
-       cmd = "let lt = sample(" + GetRandomSampleNameFromDir("lt") + ")";
+       cmd = "let cl = drum(); vol cl 0.5;";
        eval_command_queue.push(cmd);
-       cmd = "pan lt " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
-
-       cmd = "let mt = sample(" + GetRandomSampleNameFromDir("mt") + ")";
-       eval_command_queue.push(cmd);
-       cmd = "pan mt " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       cmd = "pan cl " + std::to_string(GetRandomBetweenNegativeOneAndOne());
        eval_command_queue.push(cmd);
 
-       cmd = "let ht = sample(" + GetRandomSampleNameFromDir("ht") + ")";
+       cmd = "let cb = drum(); vol cb 0.5;";
        eval_command_queue.push(cmd);
-       cmd = "pan ht " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
-
-       cmd = "let ch = sample(" + GetRandomSampleNameFromDir("ch") + ")";
-       eval_command_queue.push(cmd);
-       cmd = "pan ch " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       cmd = "pan cb " + std::to_string(GetRandomBetweenNegativeOneAndOne());
        eval_command_queue.push(cmd);
 
-       cmd = "let oh = sample(" + GetRandomSampleNameFromDir("oh") + ")";
+       cmd = "let hh = drum(); vol hh 0.3;";
+       eval_command_queue.push(cmd);
+       cmd = "pan hh " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let oh = drum(); vol oh 0.3;";
        eval_command_queue.push(cmd);
        cmd = "pan oh " + std::to_string(GetRandomBetweenNegativeOneAndOne());
        eval_command_queue.push(cmd);
 
-       cmd = "let prc1 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
+       cmd = "let per1 = drum(); vol per1 0.5;";
        eval_command_queue.push(cmd);
-       cmd = "pan prc1 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
-
-       cmd = "let prc2 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
-       eval_command_queue.push(cmd);
-       cmd = "pan prc2 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       cmd = "pan per1 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
        eval_command_queue.push(cmd);
 
-       cmd = "let cb = sample(perc/808cowbell.aiff)";
+       cmd = "let per2 = drum(); vol per2 0.5;";
        eval_command_queue.push(cmd);
-       cmd = "pan cb " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       cmd = "pan per2 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let per3 = drum(); vol per3 0.5;";
+       eval_command_queue.push(cmd);
+       cmd = "pan per3 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
        eval_command_queue.push(cmd);
 
        return evaluator::NULLL;

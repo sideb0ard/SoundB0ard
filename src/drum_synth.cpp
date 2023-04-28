@@ -387,15 +387,15 @@ void DrumSynth::noteOn(midi_event ev) {
   starting_frequency_ = Midi2Freq(midinote + settings_.pitch_range);
   frequency_diff_ = starting_frequency_ - base_frequency_;
 
-  if (!osc1_->m_note_on) {
-    osc1_->m_osc_fo = starting_frequency_;
-    osc1_->StartOscillator();
+  // if (!osc1_->m_note_on) {
+  osc1_->m_osc_fo = starting_frequency_;
+  osc1_->StartOscillator();
 
-    osc2_->m_osc_fo = starting_frequency_;
-    osc2_->StartOscillator();
+  osc2_->m_osc_fo = starting_frequency_;
+  osc2_->StartOscillator();
 
-    lfo_.StartOscillator();
-  }
+  lfo_.StartOscillator();
+  //}
 
   eg_.StartEg();
 }
@@ -413,64 +413,64 @@ void DrumSynth::Save(std::string new_preset_name) {
   std::ofstream presetzzz;
   const std::string kSEP = "::";
   presetzzz.open(DRUM_PRESET_FILENAME, std::ios::app);
-  presetzzz << "name:" << settings_.name << kSEP;
-  presetzzz << "distortion_threshold:" << settings_.distortion_threshold
+  presetzzz << "name=" << settings_.name << kSEP;
+  presetzzz << "distortion_threshold=" << settings_.distortion_threshold
             << kSEP;
-  presetzzz << "pitch_range:" << settings_.pitch_range << kSEP;
-  presetzzz << "q_range:" << settings_.q_range << kSEP;
-  presetzzz << "osc1_wav:" << settings_.osc1_wav << kSEP;
-  presetzzz << "osc1_amp:" << settings_.osc1_amp << kSEP;
-  presetzzz << "osc1_ratio:" << settings_.osc1_ratio << kSEP;
-  presetzzz << "filter1_enable:" << settings_.filter1_enable << kSEP;
-  presetzzz << "filter1_type:" << settings_.filter1_type << kSEP;
-  presetzzz << "filter1_fc:" << settings_.filter1_fc << kSEP;
-  presetzzz << "filter1_q:" << settings_.filter1_q << kSEP;
-  presetzzz << "osc2_wav:" << settings_.osc2_wav << kSEP;
-  presetzzz << "osc2_amp:" << settings_.osc2_amp << kSEP;
-  presetzzz << "osc2_ratio:" << settings_.osc2_ratio << kSEP;
-  presetzzz << "filter2_enable:" << settings_.filter2_enable << kSEP;
-  presetzzz << "filter2_type:" << settings_.filter2_type << kSEP;
-  presetzzz << "filter2_fc:" << settings_.filter2_fc << kSEP;
-  presetzzz << "filter2_q:" << settings_.filter2_q << kSEP;
-  presetzzz << "master_filter_enable:" << settings_.master_filter_enable
+  presetzzz << "pitch_range=" << settings_.pitch_range << kSEP;
+  presetzzz << "q_range=" << settings_.q_range << kSEP;
+  presetzzz << "osc1_wav=" << settings_.osc1_wav << kSEP;
+  presetzzz << "osc1_amp=" << settings_.osc1_amp << kSEP;
+  presetzzz << "osc1_ratio=" << settings_.osc1_ratio << kSEP;
+  presetzzz << "filter1_enable=" << settings_.filter1_enable << kSEP;
+  presetzzz << "filter1_type=" << settings_.filter1_type << kSEP;
+  presetzzz << "filter1_fc=" << settings_.filter1_fc << kSEP;
+  presetzzz << "filter1_q=" << settings_.filter1_q << kSEP;
+  presetzzz << "osc2_wav=" << settings_.osc2_wav << kSEP;
+  presetzzz << "osc2_amp=" << settings_.osc2_amp << kSEP;
+  presetzzz << "osc2_ratio=" << settings_.osc2_ratio << kSEP;
+  presetzzz << "filter2_enable=" << settings_.filter2_enable << kSEP;
+  presetzzz << "filter2_type=" << settings_.filter2_type << kSEP;
+  presetzzz << "filter2_fc=" << settings_.filter2_fc << kSEP;
+  presetzzz << "filter2_q=" << settings_.filter2_q << kSEP;
+  presetzzz << "master_filter_enable=" << settings_.master_filter_enable
             << kSEP;
-  presetzzz << "master_filter_type:" << settings_.master_filter_type << kSEP;
-  presetzzz << "master_filter_fc:" << settings_.master_filter_fc << kSEP;
-  presetzzz << "master_filter_q:" << settings_.master_filter_q << kSEP;
-  presetzzz << "eg_attack_ms:" << settings_.eg_attack_ms << kSEP;
-  presetzzz << "eg_decay_ms:" << settings_.eg_decay_ms << kSEP;
-  presetzzz << "eg_sustain_level:" << settings_.eg_sustain_level << kSEP;
-  presetzzz << "eg_release_ms:" << settings_.eg_release_ms << kSEP;
-  presetzzz << "eg_hold_time_ms:" << settings_.eg_hold_time_ms << kSEP;
-  presetzzz << "eg_ramp_mode:" << settings_.eg_ramp_mode << kSEP;
-  presetzzz << "lfo_wave:" << settings_.lfo_wave << kSEP;
-  presetzzz << "lfo_mode:" << settings_.lfo_mode << kSEP;
-  presetzzz << "lfo_rate:" << settings_.lfo_rate << kSEP;
+  presetzzz << "master_filter_type=" << settings_.master_filter_type << kSEP;
+  presetzzz << "master_filter_fc=" << settings_.master_filter_fc << kSEP;
+  presetzzz << "master_filter_q=" << settings_.master_filter_q << kSEP;
+  presetzzz << "eg_attack_ms=" << settings_.eg_attack_ms << kSEP;
+  presetzzz << "eg_decay_ms=" << settings_.eg_decay_ms << kSEP;
+  presetzzz << "eg_sustain_level=" << settings_.eg_sustain_level << kSEP;
+  presetzzz << "eg_release_ms=" << settings_.eg_release_ms << kSEP;
+  presetzzz << "eg_hold_time_ms=" << settings_.eg_hold_time_ms << kSEP;
+  presetzzz << "eg_ramp_mode=" << settings_.eg_ramp_mode << kSEP;
+  presetzzz << "lfo_wave=" << settings_.lfo_wave << kSEP;
+  presetzzz << "lfo_mode=" << settings_.lfo_mode << kSEP;
+  presetzzz << "lfo_rate=" << settings_.lfo_rate << kSEP;
 
-  presetzzz << "eg_osc1_pitch_enable:" << settings_.eg_osc1_pitch_enable
+  presetzzz << "eg_osc1_pitch_enable=" << settings_.eg_osc1_pitch_enable
             << kSEP;
-  presetzzz << "eg_osc2_pitch_enable:" << settings_.eg_osc2_pitch_enable
+  presetzzz << "eg_osc2_pitch_enable=" << settings_.eg_osc2_pitch_enable
             << kSEP;
-  presetzzz << "eg_filter1_freq_enable:" << settings_.eg_filter1_freq_enable
+  presetzzz << "eg_filter1_freq_enable=" << settings_.eg_filter1_freq_enable
             << kSEP;
-  presetzzz << "eg_filter1_q_enable:" << settings_.eg_filter1_q_enable << kSEP;
-  presetzzz << "eg_filter2_freq_enable:" << settings_.eg_filter2_freq_enable
+  presetzzz << "eg_filter1_q_enable=" << settings_.eg_filter1_q_enable << kSEP;
+  presetzzz << "eg_filter2_freq_enable=" << settings_.eg_filter2_freq_enable
             << kSEP;
-  presetzzz << "eg_filter2_q_enable:" << settings_.eg_filter2_q_enable << kSEP;
+  presetzzz << "eg_filter2_q_enable=" << settings_.eg_filter2_q_enable << kSEP;
 
-  presetzzz << "lfo_master_amp_enable:" << settings_.lfo_master_amp_enable
+  presetzzz << "lfo_master_amp_enable=" << settings_.lfo_master_amp_enable
             << kSEP;
-  presetzzz << "lfo_osc1_pitch_enable:" << settings_.lfo_osc1_pitch_enable
+  presetzzz << "lfo_osc1_pitch_enable=" << settings_.lfo_osc1_pitch_enable
             << kSEP;
-  presetzzz << "lfo_osc2_pitch_enable:" << settings_.lfo_osc2_pitch_enable
+  presetzzz << "lfo_osc2_pitch_enable=" << settings_.lfo_osc2_pitch_enable
             << kSEP;
-  presetzzz << "lfo_filter1_freq_enable:" << settings_.lfo_filter1_freq_enable
+  presetzzz << "lfo_filter1_freq_enable=" << settings_.lfo_filter1_freq_enable
             << kSEP;
-  presetzzz << "lfo_filter1_q_enable:" << settings_.lfo_filter1_q_enable
+  presetzzz << "lfo_filter1_q_enable=" << settings_.lfo_filter1_q_enable
             << kSEP;
-  presetzzz << "lfo_filter2_freq_enable:" << settings_.lfo_filter2_freq_enable
+  presetzzz << "lfo_filter2_freq_enable=" << settings_.lfo_filter2_freq_enable
             << kSEP;
-  presetzzz << "lfo_filter2_q_enable:" << settings_.lfo_filter2_q_enable
+  presetzzz << "lfo_filter2_q_enable=" << settings_.lfo_filter2_q_enable
             << kSEP;
 
   presetzzz << std::endl;

@@ -695,24 +695,15 @@ let garmelody = fn(num_steps, notez, loop_len)
 
 let gamelody = fn(num_steps, root_key, loop_len)
 {
-  let melody = [];
+  let melody = rand_array(16, 0, 0);
   if (num_steps > 16) {
     return melody;
   }
 
   let notez = notes_in_key(root_key);
 
-  let rn = rand(num_steps) + 2;
-  let rn2 = num_steps - rn;
-
-  if (rn < 8) {
-    melody = bjork(rn, 8) + bjork(rn2, 8);
-  } else {
-    melody = bjork(num_steps, 16);
-  }
-
   for (i = 0; i < len(melody); ++i) {
-    if (melody[i] == 1) {
+    if (rand(100)> 10) {
       let note = notez[rand(len(notez))];
       if (i == 0 || i == len(melody) -1) {
         note = root_key;
