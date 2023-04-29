@@ -1,12 +1,3 @@
-let shiko = [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
-let son = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
-let rumba = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0];
-let soukous = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0];
-let gahu = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
-let bossa = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0];
-
-let rhythms_int = [ shiko, son, rumba, soukous, gahu, bossa, bjork(3, 16), bjork(5, 16)];
-
 let briff = fn(root)
 {
   #print("VALLEYNOTES:", valid_notes);
@@ -82,12 +73,37 @@ let map = fn(arrray, fooonction)
 
 let rand_beat = gen()
 {
-  setup() {}
+  setup() {
+    let shiko = [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
+    let son = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
+    let rumba = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0];
+    let soukous = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0];
+    let gahu = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
+    let bossa = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0];
+    let bruijun1 =  [1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0];
+    let bruijun2 =  [1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0];
+    let bruijun3 =  [1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0];
+    let bruijun4 =  [1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0];
+    let bruijun5 =  [1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0];
+    let bruijun6 =  [1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0];
+    let bruijun7 =  [1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0];
+    let bruijun8 =  [1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0];
+    let bruijun9 =  [1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0];
+    let bruijun10 =  [1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0];
+    let bruijun11 =  [1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0];
+    let bruijun12 =  [1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0];
+    let bruijun13 =  [1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0];
+    let bruijun14 =  [1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0];
+    let bruijun15 =  [1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0];
+    let bruijun16 =  [1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0];
+
+    let rhythms_int = [ shiko, son, rumba, soukous, gahu, bossa, bjork(3, 16), bjork(5, 16), bruijun1, bruijun2, bruijun3, bruijun4, bruijun5, bruijun6, bruijun7, bruijun8, bruijun9, bruijun10, bruijun11, bruijun12, bruijun13, bruijun14, bruijun15, bruijun16];
+
+  }
 
   run() {
-    let idx = rand(len(rhythms_int))
-      #puts("IDX is ", idx, " - pattern is: ", rhythms_int[idx])
-      return rhythms_int[idx]
+    let idx = rand(len(rhythms_int));
+    return rhythms_int[idx];
   }
 }
 
@@ -432,6 +448,21 @@ let mask = fn(original_pattern, mask_pattern)
       push(return_pattern, 0);
     } else {
       push(return_pattern, original_pattern[i]);
+    }
+  }
+
+  return return_pattern;
+}
+
+let ormask = fn(first_pattern, second_pattern)
+{
+  let return_pattern = [];
+
+  for (i = 0; i < min(len(first_pattern), len(second_pattern)); ++i) {
+    if (first_pattern[i] > 0 || second_pattern[i] > 0)  {
+      push(return_pattern, 1);
+    } else {
+      push(return_pattern, 0);
     }
   }
 

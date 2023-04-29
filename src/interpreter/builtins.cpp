@@ -1794,7 +1794,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
        std::string cmd = "let bd = drum();";
        eval_command_queue.push(cmd);
 
-       cmd = "let sd = drum();";
+       cmd = "let sd = drum(); vol sd 0.3";
        eval_command_queue.push(cmd);
 
        cmd = "let cp = drum(); vol cp 0.5;";
@@ -1835,6 +1835,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
        cmd = "let per3 = drum(); vol per3 0.5;";
        eval_command_queue.push(cmd);
        cmd = "pan per3 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
+       eval_command_queue.push(cmd);
+
+       cmd = "let dx = fm(); vol fm 0.8;";
        eval_command_queue.push(cmd);
 
        return evaluator::NULLL;
