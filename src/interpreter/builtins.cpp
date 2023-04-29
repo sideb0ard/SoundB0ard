@@ -1837,7 +1837,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
        cmd = "pan per3 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
        eval_command_queue.push(cmd);
 
-       cmd = "let dx = fm(); vol fm 0.8;";
+       cmd = "let dx = fm(); vol dx 0.8;";
        eval_command_queue.push(cmd);
 
        return evaluator::NULLL;
