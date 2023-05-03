@@ -477,7 +477,7 @@ class SetStatement : public Statement {
 
   int fx_num_ = -1;
 
-  bool is_mixer_component_{false};
+  bool is_xfader_component_{false};
   int mixer_fx_num_ = -1;
 };
 

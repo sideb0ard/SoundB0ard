@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "xfader.h"
+
 struct PreviewBuffer {
   std::string filename{};
   std::vector<double> audio_buffer{};
@@ -65,6 +67,8 @@ struct Mixer {
   std::vector<DelayedMidiEvent> _action_items =
       {};  // TODO get rid of this version
   std::vector<audio_action_queue_item> _delayed_action_items = {};
+
+  XFader xfader_;
 
   std::array<StereoVal, MAX_NUM_SOUND_GENERATORS> soundgen_cur_val_{};
 

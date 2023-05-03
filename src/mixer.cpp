@@ -121,6 +121,8 @@ std::string Mixer::StatusMixr() {
      << "reverb: " << fx_[1]->Status() << std::endl;
   ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
      << "distort: " << fx_[2]->Status() << std::endl;
+  ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
+     << "xfader: " << xfader_.Status() << std::endl;
   ss << ANSI_COLOR_WHITE;
   // clang-format on
 
@@ -494,6 +496,8 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
       soundgen_cur_val_[idx] = sg->GenNext(timing_info);
 
       bool collect_value = false;
+      // if nothing is soloed, or this sg is in the solo group,
+      // collect its output value
       if (soloed_sound_generator_idz.empty() ||
           std::find(soloed_sound_generator_idz.begin(),
                     soloed_sound_generator_idz.end(),
@@ -502,8 +506,9 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
       }
 
       if (collect_value) {
-        output_left += soundgen_cur_val_[idx].left;
-        output_right += soundgen_cur_val_[idx].right;
+        output_left += soundgen_cur_val_[idx].left * xfader_.GetValueFor(idx);
+        output_right += soundgen_cur_val_[idx].right * xfader_.GetValueFor(idx);
+
         fx_delay_send +=
             soundgen_cur_val_[idx] * sg->mixer_fx_send_intensity_[0];
         fx_reverb_send +=
@@ -511,6 +516,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
         fx_distort_send +=
             soundgen_cur_val_[idx] * sg->mixer_fx_send_intensity_[2];
       }
+
       idx++;
     }
 
@@ -738,6 +744,10 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     if (action.mixer_fx_id != -1) {
       double param_val = std::stod(action.param_val);
       fx_[action.mixer_fx_id]->SetParam(action.param_name, param_val);
+    } else if (action.is_xfader) {
+      double param_val = std::stod(action.param_val);
+      // note: ignores param_name, only one param at the moment
+      xfader_.SetXFaderPosition(param_val);
     }
   } else if (action.type == AudioAction::MIXER_FX_UPDATE) {
     for (const auto &soundgen_num : action.group_of_soundgens) {
@@ -746,6 +756,12 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
         if (sg) {
           sg->SetFxSend(action.mixer_fx_id, action.fx_intensity);
         }
+      }
+    }
+  } else if (action.type == AudioAction::MIXER_XFADE_ASSIGN) {
+    for (const auto &soundgen_num : action.group_of_soundgens) {
+      if (IsValidSoundgenNum(soundgen_num)) {
+        xfader_.Assign(soundgen_num, action.xfade_channel);
       }
     }
   } else if (action.type == AudioAction::UPDATE) {

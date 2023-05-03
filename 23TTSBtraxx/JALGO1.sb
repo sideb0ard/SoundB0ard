@@ -1,0 +1,18 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set ab1:stutter 1;
+    } else {
+      if (count % 2 == 0) {
+        set blak:stutter 1;
+      }
+    }
+  }
+}
+

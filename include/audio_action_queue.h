@@ -29,6 +29,7 @@ enum AudioAction {
   MIDI_MAP_SHOW,
   MIXER_UPDATE,
   MIXER_FX_UPDATE,
+  MIXER_XFADE_ASSIGN,
   MONITOR,
   NO_ACTION,
   PREVIEW,
@@ -45,9 +46,11 @@ enum AudioAction {
 struct audio_action_queue_item {
   AudioAction type;
   int mixer_soundgen_idx{-1};
+  bool is_xfader{false};
   std::vector<int> group_of_soundgens{};
   std::shared_ptr<SBAudio::SoundGenerator> sg;
   std::vector<std::shared_ptr<Fx>> fx;
+  unsigned int xfade_channel{99};
 
   std::string preset_name;
   std::map<std::string, double> preset;

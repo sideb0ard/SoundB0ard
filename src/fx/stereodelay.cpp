@@ -162,10 +162,10 @@ std::string StereoDelay::Status() {
       sync_len = "1/16";
   }
   std::stringstream ss;
-  ss << "delayms:" << m_delay_time_ms_;
+  ss << "ms:" << m_delay_time_ms_;
   ss << " fb:" << m_feedback_percent_;
-  ss << " ratio:" << m_delay_ratio_;
-  ss << " wetmx:" << m_wet_mix_;
+  ss << " rat:" << m_delay_ratio_;
+  ss << " mx:" << m_wet_mix_;
   ss << " mode:" << mode;
   ss << " sync:" << sync_;
   ss << " sync_len:" << sync_len;
@@ -180,13 +180,13 @@ StereoVal StereoDelay::Process(StereoVal input) {
 }
 
 void StereoDelay::SetParam(std::string name, double val) {
-  if (name == "delayms")
+  if (name == "ms")
     SetDelayTimeMs(val);
   else if (name == "fb")
     SetFeedbackPercent(val);
-  else if (name == "ratio")
+  else if (name == "rat")
     SetDelayRatio(val);
-  else if (name == "wetmx")
+  else if (name == "mx")
     SetWetMix(val);
   else if (name == "mode")
     SetMode(val);

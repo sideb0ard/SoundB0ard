@@ -198,18 +198,19 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
     return nullptr;
   }
   if (stmt->target_->String() == "mixer") {
-    stmt->is_mixer_component_ = true;
     if (cur_token_.literal_.rfind("delay", 0) == 0) {
       stmt->mixer_fx_num_ = 0;
     } else if (cur_token_.literal_.rfind("reverb", 0) == 0) {
       stmt->mixer_fx_num_ = 1;
     } else if (cur_token_.literal_.rfind("distort", 0) == 0) {
       stmt->mixer_fx_num_ = 2;
+    } else if (cur_token_.literal_.rfind("xfader", 0) == 0) {
+      stmt->is_xfader_component_ = true;
     }
-    if (stmt->mixer_fx_num_ == -1) {
-      std::cerr
-          << "Needs to be one of [delay, reverb, distort] for mixer param."
-          << std::endl;
+    if (stmt->mixer_fx_num_ == -1 && !stmt->is_xfader_component_) {
+      std::cerr << "Needs to be one of [delay, reverb, distort, xfader] for "
+                   "mixer param."
+                << std::endl;
       return nullptr;
     }
 

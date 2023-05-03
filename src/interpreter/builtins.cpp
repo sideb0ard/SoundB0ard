@@ -1051,6 +1051,45 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
        audio_queue.push(action_req);
        return evaluator::NULLL;
      })},
+    {"xassign",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() < 2)
+             return evaluator::NewError(
+                 "`send` requires at least two args - channel side and source");
+
+           auto xfade_left_or_right =
+               std::dynamic_pointer_cast<object::Number>(input[0]);
+           if (xfade_left_or_right) {
+             audio_action_queue_item action_req{
+                 .type = AudioAction::MIXER_XFADE_ASSIGN,
+                 .xfade_channel =
+                     static_cast<unsigned int>(xfade_left_or_right->value_)};
+
+             auto sg_array = std::dynamic_pointer_cast<object::Array>(input[1]);
+             if (sg_array) {
+               for (auto const &e : sg_array->elements_) {
+                 auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(e);
+                 if (sg) {
+                   action_req.group_of_soundgens.push_back(sg->soundgen_id_);
+                 }
+               }
+             } else {
+               auto sg =
+                   std::dynamic_pointer_cast<object::SoundGenerator>(input[1]);
+               if (sg) {
+                 action_req.group_of_soundgens.push_back(sg->soundgen_id_);
+               }
+             }
+             if (action_req.group_of_soundgens.size() == 0) {
+               std::cout << "NO SOUNDGENS FOUND, RETURNING..\n";
+               return evaluator::NULLL;
+             }
+             audio_queue.push(action_req);
+           }
+           return evaluator::NULLL;
+         })},
     {"is_array", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> input)
                          -> std::shared_ptr<object::Object> {

@@ -1,0 +1,28 @@
+
+let bbeblah_gen = gen()
+{
+  setup()
+  {
+    let beat = rand_beat();
+    let lpp = 240 / 10;
+    let lx = 1;
+  }
+  run()
+  {
+
+    for (i = 0; i < 16; ++i) {
+      if (beat[i] == 1) {
+        note_on_at(bd, 20, i * pp);
+      } else {
+        note_on_at(hh, 20, i * pp + lpp * lx);
+      }
+    }
+    lx = incr(lx, 1, 10);
+
+    if (count % 4 == 0) {
+      beat = rand_beat();
+    }
+
+  }
+}
+
