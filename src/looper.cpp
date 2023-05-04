@@ -36,8 +36,12 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   filename_ = filename;
   ImportFile(filename_);
 
-  eg_.m_attack_time_msec = 20;
-  eg_.m_release_time_msec = 50;
+  eg_.SetAttackTimeMsec(5);
+  eg_.SetDecayTimeMsec(0);
+  eg_.SetSustainLevel(1);
+  eg_.SetReleaseTimeMsec(50);
+  eg_.SetRampMode(false);
+  eg_.Update();
 
   degrade_by_ = 0;
 
@@ -47,15 +51,6 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
 }
 
 void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
-  // SoundGenerator::EventNotify(event, tinfo);
-
-  if (!started_ && tinfo.is_start_of_loop) {
-    eg_.StartEg();
-    started_ = true;
-    LaunchGrain(active_grain_, tinfo);
-  }
-  if (!started_) return;
-
   double decimal_percent_of_loop = 0;
   if (tinfo.is_midi_tick) {
     if (started_)
@@ -90,6 +85,13 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
       }
     }
   }
+
+  if (!started_ && tinfo.is_start_of_loop) {
+    eg_.StartEg();
+    started_ = true;
+    LaunchGrain(active_grain_, tinfo);
+  }
+  if (!started_) return;
 
   if (tinfo.is_start_of_loop) {
     loop_counter_++;
@@ -140,6 +142,9 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   }
 }
 
+// for debugging only
+int launch_count = 0;
+
 void Looper::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   int duration_frames = grain_duration_frames_;
   if (quasi_grain_fudge_ != 0)
@@ -165,12 +170,19 @@ void Looper::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   start_xfade_at_frame_time_ = next_grain_launch_sample_time_;
   stop_xfade_at_frame_time_ = tinfo.cur_sample + xfade_time_in_frames_;
 
-  // std::cout << "LAUNCH GRAIN at " << tinfo.cur_sample
-  //           << " durATION: " << duration_frames
-  //           << " GRAIN SPACING: " << grain_spacing_frames_
-  //           << " NEXT GRAIN at: " << next_grain_launch_sample_time_
-  //           << " NEXT XFADE at: " << start_xfade_at_frame_time_
-  //           << " STOP XFADE at: " << stop_xfade_at_frame_time_ << std::endl;
+  // if (launch_count < 10) {
+  //   std::cout << "LAUNCH INDEX IS " << grain_idx << std::endl;
+  //   std::cout << "IS START OF LOOP? " << tinfo.is_start_of_loop
+  //             << " MIDI IDX:" << tinfo.midi_tick << std::endl;
+  //   // std::cout << "LAUNCH GRAIN at " << tinfo.cur_sample
+  //   //           << " durATION: " << duration_frames
+  //   //           << " GRAIN SPACING: " << grain_spacing_frames_
+  //   //           << " NEXT GRAIN at: " << next_grain_launch_sample_time_
+  //   //           << " NEXT XFADE at: " << start_xfade_at_frame_time_
+  //   //           << " STOP XFADE at: " << stop_xfade_at_frame_time_ <<
+  //   //           std::endl;
+  //   ++launch_count;
+  // }
 }
 
 void Looper::SwitchXFadeGrains() {

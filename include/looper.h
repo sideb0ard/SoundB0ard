@@ -116,7 +116,7 @@ class Looper : public SoundGenerator {
   int cur_sixteenth_{0};  // used to track scramble
 
   double incr_speed_{1};
-  double cur_midi_idx_{-1};
+  double cur_midi_idx_{0};
 
   double plooplen_{16};
   double poffset_{0};
