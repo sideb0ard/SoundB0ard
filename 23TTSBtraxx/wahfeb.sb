@@ -17,6 +17,9 @@ let mawblah_gen = gen()
     let mof = 0;
     let mx = 0;
 
+    let xposz = [-1, 0, -1, 1, 0, 1];
+    let xx = 0;
+
     let mlenz = [1, 2];
     let mlx = 0;
   }
@@ -33,6 +36,9 @@ let mawblah_gen = gen()
     lx = incr(lx, 0 , len(lenz));
 
     set maw10:plooplen lenz[lx];
+
+    set mixer:xfader:xpos xposz[xx];
+    xx = incr(xx, 0, len(xposz));
 
     if (count % 4 == 3) {
       solo(mawz[mwx], at=moffsetz[mof]*16);
