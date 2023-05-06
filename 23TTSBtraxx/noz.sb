@@ -64,15 +64,11 @@ let dbblah_gen = gen()
 {
   setup()
   {
-    let bitz = [6, 8, 12, 7];
-    let bx = 0;
     let plenz = [2, 1, 3, 1, 4, 3];
     let pz = 0;
   }
   run()
   {
-    set maw2:fx0:bitdepth bitz[bx];
-    bx = incr(bx, 0, len(bitz));
 
     set maw2:plooplen 16;
     if (count % 8 == 7) {
@@ -95,6 +91,7 @@ let dbblah_gen = gen()
 # p3 < osc 2 "0 99" "set dx:op3out %"
 # p4 < osc 3 "0 99" "set dx:op4out %"
 
+# wahz = WURPZ
 let dxxblah_gen = gen()
 {
   setup()
@@ -111,7 +108,8 @@ let dxxblah_gen = gen()
   {
     if (count % 4 < 3) {
       for (i = 0; i < 16; ++i) {
-        stepper(dx, down(mel, 24), mx, i, drz[drzx]);
+        # stepper(dx, down(mel, 24), mx, i, drz[drzx]);
+        stepper(wahz, down(mel, 24), mx, i, drz[drzx]);
         mx = incr(mx, 0, maxx);
         drzx = incr(drzx, 0, len(drz));
       }

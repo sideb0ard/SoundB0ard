@@ -43,7 +43,7 @@ let bin2_gen = gen()
 {
   setup()
   {
-    let t = 8194;
+    let t = 88484894;
     let bx = 0;
     let ptz = [0.8, 1, 1.2, 1.5, 2];
     let px = 0;
@@ -51,9 +51,9 @@ let bin2_gen = gen()
   run()
   {
     if (count % 5 < 4) {
-      (( ((t*5)&(t>>7)) | ((t*3)&(t>>10)) ) & 255) / 127 - 1;
-      ++t;
-      perky(bits(t), kt2);
+      let p = bits( t >> ( 8/  ( (t / 32) % 3 ) ) ):
+        ++t;
+      perky(p, kt2);
       set kt2[bx]:pitch ptz[px];
       bx = incr(bx, 0, len(kt2));
       px = incr(px, 0, len(ptz));
@@ -101,4 +101,23 @@ let bablah_gen = gen()
 }
 # let bsqww = loop(bombz/BSQWASPR8.wav); set bsqww:len 12
 
+# let dics = loop(JUNALGOGZ/dicscovibe.wav); set dics:len 2;
+# let flav = loop(JUNALGOGZ/FLAVA.wav);  set flav:len 2
+
+
+let fldblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      solo(flav) at=12*pp;
+      unsolo() at 16*pp;
+      #set mixer:xfader:xpos 1 at=12*pp;
+      #set mixer:xfader:xpos 0 at=16*pp;
+    }
+  }
+}
 

@@ -19,8 +19,10 @@ void XFader::Assign(int idx, unsigned int left_or_right) {
 
   if (left_or_right == LEFT) {
     left_channel_.insert(idx);
-  } else {
+  } else if (left_or_right == RIGHT) {
     right_channel_.insert(idx);
+  } else {
+    Clear(idx);
   }
 }
 

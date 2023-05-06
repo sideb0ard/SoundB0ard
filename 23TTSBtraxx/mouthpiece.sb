@@ -14,7 +14,7 @@ let I = [22, 26, 29];
 let chrz = [ vi, ii, V, I];
 let chx = 0;
 
-# dx purlp // fourteen // wuurpr
+# dx purlp // vol dx 0.8
 
 let chblah_gen = gen()
 {

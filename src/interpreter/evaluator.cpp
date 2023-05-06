@@ -256,6 +256,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
           .type = AudioAction::MIXER_UPDATE,
           .mixer_fx_id = set_stmt->mixer_fx_num_,
           .is_xfader = set_stmt->is_xfader_component_,
+          .delayed_by = delayed_by,
           .param_name = set_stmt->param_,
           .param_val = val};
       audio_queue.push(action);

@@ -726,8 +726,8 @@ let garmelody = fn(num_steps, notez, loop_len)
 
 let gamelody = fn(num_steps, root_key, loop_len)
 {
-  let melody = rand_array(16, 0, 0);
-  if (num_steps > 16) {
+  let melody = rand_array(loop_len, 0, 0);
+  if (num_steps > loop_len) {
     return melody;
   }
 

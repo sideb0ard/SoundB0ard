@@ -31,7 +31,7 @@ let bdlah_gen = gen()
     if (count % 2 == 0) {
       for (i = 0; i < 16; ++i) {
         if (pat[i] == 1) {
-          note_on_at(ch, 1, i * pp * 2);
+          note_on_at(ch, 1, i * pp * 2, dur = 1000);
         }
       }
 
@@ -39,6 +39,7 @@ let bdlah_gen = gen()
   }
 }
 
+# waz = drum() // Srqttx
 let moblah_gen = gen()
 {
   setup()
@@ -58,14 +59,25 @@ let moblah_gen = gen()
       pmax = incr(pmax, 3, len(mel));
 
     }
+    if (count % 3 == 0) {
+
+      for (i = 0; i < 16; ++i) {
+        stepper(waz, mel, px, i, 100);
+        px = incr(px, 0, pmax);
+      }
+      pmax = incr(pmax, 3, len(mel));
+
+    }
   }
 }
 
 let hh1 = sample(wavalc/dm02_909_closedhat_005.wav);
+vol hh1 0.3;
 let perxz1 = [hh1];
 let pr1x = 0;
 
 let tmb = sample(perc/tambourine.aif);
+vol tmb 0.2;
 let perxz2 = [tmb];
 let pr2x = 0;
 let pblah_gen = gen()
@@ -95,6 +107,25 @@ let pblah_gen = gen()
       }
     }
 
+  }
+}
+
+
+# let one = loop(JUNALGOGZ/onetimeTSTM.wav);
+let oneblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 2) {
+      set one:stutter 1;
+    }
+    if (count % 6 == 5) {
+      set one:len 4 at=12;
+      set one:len 2 at=16;
+    }
   }
 }
 

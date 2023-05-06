@@ -21,16 +21,17 @@ let skcblah_gen = gen()
       lx = incr(lx, 0, len(lenz));
     }
     if (count % 16 == 0) {
-      note_on(bdrop, 1);
+      note_on(bdrop, 1, dur = 1000);
     }
   }
 }
 
-# let bsqr = loop(bombz/BSQWASPR8.wav); set bsqr:len 6; add_fx(bsqr, "filter");
-# p5 < osc 12 "300 16000" "set bsqr:fx0:freq %"
+# let bsqr = loop(bombz/BSQWASPR8.wav); set bsqr:len 6;
 # llasticx2
 let hh = sample(ch/hh13.aif);
 
+# YESS! dx = ZKZZ and waz = RBTRR
+# dx = drum() # WALE or Srqttx ? PIPEBLING // ZKZZ
 let mel = [23, 0, 23, 17, 0, 14, 0, 0, 0, 13, 0, 0, 7, 24, 24, 0];
 let dhhblah_gen = gen()
 {
@@ -53,7 +54,78 @@ let dhhblah_gen = gen()
     }
   }
 }
-# p7 < osc 2 "0 95" "set dx:op2out %"
-# p8 < osc 3 "0 95" "set dx:op3out %"
-# p9 < osc 7 "0 95" "set dx:op4out %"
 
+# HIGHWR or RBTRR ?
+let wahblah_gen = gen()
+{
+  setup()
+  {
+    let mel = gamelody(7, 23, 16);
+    let mx = 0;
+    let mmax = 3;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(waz, mel, mx, i, 300);
+      mx = incr(mx, 0, mmax);
+    }
+    mmax = incr(mmax, 3, 16);
+    if (count % 10 == 0) {
+      mel = gamelody(7, 23, 16);
+    }
+  }
+}
+
+# let js = sample(JUNALGOGZ/JSFTYmylove.wav); set js:len 2;
+let hhblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set js:scramble 1;
+    }
+    if (count % 16 == 15) {
+      set js:reverse 1;
+    }
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        if (i % 4 == 2) {
+          note_on_at(hh, 1, i * pp);
+        }
+      }
+    }
+  }
+}
+
+let regblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      set reg:stutter 1;
+      set yeam:stutter 1;
+      set dubr:scramble 1;
+
+    }
+    if (count % 4 == 0) {
+      set reg:scramble 1;
+      set reg:stutter 1;
+      set brek:stutter 1;
+    }
+  }
+}
+
+# let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8
+# dx = SPCZZ // waz = RBTRR // PIPEBLING
+# let reg = loop(JUNALGOGZ/reaggaeGUITR.wav) ; set reg:len 2
+
+# let drr = loop(JUNALGOGZ/drumROLLZ.wav); set drr:len 2
+
+#  let bonz = loop(JUNALGOGZ/bongOS.wav)
