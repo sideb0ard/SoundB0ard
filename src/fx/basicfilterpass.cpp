@@ -10,21 +10,37 @@
 
 FilterPass ::FilterPass() {
   type_ = BASICFILTER;
-  enabled_ = true;
+  m_filter_ = std::make_unique<MoogLadder>();
+  m_filter_->SetFcControl(10000);
+  m_filter_->SetQControl(7);
 
-  m_filter_.m_aux_control = 0.0;
+  m_lfo1_.m_waveform = SINE;
+  m_lfo1_.m_lfo_mode = LFOSYNC;
+  m_lfo1_.m_fo = DEFAULT_LFO_RATE;
 
+  m_lfo2_.m_waveform = SINE;
+  m_lfo2_.m_lfo_mode = LFOSYNC;
+  m_lfo2_.m_fo = DEFAULT_LFO_RATE;
+
+  Update();
   m_lfo1_.StartOscillator();
   m_lfo2_.StartOscillator();
 
   printf("LFO1 freq is %.2f\n", m_lfo1_.m_osc_fo);
+  enabled_ = true;
+}
+
+void FilterPass::Update() {
+  m_filter_->Update();
+  m_lfo1_.Update();
+  m_lfo2_.Update();
 }
 
 std::string FilterPass::Status() {
   std::stringstream ss;
-  ss << "freq:" << m_filter_.m_fc_control;
-  ss << " q:" << m_filter_.m_q_control;
-  ss << " type:" << k_filter_type_names[m_filter_.m_filter_type];
+  ss << "freq:" << m_filter_->m_fc_control;
+  ss << " q:" << m_filter_->m_q_control;
+  ss << " type:" << k_filter_type_names[m_filter_->m_filter_type];
   ss << " lfo1_active:" << m_lfo1_active_;
   ss << " lfo1_type:" << m_lfo1_.m_waveform;
   ss << " lfo1_amp:" << m_lfo1_.m_amplitude << "\n";
@@ -43,29 +59,29 @@ StereoVal FilterPass::Process(StereoVal input) {
   if (m_lfo1_active_) {
     m_lfo1_.Update();
     lfo1_val = m_lfo1_.DoOscillate(NULL);
-    m_filter_.SetFcMod(lfo1_val * FILTER_FC_MOD_RANGE);
+    m_filter_->SetFcMod(lfo1_val * FILTER_FC_MOD_RANGE);
   }
 
   if (m_lfo2_active_) {
     m_lfo2_.Update();
     lfo2_val = m_lfo2_.DoOscillate(NULL);
-    m_filter_.SetQControl(bipolar_to_unipolar(lfo2_val));
+    m_filter_->SetQControl(bipolar_to_unipolar(lfo2_val));
   }
 
-  m_filter_.Update();
-  input.left = m_filter_.DoFilter(input.left);
-  input.right = m_filter_.DoFilter(input.right);
+  m_filter_->Update();
+  input.left = m_filter_->DoFilter(input.left);
+  input.right = input.left;
 
   return input;
 }
 
 void FilterPass::SetParam(std::string name, double val) {
   if (name == "freq")
-    m_filter_.SetFcControl(val);
+    m_filter_->SetFcControl(val);
   else if (name == "q")
-    m_filter_.SetQControl(val);
+    m_filter_->SetQControl(val);
   else if (name == "type")
-    m_filter_.SetType(val);
+    m_filter_->SetType(val);
   else if (name == "lfo1_active")
     SetLfoActive(1, val);
   else if (name == "lfo1_type")
@@ -82,6 +98,8 @@ void FilterPass::SetParam(std::string name, double val) {
     SetLfoAmp(2, val);
   else if (name == "lfo2_rate")
     SetLfoRate(2, val);
+
+  Update();
 }
 
 void FilterPass::SetLfoType(int lfo_num, unsigned int type) {

@@ -19,12 +19,12 @@ let len_gen = gen()
   }
   run()
   {
-      if (count % 4 == 0 && rand(100) > 80) {
-        update_patlen(rand(10));
-      } else {
-        update_patlen(lenz[lx]);
-        lx = incr(lx, 0, len(lenz));
-      }
+    if (count % 4 == 0 && rand(100) > 80) {
+      update_patlen(rand(10));
+    } else {
+      update_patlen(lenz[lx]);
+      lx = incr(lx, 0, len(lenz));
+    }
   }
 }
 
@@ -53,7 +53,7 @@ let masklooper = fn(looper, msk)
   }
 }
 
-# let eden = loop(legowelt/Synth-EdenHarp.wav) ; set eden:len 4; 
+# let eden = loop(legowelt/Synth-EdenHarp.wav) ; set eden:len 4;
 let stepper = fn(sg, pat, read_idx, play_idx, d)
 {
   if (type(pat[read_idx]) == "ARRAY") {
@@ -287,7 +287,7 @@ let vocblah_gen = gen()
       for (i = 0; i < 16; ++i) {
         if (beat[i] == 1) {
           note_on_at(vocz[vx], 1, i*pp, dur = d);
-          vx = incr(vx, 0, len(vocz)); 
+          vx = incr(vx, 0, len(vocz));
           d = d + 20;
           if (d > PP) {
             d = 100;

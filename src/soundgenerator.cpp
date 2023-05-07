@@ -48,7 +48,7 @@ void SoundGenerator::ListPresets() {
 std::string SoundGenerator::Status() { return std::string{"BASE CLASS, YO"}; }
 
 void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo) {
-  int midi_note = ev.data1;
+  (void)tinfo;
 
   switch (ev.event_type) {
     case (MIDI_ON): {  // Hex 0x80
@@ -76,6 +76,7 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo) {
 void SoundGenerator::EventNotify(broadcast_event event,
                                  mixer_timing_info tinfo) {
   (void)event;
+  (void)tinfo;
 }
 
 double SoundGenerator::GetPan() { return pan; }
@@ -104,7 +105,7 @@ StereoVal SoundGenerator::Effector(StereoVal val) {
 }
 
 bool SoundGenerator::IsSynth() {
-  if (type == MINISYNTH_TYPE || type == DXSYNTH_TYPE == type == DRUMSYNTH_TYPE)
+  if (type == MINISYNTH_TYPE || type == DXSYNTH_TYPE || type == DRUMSYNTH_TYPE)
     return true;
 
   return false;

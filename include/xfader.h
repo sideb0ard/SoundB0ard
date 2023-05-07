@@ -24,7 +24,7 @@ class XFader {
 
   int frames_per_midi_tick_{0};
 
-  double xfade_time_midi_tics_{10};
+  double xfade_time_midi_tics_{1};
   bool active_fade_{false};
   unsigned int fading_direction_{LEFT};
 

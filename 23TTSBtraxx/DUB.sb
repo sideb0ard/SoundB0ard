@@ -7,9 +7,7 @@ let bsslah_gen = gen()
   {
     #let bline = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0];
     let t = 43433;
-
-    let num = 3;
-
+    let num = 13;
   }
   run()
   {
@@ -21,7 +19,7 @@ let bsslah_gen = gen()
     if (count % 8 < 7) {
       for (i = 0; i < 16; ++i) {
         if (p[i] == 1) {
-          note_on_at(bd, 33, i * pp);
+          note_on_at(bd, num, i * pp);
         }
       }
     }
@@ -29,7 +27,7 @@ let bsslah_gen = gen()
     if (count % 11 < 7) {
       for (i = 0; i < 16; ++i) {
         if (p[i] == 0) {
-          note_on_at(dx, 33, i * pp);
+          note_on_at(cb, num, i * pp);
         }
       }
     }
@@ -58,7 +56,7 @@ let dxblah_gen = gen()
   {
     if (count % 16 < 8) {
       for (i = 0; i < 16; ++i) {
-        stepper(dx, melt, idx, i, drx);
+        stepper(cl, melt, idx, i, drx);
         idx = incr(idx, 0, idmm);
       }
       idmm = incr(idmm, 4, 16);

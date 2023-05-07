@@ -20,9 +20,10 @@ class FilterPass : public Fx {
   void SetLfoRate(int lfo_num, double val);
   void SetLfoAmp(int lfo_num, double val);
   void SetLfoType(int lfo_num, unsigned int type);
+  void Update();
 
  private:
-  MoogLadder m_filter_;
+  std::unique_ptr<MoogLadder> m_filter_;
 
   LFO m_lfo1_;  // route to freq
   bool m_lfo1_active_{false};
