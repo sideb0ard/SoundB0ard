@@ -31,16 +31,17 @@ void XFader::Clear(int idx) {
   right_channel_.erase(idx);
 }
 
-void XFader::Update() {
+void XFader::Update(mixer_timing_info tinfo) {
+  frames_per_midi_tick_ = tinfo.frames_per_midi_tick;
   if (active_fade_) {
-    double ramp_val = ramper_.Generate();
     if (fading_direction_ == LEFT) {
-      xfader_position_ = -1.0 * ramp_val;
+      xfader_position_ -= increment_;
+      if (xfader_position_ <= xfader_destination_position_)
+        active_fade_ = false;
     } else {
-      xfader_position_ = ramp_val;
-    }
-    if (ramp_val == 1) {
-      active_fade_ = false;
+      xfader_position_ += increment_;
+      if (xfader_position_ >= xfader_destination_position_)
+        active_fade_ = false;
     }
   }
 }
@@ -65,23 +66,34 @@ double XFader::GetValueFor(int idx) {
   return 1;
 }
 
-void XFader::SetXFaderPosition(double pos) {
-  if (pos >= -1 && pos <= 1) {
-    xfader_position_ = pos;
+void XFader::Set(std::string var, double val) {
+  if (var == "xpos") {
+    SetXFaderPosition(val);
+  } else if (var == "fade_tics") {
+    SetFadeTimeMidiTicks(val);
   }
 }
 
-void XFader::Fade(unsigned int left_or_right, double time_in_frames) {
-  ramper_.Reset(time_in_frames);
-  fading_direction_ = left_or_right;
-  active_fade_ = true;
+void XFader::SetXFaderPosition(double pos) {
+  if (pos >= -1 && pos <= 1 && pos != xfader_position_) {
+    xfader_destination_position_ = pos;
+    double distance = std::abs(xfader_position_ - xfader_destination_position_);
+    increment_ = distance / (xfade_time_midi_tics_ * frames_per_midi_tick_);
+    active_fade_ = true;
+    if (xfader_destination_position_ < xfader_position_)
+      fading_direction_ = LEFT;
+    else
+      fading_direction_ = RIGHT;
+  }
 }
+
+void XFader::SetFadeTimeMidiTicks(double tics) { xfade_time_midi_tics_ = tics; }
 
 std::string XFader::Status() {
   std::stringstream ss;
   constexpr int xfader_graphic_size = 15;
 
-  ss << "xpos: " << xfader_position_ << " [ ";
+  ss << "[ ";
   for (auto it = left_channel_.begin(); it != left_channel_.end(); ++it) {
     ss << *it << " ";
   }
@@ -111,6 +123,7 @@ std::string XFader::Status() {
     ss << *it << " ";
   }
   ss << "]";
+  ss << " xpos: " << xfader_position_ << " fade_tics:" << xfade_time_midi_tics_;
 
   return ss.str();
 }

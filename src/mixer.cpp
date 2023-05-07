@@ -458,6 +458,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     return_bpm = bpm_to_be_updated;
     bpm_to_be_updated = 0;
   }
+  xfader_.Update(timing_info);
 
   for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2) {
     double output_left = 0.0;
@@ -741,13 +742,11 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
       sg->allNotesOff();
     }
   } else if (action.type == AudioAction::MIXER_UPDATE) {
+    double param_val = std::stod(action.param_val);
     if (action.mixer_fx_id != -1) {
-      double param_val = std::stod(action.param_val);
       fx_[action.mixer_fx_id]->SetParam(action.param_name, param_val);
     } else if (action.is_xfader) {
-      double param_val = std::stod(action.param_val);
-      // note: ignores param_name, only one param at the moment
-      xfader_.SetXFaderPosition(param_val);
+      xfader_.Set(action.param_name, param_val);
     }
   } else if (action.type == AudioAction::MIXER_FX_UPDATE) {
     for (const auto &soundgen_num : action.group_of_soundgens) {
@@ -757,6 +756,13 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
           sg->SetFxSend(action.mixer_fx_id, action.fx_intensity);
         }
       }
+    }
+  } else if (action.type == AudioAction::MIXER_XFADE_ACTION) {
+    if (action.xfade_direction == 0) {
+      xfader_.Set("xpos", -1);
+    }
+    if (action.xfade_direction == 1) {
+      xfader_.Set("xpos", 1);
     }
   } else if (action.type == AudioAction::MIXER_XFADE_ASSIGN) {
     for (const auto &soundgen_num : action.group_of_soundgens) {

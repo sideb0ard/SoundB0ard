@@ -593,7 +593,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto return_array = std::make_shared<object::Array>(
                  std::vector<std::shared_ptr<object::Object>>());
 
-             int num_taken = 0;
+             unsigned int num_taken = 0;
              while (num_taken < num_to_take) {
                auto idx = rand() % array_obj->elements_.size();
                auto it = find(return_array->elements_.begin(),
@@ -1155,12 +1155,43 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            return evaluator::NULLL;
          })},
+    {"xfade",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() == 0)
+             return evaluator::NewError(
+                 "`xfade` requires at least one arg - a direction LEFT(0) or "
+                 "RIGHT(1)");
+
+           auto at_obj = std::find_if(input.begin(), input.end(),
+                                      [](std::shared_ptr<object::Object> o) {
+                                        return o->Type() == object::AT_OBJ;
+                                      });
+           int delayed_by{0};
+           if (at_obj != input.end()) {
+             auto at = std::dynamic_pointer_cast<object::At>(*at_obj);
+             if (at) {
+               delayed_by = at->value_;
+             }
+           }
+
+           auto num_obj = std::dynamic_pointer_cast<object::Number>(input[0]);
+           if (num_obj) {
+             audio_action_queue_item action_req{
+                 .type = AudioAction::MIXER_XFADE_ACTION,
+                 .delayed_by = delayed_by,
+                 .xfade_direction = static_cast<unsigned int>(num_obj->value_)};
+             audio_queue.push(action_req);
+           }
+           return evaluator::NULLL;
+         })},
     {"is_array", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> input)
                          -> std::shared_ptr<object::Object> {
                        if (input.size() != 1)
                          return evaluator::NewError(
-                             "`is_array` requires a single args - an array");
+                             "`is_array` requires a single arg - an array");
 
                        std::shared_ptr<object::Array> array_obj =
                            std::dynamic_pointer_cast<object::Array>(input[0]);

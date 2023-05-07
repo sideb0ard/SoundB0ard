@@ -59,3 +59,33 @@ target_link_libraries(Sbsh ${PORTMIDI_LIB})
 target_link_libraries(Sbsh ${READLINE_LIB})
 target_link_libraries(Sbsh ${HISTORY_LIB})
 target_link_libraries(Sbsh ${SNDFILE_LIB})
+
+
+#################################################################
+# TESTS
+#
+#enable_testing()
+#
+#include(FetchContent)
+#FetchContent_Declare(
+#  googletest
+#  GIT_REPOSITORY https://github.com/google/googletest.git
+#  GIT_TAG        v1.13.0
+#)
+#FetchContent_MakeAvailable(googletest)
+#
+#add_executable(
+#  ramp_test
+#  tests/ramp_test.cpp
+#  src/fx/ramp.cpp
+#)
+#
+#target_include_directories(ramp_test PRIVATE ${Sbsh_INCLUDE_DIRS})
+#target_include_directories(ramp_test PRIVATE ${HomebrewIncDir})
+#target_link_libraries(
+#  ramp_test
+#  GTest::gtest_main
+#)
+#
+#include(GoogleTest)
+#gtest_discover_tests(ramp_test)
