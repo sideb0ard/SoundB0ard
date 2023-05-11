@@ -1,83 +1,9 @@
-# let skc = loop(glitchedVinyl/skipstep2BASS.wav); add_fx(skc, "distort"); set skc:len 2
-# p1 < osc 8 "0 15"  "set skc:poffset %"
 let bdrop = sample(bombz/BSQ_BASSDROP.wav);
-let skcblah_gen = gen()
-{
-  setup()
-  {
-    let lenz = [15, 14, 12, 16];
-    let lx = 0;
-  }
-  run()
-  {
-    if (count % 8 == 7) {
-      set skc:reverse 1;
-    }
-    if (count % 16 == 15) {
-      set skc:scramble 1;
-    }
-    if (count % 16 == 14) {
-      set skc:plooplen lenz[lx];
-      lx = incr(lx, 0, len(lenz));
-    }
-    if (count % 16 == 0) {
-      note_on(bdrop, 1, dur = 1000);
-    }
-  }
-}
 
 # let bsqr = loop(bombz/BSQWASPR8.wav); set bsqr:len 6;
-# llasticx2
 let hh = sample(ch/hh13.aif);
 
-# YESS! dx = ZKZZ and waz = RBTRR
-# dx = drum() # WALE or Srqttx ? PIPEBLING // ZKZZ
-let mel = [23, 0, 23, 17, 0, 14, 0, 0, 0, 13, 0, 0, 7, 24, 24, 0];
-let dhhblah_gen = gen()
-{
-  setup()
-  {
-    let mx = 0;
-    let mmax = 3;
-    let durz = [60, 90, 100, 150, 200, 250, 300];
-    let drx = 0;
-  }
-  run()
-  {
-    if (count % 2 == 1) {
-      for (i = 0; i < 16; ++i) {
-        stepper(dx, mel, mx, i, durz[drx]);
-        drx = incr(drx, 0, len(durz));
-        mx = incr(mx, 0, mmax);
-      }
-      mmax = incr(mmax, 3, 16);
-    }
-  }
-}
-
-# HIGHWR or RBTRR ?
-let wahblah_gen = gen()
-{
-  setup()
-  {
-    let mel = gamelody(7, 23, 16);
-    let mx = 0;
-    let mmax = 3;
-  }
-  run()
-  {
-    for (i = 0; i < 16; ++i) {
-      stepper(waz, mel, mx, i, 300);
-      mx = incr(mx, 0, mmax);
-    }
-    mmax = incr(mmax, 3, 16);
-    if (count % 10 == 0) {
-      mel = gamelody(7, 23, 16);
-    }
-  }
-}
-
-# let js = sample(JUNALGOGZ/JSFTYmylove.wav); set js:len 2;
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav);
 let hhblah_gen = gen()
 {
   setup()
@@ -101,6 +27,53 @@ let hhblah_gen = gen()
   }
 }
 
+
+# cl = NUURF and cp HIGHWR
+let mel = [23, 0, 23, 17, 0, 14, 0, 0, 0, 13, 0, 0, 7, 24, 24, 0];
+let dhhblah_gen = gen()
+{
+  setup()
+  {
+    let mx = 0;
+    let mmax = 3;
+    let durz = [60, 90, 100, 150, 200, 250, 300];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      for (i = 0; i < 16; ++i) {
+        stepper(cl, mel, mx, i, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        mx = incr(mx, 0, mmax);
+      }
+      mmax = incr(mmax, 3, 16);
+    }
+  }
+}
+
+let wahblah_gen = gen()
+{
+  setup()
+  {
+    let mel = gamelody(16, 23);
+    let mx = 0;
+    let mmax = 3;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(cp, mel, mx, i, 300);
+      mx = incr(mx, 0, mmax);
+    }
+    mmax = incr(mmax, 3, 16);
+    if (count % 10 == 0) {
+      mel = gamelody(7, 23, 16);
+    }
+  }
+}
+
+# let drr = loop(JUNALGOGZ/drumROLLZ.wav); set drr:len 2
 let regblah_gen = gen()
 {
   setup()
@@ -109,15 +82,11 @@ let regblah_gen = gen()
   run()
   {
     if (count % 3 == 0) {
-      set reg:stutter 1;
-      set yeam:stutter 1;
-      set dubr:scramble 1;
+      set drr:scramble 1;
 
     }
     if (count % 4 == 0) {
-      set reg:scramble 1;
-      set reg:stutter 1;
-      set brek:stutter 1;
+      set drr:reverse 1;
     }
   }
 }
@@ -126,6 +95,5 @@ let regblah_gen = gen()
 # dx = SPCZZ // waz = RBTRR // PIPEBLING
 # let reg = loop(JUNALGOGZ/reaggaeGUITR.wav) ; set reg:len 2
 
-# let drr = loop(JUNALGOGZ/drumROLLZ.wav); set drr:len 2
 
 #  let bonz = loop(JUNALGOGZ/bongOS.wav)

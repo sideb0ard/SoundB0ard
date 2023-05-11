@@ -2,7 +2,7 @@
 # kit();
 # load_preset(bd, "KICKR"); load_preset(cb, "oopdz"); load_preset(cl, "glotch");
 # load_preset(cp, "scicczr"); load_preset(hh, "snipz");  load_preset(oh, "OH");
-# load_preset(sd, "SNDrm");
+# load_preset(sd, "SNDrm"); load_preset(dx, "purlp");
 
 # I-vi-IV-V
 # key of E // 16 // 28
@@ -48,6 +48,7 @@ let bdumblah_gen = gen()
     }
   }
 }
+
 let bdumblah2_gen = gen()
 {
   setup()
@@ -102,7 +103,7 @@ let perc1blah_gen = gen()
 }
 
 
-# hh = snipz // oh = OH
+## hh = snipz // oh = OH
 let htz = [hh, oh];
 let hhblah_gen = gen()
 {
@@ -174,13 +175,13 @@ let cblah_gen = gen()
 }
 
 
-# let dx = fm(); load_preset(dx, "purlp");
-
-# wuurpr // landroiD
-# p3 < osc 8 "50 90"  "set dx:op3out %"
-# p4 < osc 3 "50 90"  "set dx:op4out %"
-# p5 < osc 1 "50 90"  "set dx:op2out %"
-# purlp // SBBZzz // whippit // sawrr // drmrrr
+## let dx = fm(); load_preset(dx, "purlp");
+#
+## wuurpr // landroiD
+## p3 < osc 8 "50 90"  "set dx:op3out %"
+## p4 < osc 3 "50 90"  "set dx:op4out %"
+## p5 < osc 1 "50 90"  "set dx:op2out %"
+## purlp // SBBZzz // whippit // sawrr // drmrrr
 let wwblah_gen = gen()
 {
   setup()
@@ -212,12 +213,13 @@ let wwblah_gen = gen()
     }
   }
 }
+
 let wwblah_gen2 = gen()
 {
   setup()
   {
     let dr = 500;
-    let melly = gamelody(16, 16, 1);
+    let melly = gamelody(16, 28);
     let mx = 0;
     let mmax = 3;
 
@@ -225,7 +227,7 @@ let wwblah_gen2 = gen()
   run()
   {
     if (count % 16 == 0) {
-      melly = gamelody(16, 16, 1);
+      melly = gamelody(16, 28);
     }
     let mel = melly;
     if (count % 4 == 3) {
@@ -239,9 +241,8 @@ let wwblah_gen2 = gen()
   }
 }
 
-#let per1 = drum(); let per2 = drum(); let per3 = drum();
-#load_preset(per1, "DWUB"); load_preset(per2, "wllopa"); load_preset(per3, "WWWWWl");
-#vol per1 0.4; vol per2 0.4; vol per3 0.4;
+##load_preset(per1, "DWUB"); load_preset(per2, "wllopa"); load_preset(per3, "WWWWWl");
+##vol per1 0.4; vol per2 0.4; vol per3 0.4;
 let microblah_gen = gen()
 {
   setup()
@@ -297,4 +298,5 @@ let deeblah_gen = gen()
       }
     }
   }
+}
 

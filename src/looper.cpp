@@ -292,6 +292,7 @@ void Looper::start() {
 }
 
 void Looper::stop() {
+  std::cout << "STOP!\n";
   eg_.Release();
   stop_pending_ = true;
 }

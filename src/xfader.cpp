@@ -21,14 +21,12 @@ void XFader::Assign(int idx, unsigned int left_or_right) {
     left_channel_.insert(idx);
   } else if (left_or_right == RIGHT) {
     right_channel_.insert(idx);
-  } else {
-    Clear(idx);
   }
 }
 
-void XFader::Clear(int idx) {
-  left_channel_.erase(idx);
-  right_channel_.erase(idx);
+void XFader::Clear() {
+  left_channel_.clear();
+  right_channel_.clear();
 }
 
 void XFader::Update(mixer_timing_info tinfo) {

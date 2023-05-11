@@ -9,7 +9,7 @@ class XFader {
   ~XFader() = default;
 
   void Assign(int soundgenerator_idx, unsigned int left_or_right);
-  void Clear(int soundgenerator_idx);
+  void Clear();
 
   void Update(mixer_timing_info tinfo);
   double GetValueFor(int soundgenerator_idx);

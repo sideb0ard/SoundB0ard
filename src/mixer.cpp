@@ -739,7 +739,8 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
   } else if (action.type == AudioAction::STOP) {
     if (IsValidSoundgenNum(action.soundgen_num)) {
       auto sg = sound_generators_[action.soundgen_num];
-      sg->allNotesOff();
+      // sg->allNotesOff();
+      sg->stop();
     }
   } else if (action.type == AudioAction::MIXER_UPDATE) {
     double param_val = std::stod(action.param_val);
@@ -770,6 +771,8 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
         xfader_.Assign(soundgen_num, action.xfade_channel);
       }
     }
+  } else if (action.type == AudioAction::MIXER_XFADE_CLEAR) {
+    xfader_.Clear();
   } else if (action.type == AudioAction::UPDATE) {
     if (IsValidSoundgenNum(action.mixer_soundgen_idx)) {
       double param_val = std::stod(action.param_val);

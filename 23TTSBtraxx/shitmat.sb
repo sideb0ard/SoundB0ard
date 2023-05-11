@@ -1,0 +1,23 @@
+
+let sxblah_gen = gen()
+{
+  setup()
+  {
+    let poz = [-1, 1];
+    let px = 0;
+  }
+  run()
+  {
+    set mixer:xfader:xpos poz[px];
+    px = incr(px, 0, len(poz));
+    if (count % 3 == 0) {
+      set sht1:stutter 1;
+      set sht2:scramble 1;
+    }
+    if (count % 4 == 0) {
+      set sht1:scramble 1;
+      set sht2:stutter 1;
+    }
+  }
+}
+

@@ -142,17 +142,12 @@ let snnblah_gen = gen()
   }
 }
 
-# let sv = loop(legowelt/Synth-Valkery.wav); set sv:len 5;
-# add_fx(sv, "filter", "reverb", "delay")
-#p3 < osc 8 "0 80"  "set mixer:delay:fb %"
-#p4 < osc 8 "20 90"  "set sv:fx1:wetmx %"
-#p5 < osc 7 "20 90"  "set sv:fx2:fb %"
-#p6 < osc 12 "80 300"  "set sv:fx0:freq %"
-
 #let shr = loop(strings/shadesofrhythm4bar.aiff); set shr:len 12
 #p7 < osc 8 "20 90"  "set shr:fx1:wetmx %"
 #p8 < osc 7 "20 90"  "set shr:fx2:fb %"
 #p9 < osc 12 "80 300"  "set shr:fx0:freq %"
+
+# let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4)
 
 let sblah_gen = gen()
 {
@@ -164,8 +159,6 @@ let sblah_gen = gen()
   }
   run()
   {
-    set shr:pitch pxz[px];
-    px = incr(px, 0, len(pxz));
     if (count % 15 == 0) {
       set shr:scramble 1;
     }
@@ -174,7 +167,7 @@ let sblah_gen = gen()
     }
     if (count % 13 == 0) {
       set shr:stutter 1;
-      set sv:stutter 1;
+      set wrb:stutter 1;
     }
   }
 }
@@ -215,6 +208,16 @@ let ppblah_gen = gen()
     if (count % 11 == 0) {
       pat = rand_array(16, 0, 5);
     }
+  }
+}
+
+let wuhmblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
   }
 }
 

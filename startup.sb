@@ -117,8 +117,28 @@ let countr = gen()
     ++count;
   }
 }
+let xfade_gen = gen()
+{
+  setup()
+  {
+    let poz = [1, -1, 1, 1, -1, 1, -1];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set mixer:xfader:xpos poz[px] at=8*pp;
+      if (count % 16 < 14 ) {
+        set mixer:xfader:xpos 0 at=16*pp;
+      }
+      px = incr(px, 0, len(poz));
+    }
+  }
+}
+
 
 p0 # countr ;
+p1 # xfade_gen ;
 
 # i.e. 3840 / 16 == 240 midi Pulses Per 16th
 let pp = 240;
@@ -724,13 +744,9 @@ let garmelody = fn(num_steps, notez, loop_len)
 }
 
 
-let gamelody = fn(num_steps, root_key, loop_len)
+let gamelody = fn(num_steps, root_key)
 {
-  let melody = rand_array(loop_len, 0, 0);
-  if (num_steps > loop_len) {
-    return melody;
-  }
-
+  let melody = rand_array(num_steps, 0, 0);
   let notez = notes_in_key(root_key);
 
   for (i = 0; i < len(melody); ++i) {
