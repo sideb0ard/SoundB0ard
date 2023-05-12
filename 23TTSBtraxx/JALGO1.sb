@@ -3,63 +3,44 @@
 # p3 < osc 5 "0 1" "send(0, iknow, %)"
 
 #let ntz = [23, 21, 34];
+#let ntz = [55, 54, 47];
 let ntz = [55, 54, 47];
 
-
-let fade_fn = fn(sg)
-{
-  p99 < over 8 "1 0" "vol " +  sg + " %";
-}
-
-# cb = BLELL // MFFF // scicczr // TINPAN
-let mamwblah_gen = gen()
+# dx - wuurpr
+let strabblah = gen()
 {
   setup()
   {
-    let bs = rand_array(16, 0, 1);
-    let ix = 0;
-    let imax = 4;
-    let d = 150;
+    let notez = [47, 55];
     let nx = 0;
+    let cnt = 7;
+    let the_mel = combinor(bjork(cnt, 16), notez);
   }
   run()
   {
-
-    if (count % 3 == 0) {
-      set iknow:stutter;
+    for (i = 0; i < 16; ++i) {
+      let v = 100 + rand(27);
+      let off = 0;
+      if (count % 4 == 0) {
+        v = 127;
+      }
+      if (count % 2 == 1) {
+        off = 48;
+      }
+      if (the_mel[i] > 0 ) {
+        note_on_at(dx, the_mel[i], i*pp + off, vel = v);
+      }
     }
+    # print(the_mel);
     if (count % 4 == 0) {
-      set iknow:scramble;
-    }
-
-    if (count % 4 < 3) {
-      let mel = combinor(bs, down(notes_in_chord(ntz[nx]), 12));
-      if (count % 4 == 3) {
-        mel = combinor(bs, notes_in_chord(ntz[nx]));
-      }
-      if (count % 16 == 13) {
-        mel = combinor(bs, down(notes_in_chord(ntz[nx]), 24));
-      }
-      nx = incr(nx, 0, len(ntz));
-      for (i = 0; i < 16; ++i) {
-        stepper(cb, mel, i, ix, d);
-        ix = incr(ix, 0, imax);
-        d = d + 30;
-        if (d > 700){
-          d = 150;
-        }
-      }
-      imax = incr(imax, 3, 16);
-    }
-
-    if (count % 12 == 0) {
-      bs = rand_array(16, 0, 1);
+      the_mel = combinor(bjork(cnt, 16), notez);
+      cnt = incr(cnt, 3, 11);
     }
   }
 }
 
-# let ab1 = loop(JUNALGOGZ/auchBEa2.wav); set ab1:len 2; xassign(0, ab1);
-# let ab2 = loop(JUNALGOGZ/auchRBE3.wav); xassign(1, ab2); p4 $ wwblah_gen
+# let ab1 = loop(JUNALGOGZ/auchBEa2.wav); set ab1:len 2; xassign(0, ab1); send(2, ab1, 0.4);
+# let ab2 = loop(JUNALGOGZ/auchRBE3.wav); xassign(1, ab2); p5 $ wwblah_gen; send(2, ab2, 0.4);
 let wwblah_gen = gen()
 {
   setup()
@@ -76,6 +57,13 @@ let wwblah_gen = gen()
         set ab2:scramble 1;
       }
     }
+    set ab1:on 1;
+    set ab2:on 1;
+    if (count % 16 == 15) {
+      let b = rand_array(16, 0, 1);
+      play_array(ab1, b);
+      play_array(ab2, invert(b));
+    }
 
     if (count % 4 == 3) {
       set ab1:stutter 1;
@@ -85,9 +73,8 @@ let wwblah_gen = gen()
 }
 
 # cut -- ab2 --
-# let bt = loop(JUNALGOGZ/craklBEAT.wav); send(2, bt, 1);
+# let bt = loop(JUNALGOGZ/craklBEAT.wav); send(2, bt, 0.4);
 # ^ send(2, bt, 1)
-
 
 # per1 = drum(); Srqttx
 # per2 = HIGHWR

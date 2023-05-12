@@ -1,8 +1,8 @@
-let bd = sample(wavalc/dm02_909_kickdrum_005_clean.wav);
 let hh = sample(ch/pumpDistortHH.wav);
 let hhh = sample(ch/reggaHatz.aiff);
 let guh = sample(brandyvocalz/gu.wav);
-let kt = [bd, hh, hhh, guh];
+let huh = sample(TT-NOCERA/hatUH.wav);
+let kt = [hh, hhh, guh, huh];
 
 let bin_gen = gen()
 {
@@ -67,7 +67,7 @@ let hau = sample(cp/haunterZ.aiff);
 let nyc = sample(cp/NYClap.aiff);
 let cpp = sample(cp/clap25.aif);
 let cppz = [rm, hau, nyc, cpp];
-# let awk = loop(hallow/awkardBEAT2.wav); add_fx(awk, "distort");
+# let awk = loop(hallow/awkardBEAT2.wav); send(2, awk, 0.4);
 let bablah_gen = gen()
 {
   setup()
@@ -99,11 +99,8 @@ let bablah_gen = gen()
     }
   }
 }
-# let bsqww = loop(bombz/BSQWASPR8.wav); set bsqww:len 12
 
-# let dics = loop(JUNALGOGZ/dicscovibe.wav); set dics:len 2;
-# let flav = loop(JUNALGOGZ/FLAVA.wav);  set flav:len 2
-
+# let dics = loop(JUNALGOGZ/dicscovibe.wav); set dics:len 2; send(2, dics, 0.3);
 
 let fldblah_gen = gen()
 {
@@ -113,10 +110,48 @@ let fldblah_gen = gen()
   run()
   {
     if (count % 2 == 0) {
-      solo(flav) at=12*pp;
-      unsolo() at 16*pp;
-      #set mixer:xfader:xpos 1 at=12*pp;
-      #set mixer:xfader:xpos 0 at=16*pp;
+      set dics:stutter 1;
+    }
+  }
+}
+
+#  cp SLICZ
+let ok = sample(voices/ok.wav);
+let dabblah = gen()
+{
+  setup()
+  {
+    let notez = [47, 48];
+    let nx = 0;
+    let cnt = 7;
+    let the_mel = combinor(bjork(cnt, 16), notez);
+    let d = 50;
+  }
+  run()
+  {
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        let v = 100 + rand(27);
+        let off = 0;
+        if (count % 4 == 0) {
+          v = 127;
+        }
+        if (count % 2 == 1) {
+          off = 48;
+        }
+        if (the_mel[i] > 0 ) {
+          note_on_at(cp, the_mel[i], i*pp + off, vel = v, dur = d);
+        }
+      }
+      d = d + 50;
+      if (d > 250) {
+        d = 50;
+      }
+    }
+    if (count % 4 == 0) {
+      the_mel = combinor(bjork(cnt, 16), notez);
+      cnt = incr(cnt, 3, 11);
+      note_on(ok, 1, dur = d + 100);
     }
   }
 }

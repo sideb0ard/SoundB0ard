@@ -3,7 +3,7 @@ let bdrop = sample(bombz/BSQ_BASSDROP.wav);
 # let bsqr = loop(bombz/BSQWASPR8.wav); set bsqr:len 6;
 let hh = sample(ch/hh13.aif);
 
-# let js = loop(JUNALGOGZ/JSFTYmylove.wav);
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ hhblah_gen; send(2, js, 0.2);
 let hhblah_gen = gen()
 {
   setup()
@@ -36,7 +36,7 @@ let dhhblah_gen = gen()
   {
     let mx = 0;
     let mmax = 3;
-    let durz = [60, 90, 100, 150, 200, 250, 300];
+    let durz = [200, 250, 300];
     let drx = 0;
   }
   run()
@@ -68,7 +68,7 @@ let wahblah_gen = gen()
     }
     mmax = incr(mmax, 3, 16);
     if (count % 10 == 0) {
-      mel = gamelody(7, 23, 16);
+      mel = gamelody(16, 23);
     }
   }
 }
@@ -94,6 +94,5 @@ let regblah_gen = gen()
 # let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8
 # dx = SPCZZ // waz = RBTRR // PIPEBLING
 # let reg = loop(JUNALGOGZ/reaggaeGUITR.wav) ; set reg:len 2
-
 
 #  let bonz = loop(JUNALGOGZ/bongOS.wav)
