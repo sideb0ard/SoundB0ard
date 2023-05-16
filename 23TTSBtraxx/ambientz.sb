@@ -3,6 +3,7 @@ let ch = sample(ch/hatTail.aiff);
 let sn = sample(noises/skateWheelDoublehit.aiff);
 
 # JUSTIFY STILL
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ hhblah_gen; send(2, js, 0.2);
 let bdlah_gen = gen()
 {
   setup()
@@ -40,7 +41,6 @@ let bdlah_gen = gen()
   }
 }
 
-# cb = drum() // Srqttx
 let moblah_gen = gen()
 {
   setup()
@@ -72,6 +72,7 @@ let moblah_gen = gen()
   }
 }
 
+# cb = drum() // Srqttx
 let hh1 = sample(wavalc/dm02_909_closedhat_005.wav);
 vol hh1 0.3;
 let perxz1 = [hh1];
@@ -123,10 +124,13 @@ let oneblah_gen = gen()
     if (count % 4 == 2) {
       set one:stutter 1;
     }
-    if (count % 6 == 5) {
-      set one:len 4 at=12;
-      set one:len 2 at=16;
+    if (count % 8 == 7) {
+      set one:reverse 1;
     }
+    # if (count % 6 == 5) {
+      #   set one:len 4 at=12;
+      #   set one:len 2 at=16;
+      # }
   }
 }
 

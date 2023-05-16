@@ -143,11 +143,10 @@ let snnblah_gen = gen()
 }
 
 #let shr = loop(strings/shadesofrhythm4bar.aiff); set shr:len 12
-#p7 < osc 8 "20 90"  "set shr:fx1:wetmx %"
-#p8 < osc 7 "20 90"  "set shr:fx2:fb %"
-#p9 < osc 12 "80 300"  "set shr:fx0:freq %"
+#p7 < osc 8 "0.2 0.9"  "send(1, shr, %)";
+#p8 < osc 8 "0.2 0.9"  "send(0, shr, %)";
 
-# let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4)
+# let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4) ; add_fx(one, "sidechain", wrb)"
 
 let sblah_gen = gen()
 {
@@ -208,16 +207,6 @@ let ppblah_gen = gen()
     if (count % 11 == 0) {
       pat = rand_array(16, 0, 5);
     }
-  }
-}
-
-let wuhmblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
   }
 }
 

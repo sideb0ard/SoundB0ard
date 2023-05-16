@@ -1,34 +1,7 @@
-let bdrop = sample(bombz/BSQ_BASSDROP.wav);
-
 # let bsqr = loop(bombz/BSQWASPR8.wav); set bsqr:len 6;
-let hh = sample(ch/hh13.aif);
-
-# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ hhblah_gen; send(2, js, 0.2);
-let hhblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 4 == 3) {
-      set js:scramble 1;
-    }
-    if (count % 16 == 15) {
-      set js:reverse 1;
-    }
-    if (count % 8 < 6) {
-      for (i = 0; i < 16; ++i) {
-        if (i % 4 == 2) {
-          note_on_at(hh, 1, i * pp);
-        }
-      }
-    }
-  }
-}
-
 
 # cl = NUURF and cp HIGHWR
+# cl = PIPEBLING and cp BADUM ** send both to 2, 0.4
 let mel = [23, 0, 23, 17, 0, 14, 0, 0, 0, 13, 0, 0, 7, 24, 24, 0];
 let dhhblah_gen = gen()
 {
@@ -90,6 +63,32 @@ let regblah_gen = gen()
     }
   }
 }
+
+let hh = sample(ch/hh13.aif);
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ hhblah_gen; send(2, js, 0.2);
+let hhblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set js:scramble 1;
+    }
+    if (count % 16 == 15) {
+      set js:reverse 1;
+    }
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        if (i % 4 == 2) {
+          note_on_at(hh, 1, i * pp);
+        }
+      }
+    }
+  }
+}
+
 
 # let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8
 # dx = SPCZZ // waz = RBTRR // PIPEBLING

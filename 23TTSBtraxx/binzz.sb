@@ -67,7 +67,7 @@ let hau = sample(cp/haunterZ.aiff);
 let nyc = sample(cp/NYClap.aiff);
 let cpp = sample(cp/clap25.aif);
 let cppz = [rm, hau, nyc, cpp];
-# let awk = loop(hallow/awkardBEAT2.wav); send(2, awk, 0.4);
+# let awk = loop(hallow/awkardBEAT2.wav); send(2, awk, 0.6); p8 $ bablah_gen
 let bablah_gen = gen()
 {
   setup()
@@ -80,7 +80,7 @@ let bablah_gen = gen()
     let ptx = 0;
   }
   run()
-  {
+  {
     play_array(bddd, bjork(bjz[bx], 16), dur=500);
     bx = incr(bx, 0, len(bjz));
     set awk:on 1;

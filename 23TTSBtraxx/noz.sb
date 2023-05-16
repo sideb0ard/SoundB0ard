@@ -33,20 +33,20 @@ let prgx = 0;
 let t = 434344;
 let p = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
 
-let progblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    ++t;
-    p = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
-    if (count % 8 == 0) {
-      prgx = incr(prgx, 0, len(progz));
-    }
-  }
-}
+#let progblah_gen = gen()
+#{
+#  setup()
+#  {
+#  }
+#  run()
+#  {
+#    ++t;
+#    p = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
+#    if (count % 8 == 0) {
+#      prgx = incr(prgx, 0, len(progz));
+#    }
+#  }
+#}
 
 let dn_fn = fn(x)
 {
@@ -130,7 +130,7 @@ let cbxxah_gen = gen()
     let maxx = 3;
     let mx = 0;
 
-    let drz = [50, 75, 100, 250, 400, 600];
+    let drz = [250, 75, 100, 250, 400, 600];
     let drzx = 0;
   }
   run()
@@ -140,8 +140,8 @@ let cbxxah_gen = gen()
       for (i = 0; i < 16; ++i) {
         stepper(cb, mel, mx, i, drz[drzx]);
         mx = incr(mx, 0, maxx);
-        drzx = incr(drzx, 0, len(drz));
       }
+      drzx = incr(drzx, 0, len(drz));
       maxx = incr(maxx, 2, len(mel));
     }
   }
@@ -166,14 +166,16 @@ let fxblah_gen = gen()
   }
 }
 
-#cb = DrumZynth - PIPEBLING
-#cl = DrumZynth -  SQWA
+#cb = DrumZynth - PIPEBLING // MFFF // ZKZZ
+#cl = DrumZynth -  SQWA // BADUM
 let melblah_gen = gen()
 {
   setup()
   {
     let px = 0;
     let pmax = 3;
+    let drz = [250, 75, 100, 250, 400, 600];
+    let drzx = 0;
   }
   run()
   {
@@ -182,10 +184,11 @@ let melblah_gen = gen()
       let pat = combinor(p, progz[prgx]);
 
       for (i = 0; i < 16; ++i) {
-        stepper(cl, pat, px, i, 50);
+        stepper(cl, pat, px, i, drz[drzx]);
         px = incr(px, 0, pmax);
       }
       pmax = incr(pmax, 4, 16);
+      drzx = incr(drsz, 0, len(drz));
     }
 
     if (count % 16 == 0) {
