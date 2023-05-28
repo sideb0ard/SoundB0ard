@@ -1,38 +1,45 @@
+# F# == 18, 30, 42, 54
 
 # let bgr = loop(bombz/BSQWASPR8.wav); set bgr:len 32;
 
-# let key - f# - 22
-# notes_in_chord 22, 26, 29;
+# let haz = loop(JUNALGOGZ/Hatzwoohoo.wav);
+
 # progression = vi-ii-V-I
 
-# notes_in_key(22)
-# [22, 24, 26, 27, 29, 31, 33, 34]
-let vi = [31, 34, 26];
-let ii = [24, 27, 31];
-let V = [29, 33, 24];
-let I = [22, 26, 29];
+# notes_in_key(18)
+# [18, 20, 22, 23, 25, 27, 29, 30]
+# notes_in_key(30)
+# [30, 32, 34, 35, 37, 39, 41, 42]
+
+let vi = [27, 30, 34];
+let ii = [20. 23. 27];
+let V = [25, 29, 32];
+let I = [30, 34, 37];
+
 let chrz = [ vi, ii, V, I];
 let chx = 0;
 
 # dx purlp // vol dx 0.8
 # let dx2 = fnc
+# dx2 = // nrth
 
-#let chblah_gen = gen()
-#{
-#  setup()
-#  {
-#  }
-#  run()
-#  {
-#    if (count % 8 == 0) {
-#      chx = incr(chx, 0, len(chrz));
-#    }
-#  }
-#}
+let chblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 8 == 0) {
+      chx = incr(chx, 0, len(chrz));
+    }
+  }
+}
 
 
 let msk = "00f0";
-let key = 22;
+# let key = 22;
+let key = 27;
 
 #  let bq = loop(bombz/BSQ_M14.wav); set bq:len 2; send(2, bq, 0.4);
 let bqlah_gen = gen()
@@ -59,16 +66,12 @@ let bqlah_gen = gen()
       set bq:scramble 1;
       bx = incr(bx, 0, len(bjz));
       # play_array(dx, rotate(combinor(bt, [34, 52]), 2));
-      #play_array(dx, rotate(combinor(bt, chrz[chx]), 2));
+      # play_array(dx, rotate(combinor(bt, chrz[chx]), 2));
     }
   }
 }
 
-# dx = purlp // lowx0r // dettrr2  // swuuush // beleep
-# dx2 = narf2 // l0renzo4 // rrrkan
-
-# dx basss // dx2 surgefizz
-
+# p3 $ steeblah_gen
 let steeblah_gen = gen()
 {
   setup()
@@ -113,7 +116,7 @@ let ste2blah_gen = gen()
       let mymel = mask(mel, rotate(msk, msk2x));
       msk2x = incr(msk2x, 0, 4);
       for (i = 0; i < 16; ++i) {
-        if (mel[i] > 0) {
+        if (mymel[i] > 0) {
           note_on_at(dx2, mymel[i], i * pp + pp);
         }
       }
@@ -152,7 +155,7 @@ let ste3blah_gen = gen()
   {
 
     for (i = 0; i < 16; ++i) {
-      stepper(dx2, mel, lx, i, drz[drx]);
+      #stepper(dx2, mel, lx, i, drz[drx]);
       lx = incr(lx, 0, mlx);
       drx = incr(drx, 0, len(drz));
       stepper(dx, up(mel2, 12), lx, i, drz[drx]);
@@ -178,7 +181,6 @@ let cr = sample(noises/crnchHar.aiff);
 
 let percz = [bd, m5, cr, m1, rl];
 let px = 0;
-
 
 let hh1 = sample(ch/AbraHat.aiff);
 let hh2 = sample(ch/acidHat3.aiff);
@@ -216,6 +218,7 @@ let pblah_gen = gen()
 # let mouth = loop(voices/mouthpiece.wav); set mouth:len 4; p7 $ mouthblah_gen
 # p8 < osc 8 "0.1 0.7" "send(0, mouth, %)"
 
+let ine = sample(voices/ineed.wav);
 let mouthblah_gen = gen()
 {
   setup()
@@ -247,37 +250,40 @@ let mouthblah_gen = gen()
       set mouth:off 1;
       play_array(mouth, rand_beat());
     }
+    if (count % 16 == 12) {
+      play_array(ine, rand_beat());
+    }
   }
 }
-
-# mo = simple // aqua //
-let moblah_gen = gen()
+# per3 = // PIPE //  TWANrG // Srqttx
+let pdxxblah_gen = gen()
 {
   setup()
   {
-    let bjz = [3, 5, 7, 11];
-    let bx = 0;
-    let bmx = 0;
+    let d = 290;
+    let mel = combinor(bassgen(), vi + up(vi, 12));
   }
   run()
   {
+    if (count % 4 == 2) {
+      mel = combinor(bassgen(), vi + up(vi, 12));
+    }
     if (count % 2 == 0) {
-
-      # let bt = mask(bjork(bjz[bx], 16), rotate(msk, bmx));
-      let bt = bjork(bjz[bx], 16);
-      bmx = incr(bmx, 0, 4);
-      bx = incr(bx, 0, len(bjz));
       for (i = 0; i < 16; ++i) {
-        if (bt[i] == 1) {
-          note_on_at(mo, chrz[chx][0], i * pp * 2, dur = 400);
+        if (mel[i] > 0) {
+          note_on_at(per3, mel[i], i * pp, dur = d);
         }
+      }
+      d = d + 40;
+      if (d > 300) {
+        d = 90;
       }
     }
   }
 }
 
-# let dub = loop(JUNALGOGZ/DUBBASS.wav); set dub:len 2
-#  let hhhb = loop(JUNALGOGZ/HHbeat.wav); set hhhb:len 2
+
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ bbblah_gen; send(2, js, 0.2);
 
 let bbblah_gen = gen()
 {
@@ -288,16 +294,16 @@ let bbblah_gen = gen()
   {
     set bq:on 1;
     if (count % 2 == 0) {
-      set hhhb:on 1;
+      set js:on 1;
     }
 
     if (count % 4 == 3) {
       let b = rand_beat();
-      play_array(hhhb, b);
+      play_array(js, b);
       play_array(bq, invert(b));
     }
     if (count % 7 == 0) {
-      set hhhb:stutter 1;
+      set js:stutter 1;
       set bq:stutter 1;
     }
   }

@@ -1946,6 +1946,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
        cmd = "let dx = fm(); vol dx 0.8;";
        eval_command_queue.push(cmd);
 
+       cmd = "let dx2 = fm(); vol dx2 0.7;";
+       eval_command_queue.push(cmd);
+
        return evaluator::NULLL;
      })},
     {"load_dir", std::make_shared<object::BuiltIn>(

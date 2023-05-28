@@ -59,6 +59,8 @@ class Looper : public SoundGenerator {
   void noteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
 
+  void Reset();
+
  public:
   bool started_{false};
 
@@ -101,6 +103,10 @@ class Looper : public SoundGenerator {
   double loop_len_{1};  // bars
   int loop_counter_{-1};
 
+  bool stop_count_pending_{false};
+  int stop_len_{0};
+  int stop_countr_{0};
+
   bool scramble_mode_{false};
   bool scramble_pending_{false};
   int current_sixteenth_{0};
@@ -138,6 +144,7 @@ class Looper : public SoundGenerator {
   void SetLoopMode(unsigned int m);
   void SetLoopLen(double bars);
   void SetScramblePending();
+  void SetStopPending(int loops);
   void SetStutterPending();
   void SetReversePending();
 

@@ -91,7 +91,27 @@ let hhblah_gen = gen()
 
 
 # let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8
-# dx = SPCZZ // waz = RBTRR // PIPEBLING
 # let reg = loop(JUNALGOGZ/reaggaeGUITR.wav) ; set reg:len 2
-
 #  let bonz = loop(JUNALGOGZ/bongOS.wav)
+
+# p15 < osc 4 "0.2 0.9" "send(0, jon, %)"
+
+# let fl = loop(voices/feelmeflow.wav); set fl:len 2; vol js 1
+let endblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set jon:stutter 1;
+      set reg:scramble 1;
+    }
+    if (count % 3 == 0) {
+      set bonz:stutter 1;
+      set fl:scramble 1;
+    }
+  }
+}
+

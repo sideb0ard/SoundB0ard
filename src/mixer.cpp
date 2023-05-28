@@ -93,6 +93,7 @@ Mixer::Mixer() {
   timing_info.has_started = false;
   timing_info.is_midi_tick = true;
   timing_info.is_start_of_loop = true;
+  timing_info.is_end_of_loop = false;
   timing_info.is_thirtysecond = true;
   timing_info.is_twentyfourth = true;
   timing_info.is_sixteenth = true;
@@ -155,7 +156,7 @@ std::string Mixer::StatusEnv() {
   for (auto &[var_name, sg_idx] : soundgens) {
     if (IsValidSoundgenNum(sg_idx)) {
       auto sg = sound_generators_[sg_idx];
-      if (!sg->active) continue;
+      // if (!sg->active) continue;
       ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
          << sg->Status() << ANSI_COLOR_RESET << std::endl;
 
@@ -413,9 +414,14 @@ void Mixer::MidiTick() {
   timing_info.is_quarter = false;
   timing_info.is_third = false;
   timing_info.is_start_of_loop = false;
+  timing_info.is_end_of_loop = false;
 
-  if (timing_info.midi_tick % PPBAR == 0) {
+  int cur_tick = timing_info.midi_tick % PPBAR;
+  if (cur_tick == 0) {
     timing_info.is_start_of_loop = true;
+  }
+  if (cur_tick == PPBAR - 1) {
+    timing_info.is_end_of_loop = true;
   }
 
   if (timing_info.midi_tick % 120 == 0) {

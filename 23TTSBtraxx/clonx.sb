@@ -2,16 +2,14 @@
 let hh1 = sample(ch/timbaHat1.aiff);
 let hh2 = sample(ch/timabHat2.aiff);
 let hh3 = sample(ch/angelHat.aiff);
-# add_fx(hh1, "delay"); add_fx(hh2, "delay"); add_fx(hh3, "delay");
-
-# 3 delays and differing osc
-# p2 < osc 8 "23 45"  "set hh1:fx0:fb %"
-# p3 < osc 11 "42 77"  "set hh2:fx0:fb %"
-# p4 < osc 23 "0 23"  "set hh3:fx0:fb %"
+let hhz = [hh1, hh2, hh3];
+# send(0, hhz, 0.4);
 
 let bd1 = sample(bd/solid.aiff);
 let bd2 = sample(bd/LOUkick.aiff);
 let bd3 = sample(bd/garageKick.aiff);
+
+# let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4) ;
 
 let kblah_gen = gen()
 {
@@ -145,8 +143,6 @@ let snnblah_gen = gen()
 #let shr = loop(strings/shadesofrhythm4bar.aiff); set shr:len 12
 #p7 < osc 8 "0.2 0.9"  "send(1, shr, %)";
 #p8 < osc 8 "0.2 0.9"  "send(0, shr, %)";
-
-# let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4) ; add_fx(one, "sidechain", wrb)"
 
 let sblah_gen = gen()
 {

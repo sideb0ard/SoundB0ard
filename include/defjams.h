@@ -224,6 +224,7 @@ typedef struct mixer_timing_info {
 
   bool has_started{false};
   bool is_start_of_loop{false};  // true for one sample during loop time
+  bool is_end_of_loop{false};    // true for one MIDI TICK during loop time
   bool is_thirtysecond{false};
   bool is_twentyfourth{false};
   bool is_sixteenth{false};

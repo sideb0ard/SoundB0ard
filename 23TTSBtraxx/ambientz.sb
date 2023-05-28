@@ -1,9 +1,35 @@
+
+# let one = loop(JUNALGOGZ/onetimeTSTM.wav); vol one 0.7; set one:len 2; p10 $ oneblah_gen
+let oneblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 2) {
+      set one:stutter 1;
+    }
+    if (count % 8 == 7) {
+      set one:reverse 1;
+    }
+    # if (count % 6 == 5) {
+      #   set one:len 4 at=12;
+      #   set one:len 2 at=16;
+      # }
+  }
+}
+
+
+
+
+# sidechain one with bd
+# add_fx(one, "sidechain", bd);
+
 let bd = sample(bd/808kick.aif);
 let ch = sample(ch/hatTail.aiff);
 let sn = sample(noises/skateWheelDoublehit.aiff);
 
-# JUSTIFY STILL
-# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ hhblah_gen; send(2, js, 0.2);
 let bdlah_gen = gen()
 {
   setup()
@@ -41,11 +67,15 @@ let bdlah_gen = gen()
   }
 }
 
+# vol per1 0.2 // Srqttx
+# sd // // HIGHWR // TRASHP // TWANrG
 let moblah_gen = gen()
 {
   setup()
   {
-    let mel = [30, 0, 23, 0, 30, 0, 30, 0, 30, 0, 23, 0, 23, 0, 28, 0];
+    #let mel = [30, 0, 23, 0, 30, 0, 30, 0, 30, 0, 23, 0, 23, 0, 28, 0];
+    let ntz = [55, 54, 47];
+    let mel = combinor(bassgen(), ntz);
     let px = 0;
     let pmax = 3;
   }
@@ -54,25 +84,27 @@ let moblah_gen = gen()
     if (count % 2 == 0) {
 
       for (i = 0; i < 16; ++i) {
-        stepper(mo, mel, px, i, 100);
+        stepper(sd, mel, px, i, 100);
         px = incr(px, 0, pmax);
       }
       pmax = incr(pmax, 3, len(mel));
 
     }
-    if (count % 3 == 0) {
 
+    if (count % 3 == 0) {
       for (i = 0; i < 16; ++i) {
-        stepper(per1, mel, px, i, 100);
+        stepper(per1, up(mel, 12), px, i, 100);
         px = incr(px, 0, pmax);
       }
       pmax = incr(pmax, 3, len(mel));
+    }
 
+    if (count % 8 == 7) {
+      mel = combinor(bassgen(), ntz);
     }
   }
 }
 
-# cb = drum() // Srqttx
 let hh1 = sample(wavalc/dm02_909_closedhat_005.wav);
 vol hh1 0.3;
 let perxz1 = [hh1];
@@ -111,27 +143,4 @@ let pblah_gen = gen()
 
   }
 }
-
-
-# let one = loop(JUNALGOGZ/onetimeTSTM.wav); vol one 0.6;
-let oneblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 4 == 2) {
-      set one:stutter 1;
-    }
-    if (count % 8 == 7) {
-      set one:reverse 1;
-    }
-    # if (count % 6 == 5) {
-      #   set one:len 4 at=12;
-      #   set one:len 2 at=16;
-      # }
-  }
-}
-
-
+# let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4) ;

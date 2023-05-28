@@ -513,7 +513,10 @@ let perky = fn(beat_pattern, sample_array)
   }
 }
 
-let cbeat = fn(cp)
+let cbeat = fn(cp) {
+  cmbeat(cp, 1);
+}
+let cmbeat = fn(cp, midi_num)
 {
   let probz = {4:90, 6:10, 12:90, 13:5, 15:10};
   let parray = map_to_array(probz, 16);
@@ -527,11 +530,16 @@ let cbeat = fn(cp)
       if (i > 0) {
         offset = rand(45);
       }
-      note_on_at(cp, 1, i * pp - offset, vel = v);
+      note_on_at(cp, midi_num, i * pp - offset, vel = v);
     }
   }
 }
+
 let dbeat = fn(bd)
+{
+  dmbeat(bd, 1);
+}
+let dmbeat = fn(bd, midi_num)
 {
   let probz = {0:90, 6:90, 11:50, 14:50};
   let parray = map_to_array(probz, 16);
@@ -548,23 +556,27 @@ let dbeat = fn(bd)
       if (i > 0) {
         offset = rand(25);
       }
-      note_on_at(bd, 1, i * pp + offset, vel = v);
+      note_on_at(bd, midi_num, i * pp + offset, vel = v);
     }
   }
 }
 
 let hhbeat = fn(hh)
 {
+  hhmbeat(hh, 1);
+}
+let hhmbeat = fn(hh, midi_num)
+{
   let sw = rand(pp/2);
   if (rand(100) < 95) {
     for (i = 0; i < 16; ++i) {
       if (rand(100) < 95) {
         let offset = 0;
-        let v = 80 + rand(27);
+        let v = 60 + rand(27);
         if (i % 2 == 1) {
           offset = sw;
         }
-        note_on_at(hh, 1, i * pp + offset, vel = v);
+        note_on_at(hh, midi_num, i * pp + offset, vel = v);
       }
     }
   }

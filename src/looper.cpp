@@ -22,20 +22,12 @@ const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 }  // namespace
 
-Looper::Looper(std::string filename, unsigned int loop_mode) {
-  std::cout << "NEW LOOOOOPPPPPER " << loop_mode << std::endl;
+void Looper::Reset() {
   audio_buffer_read_idx_ = 0;
   active_grain_ = &grain_a_;
   incoming_grain_ = &grain_b_;
   reverse_mode_ = false;
-
   SetGrainDensity(15);
-
-  type = LOOPER_TYPE;
-
-  filename_ = filename;
-  ImportFile(filename_);
-
   eg_.SetAttackTimeMsec(5);
   eg_.SetDecayTimeMsec(0);
   eg_.SetSustainLevel(1);
@@ -44,6 +36,19 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   eg_.Update();
 
   degrade_by_ = 0;
+
+  active = true;
+  started_ = false;
+  stop_pending_ = false;
+}
+
+Looper::Looper(std::string filename, unsigned int loop_mode) {
+  std::cout << "NEW LOOOOOPPPPPER " << loop_mode << std::endl;
+
+  type = LOOPER_TYPE;
+
+  filename_ = filename;
+  ImportFile(filename_);
 
   SetLoopMode(loop_mode);
 
@@ -93,6 +98,15 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   }
   if (!started_) return;
 
+  if (tinfo.is_end_of_loop) {
+    if (stop_count_pending_) {
+      stop_countr_++;
+      if (stop_countr_ >= stop_len_) {
+        stop();
+        stop_count_pending_ = false;
+      }
+    }
+  }
   if (tinfo.is_start_of_loop) {
     loop_counter_++;
 
@@ -197,7 +211,9 @@ void Looper::SwitchXFadeGrains() {
 
 StereoVal Looper::GenNext(mixer_timing_info tinfo) {
   StereoVal val = {0., 0.};
-  if (!started_ || !active) return val;
+  if (!started_ || !active) {
+    return val;
+  }
 
   if (stop_pending_ && eg_.m_state == OFFF) active = false;
 
@@ -286,13 +302,9 @@ std::string Looper::Info() {
   return ss.str();
 }
 
-void Looper::start() {
-  active = true;
-  stop_pending_ = false;
-}
+void Looper::start() { Reset(); }
 
 void Looper::stop() {
-  std::cout << "STOP!\n";
   eg_.Release();
   stop_pending_ = true;
 }
@@ -418,6 +430,12 @@ void Looper::SetLoopMode(unsigned int m) {
 }
 void Looper::SetScramblePending() { scramble_pending_ = true; }
 
+void Looper::SetStopPending(int loops) {
+  stop_count_pending_ = true;
+  stop_len_ = loops;
+  stop_countr_ = 0;
+}
+
 void Looper::SetStutterPending() { stutter_pending_ = true; }
 void Looper::SetReversePending() { reverse_pending_ = true; }
 
@@ -457,7 +475,7 @@ void Looper::SetPinc(int pinc) { pinc_ = pinc; }
 
 void Looper::SetParam(std::string name, double val) {
   if (name == "on") {
-    eg_.StartEg();
+    start();
   } else if (name == "off") {
     eg_.NoteOff();
   } else if (name == "pitch")
@@ -483,6 +501,8 @@ void Looper::SetParam(std::string name, double val) {
     SetScramblePending();
   else if (name == "stutter")
     SetStutterPending();
+  else if (name == "stop_in")
+    SetStopPending(val);
   else if (name == "reverse")
     SetReversePending();
   else if (name == "grain_dur_ms")

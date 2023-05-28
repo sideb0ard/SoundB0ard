@@ -34,10 +34,9 @@ let ksn = sample(perc/krushsn.wav);
 let hic = sample(perc/grit.aiff);
 let kt2 = [bd2, hh2, hh3, ksn, hic];
 
-# let bsqw = loop(bombz/BSQWASPR13.wav); set bsqw:len 4;
-# add_fx(bsqw, "reverb", "filter");
-# p7 < osc 4  "300 15000" "set bsqw:fx1:freq %";
-# p8 < osc 13  "10 86" "set bsqw:fx0:wetmx %";
+# let bsqw = loop(bombz/BSQWASPR13.wav); set bsqw:len 4; vol bt 0
+# add_fx(bsqw, "sidechain", bt); vol bt 1
+
 
 let bin2_gen = gen()
 {
@@ -80,7 +79,7 @@ let bablah_gen = gen()
     let ptx = 0;
   }
   run()
-  {
+  {
     play_array(bddd, bjork(bjz[bx], 16), dur=500);
     bx = incr(bx, 0, len(bjz));
     set awk:on 1;
@@ -96,21 +95,6 @@ let bablah_gen = gen()
     if (count % 8 == 0) {
       set bsqw:pitch ptz[ptx];
       ptx = incr (ptx, 0, len(ptz));
-    }
-  }
-}
-
-# let dics = loop(JUNALGOGZ/dicscovibe.wav); set dics:len 2; send(2, dics, 0.3);
-
-let fldblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 2 == 0) {
-      set dics:stutter 1;
     }
   }
 }
@@ -144,7 +128,7 @@ let dabblah = gen()
         }
       }
       d = d + 50;
-      if (d > 250) {
+      if (d > 450) {
         d = 50;
       }
     }
@@ -152,6 +136,21 @@ let dabblah = gen()
       the_mel = combinor(bjork(cnt, 16), notez);
       cnt = incr(cnt, 3, 11);
       note_on(ok, 1, dur = d + 100);
+    }
+  }
+}
+
+# let dics = loop(JUNALGOGZ/dicscovibe.wav); set dics:len 2; send(2, dics, 0.3);
+
+let fldblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set dics:stutter 1;
     }
   }
 }
