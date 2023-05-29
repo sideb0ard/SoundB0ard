@@ -50,6 +50,9 @@ int AddSoundGenerator(unsigned int type, std::string filepath = "",
                                      .sg = sg,
                                      .filepath = filepath};
   //.loop_mode = loop_mode}; // ? NOT USED?
+  std::thread::id this_id = std::this_thread::get_id();
+  std::cout << "YO OBJECT - CREATE SOUND GENERTAOR!! threadid:" << this_id
+            << "\n";
   audio_queue.push(action_req);
   auto sg_index = audio_reply_queue.pop();
   if (sg_index)

@@ -53,7 +53,7 @@ static const char DRUM_PRESET_FILENAME[] = "settings/drumpresets.dat";
 #define NUM_COMPAT_NOTES 6
 
 #define MAX_NUM_PROC 100
-#define MAX_NUM_SOUND_GENERATORS 100
+#define MAX_NUM_SOUND_GENERATORS 10
 #define NUM_PROGRESSIONS 4
 
 #define MAX_NUM_MIDI_LOOPS 64

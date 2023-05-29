@@ -188,28 +188,29 @@ std::string Mixer::StatusSgz(bool all) {
   if (sound_generators_.size() > 0) {
     ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "sound generators"
        << COOL_COLOR_GREEN << "]\n";
-    int i = 0;
-    for (auto sg : sound_generators_) {
-      if ((sg->active && sg->GetVolume() > 0.0) || all) {
-        ss << COOL_COLOR_GREEN << "[" << ANSI_COLOR_WHITE << "s" << i
-           << COOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
-        ss << sg->Info() << ANSI_COLOR_RESET << "\n";
+    for (int i = 0; i < sound_generators_idx_; i++) {
+      auto sg = sound_generators_[i];
+      if (sg) {
+        if ((sg->active && sg->GetVolume() > 0.0) || all) {
+          ss << COOL_COLOR_GREEN << "[" << ANSI_COLOR_WHITE << "s" << i
+             << COOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
+          ss << sg->Info() << ANSI_COLOR_RESET << "\n";
 
-        if (sg->effects_num > 0) {
-          ss << "      ";
-          for (int j = 0; j < sg->effects_num; j++) {
-            auto f = sg->effects_[j];
-            if (f->enabled_)
-              ss << COOL_COLOR_YELLOW;
-            else
-              ss << ANSI_COLOR_RESET;
-            ss << "\n[fx " << i << ":" << j << f->Status() << "]";
+          if (sg->effects_num > 0) {
+            ss << "      ";
+            for (int j = 0; j < sg->effects_num; j++) {
+              auto f = sg->effects_[j];
+              if (f->enabled_)
+                ss << COOL_COLOR_YELLOW;
+              else
+                ss << ANSI_COLOR_RESET;
+              ss << "\n[fx " << i << ":" << j << f->Status() << "]";
+            }
+            ss << ANSI_COLOR_RESET;
           }
-          ss << ANSI_COLOR_RESET;
+          ss << "\n\n";
         }
-        ss << "\n\n";
       }
-      i++;
     }
   }
   return ss.str();
@@ -339,13 +340,16 @@ void Mixer::EmitEvent(broadcast_event event) {
   ev.timing_info = timing_info;
   process_event_queue.push(ev);
 
-  for (auto sg : sound_generators_) {
-    sg->EventNotify(event, timing_info);
-    if (sg->effects_num > 0) {
-      for (int j = 0; j < sg->effects_num; j++) {
-        if (sg->effects_[j]) {
-          auto f = sg->effects_[j];
-          f->EventNotify(event, timing_info);
+  for (int i = 0; i < sound_generators_idx_; i++) {
+    auto sg = sound_generators_[i];
+    if (sg) {
+      sg->EventNotify(event, timing_info);
+      if (sg->effects_num > 0) {
+        for (int j = 0; j < sg->effects_num; j++) {
+          if (sg->effects_[j]) {
+            auto f = sg->effects_[j];
+            f->EventNotify(event, timing_info);
+          }
         }
       }
     }
@@ -398,9 +402,17 @@ void Mixer::PanChange(int sg, float val) {
 }
 
 void Mixer::AddSoundGenerator(std::shared_ptr<SBAudio::SoundGenerator> sg) {
-  int soundgen_id = sound_generators_.size();
-  sg->soundgen_id_ = soundgen_id;
-  sound_generators_.push_back(sg);
+  std::thread::id this_id = std::this_thread::get_id();
+  std::cout << "ADD SOUND GEN on THREAD " << this_id << std::endl;
+  int soundgen_id = sound_generators_idx_;
+  std::cout << "SOUND GEN ID" << soundgen_id << std::endl;
+  if (soundgen_id < MAX_NUM_SOUND_GENERATORS) {
+    sg->soundgen_id_ = soundgen_id;
+    sound_generators_[sound_generators_idx_++] = sg;
+  } else {
+    std::cout << "NAH, FULL MATe!\n";
+    soundgen_id = -1;
+  }
   audio_reply_queue.push(soundgen_id);
 }
 
@@ -498,9 +510,9 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     StereoVal fx_delay_send{};
     StereoVal fx_reverb_send{};
     StereoVal fx_distort_send{};
-    int idx = 0;
-    for (auto sg : sound_generators_) {
-      soundgen_cur_val_[idx] = sg->GenNext(timing_info);
+    for (int i = 0; i < sound_generators_idx_; i++) {
+      auto sg = sound_generators_[i];
+      soundgen_cur_val_[i] = sg->GenNext(timing_info);
 
       bool collect_value = false;
       // if nothing is soloed, or this sg is in the solo group,
@@ -508,23 +520,20 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
       if (soloed_sound_generator_idz.empty() ||
           std::find(soloed_sound_generator_idz.begin(),
                     soloed_sound_generator_idz.end(),
-                    idx) != soloed_sound_generator_idz.end()) {
+                    i) != soloed_sound_generator_idz.end()) {
         collect_value = true;
       }
 
       if (collect_value) {
-        output_left += soundgen_cur_val_[idx].left * xfader_.GetValueFor(idx);
-        output_right += soundgen_cur_val_[idx].right * xfader_.GetValueFor(idx);
+        output_left += soundgen_cur_val_[i].left * xfader_.GetValueFor(i);
+        output_right += soundgen_cur_val_[i].right * xfader_.GetValueFor(i);
 
-        fx_delay_send +=
-            soundgen_cur_val_[idx] * sg->mixer_fx_send_intensity_[0];
+        fx_delay_send += soundgen_cur_val_[i] * sg->mixer_fx_send_intensity_[0];
         fx_reverb_send +=
-            soundgen_cur_val_[idx] * sg->mixer_fx_send_intensity_[1];
+            soundgen_cur_val_[i] * sg->mixer_fx_send_intensity_[1];
         fx_distort_send +=
-            soundgen_cur_val_[idx] * sg->mixer_fx_send_intensity_[2];
+            soundgen_cur_val_[i] * sg->mixer_fx_send_intensity_[2];
       }
-
-      idx++;
     }
 
     auto delay_val = fx_[0]->Process(fx_delay_send);
@@ -545,8 +554,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
 bool Mixer::DelSoundgen(int soundgen_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
     printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
-    std::shared_ptr<SBAudio::SoundGenerator> sg =
-        sound_generators_[soundgen_num];
+    auto sg = sound_generators_[soundgen_num];
 
     sound_generators_[soundgen_num] = nullptr;
   }
@@ -554,7 +562,7 @@ bool Mixer::DelSoundgen(int soundgen_num) {
 }
 
 bool Mixer::IsValidSoundgenNum(int sg_num) {
-  if (sg_num < static_cast<int>(sound_generators_.size()) &&
+  if (sg_num >= 0 && sg_num < sound_generators_idx_ &&
       sound_generators_[sg_num])
     return true;
 
@@ -563,8 +571,7 @@ bool Mixer::IsValidSoundgenNum(int sg_num) {
 
 bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
-    std::shared_ptr<SBAudio::SoundGenerator> sg =
-        sound_generators_[soundgen_num];
+    auto sg = sound_generators_[soundgen_num];
     if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects_[fx_num])
       return true;
   }
@@ -574,12 +581,18 @@ bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
 void Mixer::PrintMidiInfo() {
   std::stringstream ss;
   ss << ANSI_COLOR_WHITE "Midi Notes:\n";
-  ss << "0 C:12 C#:13 D:14 D#:15 E:16 F:17 F#:18 G:19 G#:20 A:21 A#:22 B:23\n";
-  ss << "1 C:24 C#:25 D:26 D#:27 E:28 F:29 F#:30 G:31 G#:32 A:33 A#:34 B:35\n";
-  ss << "2 C:36 C#:37 D:38 D#:39 E:40 F:41 F#:42 G:43 G#:44 A:45 A#:46 B:47\n";
-  ss << "3 C:48 C#:49 D:50 D#:51 E:52 F:53 F#:54 G:55 G#:56 A:57 A#:58 B:59\n";
-  ss << "4 C:60 C#:61 D:62 D#:63 E:64 F:65 F#:66 G:67 G#:68 A:69 A#:70 B:71\n";
-  ss << "5 C:72 C#:73 D:74 D#:75 E:76 F:77 F#:78 G:79 G#:80 A:81 A#:82 B:83\n";
+  ss << "0 C:12 C#:13 D:14 D#:15 E:16 F:17 F#:18 G:19 G#:20 A:21 A#:22 "
+        "B:23\n";
+  ss << "1 C:24 C#:25 D:26 D#:27 E:28 F:29 F#:30 G:31 G#:32 A:33 A#:34 "
+        "B:35\n";
+  ss << "2 C:36 C#:37 D:38 D#:39 E:40 F:41 F#:42 G:43 G#:44 A:45 A#:46 "
+        "B:47\n";
+  ss << "3 C:48 C#:49 D:50 D#:51 E:52 F:53 F#:54 G:55 G#:56 A:57 A#:58 "
+        "B:59\n";
+  ss << "4 C:60 C#:61 D:62 D#:63 E:64 F:65 F#:66 G:67 G#:68 A:69 A#:70 "
+        "B:71\n";
+  ss << "5 C:72 C#:73 D:74 D#:75 E:76 F:77 F#:78 G:79 G#:80 A:81 A#:82 "
+        "B:83\n";
   ss << "Chord Progressions: I-IV-V, I-V-vi-IV, I-vi-IV-V, vi-ii-V-I\n"
      << ANSI_COLOR_RESET;
 
@@ -681,7 +694,10 @@ StereoVal PreviewBuffer::Generate() {
 }
 
 void Mixer::ProcessActionMessage(audio_action_queue_item action) {
-  if (action.type == AudioAction::STATUS) Ps(action.status_all);
+  if (action.type == AudioAction::STATUS) {
+    std::cout << "YO IT ME STSTUA\n";
+    Ps(action.status_all);
+  }
   if (action.type == AudioAction::MIDI_MAP)
     AddMidiMapping(action.mapped_id, action.mapped_param);
   if (action.type == AudioAction::MIDI_MAP_SHOW)
@@ -692,8 +708,11 @@ void Mixer::ProcessActionMessage(audio_action_queue_item action) {
     AddFileToMonitor(action.filepath);
   } else if (action.type == AudioAction::ADD) {
     if (action.sg) {
+      std::cout << "YO ADD SD\n";
       AddSoundGenerator(action.sg);
+      std::cout << "YO ADD SD IS DUN\n";
     }
+    std::cout << "DUN WIT IF SCTION" << std::endl;
   } else if (action.type == AudioAction::ADD_FX) {
     if (action.sg) {
       for (auto fx : action.fx) {

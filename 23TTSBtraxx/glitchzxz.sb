@@ -1,6 +1,6 @@
 # let bsqr = loop(bombz/BSQWASPR8.wav); set bsqr:len 6;
 
-# cl = NUURF and cp HIGHWR
+# cl = NUURF and cp HIGHWR // vol cl 0.8 ; vol cp 0.8
 # cl = PIPEBLING and cp BADUM ** send both to 2, 0.4
 let mel = [23, 0, 23, 17, 0, 14, 0, 0, 0, 13, 0, 0, 7, 24, 24, 0];
 let dhhblah_gen = gen()
@@ -46,7 +46,7 @@ let wahblah_gen = gen()
   }
 }
 
-# let drr = loop(JUNALGOGZ/drumROLLZ.wav); set drr:len 2
+# let drr = loop(JUNALGOGZ/drumROLLZ.wav); set drr:len 2; p4 $ regblah_gen
 let regblah_gen = gen()
 {
   setup()
@@ -65,7 +65,9 @@ let regblah_gen = gen()
 }
 
 let hh = sample(ch/hh13.aif);
-# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ hhblah_gen; send(2, js, 0.2);
+# let ab = loop(voices/abouttafeel.wav); set ab:len 4
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav);
+# vol js 1; p6 $ hhblah_gen; send(2, js, 0.2);
 let hhblah_gen = gen()
 {
   setup()
@@ -73,8 +75,10 @@ let hhblah_gen = gen()
   }
   run()
   {
+    set ab:stutter 1;
     if (count % 4 == 3) {
       set js:scramble 1;
+      set ab:stutter 1;
     }
     if (count % 16 == 15) {
       set js:reverse 1;

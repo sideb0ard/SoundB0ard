@@ -44,6 +44,8 @@ void Looper::Reset() {
 
 Looper::Looper(std::string filename, unsigned int loop_mode) {
   std::cout << "NEW LOOOOOPPPPPER " << loop_mode << std::endl;
+  std::thread::id this_id = std::this_thread::get_id();
+  std::cout << "LOOOOOPPPPPER on THREAD " << this_id << std::endl;
 
   type = LOOPER_TYPE;
 
@@ -310,6 +312,7 @@ void Looper::stop() {
 }
 
 Looper::~Looper() {
+  std::cout << "YO! del me DESTRIR" << std::endl;
   // TODO delete file
 }
 
@@ -474,8 +477,10 @@ void Looper::SetPlooplen(int plooplen) {
 void Looper::SetPinc(int pinc) { pinc_ = pinc; }
 
 void Looper::SetParam(std::string name, double val) {
-  if (name == "on") {
+  if (name == "active") {
     start();
+  } else if (name == "on") {
+    eg_.StartEg();
   } else if (name == "off") {
     eg_.NoteOff();
   } else if (name == "pitch")

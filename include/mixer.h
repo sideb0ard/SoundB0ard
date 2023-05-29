@@ -60,7 +60,10 @@ struct Mixer {
   std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_ = {};
   bool proc_initialized_{false};
 
-  std::vector<std::shared_ptr<SBAudio::SoundGenerator>> sound_generators_ = {};
+  int sound_generators_idx_{0};
+  std::array<std::shared_ptr<SBAudio::SoundGenerator>, MAX_NUM_SOUND_GENERATORS>
+      sound_generators_ = {};
+  std::array<StereoVal, MAX_NUM_SOUND_GENERATORS> soundgen_cur_val_{};
 
   std::array<std::shared_ptr<Fx>, kMixerNumSendFx> fx_;
 
@@ -69,8 +72,6 @@ struct Mixer {
   std::vector<audio_action_queue_item> _delayed_action_items = {};
 
   XFader xfader_;
-
-  std::array<StereoVal, MAX_NUM_SOUND_GENERATORS> soundgen_cur_val_{};
 
   std::vector<int> soloed_sound_generator_idz{};
 

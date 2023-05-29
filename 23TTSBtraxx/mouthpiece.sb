@@ -2,8 +2,6 @@
 
 # let bgr = loop(bombz/BSQWASPR8.wav); set bgr:len 32;
 
-# let haz = loop(JUNALGOGZ/Hatzwoohoo.wav);
-
 # progression = vi-ii-V-I
 
 # notes_in_key(18)
@@ -12,30 +10,12 @@
 # [30, 32, 34, 35, 37, 39, 41, 42]
 
 let vi = [27, 30, 34];
-let ii = [20. 23. 27];
-let V = [25, 29, 32];
-let I = [30, 34, 37];
 
-let chrz = [ vi, ii, V, I];
+let chrz = [ vi ];
 let chx = 0;
 
 # dx purlp // vol dx 0.8
 # let dx2 = fnc
-# dx2 = // nrth
-
-let chblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 8 == 0) {
-      chx = incr(chx, 0, len(chrz));
-    }
-  }
-}
-
 
 let msk = "00f0";
 # let key = 22;
@@ -218,6 +198,8 @@ let pblah_gen = gen()
 # let mouth = loop(voices/mouthpiece.wav); set mouth:len 4; p7 $ mouthblah_gen
 # p8 < osc 8 "0.1 0.7" "send(0, mouth, %)"
 
+# let haz = loop(JUNALGOGZ/Hatzwoohoo.wav);
+
 let ine = sample(voices/ineed.wav);
 let mouthblah_gen = gen()
 {
@@ -250,9 +232,6 @@ let mouthblah_gen = gen()
       set mouth:off 1;
       play_array(mouth, rand_beat());
     }
-    if (count % 16 == 12) {
-      play_array(ine, rand_beat());
-    }
   }
 }
 # per3 = // PIPE //  TWANrG // Srqttx
@@ -271,7 +250,7 @@ let pdxxblah_gen = gen()
     if (count % 2 == 0) {
       for (i = 0; i < 16; ++i) {
         if (mel[i] > 0) {
-          note_on_at(per3, mel[i], i * pp, dur = d);
+          note_on_at(per3, mel[i] - 12, i * pp, dur = d);
         }
       }
       d = d + 40;
@@ -283,7 +262,7 @@ let pdxxblah_gen = gen()
 }
 
 
-# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ bbblah_gen; send(2, js, 0.2);
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ bbblah_gen;
 
 let bbblah_gen = gen()
 {
@@ -295,6 +274,7 @@ let bbblah_gen = gen()
     set bq:on 1;
     if (count % 2 == 0) {
       set js:on 1;
+      set haz:stutter 1;
     }
 
     if (count % 4 == 3) {
