@@ -402,10 +402,7 @@ void Mixer::PanChange(int sg, float val) {
 }
 
 void Mixer::AddSoundGenerator(std::unique_ptr<SBAudio::SoundGenerator> sg) {
-  std::thread::id this_id = std::this_thread::get_id();
-  std::cout << "ADD SOUND GEN on THREAD " << this_id << std::endl;
   int soundgen_id = sound_generators_idx_;
-  std::cout << "SOUND GEN ID" << soundgen_id << std::endl;
   if (soundgen_id < MAX_NUM_SOUND_GENERATORS) {
     sg->soundgen_id_ = soundgen_id;
     sound_generators_[sound_generators_idx_++] = std::move(sg);
@@ -693,7 +690,6 @@ StereoVal PreviewBuffer::Generate() {
 
 void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
   if (action->type == AudioAction::STATUS) {
-    std::cout << "YO IT ME STSTUA\n";
     Ps(action->status_all);
   }
   if (action->type == AudioAction::MIDI_MAP)
@@ -706,11 +702,8 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
     AddFileToMonitor(action->filepath);
   } else if (action->type == AudioAction::ADD) {
     if (action->sg) {
-      std::cout << "YO ADD SD\n";
       AddSoundGenerator(std::move(action->sg));
-      std::cout << "YO ADD SD IS DUN\n";
     }
-    std::cout << "DUN WIT IF SCTION" << std::endl;
   } else if (action->type == AudioAction::ADD_FX) {
     if (action->soundgen_num && IsValidSoundgenNum(action->soundgen_num)) {
       auto &sg = sound_generators_[action->soundgen_num];
@@ -724,37 +717,39 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
     UpdateBpm(action->new_bpm);
   } else if (action->type == AudioAction::VOLUME) {
     VolChange(action->new_volume);
-    //} else if (action->type == AudioAction::MIDI_EVENT_ADD ||
-    //           action->type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
-    //  if (IsValidSoundgenNum(action->soundgen_num)) {
-    //    auto &sg = sound_generators_[action->soundgen_num];
+  } else if (action->type == AudioAction::MIDI_EVENT_ADD ||
+             action->type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+    if (IsValidSoundgenNum(action->soundgen_num)) {
+      auto &sg = sound_generators_[action->soundgen_num];
 
-    //    for (auto midinum : action->notes) {
-    //      midi_event event_on =
-    //          new_midi_event(MIDI_ON, midinum, action->velocity);
-    //      event_on.source = EXTERNAL_OSC;
-    //      event_on.dur = action->duration;
+      for (auto midinum : action->notes) {
+        midi_event event_on =
+            new_midi_event(MIDI_ON, midinum, action->velocity);
+        event_on.source = EXTERNAL_OSC;
+        event_on.dur = action->duration;
 
-    //      // used later for MIDI OFF MESSAGE
-    //      int midi_note_on_time = timing_info.midi_tick;
+        // used later for MIDI OFF MESSAGE
+        int midi_note_on_time = timing_info.midi_tick;
 
-    //      // if (action->type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
-    //      //   midi_note_on_time += action->note_start_time;
-    //      //   auto ev = DelayedMidiEvent(midi_note_on_time, event_on, sg);
-    //      //   _action_items.push_back(ev);
-    //      // } else {
-    //      sg->noteOn(event_on);
-    //      //}
-    //      int midi_off_tick = midi_note_on_time + action->duration;
+        if (action->type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+          midi_note_on_time += action->note_start_time;
+          auto ev = DelayedMidiEvent(midi_note_on_time, event_on,
+                                     action->soundgen_num);
+          _action_items.push_back(ev);
+        } else {
+          sg->noteOn(event_on);
+        }
+        int midi_off_tick = midi_note_on_time + action->duration;
 
-    //      midi_event event_off =
-    //          new_midi_event(MIDI_OFF, midinum, action->velocity);
+        midi_event event_off =
+            new_midi_event(MIDI_OFF, midinum, action->velocity);
 
-    //      auto ev = DelayedMidiEvent(midi_off_tick, event_off, sg);
+        auto ev =
+            DelayedMidiEvent(midi_off_tick, event_off, action->soundgen_num);
 
-    //      // _action_items.push_back(ev);
-    //    }
-    //  }
+        _action_items.push_back(ev);
+      }
+    }
   } else if (action->type == AudioAction::SOLO) {
     if (IsValidSoundgenNum(action->soundgen_num)) {
       soloed_sound_generator_idz.push_back(action->soundgen_num);
@@ -841,7 +836,6 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
     interpreter_sound_cmds::SynthLoadPreset(
         action->args[0], action->preset_name, action->preset);
   } else if (action->type == AudioAction::RAND) {
-    std::cout << "MIXER GOT RAND CALL\n";
     sound_generators_[action->mixer_soundgen_idx]->randomize();
   } else if (action->type == AudioAction::PREVIEW) {
     PreviewAudio(std::move(action));
@@ -943,21 +937,22 @@ void Mixer::AddFileToMonitor(std::string filepath) {
 }
 
 void Mixer::CheckForDelayedEvents() {
-  // auto it = _action_items.begin();
-  // while (it != _action_items.end()) {
-  //   if (it->target_tick == timing_info.midi_tick) {
-  //     // TODO - push to action queue not call function
-  //     if (it->sg) {
-  //       it->sg->parseMidiEvent(it->event, timing_info);
-  //     } else if (it->event.event_type == MIDI_CONTROL) {
-  //       HandleMidiControlMessage(it->event.data1, it->event.data2);
-  //     }
-  //     // `erase()` invalidates the iterator, use returned iterator
-  //     it = _action_items.erase(it);
-  //   } else {
-  //     ++it;
-  //   }
-  // }
+  auto it = _action_items.begin();
+  while (it != _action_items.end()) {
+    if (it->target_tick == timing_info.midi_tick) {
+      // TODO - push to action queue not call function
+      if (IsValidSoundgenNum(it->sg_idx)) {
+        auto &sg = sound_generators_[it->sg_idx];
+        sg->parseMidiEvent(it->event, timing_info);
+      } else if (it->event.event_type == MIDI_CONTROL) {
+        HandleMidiControlMessage(it->event.data1, it->event.data2);
+      }
+      // `erase()` invalidates the iterator, use returned iterator
+      it = _action_items.erase(it);
+    } else {
+      ++it;
+    }
+  }
 
   std::vector<std::unique_ptr<AudioActionItem>> delayed_buffer;
   auto dit = delayed_action_items_.begin();

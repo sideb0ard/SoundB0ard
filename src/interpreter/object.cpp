@@ -50,9 +50,6 @@ int AddSoundGenerator(unsigned int type, std::string filepath = "",
   action->sg = std::move(sg);
   action->filepath = filepath;
 
-  std::thread::id this_id = std::this_thread::get_id();
-  std::cout << "YO OBJECT - CREATE SOUND GENERTAOR!! threadid:" << this_id
-            << "\n";
   audio_queue.push(std::move(action));
   auto sg_index = audio_reply_queue.pop();
   if (sg_index)
@@ -167,7 +164,6 @@ std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
 
 Granular::Granular(std::string sample_path, int loop_mode) {
-  std::cout << "OBJECT! LOOPM ODE IS " << loop_mode << std::endl;
   soundgen_id_ = AddSoundGenerator(LOOPER_TYPE, sample_path, loop_mode);
   soundgenerator_type = LOOPER_TYPE;
 }

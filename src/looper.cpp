@@ -312,7 +312,6 @@ void Looper::stop() {
 }
 
 Looper::~Looper() {
-  std::cout << "YO! del me DESTRIR" << std::endl;
   // TODO delete file
 }
 

@@ -38,15 +38,14 @@ struct file_monitor {
   std::filesystem::file_time_type function_file_filepath_last_write_time;
 };
 
-// struct DelayedMidiEvent {
-//   DelayedMidiEvent() = default;
-//   DelayedMidiEvent(int target_tick, midi_event event,
-//                    std::shared_ptr<SBAudio::SoundGenerator> sg)
-//       : target_tick{target_tick}, event{event}, sg{sg} {}
-//   int target_tick{0};
-//   midi_event event{};
-//   std::unique_ptr<SBAudio::SoundGenerator> sg{};
-// };
+struct DelayedMidiEvent {
+  DelayedMidiEvent() = default;
+  DelayedMidiEvent(int target_tick, midi_event event, int sg_idx)
+      : target_tick{target_tick}, event{event}, sg_idx{sg_idx} {}
+  int target_tick{0};
+  midi_event event{};
+  int sg_idx{-1};
+};
 
 struct Mixer {
  public:
@@ -67,8 +66,8 @@ struct Mixer {
 
   std::array<std::shared_ptr<Fx>, kMixerNumSendFx> fx_;
 
-  // std::vector<DelayedMidiEvent> _action_items =
-  //     {};  // TODO get rid of this version
+  std::vector<DelayedMidiEvent> _action_items =
+      {};  // TODO get rid of this version
   std::vector<std::unique_ptr<AudioActionItem>> delayed_action_items_ = {};
 
   XFader xfader_;
