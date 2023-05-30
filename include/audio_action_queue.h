@@ -45,12 +45,15 @@ enum AudioAction {
   VOLUME,
 };
 
-struct audio_action_queue_item {
+class AudioActionItem {
+ public:
+  AudioActionItem(AudioAction type) : type{type} {}
+  ~AudioActionItem() = default;
   AudioAction type;
+  std::unique_ptr<SBAudio::SoundGenerator> sg{nullptr};
   int mixer_soundgen_idx{-1};
   bool is_xfader{false};
   std::vector<int> group_of_soundgens{};
-  std::shared_ptr<SBAudio::SoundGenerator> sg;
   std::vector<std::shared_ptr<Fx>> fx;
   unsigned int xfade_channel{99};
   unsigned int xfade_direction{99};

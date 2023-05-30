@@ -8,7 +8,7 @@
 #include "gtest/gtest.h"
 
 auto global_env = std::make_shared<object::Environment>();
-Tsqueue<audio_action_queue_item> audio_queue;
+Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 Tsqueue<std::string> eval_command_queue;
 Tsqueue<std::string> repl_queue;
 Tsqueue<event_queue_item> process_event_queue;

@@ -25,7 +25,7 @@
 namespace fs = std::filesystem;
 
 extern Mixer *mixr;
-extern Tsqueue<audio_action_queue_item> audio_queue;
+extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
 extern siv::PerlinNoise perlinGenerator;
@@ -136,45 +136,46 @@ std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz) {
 }
 void SendMidiMappingShow() {
   std::cout << "sending a midi map SHOW\n";
-  audio_action_queue_item action{.type = AudioAction::MIDI_MAP_SHOW};
-  audio_queue.push(action);
+  auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_MAP_SHOW);
+  audio_queue.push(std::move(action));
 }
 
 void SendMidiMapping(int mapped_id, std::string mapped_param) {
   std::cout << "sending a midi map\n";
-  audio_action_queue_item action{.type = AudioAction::MIDI_MAP,
-                                 .mapped_id = mapped_id,
-                                 .mapped_param = mapped_param};
-  audio_queue.push(action);
+  auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_MAP);
+  action->mapped_id = mapped_id;
+  action->mapped_param = mapped_param;
+  audio_queue.push(std::move(action));
 }
 
 void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
                 int vel, int dur) {
-  audio_action_queue_item action_req{
-      .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
-      .soundgen_num = sgid,
-      .notes = midi_nums,
-      .velocity = vel,
-      .duration = dur,
-      .note_start_time = note_start_time};
-  audio_queue.push(action_req);
+  auto action =
+      std::make_unique<AudioActionItem>(AudioAction::MIDI_EVENT_ADD_DELAYED);
+  action->soundgen_num = sgid;
+  action->notes = midi_nums;
+  action->velocity = vel;
+  action->duration = dur;
+  action->note_start_time = note_start_time;
+  audio_queue.push(std::move(action));
 }
 void midi_event_at(int sgid, midi_event ev, int start_time) {
-  audio_action_queue_item action_req{.type = AudioAction::RECORDED_MIDI_EVENT,
-                                     .has_midi_event = true,
-                                     .event = ev,
-                                     .mixer_soundgen_idx = sgid,
-                                     .start_at = start_time};
-  audio_queue.push(action_req);
+  auto action =
+      std::make_unique<AudioActionItem>(AudioAction::RECORDED_MIDI_EVENT);
+  action->has_midi_event = true;
+  action->event = ev;
+  action->mixer_soundgen_idx = sgid;
+  action->start_at = start_time;
+  audio_queue.push(std::move(action));
 }
 
 void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur) {
-  audio_action_queue_item action_req{.type = AudioAction::MIDI_EVENT_ADD,
-                                     .soundgen_num = sgid,
-                                     .notes = midi_nums,
-                                     .velocity = vel,
-                                     .duration = dur};
-  audio_queue.push(action_req);
+  auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_EVENT_ADD);
+  action->soundgen_num = sgid;
+  action->notes = midi_nums;
+  action->velocity = vel;
+  action->duration = dur;
+  audio_queue.push(std::move(action));
 }
 
 template <typename T>
@@ -1016,25 +1017,26 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          return evaluator::NULLL;
        }
 
-       audio_action_queue_item action_req{.type = AudioAction::MIXER_FX_UPDATE,
-                                          .mixer_fx_id = destination_fx,
-                                          .delayed_by = delayed_by};
+       auto action =
+           std::make_unique<AudioActionItem>(AudioAction::MIXER_FX_UPDATE);
+       action->mixer_fx_id = destination_fx;
+       action->delayed_by = delayed_by;
 
        auto sg_array = std::dynamic_pointer_cast<object::Array>(input[1]);
        if (sg_array) {
          for (auto const &e : sg_array->elements_) {
            auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(e);
            if (sg) {
-             action_req.group_of_soundgens.push_back(sg->soundgen_id_);
+             action->group_of_soundgens.push_back(sg->soundgen_id_);
            }
          }
        } else {
          auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(input[1]);
          if (sg) {
-           action_req.group_of_soundgens.push_back(sg->soundgen_id_);
+           action->group_of_soundgens.push_back(sg->soundgen_id_);
          }
        }
-       if (action_req.group_of_soundgens.size() == 0) {
+       if (action->group_of_soundgens.size() == 0) {
          std::cout << "NO SOUNDGENS FOUND, RETURNING..\n";
          return evaluator::NULLL;
        }
@@ -1047,8 +1049,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            intensity_val = intensity_obj->value_;
          }
        }
-       action_req.fx_intensity = intensity_val;
-       audio_queue.push(action_req);
+       action->fx_intensity = intensity_val;
+       audio_queue.push(std::move(action));
        return evaluator::NULLL;
      })},
     {"xassign",
@@ -1074,32 +1076,32 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            auto xfade_left_or_right =
                std::dynamic_pointer_cast<object::Number>(input[0]);
            if (xfade_left_or_right) {
-             audio_action_queue_item action_req{
-                 .type = AudioAction::MIXER_XFADE_ASSIGN,
-                 .delayed_by = delayed_by,
-                 .xfade_channel =
-                     static_cast<unsigned int>(xfade_left_or_right->value_)};
+             auto action = std::make_unique<AudioActionItem>(
+                 AudioAction::MIXER_XFADE_ASSIGN);
+             action->delayed_by = delayed_by;
+             action->xfade_channel =
+                 static_cast<unsigned int>(xfade_left_or_right->value_);
 
              auto sg_array = std::dynamic_pointer_cast<object::Array>(input[1]);
              if (sg_array) {
                for (auto const &e : sg_array->elements_) {
                  auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(e);
                  if (sg) {
-                   action_req.group_of_soundgens.push_back(sg->soundgen_id_);
+                   action->group_of_soundgens.push_back(sg->soundgen_id_);
                  }
                }
              } else {
                auto sg =
                    std::dynamic_pointer_cast<object::SoundGenerator>(input[1]);
                if (sg) {
-                 action_req.group_of_soundgens.push_back(sg->soundgen_id_);
+                 action->group_of_soundgens.push_back(sg->soundgen_id_);
                }
              }
-             if (action_req.group_of_soundgens.size() == 0) {
+             if (action->group_of_soundgens.size() == 0) {
                std::cout << "NO SOUNDGENS FOUND, RETURNING..\n";
                return evaluator::NULLL;
              }
-             audio_queue.push(action_req);
+             audio_queue.push(std::move(action));
            }
            return evaluator::NULLL;
          })},
@@ -1119,11 +1121,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        }
                      }
 
-                     audio_action_queue_item action_req{
-                         .type = AudioAction::MIXER_XFADE_CLEAR,
-                         .delayed_by = delayed_by};
+                     auto action = std::make_unique<AudioActionItem>(
+                         AudioAction::MIXER_XFADE_CLEAR);
+                     action->delayed_by = delayed_by;
 
-                     audio_queue.push(action_req);
+                     audio_queue.push(std::move(action));
                      return evaluator::NULLL;
                    })},
     {"xfade",
@@ -1149,11 +1151,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            auto num_obj = std::dynamic_pointer_cast<object::Number>(input[0]);
            if (num_obj) {
-             audio_action_queue_item action_req{
-                 .type = AudioAction::MIXER_XFADE_ACTION,
-                 .delayed_by = delayed_by,
-                 .xfade_direction = static_cast<unsigned int>(num_obj->value_)};
-             audio_queue.push(action_req);
+             auto action = std::make_unique<AudioActionItem>(
+                 AudioAction::MIXER_XFADE_ACTION);
+             action->delayed_by = delayed_by;
+             action->xfade_direction =
+                 static_cast<unsigned int>(num_obj->value_);
+             audio_queue.push(std::move(action));
            }
            return evaluator::NULLL;
          })},
@@ -1251,10 +1254,10 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              if (at) {
                delayed_by = at->value_;
                int dif_til_next_loop = (3840 - delayed_by) % 3840;
-               audio_action_queue_item action_req{
-                   .type = AudioAction::UNSOLO,
-                   .delayed_by = delayed_by + dif_til_next_loop};
-               audio_queue.push(action_req);
+               auto action =
+                   std::make_unique<AudioActionItem>(AudioAction::UNSOLO);
+               action->delayed_by = delayed_by + dif_til_next_loop;
+               audio_queue.push(std::move(action));
              }
            }
 
@@ -1262,11 +1265,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[i]);
              if (soundgen) {
-               audio_action_queue_item action_req{
-                   .type = AudioAction::SOLO,
-                   .soundgen_num = soundgen->soundgen_id_,
-                   .delayed_by = delayed_by};
-               audio_queue.push(action_req);
+               auto action =
+                   std::make_unique<AudioActionItem>(AudioAction::SOLO);
+               action->soundgen_num = soundgen->soundgen_id_;
+               action->delayed_by = delayed_by;
+               audio_queue.push(std::move(action));
              }
            }
            return evaluator::NULLL;
@@ -1275,45 +1278,45 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object> {
                      (void)args;
-                     audio_action_queue_item action_req{
-                         .type = AudioAction::UNSOLO};
-                     audio_queue.push(action_req);
+                     auto action =
+                         std::make_unique<AudioActionItem>(AudioAction::UNSOLO);
+                     audio_queue.push(std::move(action));
                      return evaluator::NULLL;
                    })},
-    {"mvol",
+    {"mvol", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> args)
+                     -> std::shared_ptr<object::Object> {
+                   if (args.size() != 1)
+                     return evaluator::NewError(
+                         "`Master Volume` requires a volume value.");
+
+                   auto num_obj =
+                       std::dynamic_pointer_cast<object::Number>(args[0]);
+                   if (!num_obj) return evaluator::NULLL;
+
+                   auto action =
+                       std::make_unique<AudioActionItem>(AudioAction::VOLUME);
+                   action->new_volume = num_obj->value_;
+                   audio_queue.push(std::move(action));
+                   return evaluator::NULLL;
+                 })},
+    {"stop",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
            if (args.size() != 1)
              return evaluator::NewError(
-                 "`Master Volume` requires a volume value.");
+                 "`stop` requires a sound_generator target");
 
-           auto num_obj = std::dynamic_pointer_cast<object::Number>(args[0]);
-           if (!num_obj) return evaluator::NULLL;
-
-           audio_action_queue_item action_req{.type = AudioAction::VOLUME,
-                                              .new_volume = num_obj->value_};
-           audio_queue.push(action_req);
+           auto soundgen =
+               std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+           if (soundgen) {
+             auto action = std::make_unique<AudioActionItem>(AudioAction::STOP);
+             action->soundgen_num = soundgen->soundgen_id_;
+             audio_queue.push(std::move(action));
+           }
            return evaluator::NULLL;
          })},
-    {"stop", std::make_shared<object::BuiltIn>(
-                 [](std::vector<std::shared_ptr<object::Object>> args)
-                     -> std::shared_ptr<object::Object> {
-                   if (args.size() != 1)
-                     return evaluator::NewError(
-                         "`stop` requires a sound_generator target");
-
-                   auto soundgen =
-                       std::dynamic_pointer_cast<object::SoundGenerator>(
-                           args[0]);
-                   if (soundgen) {
-                     audio_action_queue_item action_req{
-                         .type = AudioAction::STOP,
-                         .soundgen_num = soundgen->soundgen_id_};
-                     audio_queue.push(action_req);
-                   }
-                   return evaluator::NULLL;
-                 })},
     {"note_on",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -1403,14 +1406,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        std::dynamic_pointer_cast<object::Number>(args[2]);
                    if (delayed_time) delayed_by = delayed_time->value_;
                  }
-                 audio_action_queue_item action{
-                     .type = AudioAction::UPDATE,
-                     .mixer_soundgen_idx = soundgen->soundgen_id_,
-                     .delayed_by = delayed_by,
-                     .fx_id = -1,
-                     .param_name = "pitch",
-                     .param_val = std::to_string(number->value_)};
-                 audio_queue.push(action);
+                 auto action =
+                     std::make_unique<AudioActionItem>(AudioAction::UPDATE);
+                 action->mixer_soundgen_idx = soundgen->soundgen_id_;
+                 action->delayed_by = delayed_by;
+                 action->fx_id = -1;
+                 action->param_name = "pitch";
+                 action->param_val = std::to_string(number->value_);
+                 audio_queue.push(std::move(action));
                }
              }
            }
@@ -1434,11 +1437,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              if (soundgen && mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
                auto fx = interpreter_sound_cmds::ParseFXCmd(args);
                if (fx.size() > 0) {
-                 audio_action_queue_item action_req{
-                     .type = AudioAction::ADD_FX,
-                     .sg = mixr->sound_generators_[soundgen->soundgen_id_],
-                     .fx = fx};
-                 audio_queue.push(action_req);
+                 auto action =
+                     std::make_unique<AudioActionItem>(AudioAction::ADD_FX);
+                 action->soundgen_num = soundgen->soundgen_id_;
+                 action->fx = fx;
+                 audio_queue.push(std::move(action));
                }
              }
            }
@@ -1455,29 +1458,31 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         std::string filepath =
                             cwd.generic_string() + "/" + filename->value_;
 
-                        audio_action_queue_item action_req{
-                            .type = AudioAction::MONITOR, .filepath = filepath};
-                        audio_queue.push(action_req);
+                        auto action = std::make_unique<AudioActionItem>(
+                            AudioAction::MONITOR);
+                        action->filepath = filepath;
+                        audio_queue.push(std::move(action));
                         repl_queue.push("Monitoring " + filepath);
                       } else
                         std::cerr << "BARF! ARG SIZE SHOULD BE 1 -  SIZE IS "
                                   << args_size << std::endl;
                       return evaluator::NULLL;
                     })},
-    {"list_presets",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
-           int args_size = args.size();
-           if (args_size == 1) {
-             auto cmd_name = std::make_shared<object::String>("list");
-             args.push_back(cmd_name);
-             audio_action_queue_item action_req{
-                 .type = AudioAction::LIST_PRESETS, .args = args};
-             audio_queue.push(action_req);
-           }
-           return evaluator::NULLL;
-         })},
+    {"list_presets", std::make_shared<object::BuiltIn>(
+                         [](std::vector<std::shared_ptr<object::Object>> args)
+                             -> std::shared_ptr<object::Object> {
+                           int args_size = args.size();
+                           if (args_size == 1) {
+                             auto cmd_name =
+                                 std::make_shared<object::String>("list");
+                             args.push_back(cmd_name);
+                             auto action = std::make_unique<AudioActionItem>(
+                                 AudioAction::LIST_PRESETS);
+                             action->args = args;
+                             audio_queue.push(std::move(action));
+                           }
+                           return evaluator::NULLL;
+                         })},
     {"load_preset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -1490,16 +1495,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto preset_name =
                  std::dynamic_pointer_cast<object::String>(args[1]);
              if (soundgen && preset_name) {
-               audio_action_queue_item action_req{
-                   .type = AudioAction::LOAD_PRESET,
-                   .args = args,
-               };
+               auto action =
+                   std::make_unique<AudioActionItem>(AudioAction::LOAD_PRESET);
+               action->args = args;
                // read its preset file
-               action_req.preset = GetPreset(soundgen->soundgenerator_type,
-                                             preset_name->value_);
-               action_req.preset_name = preset_name->value_;
-
-               audio_queue.push(action_req);
+               action->preset = GetPreset(soundgen->soundgenerator_type,
+                                          preset_name->value_);
+               action->preset_name = preset_name->value_;
+               audio_queue.push(std::move(action));
              }
            }
            return evaluator::NULLL;
@@ -1528,13 +1531,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          << std::endl;
                auto cmd_name = std::make_shared<object::String>("load");
                args.push_back(cmd_name);
-               audio_action_queue_item action_req{
-                   .type = AudioAction::LOAD_PRESET, .args = args};
+               auto action =
+                   std::make_unique<AudioActionItem>(AudioAction::LOAD_PRESET);
+               action->args = args;
                // read its preset file
-               action_req.preset_name = preset_name->value_;
-               action_req.preset = GetPreset(soundgen->soundgenerator_type,
-                                             preset_name->value_);
-               audio_queue.push(action_req);
+               action->preset_name = preset_name->value_;
+               action->preset = GetPreset(soundgen->soundgenerator_type,
+                                          preset_name->value_);
+               audio_queue.push(std::move(action));
              }
            }
            return evaluator::NULLL;
@@ -1547,9 +1551,10 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                             auto cmd_name =
                                 std::make_shared<object::String>("save");
                             args.push_back(cmd_name);
-                            audio_action_queue_item action_req{
-                                .type = AudioAction::SAVE_PRESET, .args = args};
-                            audio_queue.push(action_req);
+                            auto action = std::make_unique<AudioActionItem>(
+                                AudioAction::SAVE_PRESET);
+                            action->args = args;
+                            audio_queue.push(std::move(action));
                           }
                           return evaluator::NULLL;
                         })},
@@ -1566,10 +1571,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            auto soundgen =
                std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
            if (soundgen) {
-             audio_action_queue_item action_req{
-                 .mixer_soundgen_idx = soundgen->soundgen_id_,
-                 .type = AudioAction::RAND};
-             audio_queue.push(action_req);
+             auto action = std::make_unique<AudioActionItem>(AudioAction::RAND);
+             action->mixer_soundgen_idx = soundgen->soundgen_id_;
+             audio_queue.push(std::move(action));
              return evaluator::NULLL;
            }
 

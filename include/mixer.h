@@ -38,15 +38,15 @@ struct file_monitor {
   std::filesystem::file_time_type function_file_filepath_last_write_time;
 };
 
-struct DelayedMidiEvent {
-  DelayedMidiEvent() = default;
-  DelayedMidiEvent(int target_tick, midi_event event,
-                   std::shared_ptr<SBAudio::SoundGenerator> sg)
-      : target_tick{target_tick}, event{event}, sg{sg} {}
-  int target_tick{0};
-  midi_event event{};
-  std::shared_ptr<SBAudio::SoundGenerator> sg{};
-};
+// struct DelayedMidiEvent {
+//   DelayedMidiEvent() = default;
+//   DelayedMidiEvent(int target_tick, midi_event event,
+//                    std::shared_ptr<SBAudio::SoundGenerator> sg)
+//       : target_tick{target_tick}, event{event}, sg{sg} {}
+//   int target_tick{0};
+//   midi_event event{};
+//   std::unique_ptr<SBAudio::SoundGenerator> sg{};
+// };
 
 struct Mixer {
  public:
@@ -61,15 +61,15 @@ struct Mixer {
   bool proc_initialized_{false};
 
   int sound_generators_idx_{0};
-  std::array<std::shared_ptr<SBAudio::SoundGenerator>, MAX_NUM_SOUND_GENERATORS>
+  std::array<std::unique_ptr<SBAudio::SoundGenerator>, MAX_NUM_SOUND_GENERATORS>
       sound_generators_ = {};
   std::array<StereoVal, MAX_NUM_SOUND_GENERATORS> soundgen_cur_val_{};
 
   std::array<std::shared_ptr<Fx>, kMixerNumSendFx> fx_;
 
-  std::vector<DelayedMidiEvent> _action_items =
-      {};  // TODO get rid of this version
-  std::vector<audio_action_queue_item> _delayed_action_items = {};
+  // std::vector<DelayedMidiEvent> _action_items =
+  //     {};  // TODO get rid of this version
+  std::vector<std::unique_ptr<AudioActionItem>> delayed_action_items_ = {};
 
   XFader xfader_;
 
@@ -125,13 +125,13 @@ struct Mixer {
   void EmitEvent(broadcast_event event);
   bool DelSoundgen(int soundgen_num);
 
-  void PreviewAudio(audio_action_queue_item action);
+  void PreviewAudio(std::unique_ptr<AudioActionItem> action);
 
   void PrintTimingInfo();
   void PrintMidiInfo();
   void PrintFuncAndGenInfo();
 
-  void AddSoundGenerator(std::shared_ptr<SBAudio::SoundGenerator> sg);
+  void AddSoundGenerator(std::unique_ptr<SBAudio::SoundGenerator> sg);
 
   void VolChange(float vol);
   void VolChange(int sig, float vol);
@@ -150,7 +150,7 @@ struct Mixer {
   double GetHzPerTimingUnit(unsigned int timing_unit);
   int GetTicksPerCycleUnit(unsigned int event_type);
   void CheckForAudioActionQueueMessages();
-  void ProcessActionMessage(audio_action_queue_item action);
+  void ProcessActionMessage(std::unique_ptr<AudioActionItem> action);
 
   void AddFileToMonitor(std::string filepath);
 };

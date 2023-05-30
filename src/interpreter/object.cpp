@@ -18,42 +18,42 @@
 #include <tsqueue.hpp>
 #include <vector>
 
-extern Tsqueue<audio_action_queue_item> audio_queue;
+extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
 
 namespace {
 int AddSoundGenerator(unsigned int type, std::string filepath = "",
                       int loop_mode = 0) {
-  std::shared_ptr<SBAudio::SoundGenerator> sg;
+  std::unique_ptr<SBAudio::SoundGenerator> sg;
   switch (type) {
     case (MINISYNTH_TYPE):
-      sg = std::make_shared<SBAudio::MiniSynth>();
+      sg = std::make_unique<SBAudio::MiniSynth>();
       break;
     case (DXSYNTH_TYPE):
-      sg = std::make_shared<SBAudio::DXSynth>();
+      sg = std::make_unique<SBAudio::DXSynth>();
       break;
     case (DRUMSYNTH_TYPE):
-      sg = std::make_shared<SBAudio::DrumSynth>();
+      sg = std::make_unique<SBAudio::DrumSynth>();
       break;
     case (LOOPER_TYPE):
-      sg = std::make_shared<SBAudio::Looper>(filepath, loop_mode);
+      sg = std::make_unique<SBAudio::Looper>(filepath, loop_mode);
       break;
     case (DRUMSAMPLER_TYPE):
-      sg = std::make_shared<SBAudio::DrumSampler>(filepath);
+      sg = std::make_unique<SBAudio::DrumSampler>(filepath);
       break;
     case (SBSYNTH_TYPE):
-      sg = std::make_shared<SBAudio::SBSynth>();
+      sg = std::make_unique<SBAudio::SBSynth>();
       break;
   }
-  audio_action_queue_item action_req{.type = AudioAction::ADD,
-                                     .soundgenerator_type = type,
-                                     .sg = sg,
-                                     .filepath = filepath};
-  //.loop_mode = loop_mode}; // ? NOT USED?
+  auto action = std::make_unique<AudioActionItem>(AudioAction::ADD);
+  action->soundgenerator_type = type;
+  action->sg = std::move(sg);
+  action->filepath = filepath;
+
   std::thread::id this_id = std::this_thread::get_id();
   std::cout << "YO OBJECT - CREATE SOUND GENERTAOR!! threadid:" << this_id
             << "\n";
-  audio_queue.push(action_req);
+  audio_queue.push(std::move(action));
   auto sg_index = audio_reply_queue.pop();
   if (sg_index)
     return sg_index.value();

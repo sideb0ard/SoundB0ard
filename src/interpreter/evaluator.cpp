@@ -19,7 +19,7 @@
 #include <vector>
 
 extern Tsqueue<event_queue_item> process_event_queue;
-extern Tsqueue<audio_action_queue_item> audio_queue;
+extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<std::string> repl_queue;
 extern Tsqueue<int> audio_reply_queue;
 
@@ -199,9 +199,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     std::shared_ptr<ast::NumberLiteral> bpm =
         std::dynamic_pointer_cast<ast::NumberLiteral>(bpm_stmt->bpm_val_);
     if (bpm) {
-      audio_action_queue_item action{.type = AudioAction::BPM,
-                                     .new_bpm = bpm->value_};
-      audio_queue.push(action);
+      auto action = std::make_unique<AudioActionItem>(AudioAction::BPM);
+      action->new_bpm = bpm->value_;
+      audio_queue.push(std::move(action));
     }
   }
 
@@ -220,12 +220,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       auto target = Eval(soundgen_var_name, env);
       auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(target);
       if (soundgen) {
-        audio_action_queue_item action{
-            .type = AudioAction::INFO,
-            .param_name = soundgen_var_name->value_,
-            .mixer_soundgen_idx = soundgen->soundgen_id_};
+        auto action = std::make_unique<AudioActionItem>(AudioAction::INFO);
+        action->param_name = soundgen_var_name->value_;
+        action->mixer_soundgen_idx = soundgen->soundgen_id_;
 
-        audio_queue.push(action);
+        audio_queue.push(std::move(action));
       }
     }
   }
@@ -252,27 +251,26 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     }
 
     if (set_stmt->target_->token_.literal_ == ("mixer")) {
-      audio_action_queue_item action{
-          .type = AudioAction::MIXER_UPDATE,
-          .mixer_fx_id = set_stmt->mixer_fx_num_,
-          .is_xfader = set_stmt->is_xfader_component_,
-          .delayed_by = delayed_by,
-          .param_name = set_stmt->param_,
-          .param_val = val};
-      audio_queue.push(action);
+      auto action =
+          std::make_unique<AudioActionItem>(AudioAction::MIXER_UPDATE);
+      action->mixer_fx_id = set_stmt->mixer_fx_num_;
+      action->is_xfader = set_stmt->is_xfader_component_;
+      action->delayed_by = delayed_by;
+      action->param_name = set_stmt->param_;
+      action->param_val = val;
+      audio_queue.push(std::move(action));
       return NULLL;
     }
     auto target = Eval(set_stmt->target_, env);
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(target);
     if (soundgen) {
-      audio_action_queue_item action{
-          .type = AudioAction::UPDATE,
-          .mixer_soundgen_idx = soundgen->soundgen_id_,
-          .fx_id = set_stmt->fx_num_,
-          .param_name = set_stmt->param_,
-          .delayed_by = delayed_by,
-          .param_val = val};
-      audio_queue.push(action);
+      auto action = std::make_unique<AudioActionItem>(AudioAction::UPDATE);
+      action->mixer_soundgen_idx = soundgen->soundgen_id_;
+      action->fx_id = set_stmt->fx_num_;
+      action->param_name = set_stmt->param_;
+      action->delayed_by = delayed_by;
+      action->param_val = val;
+      audio_queue.push(std::move(action));
       return NULLL;
     }
 
@@ -295,13 +293,13 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 return NULLL;
               }
             }
-            audio_action_queue_item action{
-                .type = AudioAction::UPDATE,
-                .mixer_soundgen_idx = std::stoi(ss.str()),
-                .fx_id = set_stmt->fx_num_,
-                .param_name = set_stmt->param_,
-                .param_val = val};
-            audio_queue.push(action);
+            auto action =
+                std::make_unique<AudioActionItem>(AudioAction::UPDATE);
+            action->mixer_soundgen_idx = std::stoi(ss.str());
+            action->fx_id = set_stmt->fx_num_;
+            action->param_name = set_stmt->param_;
+            action->param_val = val;
+            audio_queue.push(std::move(action));
           }
         }
       }
@@ -314,12 +312,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     auto target = Eval(pan_stmt->target_, env);
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(target);
     if (soundgen) {
-      audio_action_queue_item action{
-          .type = AudioAction::UPDATE,
-          .mixer_soundgen_idx = soundgen->soundgen_id_,
-          .param_name = "pan",
-          .param_val = pan_stmt->value_};
-      audio_queue.push(action);
+      auto action = std::make_unique<AudioActionItem>(AudioAction::UPDATE);
+      action->mixer_soundgen_idx = soundgen->soundgen_id_;
+      action->param_name = "pan";
+      action->param_val = pan_stmt->value_;
+      audio_queue.push(std::move(action));
     }
   }
 
@@ -328,27 +325,27 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   if (play_expr) {
     if (!play_expr->path_.empty()) {
       //  import file and add decoded content
-      audio_action_queue_item action{.type = AudioAction::PREVIEW,
-                                     .preview_filename = play_expr->path_};
-      action.audio_buffer_details =
-          ImportFileContents(action.buffer, action.preview_filename);
-      audio_queue.push(action);
+      auto action = std::make_unique<AudioActionItem>(AudioAction::PREVIEW);
+      action->preview_filename = play_expr->path_;
+      action->audio_buffer_details =
+          ImportFileContents(action->buffer, action->preview_filename);
+      audio_queue.push(std::move(action));
     }
   }
 
   std::shared_ptr<ast::PsStatement> ps_expr =
       std::dynamic_pointer_cast<ast::PsStatement>(node);
   if (ps_expr) {
-    audio_action_queue_item action_req{.type = AudioAction::STATUS,
-                                       .status_all = ps_expr->all_};
-    audio_queue.push(action_req);
+    auto action = std::make_unique<AudioActionItem>(AudioAction::STATUS);
+    action->status_all = ps_expr->all_;
+    audio_queue.push(std::move(action));
   }
 
   std::shared_ptr<ast::HelpStatement> help_expr =
       std::dynamic_pointer_cast<ast::HelpStatement>(node);
   if (help_expr) {
-    audio_action_queue_item action_req{.type = AudioAction::HELP};
-    audio_queue.push(action_req);
+    auto action = std::make_unique<AudioActionItem>(AudioAction::HELP);
+    audio_queue.push(std::move(action));
   }
 
   std::shared_ptr<ast::StrategyStatement> strat_expr =
@@ -361,14 +358,13 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   std::shared_ptr<ast::VolumeStatement> vol_stmt =
       std::dynamic_pointer_cast<ast::VolumeStatement>(node);
   if (vol_stmt) {
-    audio_action_queue_item action{.type = AudioAction::UPDATE,
-                                   .param_name = "volume",
-                                   .param_val = vol_stmt->value_};
+    auto action = std::make_unique<AudioActionItem>(AudioAction::UPDATE);
+    action->param_name = "volume", action->param_val = vol_stmt->value_;
     auto target = Eval(vol_stmt->target_, env);
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(target);
     if (soundgen) {
-      action.mixer_soundgen_idx = soundgen->soundgen_id_;
-      audio_queue.push(action);
+      action->mixer_soundgen_idx = soundgen->soundgen_id_;
+      audio_queue.push(std::move(action));
     }
   }
 

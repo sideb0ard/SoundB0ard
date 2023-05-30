@@ -66,7 +66,7 @@ Mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
 extern Tsqueue<event_queue_item> process_event_queue;
 extern Tsqueue<std::string> repl_queue;
-extern Tsqueue<audio_action_queue_item> audio_queue;
+extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
 extern Tsqueue<std::string> eval_command_queue;
 
@@ -155,7 +155,7 @@ std::string Mixer::StatusEnv() {
   std::map<std::string, int> soundgens = global_env->GetSoundGenerators();
   for (auto &[var_name, sg_idx] : soundgens) {
     if (IsValidSoundgenNum(sg_idx)) {
-      auto sg = sound_generators_[sg_idx];
+      auto &sg = sound_generators_[sg_idx];
       // if (!sg->active) continue;
       ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
          << sg->Status() << ANSI_COLOR_RESET << std::endl;
@@ -189,7 +189,7 @@ std::string Mixer::StatusSgz(bool all) {
     ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "sound generators"
        << COOL_COLOR_GREEN << "]\n";
     for (int i = 0; i < sound_generators_idx_; i++) {
-      auto sg = sound_generators_[i];
+      auto &sg = sound_generators_[i];
       if (sg) {
         if ((sg->active && sg->GetVolume() > 0.0) || all) {
           ss << COOL_COLOR_GREEN << "[" << ANSI_COLOR_WHITE << "s" << i
@@ -341,7 +341,7 @@ void Mixer::EmitEvent(broadcast_event event) {
   process_event_queue.push(ev);
 
   for (int i = 0; i < sound_generators_idx_; i++) {
-    auto sg = sound_generators_[i];
+    auto &sg = sound_generators_[i];
     if (sg) {
       sg->EventNotify(event, timing_info);
       if (sg->effects_num > 0) {
@@ -401,14 +401,14 @@ void Mixer::PanChange(int sg, float val) {
   sound_generators_[sg]->SetPan(val);
 }
 
-void Mixer::AddSoundGenerator(std::shared_ptr<SBAudio::SoundGenerator> sg) {
+void Mixer::AddSoundGenerator(std::unique_ptr<SBAudio::SoundGenerator> sg) {
   std::thread::id this_id = std::this_thread::get_id();
   std::cout << "ADD SOUND GEN on THREAD " << this_id << std::endl;
   int soundgen_id = sound_generators_idx_;
   std::cout << "SOUND GEN ID" << soundgen_id << std::endl;
   if (soundgen_id < MAX_NUM_SOUND_GENERATORS) {
     sg->soundgen_id_ = soundgen_id;
-    sound_generators_[sound_generators_idx_++] = sg;
+    sound_generators_[sound_generators_idx_++] = std::move(sg);
   } else {
     std::cout << "NAH, FULL MATe!\n";
     soundgen_id = -1;
@@ -511,7 +511,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     StereoVal fx_reverb_send{};
     StereoVal fx_distort_send{};
     for (int i = 0; i < sound_generators_idx_; i++) {
-      auto sg = sound_generators_[i];
+      auto &sg = sound_generators_[i];
       soundgen_cur_val_[i] = sg->GenNext(timing_info);
 
       bool collect_value = false;
@@ -554,8 +554,6 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
 bool Mixer::DelSoundgen(int soundgen_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
     printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
-    auto sg = sound_generators_[soundgen_num];
-
     sound_generators_[soundgen_num] = nullptr;
   }
   return true;
@@ -571,7 +569,7 @@ bool Mixer::IsValidSoundgenNum(int sg_num) {
 
 bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
-    auto sg = sound_generators_[soundgen_num];
+    auto &sg = sound_generators_[soundgen_num];
     if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects_[fx_num])
       return true;
   }
@@ -661,12 +659,12 @@ int Mixer::GetTicksPerCycleUnit(unsigned int event_type) {
   return ticks;
 }
 
-void Mixer::PreviewAudio(audio_action_queue_item action) {
-  if (action.buffer.size() > 0) {
-    preview.filename = action.preview_filename;
-    preview.audio_buffer_len = action.audio_buffer_details.buffer_length;
-    preview.audio_buffer = std::move(action.buffer);
-    preview.num_channels = action.audio_buffer_details.num_channels;
+void Mixer::PreviewAudio(std::unique_ptr<AudioActionItem> action) {
+  if (action->buffer.size() > 0) {
+    preview.filename = action->preview_filename;
+    preview.audio_buffer_len = action->audio_buffer_details.buffer_length;
+    preview.audio_buffer = std::move(action->buffer);
+    preview.num_channels = action->audio_buffer_details.num_channels;
     preview.audio_buffer_read_idx = 0;
     preview.enabled = true;
   }
@@ -693,158 +691,160 @@ StereoVal PreviewBuffer::Generate() {
   return ret;
 }
 
-void Mixer::ProcessActionMessage(audio_action_queue_item action) {
-  if (action.type == AudioAction::STATUS) {
+void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
+  if (action->type == AudioAction::STATUS) {
     std::cout << "YO IT ME STSTUA\n";
-    Ps(action.status_all);
+    Ps(action->status_all);
   }
-  if (action.type == AudioAction::MIDI_MAP)
-    AddMidiMapping(action.mapped_id, action.mapped_param);
-  if (action.type == AudioAction::MIDI_MAP_SHOW)
+  if (action->type == AudioAction::MIDI_MAP)
+    AddMidiMapping(action->mapped_id, action->mapped_param);
+  if (action->type == AudioAction::MIDI_MAP_SHOW)
     PrintMidiMappings();
-  else if (action.type == AudioAction::HELP)
+  else if (action->type == AudioAction::HELP)
     mixr->Help();
-  else if (action.type == AudioAction::MONITOR) {
-    AddFileToMonitor(action.filepath);
-  } else if (action.type == AudioAction::ADD) {
-    if (action.sg) {
+  else if (action->type == AudioAction::MONITOR) {
+    AddFileToMonitor(action->filepath);
+  } else if (action->type == AudioAction::ADD) {
+    if (action->sg) {
       std::cout << "YO ADD SD\n";
-      AddSoundGenerator(action.sg);
+      AddSoundGenerator(std::move(action->sg));
       std::cout << "YO ADD SD IS DUN\n";
     }
     std::cout << "DUN WIT IF SCTION" << std::endl;
-  } else if (action.type == AudioAction::ADD_FX) {
-    if (action.sg) {
-      for (auto fx : action.fx) {
-        action.sg->AddFx(fx);
-      }
-    }
-  } else if (action.type == AudioAction::BPM) {
-    UpdateBpm(action.new_bpm);
-  } else if (action.type == AudioAction::VOLUME) {
-    VolChange(action.new_volume);
-  } else if (action.type == AudioAction::RECORDED_MIDI_EVENT) {
-    _delayed_action_items.push_back(action);
-  } else if (action.type == AudioAction::MIDI_EVENT_ADD ||
-             action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
-    if (IsValidSoundgenNum(action.soundgen_num)) {
-      auto sg = sound_generators_[action.soundgen_num];
-
-      for (auto midinum : action.notes) {
-        midi_event event_on = new_midi_event(MIDI_ON, midinum, action.velocity);
-        event_on.source = EXTERNAL_OSC;
-        event_on.dur = action.duration;
-
-        // used later for MIDI OFF MESSAGE
-        int midi_note_on_time = timing_info.midi_tick;
-
-        if (action.type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
-          midi_note_on_time += action.note_start_time;
-          auto ev = DelayedMidiEvent(midi_note_on_time, event_on, sg);
-          _action_items.push_back(ev);
-        } else {
-          sg->noteOn(event_on);
+  } else if (action->type == AudioAction::ADD_FX) {
+    if (action->soundgen_num && IsValidSoundgenNum(action->soundgen_num)) {
+      auto &sg = sound_generators_[action->soundgen_num];
+      if (sg) {
+        for (auto fx : action->fx) {
+          sg->AddFx(fx);
         }
-        int midi_off_tick = midi_note_on_time + action.duration;
-
-        midi_event event_off =
-            new_midi_event(MIDI_OFF, midinum, action.velocity);
-
-        auto ev = DelayedMidiEvent(midi_off_tick, event_off, sg);
-
-        _action_items.push_back(ev);
       }
     }
-  } else if (action.type == AudioAction::SOLO) {
-    if (IsValidSoundgenNum(action.soundgen_num)) {
-      soloed_sound_generator_idz.push_back(action.soundgen_num);
+  } else if (action->type == AudioAction::BPM) {
+    UpdateBpm(action->new_bpm);
+  } else if (action->type == AudioAction::VOLUME) {
+    VolChange(action->new_volume);
+    //} else if (action->type == AudioAction::MIDI_EVENT_ADD ||
+    //           action->type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+    //  if (IsValidSoundgenNum(action->soundgen_num)) {
+    //    auto &sg = sound_generators_[action->soundgen_num];
+
+    //    for (auto midinum : action->notes) {
+    //      midi_event event_on =
+    //          new_midi_event(MIDI_ON, midinum, action->velocity);
+    //      event_on.source = EXTERNAL_OSC;
+    //      event_on.dur = action->duration;
+
+    //      // used later for MIDI OFF MESSAGE
+    //      int midi_note_on_time = timing_info.midi_tick;
+
+    //      // if (action->type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+    //      //   midi_note_on_time += action->note_start_time;
+    //      //   auto ev = DelayedMidiEvent(midi_note_on_time, event_on, sg);
+    //      //   _action_items.push_back(ev);
+    //      // } else {
+    //      sg->noteOn(event_on);
+    //      //}
+    //      int midi_off_tick = midi_note_on_time + action->duration;
+
+    //      midi_event event_off =
+    //          new_midi_event(MIDI_OFF, midinum, action->velocity);
+
+    //      auto ev = DelayedMidiEvent(midi_off_tick, event_off, sg);
+
+    //      // _action_items.push_back(ev);
+    //    }
+    //  }
+  } else if (action->type == AudioAction::SOLO) {
+    if (IsValidSoundgenNum(action->soundgen_num)) {
+      soloed_sound_generator_idz.push_back(action->soundgen_num);
     }
-  } else if (action.type == AudioAction::UNSOLO) {
+  } else if (action->type == AudioAction::UNSOLO) {
     soloed_sound_generator_idz.clear();
-  } else if (action.type == AudioAction::STOP) {
-    if (IsValidSoundgenNum(action.soundgen_num)) {
-      auto sg = sound_generators_[action.soundgen_num];
+  } else if (action->type == AudioAction::STOP) {
+    if (IsValidSoundgenNum(action->soundgen_num)) {
+      auto &sg = sound_generators_[action->soundgen_num];
       // sg->allNotesOff();
       sg->stop();
     }
-  } else if (action.type == AudioAction::MIXER_UPDATE) {
-    double param_val = std::stod(action.param_val);
-    if (action.mixer_fx_id != -1) {
-      fx_[action.mixer_fx_id]->SetParam(action.param_name, param_val);
-    } else if (action.is_xfader) {
-      xfader_.Set(action.param_name, param_val);
+  } else if (action->type == AudioAction::MIXER_UPDATE) {
+    double param_val = std::stod(action->param_val);
+    if (action->mixer_fx_id != -1) {
+      fx_[action->mixer_fx_id]->SetParam(action->param_name, param_val);
+    } else if (action->is_xfader) {
+      xfader_.Set(action->param_name, param_val);
     }
-  } else if (action.type == AudioAction::MIXER_FX_UPDATE) {
-    for (const auto &soundgen_num : action.group_of_soundgens) {
+  } else if (action->type == AudioAction::MIXER_FX_UPDATE) {
+    for (const auto &soundgen_num : action->group_of_soundgens) {
       if (IsValidSoundgenNum(soundgen_num)) {
-        auto sg = sound_generators_[soundgen_num];
+        auto &sg = sound_generators_[soundgen_num];
         if (sg) {
-          sg->SetFxSend(action.mixer_fx_id, action.fx_intensity);
+          sg->SetFxSend(action->mixer_fx_id, action->fx_intensity);
         }
       }
     }
-  } else if (action.type == AudioAction::MIXER_XFADE_ACTION) {
-    if (action.xfade_direction == 0) {
+  } else if (action->type == AudioAction::MIXER_XFADE_ACTION) {
+    if (action->xfade_direction == 0) {
       xfader_.Set("xpos", -1);
     }
-    if (action.xfade_direction == 1) {
+    if (action->xfade_direction == 1) {
       xfader_.Set("xpos", 1);
     }
-  } else if (action.type == AudioAction::MIXER_XFADE_ASSIGN) {
-    for (const auto &soundgen_num : action.group_of_soundgens) {
+  } else if (action->type == AudioAction::MIXER_XFADE_ASSIGN) {
+    for (const auto &soundgen_num : action->group_of_soundgens) {
       if (IsValidSoundgenNum(soundgen_num)) {
-        xfader_.Assign(soundgen_num, action.xfade_channel);
+        xfader_.Assign(soundgen_num, action->xfade_channel);
       }
     }
-  } else if (action.type == AudioAction::MIXER_XFADE_CLEAR) {
+  } else if (action->type == AudioAction::MIXER_XFADE_CLEAR) {
     xfader_.Clear();
-  } else if (action.type == AudioAction::UPDATE) {
-    if (IsValidSoundgenNum(action.mixer_soundgen_idx)) {
-      double param_val = std::stod(action.param_val);
+  } else if (action->type == AudioAction::UPDATE) {
+    if (IsValidSoundgenNum(action->mixer_soundgen_idx)) {
+      double param_val = std::stod(action->param_val);
 
-      auto sg = sound_generators_[action.mixer_soundgen_idx];
+      auto &sg = sound_generators_[action->mixer_soundgen_idx];
       if (!sg) {
         std::cerr << "WHOE NELLY! Naw SG! bailing out!\n";
         return;
       }
-      if (action.param_name == "volume")
+      if (action->param_name == "volume")
         sg->SetVolume(param_val);
-      else if (action.param_name == "pan")
+      else if (action->param_name == "pan")
         sg->SetPan(param_val);
       else {
         // first check if we're setting an FX param
-        if (action.fx_id != -1) {
-          int fx_num = action.fx_id;
-          if (IsValidFx(action.mixer_soundgen_idx, fx_num)) {
+        if (action->fx_id != -1) {
+          int fx_num = action->fx_id;
+          if (IsValidFx(action->mixer_soundgen_idx, fx_num)) {
             auto f = sg->effects_[fx_num];
-            if (action.param_name == "active")
+            if (action->param_name == "active")
               f->enabled_ = param_val;
             else
-              f->SetParam(action.param_name, param_val);
+              f->SetParam(action->param_name, param_val);
           }
         } else  // must be a SoundGenerator param
         {
-          sg->SetParam(action.param_name, param_val);
+          sg->SetParam(action->param_name, param_val);
         }
       }
     }
-  } else if (action.type == AudioAction ::INFO) {
-    if (IsValidSoundgenNum(action.mixer_soundgen_idx)) {
-      auto sg = sound_generators_[action.mixer_soundgen_idx];
+  } else if (action->type == AudioAction ::INFO) {
+    if (IsValidSoundgenNum(action->mixer_soundgen_idx)) {
+      auto &sg = sound_generators_[action->mixer_soundgen_idx];
       repl_queue.push(sg->Info());
     }
-  } else if (action.type == AudioAction ::SAVE_PRESET ||
-             action.type == AudioAction ::RAND_PRESET ||
-             action.type == AudioAction ::LIST_PRESETS) {
-    interpreter_sound_cmds::ParseSynthCmd(action.args);
-  } else if (action.type == AudioAction::LOAD_PRESET) {
-    interpreter_sound_cmds::SynthLoadPreset(action.args[0], action.preset_name,
-                                            action.preset);
-  } else if (action.type == AudioAction::RAND) {
+  } else if (action->type == AudioAction ::SAVE_PRESET ||
+             action->type == AudioAction ::RAND_PRESET ||
+             action->type == AudioAction ::LIST_PRESETS) {
+    interpreter_sound_cmds::ParseSynthCmd(action->args);
+  } else if (action->type == AudioAction::LOAD_PRESET) {
+    interpreter_sound_cmds::SynthLoadPreset(
+        action->args[0], action->preset_name, action->preset);
+  } else if (action->type == AudioAction::RAND) {
     std::cout << "MIXER GOT RAND CALL\n";
-    sound_generators_[action.mixer_soundgen_idx]->randomize();
-  } else if (action.type == AudioAction::PREVIEW) {
-    PreviewAudio(action);
+    sound_generators_[action->mixer_soundgen_idx]->randomize();
+  } else if (action->type == AudioAction::PREVIEW) {
+    PreviewAudio(std::move(action));
   }
 }
 
@@ -926,13 +926,13 @@ void Mixer::CheckForExternalMidiEvents() {
 void Mixer::CheckForAudioActionQueueMessages() {
   while (auto opt_action = audio_queue.try_pop()) {
     if (opt_action) {
-      audio_action_queue_item action = opt_action.value();
-      if (action.delayed_by > 0) {
-        action.start_at = timing_info.midi_tick + action.delayed_by;
-        action.delayed_by = 0;
-        _delayed_action_items.push_back(action);
+      auto &action = opt_action.value();
+      if (action->delayed_by > 0) {
+        action->start_at = timing_info.midi_tick + action->delayed_by;
+        action->delayed_by = 0;
+        delayed_action_items_.push_back(std::move(action));
       } else {
-        ProcessActionMessage(action);
+        ProcessActionMessage(std::move(action));
       }
     }
   }
@@ -943,59 +943,59 @@ void Mixer::AddFileToMonitor(std::string filepath) {
 }
 
 void Mixer::CheckForDelayedEvents() {
-  auto it = _action_items.begin();
-  while (it != _action_items.end()) {
-    if (it->target_tick == timing_info.midi_tick) {
-      // TODO - push to action queue not call function
-      if (it->sg) {
-        it->sg->parseMidiEvent(it->event, timing_info);
-      } else if (it->event.event_type == MIDI_CONTROL) {
-        HandleMidiControlMessage(it->event.data1, it->event.data2);
-      }
-      // `erase()` invalidates the iterator, use returned iterator
-      it = _action_items.erase(it);
-    } else {
-      ++it;
-    }
-  }
+  // auto it = _action_items.begin();
+  // while (it != _action_items.end()) {
+  //   if (it->target_tick == timing_info.midi_tick) {
+  //     // TODO - push to action queue not call function
+  //     if (it->sg) {
+  //       it->sg->parseMidiEvent(it->event, timing_info);
+  //     } else if (it->event.event_type == MIDI_CONTROL) {
+  //       HandleMidiControlMessage(it->event.data1, it->event.data2);
+  //     }
+  //     // `erase()` invalidates the iterator, use returned iterator
+  //     it = _action_items.erase(it);
+  //   } else {
+  //     ++it;
+  //   }
+  // }
 
-  std::vector<audio_action_queue_item> delayed_buffer;
-  auto dit = _delayed_action_items.begin();
-  while (dit != _delayed_action_items.end()) {
-    if (dit->start_at == (timing_info.midi_tick % PPBAR)) {
-      if (dit->event.event_type == MIDI_CONTROL) {
-        HandleMidiControlMessage(dit->event.data1, dit->event.data2);
-      } else if (IsValidSoundgenNum(dit->mixer_soundgen_idx)) {
-        auto sg = sound_generators_[dit->mixer_soundgen_idx];
-        sg->parseMidiEvent(dit->event, timing_info);
-        if (dit->event.event_type == MIDI_ON && dit->event.dur > 0) {
-          auto note_off = new_midi_event(MIDI_OFF, dit->event.data1, 0);
-          audio_action_queue_item note_off_action;
-          note_off_action.event = note_off;
-          note_off_action.type = RECORDED_MIDI_EVENT;
-          note_off_action.mixer_soundgen_idx = dit->mixer_soundgen_idx;
-          note_off_action.start_at = timing_info.midi_tick + dit->event.dur;
-          delayed_buffer.push_back(note_off_action);
+  std::vector<std::unique_ptr<AudioActionItem>> delayed_buffer;
+  auto dit = delayed_action_items_.begin();
+  while (dit != delayed_action_items_.end()) {
+    if ((*dit)->start_at == (timing_info.midi_tick % PPBAR)) {
+      if ((*dit)->event.event_type == MIDI_CONTROL) {
+        HandleMidiControlMessage((*dit)->event.data1, (*dit)->event.data2);
+      } else if (IsValidSoundgenNum((*dit)->mixer_soundgen_idx)) {
+        auto &sg = sound_generators_[(*dit)->mixer_soundgen_idx];
+        sg->parseMidiEvent((*dit)->event, timing_info);
+        if ((*dit)->event.event_type == MIDI_ON && (*dit)->event.dur > 0) {
+          auto note_off = new_midi_event(MIDI_OFF, (*dit)->event.data1, 0);
+          auto action = std::make_unique<AudioActionItem>(
+              AudioAction::RECORDED_MIDI_EVENT);
+          action->event = note_off;
+          action->mixer_soundgen_idx = (*dit)->mixer_soundgen_idx;
+          action->start_at = timing_info.midi_tick + (*dit)->event.dur;
+          delayed_buffer.push_back(std::move(action));
         }
       }
-      dit = _delayed_action_items.erase(dit);
-    } else if (dit->start_at == timing_info.midi_tick) {
-      if (dit->type == RECORDED_MIDI_EVENT) {
-        if (IsValidSoundgenNum(dit->mixer_soundgen_idx)) {
-          auto sg = sound_generators_[dit->mixer_soundgen_idx];
-          sg->parseMidiEvent(dit->event, timing_info);
+      dit = delayed_action_items_.erase(dit);
+    } else if ((*dit)->start_at == timing_info.midi_tick) {
+      if ((*dit)->type == RECORDED_MIDI_EVENT) {
+        if (IsValidSoundgenNum((*dit)->mixer_soundgen_idx)) {
+          auto &sg = sound_generators_[(*dit)->mixer_soundgen_idx];
+          sg->parseMidiEvent((*dit)->event, timing_info);
         }
       } else {
-        ProcessActionMessage(*dit);
+        ProcessActionMessage(std::move(*dit));
       }
       // `erase()` invalidates the iterator, use returned iterator
-      dit = _delayed_action_items.erase(dit);
+      dit = delayed_action_items_.erase(dit);
     } else {
       ++dit;
     }
   }
-  for (auto d : delayed_buffer) {
-    _delayed_action_items.push_back(d);
+  for (auto &d : delayed_buffer) {
+    delayed_action_items_.push_back(std::move(d));
   }
 }
 
