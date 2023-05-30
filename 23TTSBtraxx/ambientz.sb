@@ -36,22 +36,24 @@ let bdlah_gen = gen()
   {
     let t = 434555;
     let pat  = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
+    let d = 100;
   }
   run()
   {
-    note_on_at(bd, 1, 0);
+    note_on_at(bd, 1, 0, dur = d);
+    d = d + 50;
+    if (d > 700) {
+      d = 50;
+    }
     send(0, ch, 0);
     if (count % 4 == 0) {
-      #set tel:stutter 1;
       send(0, ch, 0.4);
       cbeat(sn);
     }
     if (count % 3 == 0) {
-      #set tel:scramble 1;
       send(0, ch, 0.2);
     }
     if (count % 7 == 0) {
-      #set tel:reverse 1;
       pat  = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
       ++t;
     }
@@ -67,8 +69,8 @@ let bdlah_gen = gen()
   }
 }
 
-# vol per1 0.2 // Srqttx
-# sd // // HIGHWR // TRASHP // TWANrG
+# vol per1 0.3 // Srqttx
+# vol sd 0.4; sd // // HIGHWR // TRASHP // TWANrG
 let moblah_gen = gen()
 {
   setup()

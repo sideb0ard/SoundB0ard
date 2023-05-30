@@ -99,17 +99,17 @@ let bablah_gen = gen()
   }
 }
 
-#  cp SLICZ
+#  cp SLICZ // DWUB ?
 let ok = sample(voices/ok.wav);
+let notez = [47, 48];
+let cnt = 7;
+let the_mel = combinor(bjork(cnt, 16), notez);
 let dabblah = gen()
 {
   setup()
   {
-    let notez = [47, 48];
     let nx = 0;
-    let cnt = 7;
-    let the_mel = combinor(bjork(cnt, 16), notez);
-    let d = 50;
+    let d = 150;
   }
   run()
   {
@@ -128,14 +128,32 @@ let dabblah = gen()
         }
       }
       d = d + 50;
-      if (d > 450) {
-        d = 50;
+      if (d > 550) {
+        d = 150;
       }
     }
     if (count % 4 == 0) {
       the_mel = combinor(bjork(cnt, 16), notez);
       cnt = incr(cnt, 3, 11);
       note_on(ok, 1, dur = d + 100);
+    }
+  }
+}
+
+# sd = BDLOW
+let compblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      for (i = 0; i < 16; ++i) {
+        if (the_mel[i] == 0) {
+          note_on_at(sd, notez[0], i * pp);
+        }
+      }
     }
   }
 }
@@ -149,8 +167,13 @@ let fldblah_gen = gen()
   }
   run()
   {
-    if (count % 2 == 0) {
+    if (count % 4 == 0) {
       set dics:stutter 1;
+      set njb:scramble 1;
+    }
+    if (count % 3 == 0) {
+      set dics:stutter 1;
+      set njb:stutter 1;
     }
   }
 }

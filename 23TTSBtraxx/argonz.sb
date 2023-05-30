@@ -129,7 +129,7 @@ let dxxblah_gen = gen()
   }
 }
 
-# let cow = loop(JUNALGOGZ/cowbellsz.wav);
+# let cow = loop(JUNALGOGZ/cowbellsz.wav); set cow:stop_in 2
 # let wkth = loop(JUNALGOGZ/workthat.wav); set wkth:len 2
 
 let callme = sample(voices/callme.wav);

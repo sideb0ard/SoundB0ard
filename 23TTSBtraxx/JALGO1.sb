@@ -27,7 +27,7 @@ let hhabblah_gen = gen()
 # dx - wuurpr // vol dx 0.4
 # per3 = glotch // Srqttx // NUURF // MFFF
 
-# let let areyou = loop(voices/areyoureadytScratch.wav); set areyou:stop_in 1;
+# let areyou = loop(voices/areyoureadytScratch.wav); set areyou:stop_in 1;
 # p3 $ dxstrabblah
 let dxstrabblah = gen()
 {
