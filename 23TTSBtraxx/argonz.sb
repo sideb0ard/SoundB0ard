@@ -64,8 +64,8 @@ let wmwmblah_gen = gen()
 }
 
 
-# bd NUURF ? Srqttx
-# load_preset(hh, "SLOWHH")
+# bd NUURF ? Srqttx // PHART
+# load_preset(hh, "SLOWHH") ; vol hh 0.4;
 # p5 < osc 8 "0.1 0.4" "send(0, hh, %)"
 let sdw1 = sample(voices/ineed.wav);
 let sdw2 = sample(bombz/BSQ_M501_s.wav);
@@ -94,10 +94,10 @@ let bddalah_gen = gen()
     if (count % 7 < 6) {
       hhmbeat(hh, 44);
     }
-    if (count % 2 == 1) {
-      cbeat(swdz[swx]);
-      swx = incr(swx, 0, len(swdz));
-    }
+    # if (count % 2 == 1) {
+      #   cbeat(swdz[swx]);
+      #   swx = incr(swx, 0, len(swdz));
+      # }
     if (count % 3 == 1) {
       cmbeat(cb, 54);
     }
@@ -130,7 +130,7 @@ let dxxblah_gen = gen()
 }
 
 # let cow = loop(JUNALGOGZ/cowbellsz.wav); set cow:stop_in 2
-# let wkth = loop(JUNALGOGZ/workthat.wav); set wkth:len 2
+# let wkth = loop(JUNALGOGZ/workthat.wav); set wkth:len 2; set wkth:stop_in 1
 
 let callme = sample(voices/callme.wav);
 let callmeova = sample(voices/callmeova.wav);

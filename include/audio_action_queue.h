@@ -77,7 +77,6 @@ class AudioActionItem {
   // ADD varz
   unsigned int soundgenerator_type;
   std::string filepath;  // used for sample and digisynth
-  // bool loop_mode{false};  // ? NOT USED?
 
   // STATUS varz
   bool status_all{false};

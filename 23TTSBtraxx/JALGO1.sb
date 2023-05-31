@@ -3,6 +3,7 @@
 let ntz = [55, 54, 47];
 
 # let laf = loop(voices/IKNOW.wav); set laf:len 4; p2 < osc 4 "0.2 0.9" "send(0, laf, %)"
+# let bdz = loop(dloops/kicz.wav); p3 < osc 8 "0.1 0.8" "send(0, bdz, %)"; set bdz:len 2
 
 # let hhb = loop(dloops/hipHopBap.aiff); send(2, hhb, 0.5); p2 $ hhabblah_gen
 let hhabblah_gen = gen()
@@ -19,14 +20,44 @@ let hhabblah_gen = gen()
       set hhb:stutter 1;
     }
     if (count % 3 == 0) {
-      set laf:stutter 1;
+      #set laf:stutter 1;
     }
   }
 }
 
-# dx - wuurpr // vol dx 0.4
-# per3 = glotch // Srqttx // NUURF // MFFF
+# dx - wuurpr // vol dx 0.4  // llasticx ?
+# per3 = glotch // Srqttx // NUURF // MFFF // vol per3 0.3 // Scrurhf // SQWA
 
+let wuwblah_gen = gen()
+{
+  setup()
+  {
+    let mx = 0;
+    let siz = [3, 5, 7, 9];
+    let sx = 0;
+    let dz = [30, 50, 70, 150, 300];
+    let dzx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      let mel = bjork(siz[sx], 16);
+      sx = incr(sx, 0, len(siz));
+      for (i = 0; i < 16; ++i) {
+        if (mel[i] == 1) {
+          note_on_at(dx, ntz[mx] - 12, i * pp, dur = dz[dzx]);
+          mx = incr(mx, 0, len(ntz));
+          note_on_at(per3, ntz[mx] - 12, i * pp + pp*siz[sx], dur = 50);
+        } else {
+          if (i > 12) {
+            note_on_at(per3, ntz[mx], i * pp + pp*siz[sx], dur = dz[dzx]);
+          }
+        }
+        dzx = incr(dzx, 0, len(dz));
+      }
+    }
+  }
+}
 # let areyou = loop(voices/areyoureadytScratch.wav); set areyou:stop_in 1;
 # p3 $ dxstrabblah
 let dxstrabblah = gen()
@@ -43,17 +74,19 @@ let dxstrabblah = gen()
   run()
   {
     if (count % 4 < 2) {
-      for (i = 0; i < 16; ++i) {
-        let v = 100 + rand(27);
-        let off = 0;
-        if (count % 4 == 0) {
-          v = 127;
-        }
-        if (count % 2 == 1) {
-          off = 48;
-        }
-        if (the_mel[i] > 0 ) {
-          note_on_at(dx, the_mel[i], i*pp + off, vel = v);
+      if (count % 16 < 14) {
+        for (i = 0; i < 16; ++i) {
+          let v = 100 + rand(27);
+          let off = 0;
+          if (count % 4 == 0) {
+            v = 127;
+          }
+          if (count % 2 == 1) {
+            off = 48;
+          }
+          if (the_mel[i] > 0 ) {
+            note_on_at(dx, the_mel[i], i*pp + off, vel = v);
+          }
         }
       }
     } else {
@@ -67,6 +100,15 @@ let dxstrabblah = gen()
         }
       }
     }
+    if (count % 8 == 7) {
+      for (i = 0; i < len(b); ++i) {
+        if (mel[i] == 0) {
+          note_on_at(dx, mel[i]+36, i * pp, dur = dz[dzx]);
+          dzx = incr(dzx, 0, len(dz));
+        }
+      }
+    }
+
     # print(the_mel);
     if (count % 4 == 0) {
       the_mel = combinor(bjork(cnt, 16), notez);
@@ -76,6 +118,9 @@ let dxstrabblah = gen()
     }
     if (count % 3 == 0) {
       set hhb:stutter 1;
+    }
+    if (count % 8 == 7) {
+      the_mel = down(the_mel, 12);
     }
   }
 }
@@ -98,6 +143,9 @@ let ddxblah_gen = gen()
     let p = bits( ((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
     let mx = 0;
     let maxx = 4;
+    let dzzz = [100, 300, 200, 300, 400, 300, 500];
+    let lx = 0;
+    let dn = 1;
   }
   run()
   {
@@ -109,18 +157,26 @@ let ddxblah_gen = gen()
     }
     if (count % 4 == 2) {
       for (i = 0; i < 16; ++i) {
-        stepper(per1, combinor(p, down(ntz, 12)), mx, i, 400);
+        stepper(per1, combinor(p, down(ntz, 12)), mx, i, dzzz[lx]);
         mx = incr(mx, 0, maxx)
       }
     }
+    lx = incr(lx, 0, len(dzzz));
     if (count % 8 == 7) {
       set bt:stutter 1;
     }
-    for (i = 0; i < 16; ++i) {
-      stepper(per2, combinor(invert(p), ntz), mx, i, 400);
-      mx = incr(mx, 0, maxx)
+    if (count % 8 < 6) {
+      let mtz = ntz;
+      if (count % 8 == 4) {
+        mtz = scale_melody(down(ntz, dn), 38);
+        dn = incr(dn, 1, 7);
+      }
+      for (i = 0; i < 16; ++i) {
+        stepper(per2, combinor(invert(p), mtz), mx, i, dzzz[lx]);
+        mx = incr(mx, 0, maxx)
+      }
+      maxx = incr(maxx, 4, 16);
     }
-    maxx = incr(maxx, 4, 16);
   }
 }
 
@@ -138,7 +194,6 @@ let delblah_gen = gen()
   {
     if (count % 3 == 0) {
       set delz:scramble 1;
-      #set delz:reverse 1;
     }
     if (count % 4 == 0) {
       set delz:stutter 1;
@@ -147,6 +202,11 @@ let delblah_gen = gen()
     if (count % 8 == 7) {
       solo(delz) at=8*pp;
     }
+    if (count % 9 == 0) {
+      set delz:reverse 1;
+    }
   }
 }
 
+# p10 < osc 4 "0.1 0.3"  "send(0, delz, %)"
+# p11 < osc 7 "0.1 0.6"  "send(1, delz, %)"

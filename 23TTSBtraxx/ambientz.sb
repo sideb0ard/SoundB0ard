@@ -24,11 +24,11 @@ let oneblah_gen = gen()
 
 
 # sidechain one with bd
-# add_fx(one, "sidechain", bd);
+# add_fx(one, "sidechain", bd); p4 $ bdlah_gen
 
 let bd = sample(bd/808kick.aif);
-let ch = sample(ch/hatTail.aiff);
-let sn = sample(noises/skateWheelDoublehit.aiff);
+let ch = sample(ch/dr606closedhh.aif);
+let sn = sample(cp/gaborClap.aiff);
 
 let bdlah_gen = gen()
 {
@@ -69,8 +69,8 @@ let bdlah_gen = gen()
   }
 }
 
-# vol per1 0.3 // Srqttx
-# vol sd 0.4; sd // // HIGHWR // TRASHP // TWANrG
+# vol per1 0.3 // Srqttx // phoneCRAWL // glotch
+# vol sd 0.4; sd // // HIGHWR // TRASHP // TWANrG // BADUM //
 let moblah_gen = gen()
 {
   setup()
@@ -107,14 +107,17 @@ let moblah_gen = gen()
   }
 }
 
+# p9 < osc 8 "0.3 0.9" "send(0, one, %)";
 let hh1 = sample(wavalc/dm02_909_closedhat_005.wav);
 vol hh1 0.3;
 let perxz1 = [hh1];
 let pr1x = 0;
 
-let tmb = sample(perc/tambourine.aif);
-vol tmb 0.2;
-let perxz2 = [tmb];
+let tmb = sample(voices/elike.wav);
+let aw2 = sample(voices/wah.wav);
+let ova = sample(voices/callmeova.wav);
+vol tmb 0.7;
+let perxz2 = [tmb, aw2, ova];
 let pr2x = 0;
 let pblah_gen = gen()
 {
@@ -145,4 +148,9 @@ let pblah_gen = gen()
 
   }
 }
+# p14 < osc 7 "0.1 0.4" "send(0, perxz2, %)"
+# p15 < osc 8 "0.3 0.7" "send(1, perxz2, %)"
+
+# let mac = loop(aaassembly/onBEATMARCUS.wav); send(2, mac, 0.5);
 # let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4) ;
+# xassign(0, mac); xassign(1, wrb)

@@ -494,13 +494,13 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     timing_info.is_midi_tick = false;
     auto beat_time = sessionState.beatAtTime(hostTime, quantum);
     if (beat_time >= 0.) {
-      if (beat_time > timing_info.time_of_next_midi_tick) {
+      if (beat_time >= timing_info.time_of_next_midi_tick) {
         timing_info.time_of_next_midi_tick =
             (double)((int)beat_time) +
             ((timing_info.midi_tick % PPQN) * MIDI_TICK_FRAC_OF_BEAT);
-        timing_info.midi_tick++;
         timing_info.is_midi_tick = true;
         MidiTick();
+        timing_info.midi_tick++;
       }
     }
 

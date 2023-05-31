@@ -80,7 +80,7 @@ let bablah_gen = gen()
   }
   run()
   {
-    play_array(bddd, bjork(bjz[bx], 16), dur=500);
+    play_array(bddd, bjork(bjz[bx], 16), dur=900);
     bx = incr(bx, 0, len(bjz));
     set awk:on 1;
     if (count % 4 == 3) {
@@ -92,10 +92,10 @@ let bablah_gen = gen()
     if (count % 3 == 0) {
       set awk:stutter 1;
     }
-    if (count % 8 == 0) {
-      set bsqw:pitch ptz[ptx];
-      ptx = incr (ptx, 0, len(ptz));
-    }
+    #if (count % 8 == 0) {
+      #  set bsqw:pitch ptz[ptx];
+      #  ptx = incr (ptx, 0, len(ptz));
+      #}
   }
 }
 
@@ -140,6 +140,8 @@ let dabblah = gen()
   }
 }
 
+#p13 < osc 8 "0.1 0.5" "send(0, ok, %)";
+
 # sd = BDLOW
 let compblah_gen = gen()
 {
@@ -158,6 +160,7 @@ let compblah_gen = gen()
   }
 }
 
+# let njb = loop(JUNALGOGZ/newjackBEat.wav); send(2, njb, 0.2); set njb:stop_in 4
 # let dics = loop(JUNALGOGZ/dicscovibe.wav); set dics:len 2; send(2, dics, 0.3);
 
 let fldblah_gen = gen()
@@ -168,13 +171,18 @@ let fldblah_gen = gen()
   run()
   {
     if (count % 4 == 0) {
-      set dics:stutter 1;
+      #set dics:stutter 1;
       set njb:scramble 1;
     }
     if (count % 3 == 0) {
-      set dics:stutter 1;
+      #set dics:stutter 1;
       set njb:stutter 1;
     }
+    #unsolo();
+    #if (count % 8 == 7) {
+      #  solo(njb);
+      #  solo(cl);
+      #}
   }
 }
 
