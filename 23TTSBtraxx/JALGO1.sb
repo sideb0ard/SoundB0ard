@@ -3,9 +3,12 @@
 let ntz = [55, 54, 47];
 
 # let laf = loop(voices/IKNOW.wav); set laf:len 4; p2 < osc 4 "0.2 0.9" "send(0, laf, %)"
+#
 # let bdz = loop(dloops/kicz.wav); p3 < osc 8 "0.1 0.8" "send(0, bdz, %)"; set bdz:len 2
 
-# let hhb = loop(dloops/hipHopBap.aiff); send(2, hhb, 0.5); p2 $ hhabblah_gen
+#p8 < ramp 8 " 1 0" "vol laf %" ;let hhb = loop(dloops/hipHopBap.aiff); send(2, hhb, 0.5);
+
+# p2 $ hhabblah_gen
 let hhabblah_gen = gen()
 {
   setup()
@@ -13,53 +16,27 @@ let hhabblah_gen = gen()
   }
   run()
   {
+    #unsolo();
     if (count % 8 == 6) {
       set hhb:scramble 1;
     }
     if (count % 4 == 3) {
       set hhb:stutter 1;
+      set bdz:scramble 1;
     }
-    if (count % 3 == 0) {
-      #set laf:stutter 1;
+    if (count % 8 == 7) {
+      set bdz:stutter 1;
+      #solo(bdz);
     }
   }
 }
 
-# dx - wuurpr // vol dx 0.4  // llasticx ?
-# per3 = glotch // Srqttx // NUURF // MFFF // vol per3 0.3 // Scrurhf // SQWA
+# dx - wuurpr // vol dx 0.4
+# load_preset(dx, "wuurpr"); vol dx 0.4
+# per3 = glotch // Srqttx // NUURF // MFFF // vol per3 0.2
+# load_preset(per3, "MFFF"); vol per 0.3
 
-let wuwblah_gen = gen()
-{
-  setup()
-  {
-    let mx = 0;
-    let siz = [3, 5, 7, 9];
-    let sx = 0;
-    let dz = [30, 50, 70, 150, 300];
-    let dzx = 0;
-  }
-  run()
-  {
-    if (count % 2 == 0) {
-      let mel = bjork(siz[sx], 16);
-      sx = incr(sx, 0, len(siz));
-      for (i = 0; i < 16; ++i) {
-        if (mel[i] == 1) {
-          note_on_at(dx, ntz[mx] - 12, i * pp, dur = dz[dzx]);
-          mx = incr(mx, 0, len(ntz));
-          note_on_at(per3, ntz[mx] - 12, i * pp + pp*siz[sx], dur = 50);
-        } else {
-          if (i > 12) {
-            note_on_at(per3, ntz[mx], i * pp + pp*siz[sx], dur = dz[dzx]);
-          }
-        }
-        dzx = incr(dzx, 0, len(dz));
-      }
-    }
-  }
-}
-# let areyou = loop(voices/areyoureadytScratch.wav); set areyou:stop_in 1;
-# p3 $ dxstrabblah
+# p3 $ dxstrabblah; p8 < ramp 8 " 1 0" "vol bdz %"l
 let dxstrabblah = gen()
 {
   setup()
@@ -93,10 +70,12 @@ let dxstrabblah = gen()
       let b = rand_beat();
       let mel = combinor(b, notez);
       let pp = 3840 / len(b);
-      for (i = 0; i < len(b); ++i) {
-        if (mel[i] > 0) {
-          note_on_at(per3, mel[i], i * pp, dur = dz[dzx]);
-          dzx = incr(dzx, 0, len(dz));
+      if (count % 12 < 8) {
+        for (i = 0; i < len(b); ++i) {
+          if (mel[i] > 0) {
+            note_on_at(per3, mel[i], i * pp, dur = dz[dzx]);
+            dzx = incr(dzx, 0, len(dz));
+          }
         }
       }
     }
@@ -128,10 +107,12 @@ let dxstrabblah = gen()
 
 # vol hhb 0
 # let bt = loop(JUNALGOGZ/craklBEAT.wav); send(2, bt, 0.5);
-# p8 < ramp 8 "0 1" "vol hhb %";
+# load_preset(per3, "Srqttx");  p8 < ramp 8 "0 1" "vol hhb %";
 
-# per1 = drum(); Srqttx
-# per2 = HIGHWR
+# load_preset(per1, "Srqttx") ; vol per1 0.7;
+# per1 = drum(); Srqttx ; vol per1 0.7;
+# load_preset(per2, "HIGHWR"); vol per2 0.6
+# per2 = HIGHWR ; vol per2 0.6;
 
 # vol hhb 0; vol bt 0;
 # p3 $ ddxblah_gen; vol bt 1
@@ -143,7 +124,7 @@ let ddxblah_gen = gen()
     let p = bits( ((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
     let mx = 0;
     let maxx = 4;
-    let dzzz = [100, 300, 200, 300, 400, 300, 500];
+    let dzzz = [300, 300, 200, 300, 400, 300, 500];
     let lx = 0;
     let dn = 1;
   }
@@ -167,10 +148,10 @@ let ddxblah_gen = gen()
     }
     if (count % 8 < 6) {
       let mtz = ntz;
-      if (count % 8 == 4) {
-        mtz = scale_melody(down(ntz, dn), 38);
-        dn = incr(dn, 1, 7);
-      }
+      # if (count % 8 == 4) {
+        #   mtz = scale_melody(down(ntz, dn), 38);
+        #   dn = incr(dn, 1, 7);
+        # }
       for (i = 0; i < 16; ++i) {
         stepper(per2, combinor(invert(p), mtz), mx, i, dzzz[lx]);
         mx = incr(mx, 0, maxx)
@@ -182,7 +163,7 @@ let ddxblah_gen = gen()
 
 # p8 < ramp 8 "0 1" "vol hhb %";
 
-# vol per2 0; # vol per1 1
+# vol per2 0; # vol per1 1; vol hhb 0
 
 # let delz = loop(JUNALGOGZ/DELAz.wav); set delz:len 2; vol bt 1; p7 $ delblah_gen
 let delblah_gen = gen()
@@ -210,3 +191,6 @@ let delblah_gen = gen()
 
 # p10 < osc 4 "0.1 0.3"  "send(0, delz, %)"
 # p11 < osc 7 "0.1 0.6"  "send(1, delz, %)"
+
+# vol bt 0;
+# p8 < ramp 8 "1 0" "vol delz %"; p7 $ ""; vol bt 1

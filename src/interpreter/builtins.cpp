@@ -1896,65 +1896,48 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
        return evaluator::NULLL;
      })},
-    {"kit",
-     std::make_shared<
-         object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)
-                              -> std::shared_ptr<object::Object> {
-       (void)args;
-       std::string cmd = "let bd = drum();";
-       eval_command_queue.push(cmd);
+    {"kit", std::make_shared<object::BuiltIn>(
+                [](std::vector<std::shared_ptr<object::Object>> args)
+                    -> std::shared_ptr<object::Object> {
+                  (void)args;
+                  std::string cmd = "let bd = drum();";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let sd = drum(); vol sd 0.3";
-       eval_command_queue.push(cmd);
+                  cmd = "let sd = drum(); vol sd 0.3";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let cp = drum(); vol cp 0.5;";
-       eval_command_queue.push(cmd);
-       cmd = "pan cp " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
+                  cmd = "let cp = drum(); vol cp 0.5;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let cl = drum(); vol cl 0.5;";
-       eval_command_queue.push(cmd);
-       cmd = "pan cl " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
+                  cmd = "let cl = drum(); vol cl 0.5;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let cb = drum(); vol cb 0.5;";
-       eval_command_queue.push(cmd);
-       cmd = "pan cb " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
+                  cmd = "let cb = drum(); vol cb 0.5;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let hh = drum(); vol hh 0.3;";
-       eval_command_queue.push(cmd);
-       cmd = "pan hh " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
+                  cmd = "let hh = drum(); vol hh 0.3;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let oh = drum(); vol oh 0.3;";
-       eval_command_queue.push(cmd);
-       cmd = "pan oh " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
+                  cmd = "let oh = drum(); vol oh 0.3;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let per1 = drum(); vol per1 0.5;";
-       eval_command_queue.push(cmd);
-       cmd = "pan per1 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
+                  cmd = "let per1 = drum(); vol per1 0.5;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let per2 = drum(); vol per2 0.5;";
-       eval_command_queue.push(cmd);
-       cmd = "pan per2 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
+                  cmd = "let per2 = drum(); vol per2 0.5;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let per3 = drum(); vol per3 0.5;";
-       eval_command_queue.push(cmd);
-       cmd = "pan per3 " + std::to_string(GetRandomBetweenNegativeOneAndOne());
-       eval_command_queue.push(cmd);
+                  cmd = "let per3 = drum(); vol per3 0.5;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let dx = fm(); vol dx 0.8;";
-       eval_command_queue.push(cmd);
+                  cmd = "let dx = fm(); vol dx 0.8;";
+                  eval_command_queue.push(cmd);
 
-       cmd = "let dx2 = fm(); vol dx2 0.7;";
-       eval_command_queue.push(cmd);
+                  cmd = "let dx2 = fm(); vol dx2 0.7;";
+                  eval_command_queue.push(cmd);
 
-       return evaluator::NULLL;
-     })},
+                  return evaluator::NULLL;
+                })},
     {"load_dir", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {

@@ -32,41 +32,59 @@ let hh2 = sample(aesamples/SH09_HAT.WAV);
 let hh3 = sample(ch/acidHat3.aiff);
 let ksn = sample(perc/krushsn.wav);
 let hic = sample(perc/grit.aiff);
-let kt2 = [bd2, hh2, hh3, ksn, hic];
-
-# let bsqw = loop(bombz/BSQWASPR13.wav); set bsqw:len 4; vol bt 0
-# add_fx(bsqw, "sidechain", bt); vol bt 1
-
-
-let bin2_gen = gen()
-{
-  setup()
-  {
-    let t = 88484894;
-    let bx = 0;
-    let ptz = [0.8, 1, 1.2, 1.5, 2];
-    let px = 0;
-  }
-  run()
-  {
-    if (count % 5 < 4) {
-      let p = bits( t >> ( 8/  ( (t / 32) % 3 ) ) ):
-        ++t;
-      perky(p, kt2);
-      set kt2[bx]:pitch ptz[px];
-      bx = incr(bx, 0, len(kt2));
-      px = incr(px, 0, len(ptz));
-    }
-  }
-}
 
 let bddd = sample(bd/808kick.aif);
 let rm = sample(rims/hes23rim1.aif);
 let hau = sample(cp/haunterZ.aiff);
 let nyc = sample(cp/NYClap.aiff);
 let cpp = sample(cp/clap25.aif);
+let lto = sample(lt/DR660LoTom.aif);
+let ksn = sample(TT-LIMELIFE-RIGHTONTIME/kksn.wav);
+let cpc = sample(TT-LIMELIFE-RIGHTONTIME/cpclean.wav);
+
 let cppz = [rm, hau, nyc, cpp];
+# let kt2 = [bd2, hh2, hh3, ksn, hic, bddd];
+let kt2 = [bddd, bd2, lto, ksn, cpc];
+
+# let bsqw = loop(bombz/BSQWASPR13.wav); set bsqw:len 4; vol bt 0
+# add_fx(bsqw, "sidechain", bddd); vol bt 1; p5 $ bin2_gen
+
+
+let bin2_gen = gen()
+{
+  setup()
+  {
+    let t = 30506;
+    let drz = [100, 300, 500, 700, 1000];
+    let kx = 0;
+    let drx = 0;
+  }
+  run()
+  {
+    let p = bits((t*t)/(t>>8&t));
+    ++t;
+    if (count % 4 < 3) {
+      for (i = 0; i < 16; ++i) {
+        let offset = rand(30);
+        if (i % 2 == 0) {
+          offset = 0;
+        }
+        if (p[i] == 1) {
+          note_on_at(kt2[kx], 1, i*pp + offset, dur = drz[drx], vel = 90 + rand(37));
+          if (count % 8 < 5) {
+            kx = incr(kx, 0, len(kt2));
+          }
+        }
+      }
+      drx = incr(drx, 0 ,len(drz));
+    }
+
+  }
+}
+
+# let chic = loop(dloops/ChicJack.aiff);
 # let awk = loop(hallow/awkardBEAT2.wav); send(2, awk, 0.6); p8 $ bablah_gen
+# vol bt 0; vol hhb 0; vol bsqw 0;
 let bablah_gen = gen()
 {
   setup()
@@ -92,6 +110,9 @@ let bablah_gen = gen()
     if (count % 3 == 0) {
       set awk:stutter 1;
     }
+    if (count % 4 == 0) {
+      set chic:stutter 1;
+    }
     #if (count % 8 == 0) {
       #  set bsqw:pitch ptz[ptx];
       #  ptx = incr (ptx, 0, len(ptz));
@@ -99,7 +120,10 @@ let bablah_gen = gen()
   }
 }
 
-#  cp SLICZ // DWUB ?
+# p2 $ ""; p3 $ "";
+
+#  cp // Srqttx
+# load_preset(cp, "Srqttx") ; vol cp 0.7;
 let ok = sample(voices/ok.wav);
 let notez = [47, 48];
 let cnt = 7;
@@ -143,46 +167,44 @@ let dabblah = gen()
 #p13 < osc 8 "0.1 0.5" "send(0, ok, %)";
 
 # sd = BDLOW
+# load_preset(sd, "BDLOW")
 let compblah_gen = gen()
 {
   setup()
   {
+    let velz = 70;
+    let dr = 100;
+    let cntr = 0;
+    let nx = 0;
   }
   run()
   {
     if (count % 2 == 1) {
       for (i = 0; i < 16; ++i) {
+        let offs = rand(20);
+        if (count % 2 == 0) {
+          offs = 0;
+        }
         if (the_mel[i] == 0) {
-          note_on_at(sd, notez[0], i * pp);
+          if (cntr % 2 == 0) {
+            note_on_at(sd, notez[nx], i * pp + offs, vel = velz, dur = dr);
+            ++cntr;
+          } else {
+            note_on_at(dx, notez[nx], i * pp + offs, vel = velz, dur = dr);
+            ++cntr;
+          }
+          dr = dr + 50;
+          if (dr > 1000) {
+            dr = 100;
+          }
+          nx = incr(nx, 0, len(notez));
+          velz = velz + 10;
+          if (velz > 127) {
+            velz = 50;
+          }
         }
       }
     }
-  }
-}
-
-# let njb = loop(JUNALGOGZ/newjackBEat.wav); send(2, njb, 0.2); set njb:stop_in 4
-# let dics = loop(JUNALGOGZ/dicscovibe.wav); set dics:len 2; send(2, dics, 0.3);
-
-let fldblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 4 == 0) {
-      #set dics:stutter 1;
-      set njb:scramble 1;
-    }
-    if (count % 3 == 0) {
-      #set dics:stutter 1;
-      set njb:stutter 1;
-    }
-    #unsolo();
-    #if (count % 8 == 7) {
-      #  solo(njb);
-      #  solo(cl);
-      #}
   }
 }
 

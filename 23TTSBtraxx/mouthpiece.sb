@@ -15,7 +15,9 @@ let chrz = [ vi ];
 let chx = 0;
 
 # dx purlp // vol dx 0.8
+# load_preset(dx, "purlp"); vol dx 0.8;
 # let dx2 = fnc
+# load_preset(dx2, "fnc") ; vol dx2 0.7;
 
 let msk = "00f0";
 # let key = 22;
@@ -51,7 +53,8 @@ let bqlah_gen = gen()
   }
 }
 
-# p3 $ steeblah_gen
+# p2 $ bqlah_gen
+# p3 $ steeblah_gen ; p10 < ramp 8 "1 0" "vol bgr %";
 let steeblah_gen = gen()
 {
   setup()
@@ -195,10 +198,10 @@ let pblah_gen = gen()
   }
 }
 
-# let mouth = loop(voices/mouthpiece.wav); set mouth:len 4; p7 $ mouthblah_gen
+# vol bq 0; let mouth = loop(voices/mouthpiece.wav); set mouth:len 4; p7 $ mouthblah_gen
 # p8 < osc 8 "0.1 0.7" "send(0, mouth, %)"
 
-# let haz = loop(JUNALGOGZ/Hatzwoohoo.wav);
+# let haz = loop(JUNALGOGZ/Hatzwoohoo.wav); p3 $ ""; p2 $ ""; vol bq 1; p3 $ ""; p2 $ "";
 
 let ine = sample(voices/ineed.wav);
 let mouthblah_gen = gen()
@@ -235,6 +238,7 @@ let mouthblah_gen = gen()
   }
 }
 # per3 = // PIPE //  TWANrG // Srqttx
+# load_preset(per3, "Srqttx"); vol per3 0.3;
 let pdxxblah_gen = gen()
 {
   setup()
@@ -261,6 +265,9 @@ let pdxxblah_gen = gen()
   }
 }
 
+# p5 $ pdxxblah_gen
+
+# vol bq 0; vol haz 1; vol mouth 0
 
 # let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ bbblah_gen;
 
@@ -271,16 +278,16 @@ let bbblah_gen = gen()
   }
   run()
   {
-    set bq:on 1;
+    #set bq:on 1;
     if (count % 2 == 0) {
-      set js:on 1;
+      #set js:on 1;
       set haz:stutter 1;
     }
 
     if (count % 4 == 3) {
-      let b = rand_beat();
-      play_array(js, b);
-      play_array(bq, invert(b));
+      #let b = rand_beat();
+      ##play_array(js, b);
+      #play_array(bq, invert(b));
     }
     if (count % 7 == 0) {
       set js:stutter 1;

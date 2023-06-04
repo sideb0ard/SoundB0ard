@@ -2,7 +2,11 @@
 
 let getdumb = sample(voices/getdown.wav);
 # per1 = roobot // sputter // glotch // weirdz
+# load_preset(per1, "weirdz"); vol per1 0.5;
 # per2 = electrHH // Blkingz // PIPE // SQWA // TWANrG
+# load_preset(per2, "TWANrG"); vol per2 0.6;
+
+# p2 $ wmwmblah_gen
 let mel = rand_array(16, 0, 0);
 let wmwmblah_gen = gen()
 {
@@ -63,9 +67,9 @@ let wmwmblah_gen = gen()
 
 }
 
-
-# bd NUURF ? Srqttx // PHART
-# load_preset(hh, "SLOWHH") ; vol hh 0.4;
+# stop bdlah_gen
+# let bd = drum();  load_preset(bd, "Srqttx");
+# let hh = drum(); load_preset(hh, "SLOWHH") ; vol hh 0.4;
 # p5 < osc 8 "0.1 0.4" "send(0, hh, %)"
 let sdw1 = sample(voices/ineed.wav);
 let sdw2 = sample(bombz/BSQ_M501_s.wav);
@@ -105,8 +109,10 @@ let bddalah_gen = gen()
 }
 
 # down per1 - keep per2 SQWA
+# vol per1 0;
 
 # dx = deeepend // llasticx3 // nrth
+# load_preset(dx, "nrth")
 let dxxblah_gen = gen()
 {
   setup()
@@ -129,7 +135,7 @@ let dxxblah_gen = gen()
   }
 }
 
-# let cow = loop(JUNALGOGZ/cowbellsz.wav); set cow:stop_in 2
+# let cow = loop(JUNALGOGZ/cowbellsz.wav); set cow:stop_in 2 ; vol cow 0.5
 # let wkth = loop(JUNALGOGZ/workthat.wav); set wkth:len 2; set wkth:stop_in 1
 
 let callme = sample(voices/callme.wav);
