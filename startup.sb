@@ -803,3 +803,5 @@ let gcmelody = fn(num_steps, notez, loop_len)
 
   return melody;
 }
+
+kit();

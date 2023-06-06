@@ -123,7 +123,7 @@ let bablah_gen = gen()
 # p2 $ ""; p3 $ "";
 
 #  cp // Srqttx
-# load_preset(cp, "Srqttx") ; vol cp 0.7;
+# load_preset(cp, "Srqttx") ; vol cp 1;
 let ok = sample(voices/ok.wav);
 let notez = [47, 48];
 let cnt = 7;
@@ -208,3 +208,5 @@ let compblah_gen = gen()
   }
 }
 
+
+#vol awk 0; vol chic 0;

@@ -1,5 +1,6 @@
 #let ntz = [23, 21, 34];
 #let ntz = [55, 54, 47];
+# key of C
 let ntz = [55, 54, 47];
 
 # let laf = loop(voices/IKNOW.wav); set laf:len 4; p2 < osc 4 "0.2 0.9" "send(0, laf, %)"
@@ -8,7 +9,7 @@ let ntz = [55, 54, 47];
 
 #p8 < ramp 8 " 1 0" "vol laf %" ;let hhb = loop(dloops/hipHopBap.aiff); send(2, hhb, 0.5);
 
-# p2 $ hhabblah_gen
+# p2 $ hhabblah_gen;
 let hhabblah_gen = gen()
 {
   setup()
@@ -36,7 +37,7 @@ let hhabblah_gen = gen()
 # per3 = glotch // Srqttx // NUURF // MFFF // vol per3 0.2
 # load_preset(per3, "MFFF"); vol per 0.3
 
-# p3 $ dxstrabblah; p8 < ramp 8 " 1 0" "vol bdz %"l
+# p3 $ dxstrabblah; p8 < ramp 8 " 1 0" "vol bdz %";
 let dxstrabblah = gen()
 {
   setup()
@@ -70,7 +71,7 @@ let dxstrabblah = gen()
       let b = rand_beat();
       let mel = combinor(b, notez);
       let pp = 3840 / len(b);
-      if (count % 12 < 8) {
+      if (count % 12 < 10) {
         for (i = 0; i < len(b); ++i) {
           if (mel[i] > 0) {
             note_on_at(per3, mel[i], i * pp, dur = dz[dzx]);
@@ -104,15 +105,111 @@ let dxstrabblah = gen()
   }
 }
 
-
+# p4 $ hhhblah_gen
+# p5 < osc 7 "0 0.3" "send(1, uhz, %)"
 # vol hhb 0
 # let bt = loop(JUNALGOGZ/craklBEAT.wav); send(2, bt, 0.5);
 # load_preset(per3, "Srqttx");  p8 < ramp 8 "0 1" "vol hhb %";
+
+# p3 $ dxstrabblah2; p4 $ "";
+let dxstrabblah2 = gen()
+{
+  setup()
+  {
+    let notez = [41, 47, 38, 16, 60, 55];
+    let nx = 0;
+    let cnt = [9, 13, 7, 7, 9, 11];
+    let cnx = 0;
+    let the_mel = combinor(bjork(cnt[cnx], 16), notez);
+    let dz = [800, 400, 500, 700];
+    let dzx = 0;
+  }
+  run()
+  {
+    if (count % 4 < 3) {
+      if (count % 16 < 14) {
+        for (i = 0; i < 16; ++i) {
+          let v = 100 + rand(27);
+          let off = 0;
+          if (count % 4 == 0) {
+            v = 127;
+          }
+          if (count % 2 == 1) {
+            off = 48;
+          }
+          if (the_mel[i] > 0 ) {
+            note_on_at(dx, the_mel[i], i*pp + off, vel = v);
+          }
+        }
+      }
+    } else {
+      let b = rand_beat();
+      let mel = combinor(b, notez);
+      let pp = 3840 / len(b);
+      if (count % 12 < 8) {
+        for (i = 0; i < len(b); ++i) {
+          if (mel[i] > 0) {
+            note_on_at(per3, mel[i], i * pp, dur = dz[dzx]);
+            dzx = incr(dzx, 0, len(dz));
+          }
+        }
+      }
+    }
+
+    # print(the_mel);
+    if (count % 2 == 0) {
+      the_mel = combinor(bjork(cnt[cnx], 16), notez);
+      cnx = incr(cnx, 0, len(cnt));
+    }
+    if (count % 3 == 0) {
+      the_mel = down(the_mel, 12);
+    }
+  }
+}
 
 # load_preset(per1, "Srqttx") ; vol per1 0.7;
 # per1 = drum(); Srqttx ; vol per1 0.7;
 # load_preset(per2, "HIGHWR"); vol per2 0.6
 # per2 = HIGHWR ; vol per2 0.6;
+
+let uhh = sample(ch/timabHat2.aiff);
+let chp = sample(ch/pumpDistortHH.wav);
+let uhz = [uhh, chp];
+let uhx = 0;
+let hhhblah_gen = gen()
+{
+  setup()
+  {
+    let swg = 30;
+  }
+  run()
+  {
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        let off = swg;
+        let v = 60 + rand(47);
+        if (i % 2 == 0) {
+          off = 0;
+        }
+        if (i % 8 == 4) {
+          v = 105;
+        }
+        note_on_at(uhz[uhx], 1, i * pp + off, vel = v);
+        uhx = incr(uhx, 0, len(uhz));
+      }
+    }
+    if (count % 2 == 0) {
+      swg = swg + 10;
+      if (swg >50) {
+        swg = 10;
+      }
+    }
+    if (count % 3 == 0) {
+      set bt:scramble 1;
+    }
+  }
+}
+
 
 # vol hhb 0; vol bt 0;
 # p3 $ ddxblah_gen; vol bt 1
@@ -176,7 +273,7 @@ let delblah_gen = gen()
     if (count % 3 == 0) {
       set delz:scramble 1;
     }
-    if (count % 4 == 0) {
+    if (count % 5 == 0) {
       set delz:stutter 1;
     }
     unsolo();
@@ -193,4 +290,4 @@ let delblah_gen = gen()
 # p11 < osc 7 "0.1 0.6"  "send(1, delz, %)"
 
 # vol bt 0;
-# p8 < ramp 8 "1 0" "vol delz %"; p7 $ ""; vol bt 1
+# p8 < ramp 8 "1 0" "vol delz %"; p7 $ ""; vol bt 1; p3 $ dxstrabblah2

@@ -69,6 +69,7 @@ let wmwmblah_gen = gen()
 
 # stop bdlah_gen
 # let bd = drum();  load_preset(bd, "Srqttx");
+# let bd = drum();  load_preset(bd, "DUUSRTY"); ?
 # let hh = drum(); load_preset(hh, "SLOWHH") ; vol hh 0.4;
 # p5 < osc 8 "0.1 0.4" "send(0, hh, %)"
 let sdw1 = sample(voices/ineed.wav);
@@ -98,13 +99,6 @@ let bddalah_gen = gen()
     if (count % 7 < 6) {
       hhmbeat(hh, 44);
     }
-    # if (count % 2 == 1) {
-      #   cbeat(swdz[swx]);
-      #   swx = incr(swx, 0, len(swdz));
-      # }
-    if (count % 3 == 1) {
-      cmbeat(cb, 54);
-    }
   }
 }
 
@@ -131,6 +125,9 @@ let dxxblah_gen = gen()
       if (d > 400) {
         d = 90;
       }
+    }
+    if (count % 8 == 4) {
+      mel = combinor(bassgen(), ntz);
     }
   }
 }
