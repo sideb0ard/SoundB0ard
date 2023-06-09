@@ -239,6 +239,7 @@ let mouthblah_gen = gen()
 }
 # per3 = // PIPE //  TWANrG // Srqttx // oopdz
 # load_preset(per3, "Srqttx"); vol per3 0.3;
+# load_preset(per3, "oopdz"); vol per3 0.7;
 let pdxxblah_gen = gen()
 {
   setup()
@@ -301,3 +302,11 @@ let bbblah_gen = gen()
     }
   }
 }
+
+# let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8
+# p15 < osc 4 "0.2 0.9" "send(0, jon, %)"
+
+
+# play skrslazrs/SHØCK13.wav
+#
+

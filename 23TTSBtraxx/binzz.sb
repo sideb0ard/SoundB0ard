@@ -82,7 +82,6 @@ let bin2_gen = gen()
   }
 }
 
-# let chic = loop(dloops/ChicJack.aiff);
 # let awk = loop(hallow/awkardBEAT2.wav); send(2, awk, 0.6); p8 $ bablah_gen
 # vol bt 0; vol hhb 0; vol bsqw 0;
 let bablah_gen = gen()
@@ -110,9 +109,7 @@ let bablah_gen = gen()
     if (count % 3 == 0) {
       set awk:stutter 1;
     }
-    if (count % 4 == 0) {
-      set chic:stutter 1;
-    }
+
     #if (count % 8 == 0) {
       #  set bsqw:pitch ptz[ptx];
       #  ptx = incr (ptx, 0, len(ptz));
@@ -209,4 +206,4 @@ let compblah_gen = gen()
 }
 
 
-#vol awk 0; vol chic 0;
+#vol awk 0;

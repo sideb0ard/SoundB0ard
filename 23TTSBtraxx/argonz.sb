@@ -2,9 +2,9 @@
 
 let getdumb = sample(voices/getdown.wav);
 # per1 = roobot // sputter // glotch // weirdz
-# load_preset(per1, "weirdz"); vol per1 0.5;
+# load_preset(per1, "weirdz"); vol per1 0.4;
 # per2 = electrHH // Blkingz // PIPE // SQWA // TWANrG
-# load_preset(per2, "TWANrG"); vol per2 0.6;
+# load_preset(per2, "TWANrG"); vol per2 0.4;
 
 # p2 $ wmwmblah_gen
 let mel = rand_array(16, 0, 0);
@@ -69,7 +69,7 @@ let wmwmblah_gen = gen()
 
 # stop bdlah_gen
 # let bd = drum();  load_preset(bd, "Srqttx");
-# let bd = drum();  load_preset(bd, "DUUSRTY"); ?
+# let bd = drum();  load_preset(bd, "DUUSRTY"); vol bd 0.4;
 # let hh = drum(); load_preset(hh, "SLOWHH") ; vol hh 0.4;
 # p5 < osc 8 "0.1 0.4" "send(0, hh, %)"
 let sdw1 = sample(voices/ineed.wav);

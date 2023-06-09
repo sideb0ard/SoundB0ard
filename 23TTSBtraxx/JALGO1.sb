@@ -260,7 +260,13 @@ let ddxblah_gen = gen()
 
 # p8 < ramp 8 "0 1" "vol hhb %";
 
-# vol per2 0; # vol per1 1; vol hhb 0
+
+# p3 $ dxstrabblah; vol bt 0
+
+
+# p3 $ "ddxblah_gen"; vol bt 1; vol per2 0; vol per1 1
+
+# vol hhb 0
 
 # let delz = loop(JUNALGOGZ/DELAz.wav); set delz:len 2; vol bt 1; p7 $ delblah_gen
 let delblah_gen = gen()
