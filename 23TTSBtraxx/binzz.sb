@@ -82,7 +82,7 @@ let bin2_gen = gen()
   }
 }
 
-# let awk = loop(hallow/awkardBEAT2.wav); send(2, awk, 0.6); p8 $ bablah_gen
+# let awk = loop(hallow/awkardBEAT2.wav); send(2, awk, 0.6); p8 $ bablah_gen ; vol bt 0
 # vol bt 0; vol hhb 0; vol bsqw 0;
 let bablah_gen = gen()
 {
@@ -121,6 +121,7 @@ let bablah_gen = gen()
 
 #  cp // Srqttx
 # load_preset(cp, "Srqttx") ; vol cp 1;
+# p4 $ dabblah ; vol bsqw 0
 let ok = sample(voices/ok.wav);
 let notez = [47, 48];
 let cnt = 7;
@@ -160,6 +161,8 @@ let dabblah = gen()
     }
   }
 }
+
+# p3 $ bin_gen
 
 #p13 < osc 8 "0.1 0.5" "send(0, ok, %)";
 
@@ -207,3 +210,4 @@ let compblah_gen = gen()
 
 
 #vol awk 0;
+# off bablah_gen

@@ -34,6 +34,7 @@ void Looper::Reset() {
   eg_.SetReleaseTimeMsec(50);
   eg_.SetRampMode(false);
   eg_.Update();
+  eg_.StartEg();
 
   degrade_by_ = 0;
 
@@ -58,6 +59,7 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
 }
 
 void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
+  (void)event;
   double decimal_percent_of_loop = 0;
   if (tinfo.is_midi_tick) {
     if (started_)
@@ -452,10 +454,7 @@ void Looper::SetDegradeBy(int degradation) {
   if (degradation >= 0 && degradation <= 100) degrade_by_ = degradation;
 }
 
-void Looper::noteOn(midi_event ev) {
-  (void)ev;
-  eg_.StartEg();
-}
+void Looper::noteOn(midi_event ev) { (void)ev; }
 
 void Looper::noteOff(midi_event ev) {
   (void)ev;

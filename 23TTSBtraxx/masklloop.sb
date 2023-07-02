@@ -119,12 +119,12 @@ let ddblah_gen = gen()
       }
       smax = incr(smax, 0, PATLEN);
     }
-    send(0, bdz, dsen);
-    send(2, bdz, dsen);
-    dsen = dsen + 0.05;
-    if (dsen > 0.3) {
-      dsen = 0.;
-    }
+    # send(0, bdz, dsen);
+    # send(2, bdz, dsen);
+    # dsen = dsen + 0.05;
+    # if (dsen > 0.3) {
+      #   dsen = 0.;
+      # }
   }
 }
 

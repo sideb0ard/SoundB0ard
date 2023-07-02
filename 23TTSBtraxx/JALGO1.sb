@@ -7,37 +7,12 @@ let ntz = [55, 54, 47];
 #
 # let bdz = loop(dloops/kicz.wav); p3 < osc 8 "0.1 0.8" "send(0, bdz, %)"; set bdz:len 2
 
-#p8 < ramp 8 " 1 0" "vol laf %" ;let hhb = loop(dloops/hipHopBap.aiff); send(2, hhb, 0.5);
+# p8 < ramp 8 " 1 0" "vol laf %" ;let hhb = loop(JUNALGOGZ/hhb.wav); send(2, hhb, 0.75);
 
-# p2 $ hhabblah_gen;
-let hhabblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    #unsolo();
-    if (count % 8 == 6) {
-      set hhb:scramble 1;
-    }
-    if (count % 4 == 3) {
-      set hhb:stutter 1;
-      set bdz:scramble 1;
-    }
-    if (count % 8 == 7) {
-      set bdz:stutter 1;
-      #solo(bdz);
-    }
-  }
-}
-
-# dx - wuurpr // vol dx 0.4
-# load_preset(dx, "wuurpr"); vol dx 0.4
-# per3 = glotch // Srqttx // NUURF // MFFF // vol per3 0.2
+# load_preset(dx, "wuurpr"); vol dx 0.6 ; load_preset(dx2, "fnc") ; vol dx2 0.7
 # load_preset(per3, "MFFF"); vol per 0.3
 
-# p3 $ dxstrabblah; p8 < ramp 8 " 1 0" "vol bdz %";
+# p3 $ dxstrabblah; vol bdz 0;
 let dxstrabblah = gen()
 {
   setup()
@@ -51,7 +26,7 @@ let dxstrabblah = gen()
   }
   run()
   {
-    if (count % 4 < 2) {
+    if (count % 4 < 3) {
       if (count % 16 < 14) {
         for (i = 0; i < 16; ++i) {
           let v = 100 + rand(27);
@@ -105,13 +80,13 @@ let dxstrabblah = gen()
   }
 }
 
-# p4 $ hhhblah_gen
+#
 # p5 < osc 7 "0 0.3" "send(1, uhz, %)"
 # vol hhb 0
-# let bt = loop(JUNALGOGZ/craklBEAT.wav); send(2, bt, 0.5);
+# let bt = loop(JUNALGOGZ/craklBEAT.wav); send(2, bt, 0.5); p4 $ hhhblah_gen
 # load_preset(per3, "Srqttx");  p8 < ramp 8 "0 1" "vol hhb %";
 
-# p3 $ dxstrabblah2; p4 $ "";
+# p3 $ dxstrabblah2; p4 $ ""; vol hhb 0
 let dxstrabblah2 = gen()
 {
   setup()
@@ -167,10 +142,11 @@ let dxstrabblah2 = gen()
   }
 }
 
+# vol bt 0; vol hhb 0;
+# vol bt 1; vol hhb 1; p4 $ "hhhblah_gen"
+
 # load_preset(per1, "Srqttx") ; vol per1 0.7;
-# per1 = drum(); Srqttx ; vol per1 0.7;
 # load_preset(per2, "HIGHWR"); vol per2 0.6
-# per2 = HIGHWR ; vol per2 0.6;
 
 let uhh = sample(ch/timabHat2.aiff);
 let chp = sample(ch/pumpDistortHH.wav);
@@ -211,7 +187,7 @@ let hhhblah_gen = gen()
 }
 
 
-# vol hhb 0; vol bt 0;
+# vol hhb 0; vol bt 0; p4 $ ""
 # p3 $ ddxblah_gen; vol bt 1
 let ddxblah_gen = gen()
 {
@@ -292,7 +268,7 @@ let delblah_gen = gen()
   }
 }
 
-# p10 < osc 4 "0.1 0.3"  "send(0, delz, %)"
+# p10 < osc 4 "0.1 0.7"  "send(0, delz, %)"
 # p11 < osc 7 "0.1 0.6"  "send(1, delz, %)"
 
 # vol bt 0;

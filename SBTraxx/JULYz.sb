@@ -1,0 +1,79 @@
+
+# key of G
+
+let pat = rand_array(16, 0, 1);
+let ntz = notes_in_chord(55);
+let nx = 0;
+let blah_gen = gen()
+{
+  setup()
+  {
+    let v = 70;
+    let d = 50;
+    let drift = 0;
+
+  }
+  run()
+  {
+    note_on_at(bd, 12, 0 + drift, vel = v, dur = d);
+    drift = drift + 20;
+    if (drift > 100) {
+      drift = 0;
+    }
+    v = v + 5;
+    if (v > 128) {
+      v = 70;
+    }
+    d = d + 15;
+    if (d > 528) {
+      d = 50;
+    }
+
+    if (count % 4 == 3) {
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1) {
+          note_on_at(hh, ntz[nx], i*pp+ drift, vel = v, dur = d);
+          nx = incr(nx, 0, len(ntz));
+        }
+      }
+    }
+  }
+}
+
+let bdlah_gen = gen()
+{
+  setup()
+  {
+    let v = 70;
+    let d = 50;
+    let drift = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (pat[i] == 1) {
+        note_on_at(per1, ntz[nx], i*pp + drift, dur = d, vel = v);
+        drift = drift + 10;
+        if (drift > 240) {
+          drift = 0;
+        }
+        v = v + 30;
+        d = d + 70;
+        if (v > 127) {
+          v = 70;
+          d = 50;
+        }
+      }
+    }
+    if (count % 4 == 3) {
+      note_on_at(ik, 1, 12 * pp, dur =d);
+    }
+
+    for (i = 0; i < 16; ++i) {
+      if (i % 4 == 2) {
+        note_on_at(ch1, 1, i * pp);
+      }
+    }
+  }
+}
+

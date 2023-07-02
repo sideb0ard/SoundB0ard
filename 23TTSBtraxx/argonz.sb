@@ -6,7 +6,8 @@ let getdumb = sample(voices/getdown.wav);
 # per2 = electrHH // Blkingz // PIPE // SQWA // TWANrG
 # load_preset(per2, "TWANrG"); vol per2 0.4;
 
-# p2 $ wmwmblah_gen
+# override the mooblah_gen
+# p11 $ wmwmblah_gen
 let mel = rand_array(16, 0, 0);
 let wmwmblah_gen = gen()
 {
@@ -46,7 +47,6 @@ let wmwmblah_gen = gen()
         }
         stepper(per1, m, mx, i, 50);
         mx = incr(mx, 0, mmax);
-
         if (mel[i] > 0) {
           note_on_at(per1, m[i], i*pp, vel = v);
         } else {
@@ -67,11 +67,13 @@ let wmwmblah_gen = gen()
 
 }
 
+# stop mac
 # stop bdlah_gen
-# let bd = drum();  load_preset(bd, "Srqttx");
 # let bd = drum();  load_preset(bd, "DUUSRTY"); vol bd 0.4;
 # let hh = drum(); load_preset(hh, "SLOWHH") ; vol hh 0.4;
 # p5 < osc 8 "0.1 0.4" "send(0, hh, %)"
+
+# p4 $ bddalah_gen; vol mac 1
 let sdw1 = sample(voices/ineed.wav);
 let sdw2 = sample(bombz/BSQ_M501_s.wav);
 let swdz = [sdw1, sdw2];
@@ -96,7 +98,7 @@ let bddalah_gen = gen()
       }
     }
 
-    if (count % 7 < 6) {
+    iload_preset(dx, "nrth")f (count % 7 < 6) {
       hhmbeat(hh, 44);
     }
   }
@@ -133,6 +135,22 @@ let dxxblah_gen = gen()
 }
 
 # let cow = loop(JUNALGOGZ/cowbellsz.wav); set cow:stop_in 2 ; vol cow 0.5
+
+
+# let bgr = loop(bombz/BSQWASPR8.wav); set bgr:len 32;
+
+
+
+
+
+
+
+
+
+
+
+
+
 # let wkth = loop(JUNALGOGZ/workthat.wav); set wkth:len 2; set wkth:stop_in 1
 
 let callme = sample(voices/callme.wav);

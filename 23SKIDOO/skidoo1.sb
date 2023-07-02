@@ -1,0 +1,15 @@
+
+let wabblah_gen = gen()
+{
+  setup()
+  {
+    let n = 20;
+
+  }
+  run()
+  {
+    dmbeat(bd, n);
+    n = incr(n, 27, 57);
+  }
+}
+

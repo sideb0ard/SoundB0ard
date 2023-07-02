@@ -54,7 +54,11 @@ let bqlah_gen = gen()
 }
 
 # p4 $ bqlah_gen
-# p3 $ steeblah_gen ; p10 < ramp 8 "1 0" "vol bgr %";
+# p5 $ pblah_gen
+
+# p10 < ramp 8 "1 0" "vol bgr %";
+
+# p3 $ steeblah_gen ;
 let steeblah_gen = gen()
 {
   setup()
@@ -237,9 +241,9 @@ let mouthblah_gen = gen()
     }
   }
 }
-# per3 = // PIPE //  TWANrG // Srqttx // oopdz
-# load_preset(per3, "Srqttx"); vol per3 0.3;
+
 # load_preset(per3, "oopdz"); vol per3 0.7;
+
 let pdxxblah_gen = gen()
 {
   setup()
@@ -272,11 +276,12 @@ let pdxxblah_gen = gen()
   }
 }
 
-# p5 $ pdxxblah_gen
+# p5 $ pdxxblah_gen ; vol haz 0;
 
 # vol bq 0; vol haz 1; vol mouth 0
 
-# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ bbblah_gen;
+# let ita = loop(pads/italiaDream2Bar.aiff); set ita:len 4;
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav); p6 $ bbblah_gen; vol bq 1;
 
 let bbblah_gen = gen()
 {
@@ -285,23 +290,18 @@ let bbblah_gen = gen()
   }
   run()
   {
-    #set bq:on 1;
     if (count % 2 == 0) {
-      #set js:on 1;
       set haz:stutter 1;
     }
 
-    if (count % 4 == 3) {
-      #let b = rand_beat();
-      ##play_array(js, b);
-      #play_array(bq, invert(b));
-    }
     if (count % 7 == 0) {
       set js:stutter 1;
       set bq:stutter 1;
     }
   }
 }
+
+# let cow2 = loop(JUNALGOGZ/cowbellsz.wav); vol cow2 0.6; set cow2:stop_in 2
 
 # let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8
 # p15 < osc 4 "0.2 0.9" "send(0, jon, %)"

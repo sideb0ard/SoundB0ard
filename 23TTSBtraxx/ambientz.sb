@@ -1,4 +1,3 @@
-
 # let one = loop(JUNALGOGZ/onetimeTSTM.wav); vol one 0.7; set one:len 2; p10 $ oneblah_gen
 let oneblah_gen = gen()
 {
@@ -18,6 +17,10 @@ let oneblah_gen = gen()
       #   set one:len 4 at=12;
       #   set one:len 2 at=16;
       #solo(one);
+      #vol one 0.7;
+      #if (count % 8 == 7) {
+        #  vol one 0 at=pp*14;
+        #}
     }
   }
 }
@@ -28,11 +31,13 @@ let oneblah_gen = gen()
 
 # sidechain one with bd
 # add_fx(one, "sidechain", bd); p4 $ bdlah_gen; send(2, sn, 0.2); send(0, sn, 0.3);
+# add_fx(one, "sidechain", sn);
 
 let bd = sample(bd/808kick.aif);
-let ch = sample(ch/dr606closedhh.aif);
+let ch = sample(ch/hh13.aif);
 let sn = sample(cp/gaborClap.aiff);
 
+# p5 < osc 8 "0.1 0.6" "send(0, ch, %)";
 let bdlah_gen = gen()
 {
   setup()
@@ -43,7 +48,6 @@ let bdlah_gen = gen()
   }
   run()
   {
-    send(0, ch, 0);
     note_on_at(bd, 1, 0, dur = d);
     d = d + 50;
     if (d > 700) {
@@ -59,27 +63,62 @@ let bdlah_gen = gen()
       ++t;
     }
 
+    if (count % 4 == 3) {
+      let off = 20;
+      let v = 70 + rand(50);
+      for (i = 0; i < 16; ++i ) {
+        if (i % 2 == 0) {
+          off = 0;
+        }
+        note_on_at(ch, 1, i * pp + off, vel = v);
+      }
+    }
+
   }
 }
 
-# vol per1 0.3 // Srqttx // phoneCRAWL // glotch
+let rand_octave = fn()
+{
+  let octz = [0, 12, 24];
+  let the_oct = octz[rand(len(octz))];
+  if (rand(2)) {
+    return the_oct * -1;
+  }
+  return the_oct;
+}
+
+let gimme_some_notes = fn(how_many, notes_to_start)
+{
+  let return_notez = rand_array(how_many, 0, 0);
+  let nx = 0;
+
+  for (i = 0; i < how_many; ++i) {
+    return_notez[i] = notes_to_start[nx] + rand_octave();
+  }
+  return return_notez;
+}
+
 # load_preset(per1, "glotch"); vol per1 0.7;
-# vol sd 0.4; sd // // HIGHWR // TRASHP // TWANrG // BADUM //
 # load_preset(sd, "BADUM"); vol sd 0.5;
+# p3 < ramp 8 "1 0" "vol one %";
+# WAIT..
+# p2 $ modxblah_gen
+
 let ntz = [55, 54, 47];
-let moblah_gen = gen()
+let modxblah_gen = gen()
 {
   setup()
   {
     #let mel = [30, 0, 23, 0, 30, 0, 30, 0, 30, 0, 23, 0, 23, 0, 28, 0];
-    let mel = combinor(bassgen(), ntz);
+    #let mel = combinor(bassgen(), ntz);
+    let mel = combinor(bassgen(), gimme_some_notes(6, ntz));
     let px = 0;
     let pmax = 3;
     let d = 50;
   }
   run()
   {
-    if (count % 2 == 0) {
+    if (count % 8 < 6) {
       for (i = 0; i < 16; ++i) {
         # stepper(sd, mel, px, i, d);
         stepper(dx, down(mel,12), px, i, d);
@@ -91,29 +130,30 @@ let moblah_gen = gen()
       }
       pmax = incr(pmax, 3, len(mel));
     } else {
-      if (count % 3 == 0) {
-        for (i = 0; i < 16; ++i) {
-          stepper(per1, up(mel, 12), px, i, d);
-          px = incr(px, 0, pmax);
-        }
-        pmax = incr(pmax, 3, len(mel));
+      for (i = 0; i < 16; ++i) {
+        stepper(per1, up(mel, 12), px, i, d);
+        px = incr(px, 0, pmax);
       }
+      pmax = incr(pmax, 3, len(mel));
+    }
+
+    if (count % 8 == 5) {
+      mel = shift(mel, 2);
     }
 
     if (count % 8 == 7) {
-      mel = combinor(bassgen(), ntz);
+      mel = combinor(bassgen(), gimme_some_notes(6, ntz));
     }
   }
 }
 
+# let mac = loop(aaassembly/onBEATMARCUS.wav); send(2, mac, 0.5);
 
-# p3 < ramp 8 "1 0" "vol one %";
-# WAIT..
-# p2 $ moblah_gen
+
 let hh1 = sample(voices/yo.wav);
 let uf = sample(voices/uhUmf.aiff);
 vol hh1 0.3;
-let perxz1 = [hh1, uf];
+let perxz1 = [uf];
 #let perxz1 = [uf];
 let pr1x = 0;
 
@@ -123,7 +163,7 @@ let ova = sample(voices/callmeova.wav);
 vol tmb 0.7;
 let perxz2 = [tmb, aw2, ova];
 let pr2x = 0;
-let pblah_gen = gen()
+let missy_gen = gen()
 {
   setup()
   {
@@ -164,7 +204,6 @@ let pblah_gen = gen()
 # p14 < osc 7 "0.1 0.4" "send(0, perxz2, %)"
 # p15 < osc 8 "0.3 0.7" "send(1, perxz2, %)"
 
-# let mac = loop(aaassembly/onBEATMARCUS.wav); send(2, mac, 0.5);
 # let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4) ; p8 $ beatwablah_gen
 let beatwablah_gen = gen()
 {
@@ -188,6 +227,8 @@ let beatwablah_gen = gen()
   }
 }
 
+# load_preset(per3, "MFFF"); vol per3 0.3; p11 $ mooblah_gen
+# load_preset(per3, "Srqttx"); vol per3 0.6
 # xassign(0, mac); xassign(1, wrb)
 
 let mooblah_gen = gen()
@@ -204,7 +245,8 @@ let mooblah_gen = gen()
   {
     if (count % 3 == 0) {
       ntx = incr(ntx, 0, len(ntz));
-      mel = gamelody(16, ntz[ntx]-12);
+      #mel = gamelody(16, ntz[ntx]-12);
+      mel = gamelody(16, ntz[ntx] + rand_octave());
     }
     for (i = 0; i < 16; ++i) {
       stepper(per3, mel, ix, i, drz);
@@ -219,3 +261,5 @@ let mooblah_gen = gen()
   }
 }
 
+
+# stop modxblah_gen and missy_gen - just have drums and mooblah
