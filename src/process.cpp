@@ -140,8 +140,8 @@ void Process::EventNotify(mixer_timing_info tinfo) {
     }
   }
 
-  // PATTERN_PROCESS i.e. '#' or '$'
-  if (process_type_ == PATTERN_PROCESS) {
+  // FUNCTION_PROCESS i.e. '#' or '$'
+  if (process_type_ == FUNCTION_PROCESS) {
     if (tinfo.is_start_of_loop) {
       if (!started_) {
         started_ = true;
@@ -219,8 +219,8 @@ void Process::EventNotify(mixer_timing_info tinfo) {
       }
     }
   }
-  // COMMAND_PROCESS i.e. '<'
-  else if (process_type_ == COMMAND_PROCESS) {
+  // TIMED_PROCESS i.e. '<'
+  else if (process_type_ == TIMED_PROCESS) {
     if (tinfo.is_midi_tick) {
       // TODO support fractional loops
       if (timer_type_ == ProcessTimerType::EVERY) {
@@ -410,17 +410,17 @@ std::string Process::Status() {
 
   const char *PROC_COLOR = ANSI_COLOR_RESET;
   if (active_) {
-    if (process_type_ == ProcessType::PATTERN_PROCESS) {
+    if (process_type_ == ProcessType::FUNCTION_PROCESS) {
       if (target_type_ == ProcessPatternTarget::ENV)
         PROC_COLOR = ANSI_COLOR_CYAN;
       else
         PROC_COLOR = ANSI_COLOR_GREEN_TOO;
-    } else if (process_type_ == ProcessType::COMMAND_PROCESS)
+    } else if (process_type_ == ProcessType::TIMED_PROCESS)
       PROC_COLOR = ANSI_COLOR_GREEN;
   }
   ss << PROC_COLOR;
 
-  if (process_type_ == ProcessType::PATTERN_PROCESS) {
+  if (process_type_ == ProcessType::FUNCTION_PROCESS) {
     if (target_type_ == ProcessPatternTarget::ENV) {
       ss << "$ \"" << name << "\"";
     } else if (target_type_ == ProcessPatternTarget::VALUES) {
@@ -432,7 +432,7 @@ std::string Process::Status() {
         ss << t;
       }
     }
-  } else if (process_type_ == ProcessType::COMMAND_PROCESS) {
+  } else if (process_type_ == ProcessType::TIMED_PROCESS) {
     ss << "< " << s_proc_timer_types[timer_type_] << " " << loop_len_ << " \""
        << pattern_ << "\" "
        << " \"" << command_ << "\"";
