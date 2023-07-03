@@ -964,7 +964,7 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
     NextToken();
     NextToken();
 
-    process->process_type_ = PATTERN_PROCESS;
+    process->process_type_ = FUNCTION_PROCESS;
     process->target_type_ = ProcessPatternTarget::ENV;
 
     process->pattern_expression_ = ParseExpression(Precedence::PREFIX);
@@ -973,7 +973,7 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
     NextToken();
     NextToken();
 
-    process->process_type_ = PATTERN_PROCESS;
+    process->process_type_ = FUNCTION_PROCESS;
     process->target_type_ = ProcessPatternTarget::VALUES;
 
     // process->pattern_ = ParseStringLiteral();
@@ -998,7 +998,7 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
     }
     NextToken();
   } else if (PeekTokenIs(token::SLANG_LT)) {
-    process->process_type_ = COMMAND_PROCESS;
+    process->process_type_ = TIMED_PROCESS;
     NextToken();
     if (!PeekTokenIsPatternCommandTimerType()) {
       std::cerr << "Need a Pattern Command TYpe! Over, Every, Osc, While or "

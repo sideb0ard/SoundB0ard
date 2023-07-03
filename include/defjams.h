@@ -166,7 +166,7 @@ typedef enum {
 
 typedef enum { MONO, LEGATO } legato_mode;
 
-enum ProcessType { NO_PROCESS_TYPE, PATTERN_PROCESS, COMMAND_PROCESS };
+enum ProcessType { NO_PROCESS_TYPE, FUNCTION_PROCESS, TIMED_PROCESS };
 
 enum ProcessTimerType {
   NO_PROCESS_TIMER_TYPE,

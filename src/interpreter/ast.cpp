@@ -339,7 +339,7 @@ ProcessStatement::ProcessStatement(Token token) : Statement(token) {
 std::string ProcessStatement::String() const {
   std::stringstream ss;
   ss << "p" << token_.literal_;
-  if (process_type_ == PATTERN_PROCESS) {
+  if (process_type_ == FUNCTION_PROCESS) {
     if (target_type_ == ENV)
       ss << " $ ";
     else
