@@ -14,13 +14,14 @@ struct SoundGrainParams {
   double pitch{0};
   int num_channels{0};
   int degrade_by{0};
+  std::vector<double> *audio_buffer;
 };
 
 struct SoundGrain {
   SoundGrain() = default;
   ~SoundGrain() = default;
 
-  StereoVal Generate(std::vector<double> &audio_buffer);
+  StereoVal Generate();
   void Initialize(SoundGrainParams);
 
   int grain_len_frames{0};
@@ -28,6 +29,7 @@ struct SoundGrain {
 
   int audiobuffer_num_channels{0};
 
+  std::vector<double> *audio_buffer;
   double audiobuffer_cur_pos{0};
   double audiobuffer_pitch{0};
   double incr{0};

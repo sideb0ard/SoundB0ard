@@ -164,12 +164,15 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   int grain_idx = audio_buffer_read_idx_;
   if (granular_spray_frames_ > 0) grain_idx += rand() % granular_spray_frames_;
 
-  SoundGrainParams params = {.dur_frames = duration_frames,
-                             .starting_idx = grain_idx,
-                             .reverse_mode = reverse_mode_,
-                             .pitch = grain_pitch_,
-                             .num_channels = num_channels_,
-                             .degrade_by = degrade_by_};
+  SoundGrainParams params = {
+      .dur_frames = duration_frames,
+      .starting_idx = grain_idx,
+      .reverse_mode = reverse_mode_,
+      .pitch = grain_pitch_,
+      .num_channels = num_channels_,
+      .degrade_by = degrade_by_,
+      .audio_buffer = &audio_buffer_,
+  };
 
   grain->Initialize(params);
 
@@ -177,23 +180,9 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   grain_spacing_frames_ = duration_frames - xfade_time_in_frames_;
 
   next_grain_launch_sample_time_ = tinfo.cur_sample + grain_spacing_frames_;
-  // start_xfade_at_frame_time_ = tinfo.cur_sample + grain_ramp_time_;
+
   start_xfade_at_frame_time_ = next_grain_launch_sample_time_;
   stop_xfade_at_frame_time_ = tinfo.cur_sample + xfade_time_in_frames_;
-
-  // if (launch_count < 10) {
-  //   std::cout << "LAUNCH INDEX IS " << grain_idx << std::endl;
-  //   std::cout << "IS START OF LOOP? " << tinfo.is_start_of_loop
-  //             << " MIDI IDX:" << tinfo.midi_tick << std::endl;
-  //   // std::cout << "LAUNCH GRAIN at " << tinfo.cur_sample
-  //   //           << " durATION: " << duration_frames
-  //   //           << " GRAIN SPACING: " << grain_spacing_frames_
-  //   //           << " NEXT GRAIN at: " << next_grain_launch_sample_time_
-  //   //           << " NEXT XFADE at: " << start_xfade_at_frame_time_
-  //   //           << " STOP XFADE at: " << stop_xfade_at_frame_time_ <<
-  //   //           std::endl;
-  //   ++launch_count;
-  // }
 }
 
 void Granulator::SwitchXFadeGrains() {
@@ -232,8 +221,8 @@ StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
     LaunchGrain(incoming_grain_, tinfo);
   }
 
-  StereoVal active_val = active_grain_->Generate(audio_buffer_);
-  StereoVal incoming_val = incoming_grain_->Generate(audio_buffer_);
+  StereoVal active_val = active_grain_->Generate();
+  StereoVal incoming_val = incoming_grain_->Generate();
 
   if (xfader_active_) {
     double incoming_vol = xfader_.Generate();
@@ -329,11 +318,12 @@ void SoundGrain::Initialize(SoundGrainParams params) {
     audiobuffer_cur_pos = params.starting_idx;
     incr = params.pitch;
   }
+  audio_buffer = params.audio_buffer;
 
   active = true;
 }
 
-StereoVal SoundGrain::Generate(std::vector<double> &audio_buffer) {
+StereoVal SoundGrain::Generate() {
   StereoVal out = {0., 0.};
   if (!active) return out;
 
@@ -342,15 +332,15 @@ StereoVal SoundGrain::Generate(std::vector<double> &audio_buffer) {
   }
 
   int read_idx = (int)audiobuffer_cur_pos;
-  check_idx(&read_idx, audio_buffer.size());
+  check_idx(&read_idx, audio_buffer->size());
 
-  out.left = audio_buffer[read_idx];
+  out.left = (*audio_buffer)[read_idx];
   if (audiobuffer_num_channels == 1) {
     out.right = out.left;
   } else if (audiobuffer_num_channels == 2) {
     int read_idx_right = read_idx + 1;
-    check_idx(&read_idx_right, audio_buffer.size());
-    out.right = audio_buffer[read_idx_right];
+    check_idx(&read_idx_right, audio_buffer->size());
+    out.right = (*audio_buffer)[read_idx_right];
   }
   audiobuffer_cur_pos += (incr * audiobuffer_num_channels);
 
