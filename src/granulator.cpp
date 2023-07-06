@@ -1,6 +1,6 @@
 #include <defjams.h>
 #include <libgen.h>
-#include <looper.h>
+#include <granulator.h>
 #include <mixer.h>
 #include <sndfile.h>
 #include <stdlib.h>
@@ -22,7 +22,7 @@ const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 }  // namespace
 
-void Looper::Reset() {
+void Granulator::Reset() {
   audio_buffer_read_idx_ = 0;
   active_grain_ = &grain_a_;
   incoming_grain_ = &grain_b_;
@@ -43,7 +43,7 @@ void Looper::Reset() {
   stop_pending_ = false;
 }
 
-Looper::Looper(std::string filename, unsigned int loop_mode) {
+Granulator::Granulator(std::string filename, unsigned int loop_mode) {
   std::cout << "NEW LOOOOOPPPPPER " << loop_mode << std::endl;
   std::thread::id this_id = std::this_thread::get_id();
   std::cout << "LOOOOOPPPPPER on THREAD " << this_id << std::endl;
@@ -58,7 +58,7 @@ Looper::Looper(std::string filename, unsigned int loop_mode) {
   start();
 }
 
-void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
+void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   (void)event;
   double decimal_percent_of_loop = 0;
   if (tinfo.is_midi_tick) {
@@ -163,7 +163,7 @@ void Looper::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
 // for debugging only
 int launch_count = 0;
 
-void Looper::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
+void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   int duration_frames = grain_duration_frames_;
   if (quasi_grain_fudge_ != 0)
     duration_frames += rand() % (int)(quasi_grain_fudge_ * 44.1);
@@ -203,7 +203,7 @@ void Looper::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   // }
 }
 
-void Looper::SwitchXFadeGrains() {
+void Granulator::SwitchXFadeGrains() {
   if (active_grain_ == &grain_a_) {
     active_grain_ = &grain_b_;
     incoming_grain_ = &grain_a_;
@@ -213,7 +213,7 @@ void Looper::SwitchXFadeGrains() {
   }
 }
 
-StereoVal Looper::GenNext(mixer_timing_info tinfo) {
+StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
   StereoVal val = {0., 0.};
   if (!started_ || !active) {
     return val;
@@ -271,7 +271,7 @@ StereoVal Looper::GenNext(mixer_timing_info tinfo) {
   return val;
 }
 
-std::string Looper::Status() {
+std::string Granulator::Status() {
   std::stringstream ss;
   if (!active || volume == 0)
     ss << ANSI_COLOR_RESET;
@@ -285,7 +285,7 @@ std::string Looper::Status() {
   return ss.str();
 }
 
-std::string Looper::Info() {
+std::string Granulator::Info() {
   char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
   if (active) INSTRUMENT_COLOR = (char *)ANSI_COLOR_RED;
 
@@ -306,14 +306,14 @@ std::string Looper::Info() {
   return ss.str();
 }
 
-void Looper::start() { Reset(); }
+void Granulator::start() { Reset(); }
 
-void Looper::stop() {
+void Granulator::stop() {
   eg_.Release();
   stop_pending_ = true;
 }
 
-Looper::~Looper() {
+Granulator::~Granulator() {
   // TODO delete file
 }
 
@@ -372,18 +372,18 @@ StereoVal SoundGrain::Generate(std::vector<double> &audio_buffer) {
 
 //////////////////////////// end of grain stuff //////////////////////////
 
-void Looper::ImportFile(std::string filename) {
+void Granulator::ImportFile(std::string filename) {
   AudioBufferDetails deetz = ImportFileContents(audio_buffer_, filename);
   num_channels_ = deetz.num_channels;
   SetLoopLen(1);
 }
 
-void Looper::SetGrainDuration(int dur) {
+void Granulator::SetGrainDuration(int dur) {
   grains_per_sec_ = 1000. / dur;
   grain_duration_frames_ = (double)SAMPLE_RATE / grains_per_sec_;
 }
 
-void Looper::SetGrainDensity(int gps) {
+void Granulator::SetGrainDensity(int gps) {
   grains_per_sec_ = gps;
   grain_duration_frames_ = (double)SAMPLE_RATE / grains_per_sec_;
   grain_ramp_time_ = grain_duration_frames_ / 100. * 10;
@@ -392,26 +392,26 @@ void Looper::SetGrainDensity(int gps) {
   grain_spacing_frames_ = grain_duration_frames_ - xfade_time_in_frames_;
 }
 
-void Looper::SetAudioBufferReadIdx(size_t pos) {
+void Granulator::SetAudioBufferReadIdx(size_t pos) {
   if (pos < 0 || pos >= audio_buffer_.size()) {
     return;
   }
   audio_buffer_read_idx_ = pos;
 }
 
-void Looper::SetGranularSpray(int spray_ms) {
+void Granulator::SetGranularSpray(int spray_ms) {
   granular_spray_frames_ = spray_ms / 1000 * SAMPLE_RATE;
 }
 
-void Looper::SetQuasiGrainFudge(int fudgefactor) {
+void Granulator::SetQuasiGrainFudge(int fudgefactor) {
   quasi_grain_fudge_ = fudgefactor;
 }
 
-void Looper::SetGrainPitch(double pitch) { grain_pitch_ = pitch; }
-void Looper::SetIncrSpeed(double speed) { incr_speed_ = speed; }
-void Looper::SetReverseMode(bool b) { reverse_mode_ = b; }
+void Granulator::SetGrainPitch(double pitch) { grain_pitch_ = pitch; }
+void Granulator::SetIncrSpeed(double speed) { incr_speed_ = speed; }
+void Granulator::SetReverseMode(bool b) { reverse_mode_ = b; }
 
-void Looper::SetLoopMode(unsigned int m) {
+void Granulator::SetLoopMode(unsigned int m) {
   volume = 0.2;
   switch (m) {
     case (0):
@@ -432,49 +432,49 @@ void Looper::SetLoopMode(unsigned int m) {
       granular_spray_frames_ = 441;  // 10ms * (44100/1000)
   }
 }
-void Looper::SetScramblePending() { scramble_pending_ = true; }
+void Granulator::SetScramblePending() { scramble_pending_ = true; }
 
-void Looper::SetStopPending(int loops) {
+void Granulator::SetStopPending(int loops) {
   stop_count_pending_ = true;
   stop_len_ = loops;
   stop_countr_ = 0;
 }
 
-void Looper::SetStutterPending() { stutter_pending_ = true; }
-void Looper::SetReversePending() { reverse_pending_ = true; }
+void Granulator::SetStutterPending() { stutter_pending_ = true; }
+void Granulator::SetReversePending() { reverse_pending_ = true; }
 
-void Looper::SetLoopLen(double bars) {
+void Granulator::SetLoopLen(double bars) {
   if (bars != 0) {
     loop_len_ = bars;
     size_of_sixteenth_ = audio_buffer_.size() / 16 / bars;
   }
 }
 
-void Looper::SetDegradeBy(int degradation) {
+void Granulator::SetDegradeBy(int degradation) {
   if (degradation >= 0 && degradation <= 100) degrade_by_ = degradation;
 }
 
-void Looper::noteOn(midi_event ev) { (void)ev; }
+void Granulator::noteOn(midi_event ev) { (void)ev; }
 
-void Looper::noteOff(midi_event ev) {
+void Granulator::noteOff(midi_event ev) {
   (void)ev;
   eg_.NoteOff();
 }
 
-void Looper::SetPOffset(int poffset) {
+void Granulator::SetPOffset(int poffset) {
   if (poffset >= 0 && poffset <= 15) {
     poffset_ = poffset;
   }
 }
 
-void Looper::SetPlooplen(int plooplen) {
+void Granulator::SetPlooplen(int plooplen) {
   if (plooplen > 0 && plooplen <= 16) {
     plooplen_ = plooplen;
   }
 }
-void Looper::SetPinc(int pinc) { pinc_ = pinc; }
+void Granulator::SetPinc(int pinc) { pinc_ = pinc; }
 
-void Looper::SetParam(std::string name, double val) {
+void Granulator::SetParam(std::string name, double val) {
   if (name == "active") {
     start();
   } else if (name == "on") {

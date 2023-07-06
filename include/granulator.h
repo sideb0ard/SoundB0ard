@@ -1,5 +1,4 @@
-#ifndef LOOPER_H
-#define LOOPER_H
+#pragma once
 
 #include <envelope_generator.h>
 #include <fx/ramp.h>
@@ -45,10 +44,10 @@ enum LoopMode {
   smudge_mode,
 };
 
-class Looper : public SoundGenerator {
+class Granulator : public SoundGenerator {
  public:
-  Looper(std::string filename, unsigned int loop_mode);
-  ~Looper();
+  Granulator(std::string filename, unsigned int loop_mode);
+  ~Granulator();
   StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Status() override;
   std::string Info() override;
@@ -159,4 +158,3 @@ class Looper : public SoundGenerator {
 };
 
 }  // namespace SBAudio
-#endif  // LOOPER

@@ -3,7 +3,7 @@
 #include <drum_synth.h>
 #include <drumsampler.h>
 #include <dxsynth.h>
-#include <looper.h>
+#include <granulator.h>
 #include <minisynth.h>
 #include <mixer.h>
 #include <sbsynth.h>
@@ -36,7 +36,7 @@ int AddSoundGenerator(unsigned int type, std::string filepath = "",
       sg = std::make_unique<SBAudio::DrumSynth>();
       break;
     case (LOOPER_TYPE):
-      sg = std::make_unique<SBAudio::Looper>(filepath, loop_mode);
+      sg = std::make_unique<SBAudio::Granulator>(filepath, loop_mode);
       break;
     case (DRUMSAMPLER_TYPE):
       sg = std::make_unique<SBAudio::DrumSampler>(filepath);

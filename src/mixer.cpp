@@ -8,7 +8,7 @@
 #include <fx/envelope.h>
 #include <fx/fx.h>
 #include <fx/reverb.h>
-#include <looper.h>
+#include <granulator.h>
 #include <math.h>
 #include <minisynth.h>
 #include <mixer.h>

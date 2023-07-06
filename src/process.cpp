@@ -1,6 +1,6 @@
 #include <audioutils.h>
 #include <cmdloop.h>
-#include <looper.h>
+#include <granulator.h>
 #include <midimaaan.h>
 #include <mixer.h>
 #include <regex.h>
