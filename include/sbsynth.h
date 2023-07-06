@@ -25,11 +25,11 @@ class SBSynth : public SoundGenerator {
 
   void SetParam(std::string name, double val) override;
 
-  void start() override;
-  void stop() override;
+  void Start() override;
+  void Stop() override;
 
-  void noteOn(midi_event ev) override;
-  void noteOff(midi_event ev) override;
+  void NoteOn(midi_event ev) override;
+  void NoteOff(midi_event ev) override;
 
  private:
   QBLimitedOscillator m_car_osc;

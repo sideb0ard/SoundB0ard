@@ -112,11 +112,11 @@ class DrumSynth : public SoundGenerator {
   std::string Info() override;
   std::string Status() override;
   StereoVal GenNext(mixer_timing_info tinfo) override;
-  void start() override;
-  void stop() override;
-  void randomize() override;
-  void noteOn(midi_event ev) override;
-  void noteOff(midi_event ev) override;
+  void Start() override;
+  void Stop() override;
+  void Randomize() override;
+  void NoteOn(midi_event ev) override;
+  void NoteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
   void PrintSettings(DrumSettings settings);
   void LoadPreset(std::string name,

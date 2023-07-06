@@ -56,11 +56,11 @@ DXSynth::DXSynth() {
   active = true;
 }
 
-void DXSynth::start() { active = true; }
+void DXSynth::Start() { active = true; }
 
-void DXSynth::stop() {
+void DXSynth::Stop() {
   active = false;
-  allNotesOff();
+  AllNotesOff();
 }
 
 std::string DXSynth::Status() {
@@ -236,7 +236,7 @@ void DXSynth::SetOpFreq(unsigned int op, float val) {
   m_last_note_frequency = val;
 }
 
-void DXSynth::noteOn(midi_event ev) {
+void DXSynth::NoteOn(midi_event ev) {
   bool steal_note = true;
   for (auto v : voices_) {
     if (!v->m_note_on) {
@@ -258,17 +258,17 @@ void DXSynth::noteOn(midi_event ev) {
   }
 }
 
-void DXSynth::allNotesOff() {
+void DXSynth::AllNotesOff() {
   for (auto v : voices_) v->NoteOff(-1);
 }
 
-void DXSynth::noteOff(midi_event ev) {
+void DXSynth::NoteOff(midi_event ev) {
   for (auto v : voices_) v->NoteOff(ev.data1);
 }
 
-void DXSynth::control(midi_event ev) { (void)ev; }
+void DXSynth::Control(midi_event ev) { (void)ev; }
 
-void DXSynth::pitchBend(midi_event ev) {
+void DXSynth::PitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
   unsigned int data2 = ev.data2;
   printf("Pitch bend, babee: %d %d\n", data1, data2);
@@ -551,7 +551,7 @@ std::shared_ptr<DXSynthVoice> DXSynth::GetOldestVoiceWithNote(int midi_note) {
   return found_voice;
 }
 
-void DXSynth::randomize() {
+void DXSynth::Randomize() {
   // dxsynth_reset(dx);
   // return;
   // printf("Randomizing DXSYNTH!\n");

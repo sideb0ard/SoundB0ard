@@ -51,11 +51,11 @@ class Granulator : public SoundGenerator {
   StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Status() override;
   std::string Info() override;
-  void start() override;
-  void stop() override;
+  void Start() override;
+  void Stop() override;
   void EventNotify(broadcast_event event, mixer_timing_info tinfo) override;
-  void noteOn(midi_event ev) override;
-  void noteOff(midi_event ev) override;
+  void NoteOn(midi_event ev) override;
+  void NoteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
 
   void Reset();
@@ -90,7 +90,7 @@ class Granulator : public SoundGenerator {
   Ramp xfader_;
   void SwitchXFadeGrains();
   int grain_ramp_time_{0};
-  int next_grain_launch_sample_time_{0};
+  int next_grain_launch_sample_time_{1};
   int start_xfade_at_frame_time_{0};
   int stop_xfade_at_frame_time_{0};
   int xfade_time_in_frames_{0};

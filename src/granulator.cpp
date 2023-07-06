@@ -1,6 +1,6 @@
 #include <defjams.h>
-#include <libgen.h>
 #include <granulator.h>
+#include <libgen.h>
 #include <mixer.h>
 #include <sndfile.h>
 #include <stdlib.h>
@@ -44,18 +44,11 @@ void Granulator::Reset() {
 }
 
 Granulator::Granulator(std::string filename, unsigned int loop_mode) {
-  std::cout << "NEW LOOOOOPPPPPER " << loop_mode << std::endl;
-  std::thread::id this_id = std::this_thread::get_id();
-  std::cout << "LOOOOOPPPPPER on THREAD " << this_id << std::endl;
-
   type = LOOPER_TYPE;
-
   filename_ = filename;
   ImportFile(filename_);
-
   SetLoopMode(loop_mode);
-
-  start();
+  Start();
 }
 
 void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
@@ -106,7 +99,7 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
     if (stop_count_pending_) {
       stop_countr_++;
       if (stop_countr_ >= stop_len_) {
-        stop();
+        Stop();
         stop_count_pending_ = false;
       }
     }
@@ -306,9 +299,9 @@ std::string Granulator::Info() {
   return ss.str();
 }
 
-void Granulator::start() { Reset(); }
+void Granulator::Start() { Reset(); }
 
-void Granulator::stop() {
+void Granulator::Stop() {
   eg_.Release();
   stop_pending_ = true;
 }
@@ -454,9 +447,12 @@ void Granulator::SetDegradeBy(int degradation) {
   if (degradation >= 0 && degradation <= 100) degrade_by_ = degradation;
 }
 
-void Granulator::noteOn(midi_event ev) { (void)ev; }
+void Granulator::NoteOn(midi_event ev) {
+  (void)ev;
+  eg_.StartEg();
+}
 
-void Granulator::noteOff(midi_event ev) {
+void Granulator::NoteOff(midi_event ev) {
   (void)ev;
   eg_.NoteOff();
 }
@@ -476,7 +472,7 @@ void Granulator::SetPinc(int pinc) { pinc_ = pinc; }
 
 void Granulator::SetParam(std::string name, double val) {
   if (name == "active") {
-    start();
+    Start();
   } else if (name == "on") {
     eg_.StartEg();
   } else if (name == "off") {

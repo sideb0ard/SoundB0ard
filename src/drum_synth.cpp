@@ -362,19 +362,19 @@ std::string DrumSynth::Status() {
   return ss.str();
 }
 
-void DrumSynth::start() {
+void DrumSynth::Start() {
   if (active) return;  // no-op
   active = true;
 }
 
-void DrumSynth::stop() {
+void DrumSynth::Stop() {
   if (active) return;  // no-op
   active = false;
 }
 
-void DrumSynth::noteOff(midi_event ev) { eg_.NoteOff(); }
+void DrumSynth::NoteOff(midi_event ev) { eg_.NoteOff(); }
 
-void DrumSynth::noteOn(midi_event ev) {
+void DrumSynth::NoteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
   settings_.amplitude = scaleybum(0, 127, 0, 1, velocity);
@@ -600,7 +600,7 @@ void DrumSynth::PrintSettings(DrumSettings settingz) {
             << std::endl;
 }
 
-void DrumSynth::randomize() {
+void DrumSynth::Randomize() {
   DrumSettings rand_settings;
   rand_settings.name = "RANDWOOF";
 

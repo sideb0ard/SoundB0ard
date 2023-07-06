@@ -34,8 +34,8 @@ void SoundGenerator::SetFxSend(int fx_num, double intensity) {
   }
 }
 
-void SoundGenerator::start() { active = true; }
-void SoundGenerator::stop() { active = false; }
+void SoundGenerator::Start() { active = true; }
+void SoundGenerator::Stop() { active = false; }
 
 void SoundGenerator::Save(std::string preset_name) {
   std::cout << "BASE CLASS SAVE " << preset_name << " - NO OP!" << std::endl;
@@ -47,24 +47,24 @@ void SoundGenerator::ListPresets() {
 
 std::string SoundGenerator::Status() { return std::string{"BASE CLASS, YO"}; }
 
-void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo) {
+void SoundGenerator::ParseMidiEvent(midi_event ev, mixer_timing_info tinfo) {
   (void)tinfo;
 
   switch (ev.event_type) {
     case (MIDI_ON): {  // Hex 0x80
-      noteOn(ev);
+      NoteOn(ev);
       break;
     }
     case (MIDI_OFF): {  // Hex 0x90
-      noteOff(ev);
+      NoteOff(ev);
       break;
     }
     case (MIDI_CONTROL): {  // Hex 0xB0
-      control(ev);
+      Control(ev);
       break;
     }
     case (MIDI_PITCHBEND): {  // Hex 0xE0
-      pitchBend(ev);
+      PitchBend(ev);
       break;
     }
     default:

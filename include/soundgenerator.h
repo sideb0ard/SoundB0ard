@@ -23,11 +23,11 @@ class SoundGenerator {
 
   virtual void SetParam(std::string name, double val) = 0;
 
-  virtual void start();
-  virtual void stop();
+  virtual void Start();
+  virtual void Stop();
 
-  virtual void noteOn(midi_event ev) { (void)ev; };
-  virtual void noteOff(midi_event ev) { (void)ev; };
+  virtual void NoteOn(midi_event ev) { (void)ev; };
+  virtual void NoteOff(midi_event ev) { (void)ev; };
   virtual void Save(std::string preset_name);
   virtual void LoadPreset(std::string preset_name,
                           std::map<std::string, double> preset) {
@@ -41,14 +41,14 @@ class SoundGenerator {
   }
   virtual void ListPresets();
 
-  virtual void control(midi_event ev) { (void)ev; };
-  virtual void pitchBend(midi_event ev) { (void)ev; };
-  virtual void randomize(){};
-  virtual void allNotesOff(){};
+  virtual void Control(midi_event ev) { (void)ev; };
+  virtual void PitchBend(midi_event ev) { (void)ev; };
+  virtual void Randomize(){};
+  virtual void AllNotesOff(){};
 
   virtual void EventNotify(broadcast_event event, mixer_timing_info tinfo);
 
-  void parseMidiEvent(midi_event ev, mixer_timing_info tinfo);
+  void ParseMidiEvent(midi_event ev, mixer_timing_info tinfo);
 
   void SetVolume(double val);
   double GetVolume();

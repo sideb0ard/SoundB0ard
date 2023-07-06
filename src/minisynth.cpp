@@ -219,11 +219,11 @@ std::string MiniSynth::Info() {
 
   return ss.str();
 }
-void MiniSynth::start() { active = true; }
+void MiniSynth::Start() { active = true; }
 
-void MiniSynth::stop() {
+void MiniSynth::Stop() {
   active = false;
-  allNotesOff();
+  AllNotesOff();
 }
 
 void MiniSynth::LoadDefaults() {
@@ -359,7 +359,7 @@ void MiniSynth::LoadDefaults() {
   m_settings.m_generate_src = -99;
 }
 
-void MiniSynth::control(midi_event ev) {
+void MiniSynth::Control(midi_event ev) {
   double scaley_val = 0;
   switch (ev.data1) {
     case (1):
@@ -404,7 +404,7 @@ void MiniSynth::control(midi_event ev) {
   Update();
 }
 
-void MiniSynth::noteOn(midi_event ev) {
+void MiniSynth::NoteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
 
@@ -440,20 +440,20 @@ void MiniSynth::noteOn(midi_event ev) {
   }
 }
 
-void MiniSynth::allNotesOff() {
+void MiniSynth::AllNotesOff() {
   for (int i = 0; i < MAX_VOICES; i++) {
     if (voices_[i]) voices_[i]->NoteOff(-1);
   }
 }
 
-void MiniSynth::noteOff(midi_event ev) {
+void MiniSynth::NoteOff(midi_event ev) {
   for (int i = 0; i < MAX_VOICES; i++) {
     auto msv = GetOldestVoiceWithNote(ev.data1);
     if (msv) msv->NoteOff(ev.data1);
   }
 }
 
-void MiniSynth::pitchBend(midi_event ev) {
+void MiniSynth::PitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
   unsigned int data2 = ev.data2;
   // printf("Pitch bend, babee: %d %d\n", data1, data2);
@@ -802,7 +802,7 @@ std::shared_ptr<MiniSynthVoice> MiniSynth::GetOldestVoiceWithNote(
   return found_voice;
 }
 
-void MiniSynth::randomize() {
+void MiniSynth::Randomize() {
   // printf("Randomizing SYNTH!\n");
 
   strncpy(m_settings.m_settings_name, "-- random UNSAVED--", 256);

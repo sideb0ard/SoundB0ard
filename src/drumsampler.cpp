@@ -129,12 +129,12 @@ std::string DrumSampler::Info() {
   return ss.str();
 }
 
-void DrumSampler::start() {
+void DrumSampler::Start() {
   if (active) return;  // no-op
   active = true;
 }
 
-void DrumSampler::noteOn(midi_event ev) {
+void DrumSampler::NoteOn(midi_event ev) {
   is_playing = true;
   play_idx = 0;
   if (reverse_mode) play_idx = bufsize - 2;
@@ -143,12 +143,12 @@ void DrumSampler::noteOn(midi_event ev) {
   stop_pending_ = false;
 }
 
-void DrumSampler::noteOff(midi_event ev) {
+void DrumSampler::NoteOff(midi_event ev) {
   eg.Release();
   stop_pending_ = true;
 }
 
-void DrumSampler::pitchBend(midi_event ev) {
+void DrumSampler::PitchBend(midi_event ev) {
   float pitch_val = ev.data1 / 10.;
   SetPitch(pitch_val);
 }

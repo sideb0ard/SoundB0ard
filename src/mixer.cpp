@@ -737,7 +737,7 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
                                      action->soundgen_num);
           _action_items.push_back(ev);
         } else {
-          sg->noteOn(event_on);
+          sg->NoteOn(event_on);
         }
         int midi_off_tick = midi_note_on_time + action->duration;
 
@@ -759,8 +759,8 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
   } else if (action->type == AudioAction::STOP) {
     if (IsValidSoundgenNum(action->soundgen_num)) {
       auto &sg = sound_generators_[action->soundgen_num];
-      // sg->allNotesOff();
-      sg->stop();
+      // sg->AllNotesOff();
+      sg->Stop();
     }
   } else if (action->type == AudioAction::MIXER_UPDATE) {
     double param_val = std::stod(action->param_val);
@@ -836,7 +836,7 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
     interpreter_sound_cmds::SynthLoadPreset(
         action->args[0], action->preset_name, action->preset);
   } else if (action->type == AudioAction::RAND) {
-    sound_generators_[action->mixer_soundgen_idx]->randomize();
+    sound_generators_[action->mixer_soundgen_idx]->Randomize();
   } else if (action->type == AudioAction::PREVIEW) {
     PreviewAudio(std::move(action));
   }
@@ -854,7 +854,7 @@ void Mixer::AssignSoundGeneratorToMidiController(int soundgen_id) {
 
 void Mixer::RecordMidiToggle() {
   if (midi_recording && IsValidSoundgenNum(midi_target)) {
-    sound_generators_[midi_target]->allNotesOff();
+    sound_generators_[midi_target]->AllNotesOff();
   }
   midi_recording = 1 - midi_recording;
 }
@@ -898,7 +898,7 @@ void Mixer::CheckForExternalMidiEvents() {
 
       // TODO - THESE SHOULD BE SHARED WITH MIDI MESSAGE PARSING
       if (status == MIDI_ON || status == MIDI_OFF) {
-        sound_generators_[midi_target]->parseMidiEvent(ev, timing_info);
+        sound_generators_[midi_target]->ParseMidiEvent(ev, timing_info);
       }
 
       if (status == MIDI_CONTROL) {
@@ -911,7 +911,7 @@ void Mixer::CheckForExternalMidiEvents() {
       if (e.event_type == MIDI_CONTROL) {
         HandleMidiControlMessage(e.data1, e.data2);
       } else {
-        sound_generators_[midi_target]->parseMidiEvent(e, timing_info);
+        sound_generators_[midi_target]->ParseMidiEvent(e, timing_info);
       }
     }
   }
@@ -943,7 +943,7 @@ void Mixer::CheckForDelayedEvents() {
       // TODO - push to action queue not call function
       if (IsValidSoundgenNum(it->sg_idx)) {
         auto &sg = sound_generators_[it->sg_idx];
-        sg->parseMidiEvent(it->event, timing_info);
+        sg->ParseMidiEvent(it->event, timing_info);
       } else if (it->event.event_type == MIDI_CONTROL) {
         HandleMidiControlMessage(it->event.data1, it->event.data2);
       }
@@ -962,7 +962,7 @@ void Mixer::CheckForDelayedEvents() {
         HandleMidiControlMessage((*dit)->event.data1, (*dit)->event.data2);
       } else if (IsValidSoundgenNum((*dit)->mixer_soundgen_idx)) {
         auto &sg = sound_generators_[(*dit)->mixer_soundgen_idx];
-        sg->parseMidiEvent((*dit)->event, timing_info);
+        sg->ParseMidiEvent((*dit)->event, timing_info);
         if ((*dit)->event.event_type == MIDI_ON && (*dit)->event.dur > 0) {
           auto note_off = new_midi_event(MIDI_OFF, (*dit)->event.data1, 0);
           auto action = std::make_unique<AudioActionItem>(
@@ -978,7 +978,7 @@ void Mixer::CheckForDelayedEvents() {
       if ((*dit)->type == RECORDED_MIDI_EVENT) {
         if (IsValidSoundgenNum((*dit)->mixer_soundgen_idx)) {
           auto &sg = sound_generators_[(*dit)->mixer_soundgen_idx];
-          sg->parseMidiEvent((*dit)->event, timing_info);
+          sg->ParseMidiEvent((*dit)->event, timing_info);
         }
       } else {
         ProcessActionMessage(std::move(*dit));

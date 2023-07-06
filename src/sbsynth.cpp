@@ -143,13 +143,13 @@ std::string SBSynth::Info() {
   return ss.str();
 }
 
-void SBSynth::start() {
+void SBSynth::Start() {
   if (active) return;  // no-op
   active = true;
 }
-void SBSynth::stop() { active = false; }
+void SBSynth::Stop() { active = false; }
 
-void SBSynth::noteOn(midi_event ev) {
+void SBSynth::NoteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
 
@@ -164,7 +164,7 @@ void SBSynth::noteOn(midi_event ev) {
   m_eg1.StartEg();
 }
 
-void SBSynth::noteOff(midi_event ev) {
+void SBSynth::NoteOff(midi_event ev) {
   (void)ev;
   m_eg1.NoteOff();
 }

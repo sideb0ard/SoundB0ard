@@ -94,14 +94,14 @@ class DXSynth : public SoundGenerator {
   StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Info() override;
   std::string Status() override;
-  void start() override;
-  void stop() override;
-  void noteOn(midi_event ev) override;
-  void noteOff(midi_event ev) override;
-  void allNotesOff() override;
-  void control(midi_event ev) override;
-  void pitchBend(midi_event ev) override;
-  void randomize() override;
+  void Start() override;
+  void Stop() override;
+  void NoteOn(midi_event ev) override;
+  void NoteOff(midi_event ev) override;
+  void AllNotesOff() override;
+  void Control(midi_event ev) override;
+  void PitchBend(midi_event ev) override;
+  void Randomize() override;
   void SetParam(std::string name, double val) override;
   void LoadPreset(std::string preset_name,
                   std::map<std::string, double> preset) override;
