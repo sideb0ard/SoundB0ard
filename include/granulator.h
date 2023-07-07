@@ -2,43 +2,11 @@
 
 #include <envelope_generator.h>
 #include <fx/ramp.h>
+#include <grains.h>
 #include <soundgenerator.h>
 #include <stdbool.h>
 
 namespace SBAudio {
-
-struct SoundGrainParams {
-  int dur_frames{0};
-  int starting_idx{0};
-  bool reverse_mode{0};
-  double pitch{0};
-  int num_channels{0};
-  int degrade_by{0};
-  std::vector<double> *audio_buffer;
-};
-
-struct SoundGrain {
-  SoundGrain() = default;
-  ~SoundGrain() = default;
-
-  StereoVal Generate();
-  void Initialize(SoundGrainParams);
-
-  int grain_len_frames{0};
-  int grain_frame_counter{0};
-
-  int audiobuffer_num_channels{0};
-
-  std::vector<double> *audio_buffer;
-  double audiobuffer_cur_pos{0};
-  double audiobuffer_pitch{0};
-  double incr{0};
-
-  int degrade_by{0};
-
-  bool active{false};
-  bool reverse_mode{false};
-};
 
 enum LoopMode {
   loop_mode,
@@ -49,6 +17,7 @@ enum LoopMode {
 class Granulator : public SoundGenerator {
  public:
   Granulator(std::string filename, unsigned int loop_mode);
+  Granulator();
   ~Granulator();
   StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Status() override;
@@ -71,8 +40,9 @@ class Granulator : public SoundGenerator {
   int size_of_sixteenth_{0};
   int audio_buffer_read_idx_{0};
 
-  SoundGrain grain_a_;
-  SoundGrain grain_b_;
+  SoundGrainType grain_type_{SoundGrainType::Sample};
+  std::unique_ptr<SoundGrain> grain_a_;
+  std::unique_ptr<SoundGrain> grain_b_;
 
   SoundGrain *active_grain_;
   SoundGrain *incoming_grain_;
