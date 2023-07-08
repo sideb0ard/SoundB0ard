@@ -31,7 +31,6 @@ float GetRandRatio() { return dx_ratios[rand() % NUM_RATIOS]; }
 
 DXSynth::DXSynth() {
   type = DXSYNTH_TYPE;
-  std::cout << "Added, FM Synth, yo!\n";
   active_midi_osc = 1;
   volume = 0.3;
 
@@ -306,62 +305,119 @@ void DXSynth::PitchBend(midi_event ev) {
   }
 }
 
-void DXSynth::Reset() {
-  strncpy(m_settings.m_settings_name, "default", 7);
-  m_settings.m_volume_db = 0;
-  m_settings.m_voice_mode = 0;
-  m_settings.m_portamento_time_ms = 0;
-  m_settings.m_pitchbend_range = 1;  // 0 -12
-  m_settings.m_velocity_to_attack_scaling = 0;
-  m_settings.m_note_number_to_decay_scaling = 0;
-  m_settings.m_reset_to_zero = 0;
-  m_settings.m_legato_mode = 0;
+const std::map<std::string, double> wuurp_preset = {
+    {"m_volume_db", 0},
+    {"m_voice_mode", 3},
+    {"m_portamento_time_ms", 20},
+    {"m_pitchbend_range", 12},
+    {"m_velocity_to_attack_scaling", 0},
+    {"m_note_number_to_decay_scaling", 0},
+    {"m_reset_to_zero", 1},
+    {"m_legato_mode", 1},
 
-  m_settings.m_lfo1_intensity = 1;
-  m_settings.m_lfo1_rate = 0.5;
-  m_settings.m_lfo1_waveform = 0;
-  m_settings.m_lfo1_mod_dest1 = DX_LFO_DEST_NONE;
-  m_settings.m_lfo1_mod_dest2 = DX_LFO_DEST_NONE;
-  m_settings.m_lfo1_mod_dest3 = DX_LFO_DEST_NONE;
-  m_settings.m_lfo1_mod_dest4 = DX_LFO_DEST_NONE;
+    {"m_lfo1_intensity", 0.199566},
+    {"m_lfo1_rate", 0.375},
+    {"m_lfo1_waveform", 1},
+    {"m_lfo1_mod_dest1", 1},
+    {"m_lfo1_mod_dest2", 0},
+    {"m_lfo1_mod_dest3", 2},
+    {"m_lfo1_mod_dest4", 1},
 
-  m_settings.m_op1_waveform = SINE;
-  m_settings.m_op1_ratio = 1;  // 0.01-10
-  m_settings.m_op1_detune_cents = 0;
-  m_settings.m_eg1_attack_ms = 100;
-  m_settings.m_eg1_decay_ms = 100;
-  m_settings.m_eg1_sustain_lvl = 0.707;
-  m_settings.m_eg1_release_ms = 2000;
-  m_settings.m_op1_output_lvl = 90;
+    {"m_op1_waveform", 0},
+    {"m_op1_ratio", 1.802928},
+    {"m_op1_detune_cents", 1.0},
+    {"m_eg1_attack_ms", 91},
+    {"m_eg1_decay_ms", 271},
+    {"m_eg1_sustain_lvl", 0.082279},
+    {"m_eg1_release_ms", 278},
+    {"m_op1_output_lvl", 95},
 
-  m_settings.m_op2_waveform = SINE;
-  m_settings.m_op2_ratio = 1;  // 0.01-10
-  m_settings.m_op2_detune_cents = 0;
-  m_settings.m_eg2_attack_ms = 100;
-  m_settings.m_eg2_decay_ms = 100;
-  m_settings.m_eg2_sustain_lvl = 0.707;
-  m_settings.m_eg2_release_ms = 2000;
-  m_settings.m_op2_output_lvl = 75;
+    {"m_op2_waveform", SINE},
+    {"m_op2_ratio", 10},
+    {"m_op2_detune_cents", 13},
+    {"m_eg2_attack_ms", 195},
+    {"m_eg2_decay_ms", 60},
+    {"m_eg2_sustain_lvl", 0.312484},
+    {"m_eg2_release_ms", 31},
+    {"m_op2_output_lvl", 81.61393},
 
-  m_settings.m_op3_waveform = SINE;
-  m_settings.m_op3_ratio = 1;  // 0.01-10
-  m_settings.m_op3_detune_cents = 0;
-  m_settings.m_eg3_attack_ms = 100;
-  m_settings.m_eg3_decay_ms = 100;
-  m_settings.m_eg3_sustain_lvl = 0.707;
-  m_settings.m_eg3_release_ms = 2000;
-  m_settings.m_op3_output_lvl = 75;
+    {"m_op3_waveform", 3},
+    {"m_op3_ratio", 9.324116},
+    {"m_op3_detune_cents", 10},
+    {"m_eg3_attack_ms", 266},
+    {"m_eg3_decay_ms", 264},
+    {"m_eg3_sustain_lvl", 0.974699},
+    {"m_eg3_release_ms", 24},
+    {"m_op3_output_lvl", 68},
 
-  m_settings.m_op4_waveform = SINE;
-  m_settings.m_op4_ratio = 1;  // 0.01-10
-  m_settings.m_op4_detune_cents = 0;
-  m_settings.m_eg4_attack_ms = 100;
-  m_settings.m_eg4_decay_ms = 100;
-  m_settings.m_eg4_sustain_lvl = 0.707;
-  m_settings.m_eg4_release_ms = 2000;
-  m_settings.m_op4_output_lvl = 75;
-  m_settings.m_op4_feedback = 0;  // 0-70
-}
+    {"m_op4_waveform", 6},
+    {"m_op4_ratio", 9.959035},
+    {"m_op4_detune_cents", -7},
+    {"m_eg4_attack_ms", 319},
+    {"m_eg4_decay_ms", 493},
+    {"m_eg4_sustain_lvl", 0.537212},
+    {"m_eg4_release_ms", 5},
+    {"m_op4_output_lvl", 60},
+    {"m_op4_feedback", 70},
+};
+
+const std::map<std::string, double> default_preset = {
+    {"m_volume_db", 0},
+    {"m_voice_mode", 0},
+    {"m_portamento_time_ms", 0},
+    {"m_pitchbend_range", 1},
+    {"m_velocity_to_attack_scaling", 0},
+    {"m_note_number_to_decay_scaling", 0},
+    {"m_reset_to_zero", 0},
+    {"m_legato_mode", 0},
+
+    {"m_lfo1_intensity", 1.0},
+    {"m_lfo1_rate", 0.5},
+    {"m_lfo1_waveform", 0},
+    {"m_lfo1_mod_dest1", DX_LFO_DEST_NONE},
+    {"m_lfo1_mod_dest2", DX_LFO_DEST_NONE},
+    {"m_lfo1_mod_dest3", DX_LFO_DEST_NONE},
+    {"m_lfo1_mod_dest4", DX_LFO_DEST_NONE},
+
+    {"m_op1_waveform", SINE},
+    {"m_op1_ratio", 1},
+    {"m_op1_detune_cents", 0},
+    {"m_eg1_attack_ms", 100},
+    {"m_eg1_decay_ms", 100},
+    {"m_eg1_sustain_lvl", 0.707},
+    {"m_eg1_release_ms", 2000},
+    {"m_op1_output_lvl", 90},
+
+    {"m_op2_waveform", SINE},
+    {"m_op2_ratio", 1},
+    {"m_op2_detune_cents", 0},
+    {"m_eg2_attack_ms", 100},
+    {"m_eg2_decay_ms", 100},
+    {"m_eg2_sustain_lvl", 0.707},
+    {"m_eg2_release_ms", 2000},
+    {"m_op2_output_lvl", 75},
+
+    {"m_op3_waveform", SINE},
+    {"m_op3_ratio", 1},
+    {"m_op3_detune_cents", 0},
+    {"m_eg3_attack_ms", 100},
+    {"m_eg3_decay_ms", 100},
+    {"m_eg3_sustain_lvl", 0.707},
+    {"m_eg3_release_ms", 2000},
+    {"m_op3_output_lvl", 75},
+
+    {"m_op4_waveform", SINE},
+    {"m_op4_ratio", 1},
+    {"m_op4_detune_cents", 0},
+    {"m_eg4_attack_ms", 100},
+    {"m_eg4_decay_ms", 100},
+    {"m_eg4_sustain_lvl", 0.707},
+    {"m_eg4_release_ms", 2000},
+    {"m_op4_output_lvl", 75},
+    {"m_op4_feedback", 0},
+};
+
+void DXSynth::Reset() { LoadPreset("default", wuurp_preset); }
 
 bool DXSynth::PrepareForPlay() {
   for (auto v : voices_) v->PrepareForPlay();
