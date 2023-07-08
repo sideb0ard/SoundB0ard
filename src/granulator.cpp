@@ -12,20 +12,12 @@
 
 namespace SBAudio {
 
-namespace {
-void check_idx(int *index, int buffer_len) {
-  while (*index < 0.0) *index += buffer_len;
-  while (*index >= buffer_len) *index -= buffer_len;
-}
-
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
-
-}  // namespace
 
 void Granulator::Reset() {
   audio_buffer_read_idx_ = 0;
-  active_grain_ = &grain_a_;
-  incoming_grain_ = &grain_b_;
+  active_grain_ = grain_a_.get();
+  incoming_grain_ = grain_b_.get();
   reverse_mode_ = false;
   SetGrainDensity(15);
   eg_.SetAttackTimeMsec(5);
@@ -43,8 +35,13 @@ void Granulator::Reset() {
   stop_pending_ = false;
 }
 
+Granulator::Granulator() { grain_type_ = SoundGrainType::Signal; }
+
 Granulator::Granulator(std::string filename, unsigned int loop_mode) {
   type = LOOPER_TYPE;
+  grain_type_ = SoundGrainType::Sample;
+  grain_a_ = std::make_unique<SoundGrainSample>();
+  grain_b_ = std::make_unique<SoundGrainSample>();
   filename_ = filename;
   ImportFile(filename_);
   SetLoopMode(loop_mode);
@@ -165,6 +162,7 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   if (granular_spray_frames_ > 0) grain_idx += rand() % granular_spray_frames_;
 
   SoundGrainParams params = {
+      .grain_type = SoundGrainType::Sample,
       .dur_frames = duration_frames,
       .starting_idx = grain_idx,
       .reverse_mode = reverse_mode_,
@@ -186,12 +184,12 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
 }
 
 void Granulator::SwitchXFadeGrains() {
-  if (active_grain_ == &grain_a_) {
-    active_grain_ = &grain_b_;
-    incoming_grain_ = &grain_a_;
+  if (active_grain_ == grain_a_.get()) {
+    active_grain_ = grain_b_.get();
+    incoming_grain_ = grain_a_.get();
   } else {
-    active_grain_ = &grain_a_;
-    incoming_grain_ = &grain_b_;
+    active_grain_ = grain_a_.get();
+    incoming_grain_ = grain_b_.get();
   }
 }
 
@@ -298,62 +296,6 @@ void Granulator::Stop() {
 Granulator::~Granulator() {
   // TODO delete file
 }
-
-//////////////////////////// grain stuff //////////////////////////
-// looper functions continue below
-
-void SoundGrain::Initialize(SoundGrainParams params) {
-  grain_len_frames = params.dur_frames;
-  grain_frame_counter = 0;
-
-  audiobuffer_num_channels = params.num_channels;
-  degrade_by = params.degrade_by;
-
-  reverse_mode = params.reverse_mode;
-  if (params.reverse_mode) {
-    audiobuffer_cur_pos =
-        params.starting_idx + (params.dur_frames * params.num_channels) - 1;
-    incr = -1.0 * params.pitch;
-  } else {
-    audiobuffer_cur_pos = params.starting_idx;
-    incr = params.pitch;
-  }
-  audio_buffer = params.audio_buffer;
-
-  active = true;
-}
-
-StereoVal SoundGrain::Generate() {
-  StereoVal out = {0., 0.};
-  if (!active) return out;
-
-  if (degrade_by > 0) {
-    if (rand() % 100 < degrade_by) return out;
-  }
-
-  int read_idx = (int)audiobuffer_cur_pos;
-  check_idx(&read_idx, audio_buffer->size());
-
-  out.left = (*audio_buffer)[read_idx];
-  if (audiobuffer_num_channels == 1) {
-    out.right = out.left;
-  } else if (audiobuffer_num_channels == 2) {
-    int read_idx_right = read_idx + 1;
-    check_idx(&read_idx_right, audio_buffer->size());
-    out.right = (*audio_buffer)[read_idx_right];
-  }
-  audiobuffer_cur_pos += (incr * audiobuffer_num_channels);
-
-  grain_frame_counter++;
-
-  if (grain_frame_counter > grain_len_frames) {
-    active = false;
-  }
-
-  return out;
-}
-
-//////////////////////////// end of grain stuff //////////////////////////
 
 void Granulator::ImportFile(std::string filename) {
   AudioBufferDetails deetz = ImportFileContents(audio_buffer_, filename);
