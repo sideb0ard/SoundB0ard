@@ -37,6 +37,10 @@ struct DrumSettings {
   double distortion_threshold{0.5};
   double amplitude{1};
 
+  bool hard_sync{false};
+  double detune_cents{0};
+  double pulse_width_pct{50};
+
   // MOD RANGES
   double pitch_range{30};
   double q_range{7};
@@ -99,6 +103,7 @@ struct DrumSettings {
   bool lfo_master_filter_freq_enable{false};
   bool lfo_master_filter_q_enable{false};
   bool lfo_master_amp_enable{false};
+  bool lfo_pw_enable{false};
 };
 
 DrumSettings Map2DrumSettings(std::string name,

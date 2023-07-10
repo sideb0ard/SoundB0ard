@@ -94,6 +94,19 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
           (eg_out * settings_.q_range) - settings_.q_range / 2;
     }
 
+    if (settings_.lfo_pw_enable) {
+      // --- limits are 2% and 98%
+      double pulse_width = settings_.pulse_width_pct +
+                           lfo_out * (OSC_PULSEWIDTH_MAX - OSC_PULSEWIDTH_MIN) /
+                               OSC_PULSEWIDTH_MIN;
+
+      // --- bound the PWM to the range
+      pulse_width = fmin(pulse_width, OSC_PULSEWIDTH_MAX);
+      pulse_width = fmax(pulse_width, OSC_PULSEWIDTH_MIN);
+      osc1_->m_pulse_width = pulse_width;
+      osc2_->m_pulse_width = pulse_width;
+    }
+
     // note - if ENV and LFO are enabled, LFO mod will overwrite ENV
     if (settings_.lfo_filter1_freq_enable) {
       filter1_->SetFcMod(lfo_out * settings_.pitch_range);
@@ -125,6 +138,7 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
         base_frequency_ * settings_.osc1_ratio + osc1_mod_val * frequency_diff_;
     osc1_->Update();
     double osc1_out = osc1_->DoOscillate(nullptr) * settings_.osc1_amp;
+    if (osc1_->just_wrapped) osc2_->StartOscillator();
     if (settings_.filter1_enable) {
       osc1_out = filter1_->DoFilter(osc1_out);
     }
@@ -173,9 +187,13 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.pitch_range = val;
   } else if (name == "q_range") {
     settings_.q_range = val;
-  }
-
-  else if (name == "osc1") {
+  } else if (name == "sync") {
+    settings_.hard_sync = val;
+  } else if (name == "detune") {
+    if (val >= -100 && val <= 100) settings_.detune_cents = val;
+  } else if (name == "pw") {
+    if (val > 0 && val < 100) settings_.pulse_width_pct = val;
+  } else if (name == "osc1") {
     settings_.osc1_wav = val;
     osc1_->m_waveform = val;
   } else if (name == "o1amp") {
@@ -259,6 +277,8 @@ void DrumSynth::SetParam(std::string name, double val) {
 
   else if (name == "lfo_amp") {
     settings_.lfo_master_amp_enable = val;
+  } else if (name == "lfo_pw") {
+    settings_.lfo_pw_enable = val;
   } else if (name == "lfo_osc1") {
     settings_.lfo_osc1_pitch_enable = val;
   } else if (name == "lfo_osc2") {
@@ -271,7 +291,6 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.lfo_filter2_freq_enable = val;
   } else if (name == "lfo_filter2_q") {
     settings_.lfo_filter2_q_enable = val;
-
   } else if (name == "master_filter_en") {
     settings_.master_filter_enable = val;
   } else if (name == "mf_type") {
@@ -293,10 +312,12 @@ std::string DrumSynth::Info() {
     //    ss << ANSI_COLOR_CYAN;
     ss << COOL_COLOR_YELLOW_MELLOW;
   ss << "DrumZynth - " << COOL_COLOR_PINK2 << settings_.name
-     << COOL_COLOR_YELLOW_MELLOW << " - vol:" << volume
-     << " distort:" << settings_.distortion_threshold
+     << COOL_COLOR_YELLOW_MELLOW << " - vol:" << volume << std::endl;
+  ss << "     distort:" << settings_.distortion_threshold
      << " pitch_range:" << settings_.pitch_range
-     << " q_range:" << settings_.q_range << std::endl;
+     << " q_range:" << settings_.q_range << " sync:" << settings_.hard_sync
+     << " detune:" << settings_.detune_cents
+     << " pw:" << settings_.pulse_width_pct << std::endl;
   ss << "     osc1:" << GetOscType(settings_.osc1_wav) << "("
      << settings_.osc1_wav << ")"
      << " o1amp:" << settings_.osc1_amp << " o1ratio:" << settings_.osc1_ratio
@@ -332,6 +353,7 @@ std::string DrumSynth::Info() {
      << " lforate:" << settings_.lfo_rate << std::endl;
   ss << COOL_COLOR_YELLOW_MELLOW
      << "     lfo_amp:" << settings_.lfo_master_amp_enable << std::endl;
+  ss << "     lfo_pw:" << settings_.lfo_pw_enable << std::endl;
   ss << "     lfo_osc1:" << settings_.lfo_osc1_pitch_enable << std::endl;
   ss << "     lfo_osc2:" << settings_.lfo_osc2_pitch_enable << std::endl;
   ss << "     lfo_filter1_fc:" << settings_.lfo_filter1_freq_enable
@@ -418,6 +440,9 @@ void DrumSynth::Save(std::string new_preset_name) {
             << kSEP;
   presetzzz << "pitch_range=" << settings_.pitch_range << kSEP;
   presetzzz << "q_range=" << settings_.q_range << kSEP;
+  presetzzz << "sync=" << settings_.hard_sync << kSEP;
+  presetzzz << "detune=" << settings_.detune_cents << kSEP;
+  presetzzz << "pw=" << settings_.pulse_width_pct << kSEP;
   presetzzz << "osc1_wav=" << settings_.osc1_wav << kSEP;
   presetzzz << "osc1_amp=" << settings_.osc1_amp << kSEP;
   presetzzz << "osc1_ratio=" << settings_.osc1_ratio << kSEP;
@@ -460,6 +485,7 @@ void DrumSynth::Save(std::string new_preset_name) {
 
   presetzzz << "lfo_master_amp_enable=" << settings_.lfo_master_amp_enable
             << kSEP;
+  presetzzz << "lfo_pw_enable=" << settings_.lfo_pw_enable << kSEP;
   presetzzz << "lfo_osc1_pitch_enable=" << settings_.lfo_osc1_pitch_enable
             << kSEP;
   presetzzz << "lfo_osc2_pitch_enable=" << settings_.lfo_osc2_pitch_enable
@@ -479,22 +505,20 @@ void DrumSynth::Save(std::string new_preset_name) {
 }
 
 void DrumSynth::Update() {
-  filter1_->Update();
-  filter2_->Update();
-  master_filter_->Update();
-  osc1_->Update();
-  osc2_->Update();
-  eg_.Update();
-  lfo_.Update();
-}
-
-void DrumSynth::LoadSettings(DrumSettings settings) {
-  settings_ = settings;
-
   distortion_.SetParam("threshold", settings_.distortion_threshold);
 
   osc1_->m_waveform = settings_.osc1_wav;
+  osc1_->m_amplitude = settings_.osc1_amp;
+  osc1_->m_fo_ratio = settings_.osc1_ratio;
+  osc1_->m_pulse_width_control = settings_.pulse_width_pct;
+  osc1_->Update();
+
   osc2_->m_waveform = settings_.osc2_wav;
+  osc2_->m_amplitude = settings_.osc2_amp;
+  osc2_->m_fo_ratio = settings_.osc2_ratio;
+  osc2_->m_pulse_width_control = settings_.pulse_width_pct;
+  osc2_->m_cents = settings_.detune_cents;
+  osc2_->Update();
 
   filter1_->SetFcControl(settings_.filter1_fc);
   filter1_->SetQControl(settings_.filter1_q);
@@ -515,6 +539,15 @@ void DrumSynth::LoadSettings(DrumSettings settings) {
   lfo_.m_lfo_mode = settings_.lfo_mode;
   lfo_.m_fo = settings_.lfo_rate;
 
+  filter1_->Update();
+  filter2_->Update();
+  master_filter_->Update();
+  eg_.Update();
+  lfo_.Update();
+}
+
+void DrumSynth::LoadSettings(DrumSettings settings) {
+  settings_ = settings;
   Update();
 }
 
@@ -685,6 +718,12 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.pitch_range = dval;
     else if (key == "q_range")
       preset.q_range = dval;
+    else if (key == "sync")
+      preset.hard_sync = dval;
+    else if (key == "detune")
+      preset.detune_cents = dval;
+    else if (key == "pw")
+      preset.pulse_width_pct = dval;
     else if (key == "osc1_wav")
       preset.osc1_wav = dval;
     else if (key == "osc1_amp")
@@ -751,6 +790,8 @@ DrumSettings Map2DrumSettings(std::string name,
 
     else if (key == "lfo_master_amp_enable")
       preset.lfo_master_amp_enable = dval;
+    else if (key == "lfo_pw_enable")
+      preset.lfo_pw_enable = dval;
     else if (key == "lfo_osc1_pitch_enable")
       preset.lfo_osc1_pitch_enable = dval;
     else if (key == "lfo_osc2_pitch_enable")
