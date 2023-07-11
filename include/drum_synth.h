@@ -54,13 +54,21 @@ struct DrumSettings {
   double filter1_fc{10000};
   double filter1_q{1};
 
-  int osc2_wav{NOISE};
-  float osc2_amp{0};
+  int osc2_wav{SINE};
+  float osc2_amp{1};
   float osc2_ratio{1};
-  bool filter2_enable{true};
+  bool filter2_enable{false};
   unsigned int filter2_type{6};
   double filter2_fc{10000};
   double filter2_q{1};
+
+  int osc3_wav{NOISE};
+  float osc3_amp{0};
+  float osc3_ratio{1};
+  bool filter3_enable{true};
+  unsigned int filter3_type{6};
+  double filter3_fc{10000};
+  double filter3_q{1};
 
   // MASTER FILTER -> OUT
   bool master_filter_enable{false};
@@ -146,6 +154,10 @@ class DrumSynth : public SoundGenerator {
   std::unique_ptr<QBLimitedOscillator> osc2_;
   std::unique_ptr<MoogLadder> filter2_;
   // std::unique_ptr<CKThreeFive> filter2_;
+
+  std::unique_ptr<QBLimitedOscillator> osc3_;
+  std::unique_ptr<MoogLadder> filter3_;
+  // std::unique_ptr<CKThreeFive> filter3_;
 
   EnvelopeGenerator eg_;
   LFO lfo_;

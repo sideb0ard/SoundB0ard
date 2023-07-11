@@ -28,8 +28,10 @@ DrumSynth::DrumSynth() {
 
   osc1_ = std::make_unique<QBLimitedOscillator>();
   osc2_ = std::make_unique<QBLimitedOscillator>();
+  osc3_ = std::make_unique<QBLimitedOscillator>();
   filter1_ = std::make_unique<MoogLadder>();
   filter2_ = std::make_unique<MoogLadder>();
+  filter3_ = std::make_unique<MoogLadder>();
   master_filter_ = std::make_unique<MoogLadder>();
 
   // default
@@ -137,23 +139,37 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     osc1_->m_osc_fo =
         base_frequency_ * settings_.osc1_ratio + osc1_mod_val * frequency_diff_;
     osc1_->Update();
-    double osc1_out = osc1_->DoOscillate(nullptr) * settings_.osc1_amp;
-    if (osc1_->just_wrapped) osc2_->StartOscillator();
-    if (settings_.filter1_enable) {
-      osc1_out = filter1_->DoFilter(osc1_out);
-    }
 
     osc2_->m_osc_fo =
         base_frequency_ * settings_.osc1_ratio + osc2_mod_val * frequency_diff_;
     osc2_->Update();
-    double osc2_out = osc2_->DoOscillate(nullptr) * settings_.osc2_amp;
-    if (settings_.filter2_enable) {
-      osc2_out = filter2_->DoFilter(osc2_out);
+
+    osc3_->Update();
+    double osc3_out = osc3_->DoOscillate(nullptr) * settings_.osc3_amp;
+
+    double osc_mix = 0.;
+    if (settings_.hard_sync) {
+      osc1_->DoOscillate(nullptr);
+      if (osc1_->just_wrapped) osc2_->StartOscillator();
+      double osc2_out = osc2_->DoOscillate(nullptr) * settings_.osc2_amp;
+      if (settings_.filter2_enable) {
+        osc2_out = filter2_->DoFilter(osc2_out);
+      }
+      osc_mix = 0.666 * osc2_out + 0.333 * osc3_out;
+    } else {
+      double osc1_out = osc1_->DoOscillate(nullptr) * settings_.osc1_amp;
+      if (settings_.filter1_enable) {
+        osc1_out = filter1_->DoFilter(osc1_out);
+      }
+      double osc2_out = osc2_->DoOscillate(nullptr) * settings_.osc2_amp;
+      if (settings_.filter2_enable) {
+        osc2_out = filter2_->DoFilter(osc2_out);
+      }
+      osc_mix = 0.333 * osc1_out + 0.333 * osc2_out + 0.333 * osc3_out;
     }
 
     if (settings_.master_filter_enable) {
-      osc1_out = master_filter_->DoFilter(osc1_out);
-      osc2_out = master_filter_->DoFilter(osc2_out);
+      osc_mix = master_filter_->DoFilter(osc_mix);
     }
 
     //////////////////////////////
@@ -161,7 +177,7 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     double out_left = 0.0;
     double out_right = 0.0;
 
-    dca_.DoDCA(osc1_out + osc2_out, osc1_out + osc2_out, &out_left, &out_right);
+    dca_.DoDCA(osc_mix, osc_mix, &out_left, &out_right);
 
     out = {.left = out_left * volume * settings_.amplitude,
            .right = out_right * volume * settings_.amplitude};
@@ -231,6 +247,26 @@ void DrumSynth::SetParam(std::string name, double val) {
     filter2_->SetQControl(val);
   } else if (name == "f2_en") {
     settings_.filter2_enable = val;
+  }
+
+  else if (name == "osc3") {
+    settings_.osc3_wav = val;
+    osc3_->m_waveform = val;
+  } else if (name == "o3amp") {
+    settings_.osc3_amp = val;
+  } else if (name == "o3ratio") {
+    settings_.osc3_ratio = val;
+  } else if (name == "f3_type") {
+    settings_.filter3_type = val;
+    filter3_->SetType(val);
+  } else if (name == "f3_fc") {
+    settings_.filter3_fc = val;
+    filter3_->SetFcControl(val);
+  } else if (name == "f3_q") {
+    settings_.filter3_q = val;
+    filter3_->SetQControl(val);
+  } else if (name == "f3_en") {
+    settings_.filter3_enable = val;
   }
 
   else if (name == "eg_attack") {
@@ -316,7 +352,7 @@ std::string DrumSynth::Info() {
   ss << "     distort:" << settings_.distortion_threshold
      << " pitch_range:" << settings_.pitch_range
      << " q_range:" << settings_.q_range << " sync:" << settings_.hard_sync
-     << " detune:" << settings_.detune_cents
+     << " detune:" << settings_.detune_cents << " osc2.cents:" << osc2_->m_cents
      << " pw:" << settings_.pulse_width_pct << std::endl;
   ss << "     osc1:" << GetOscType(settings_.osc1_wav) << "("
      << settings_.osc1_wav << ")"
@@ -332,6 +368,13 @@ std::string DrumSynth::Info() {
      << settings_.filter2_type << ")"
      << " f2_fc:" << settings_.filter2_fc << " f2_q:" << settings_.filter2_q
      << " f2_en:" << settings_.filter2_enable << std::endl;
+  ss << "     osc3:" << GetOscType(settings_.osc3_wav) << "("
+     << settings_.osc3_wav << ")"
+     << " o3amp:" << settings_.osc3_amp << " o3ratio:" << settings_.osc3_ratio
+     << " f3_type:" << k_filter_type_names[settings_.filter3_type] << "("
+     << settings_.filter3_type << ")"
+     << " f3_fc:" << settings_.filter3_fc << " f3_q:" << settings_.filter3_q
+     << " f3_en:" << settings_.filter3_enable << std::endl;
   ss << COOL_COLOR_PINK2 << "     eg_attack:" << settings_.eg_attack_ms
      << " eg_decay:" << settings_.eg_decay_ms
      << " eg_sustain:" << settings_.eg_sustain_level
@@ -416,6 +459,9 @@ void DrumSynth::NoteOn(midi_event ev) {
   osc2_->m_osc_fo = starting_frequency_;
   osc2_->StartOscillator();
 
+  osc3_->m_osc_fo = base_frequency_;
+  osc3_->StartOscillator();
+
   lfo_.StartOscillator();
   //}
 
@@ -457,6 +503,13 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "filter2_type=" << settings_.filter2_type << kSEP;
   presetzzz << "filter2_fc=" << settings_.filter2_fc << kSEP;
   presetzzz << "filter2_q=" << settings_.filter2_q << kSEP;
+  presetzzz << "osc3_wav=" << settings_.osc3_wav << kSEP;
+  presetzzz << "osc3_amp=" << settings_.osc3_amp << kSEP;
+  presetzzz << "osc3_ratio=" << settings_.osc3_ratio << kSEP;
+  presetzzz << "filter3_enable=" << settings_.filter3_enable << kSEP;
+  presetzzz << "filter3_type=" << settings_.filter3_type << kSEP;
+  presetzzz << "filter3_fc=" << settings_.filter3_fc << kSEP;
+  presetzzz << "filter3_q=" << settings_.filter3_q << kSEP;
   presetzzz << "master_filter_enable=" << settings_.master_filter_enable
             << kSEP;
   presetzzz << "master_filter_type=" << settings_.master_filter_type << kSEP;
@@ -519,6 +572,12 @@ void DrumSynth::Update() {
   osc2_->m_pulse_width_control = settings_.pulse_width_pct;
   osc2_->m_cents = settings_.detune_cents;
   osc2_->Update();
+
+  // noise
+  osc3_->m_waveform = settings_.osc3_wav;
+  osc3_->m_amplitude = settings_.osc3_amp;
+  osc3_->m_fo_ratio = settings_.osc3_ratio;
+  osc3_->Update();
 
   filter1_->SetFcControl(settings_.filter1_fc);
   filter1_->SetQControl(settings_.filter1_q);

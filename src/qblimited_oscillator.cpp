@@ -14,9 +14,7 @@ double QBLimitedOscillator::DoOscillate(double *aux_output) {
 
   double out = 0.0;
 
-  just_wrapped = false;
   bool wrap = CheckWrapModulo();
-  if (wrap) just_wrapped = true;
 
   double calc_modulo = m_modulo + m_phase_mod;
   CheckWrapIndex(&calc_modulo);
