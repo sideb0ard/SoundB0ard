@@ -57,8 +57,8 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 
     ///////////
 
-    double osc1_mod_val = 0;
-    double osc2_mod_val = 0;
+    double osc1_mod_val = 1;
+    double osc2_mod_val = 1;
 
     if (settings_.eg_osc1_pitch_enable && settings_.lfo_osc1_pitch_enable)
       osc1_mod_val = eg_out * lfo_out;
@@ -136,12 +136,16 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     filter2_->Update();
     master_filter_->Update();
 
-    osc1_->m_osc_fo =
-        base_frequency_ * settings_.osc1_ratio + osc1_mod_val * frequency_diff_;
+    osc1_->SetFoModLin(osc1_mod_val);
+    if (settings_.pitch_bend)
+      osc1_->m_osc_fo = base_frequency_ * settings_.osc1_ratio +
+                        osc1_mod_val * frequency_diff_;
     osc1_->Update();
 
-    osc2_->m_osc_fo =
-        base_frequency_ * settings_.osc1_ratio + osc2_mod_val * frequency_diff_;
+    osc2_->SetFoModLin(osc2_mod_val);
+    if (settings_.pitch_bend)
+      osc2_->m_osc_fo = base_frequency_ * settings_.osc2_ratio +
+                        osc2_mod_val * frequency_diff_;
     osc2_->Update();
 
     osc3_->Update();
@@ -199,6 +203,8 @@ void DrumSynth::SetParam(std::string name, double val) {
   if (name == "distort") {
     settings_.distortion_threshold = val;
     distortion_.SetParam("threshold", val);
+  } else if (name == "pb") {
+    settings_.pitch_bend = val;
   } else if (name == "pitch_range") {
     settings_.pitch_range = val;
   } else if (name == "q_range") {
@@ -301,6 +307,8 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.eg_osc1_pitch_enable = val;
   } else if (name == "eg_o2_ptch") {
     settings_.eg_osc2_pitch_enable = val;
+  } else if (name == "eg_o3_ptch") {
+    settings_.eg_osc3_pitch_enable = val;
   } else if (name == "eg_f1_fc") {
     settings_.eg_filter1_freq_enable = val;
   } else if (name == "eg_f1_q") {
@@ -309,6 +317,14 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.eg_filter2_freq_enable = val;
   } else if (name == "eg_f2_q") {
     settings_.eg_filter2_q_enable = val;
+  } else if (name == "eg_f3_fc") {
+    settings_.eg_filter3_freq_enable = val;
+  } else if (name == "eg_f3_q") {
+    settings_.eg_filter3_q_enable = val;
+  } else if (name == "eg_master_fc") {
+    settings_.eg_master_filter_freq_enable = val;
+  } else if (name == "eg_master_q") {
+    settings_.eg_master_filter_q_enable = val;
   }
 
   else if (name == "lfo_amp") {
@@ -327,6 +343,10 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.lfo_filter2_freq_enable = val;
   } else if (name == "lfo_filter2_q") {
     settings_.lfo_filter2_q_enable = val;
+  } else if (name == "lfo_master_fc") {
+    settings_.lfo_master_filter_freq_enable = val;
+  } else if (name == "lfo_master_q") {
+    settings_.lfo_master_filter_q_enable = val;
   } else if (name == "master_filter_en") {
     settings_.master_filter_enable = val;
   } else if (name == "mf_type") {
@@ -353,7 +373,8 @@ std::string DrumSynth::Info() {
      << " pitch_range:" << settings_.pitch_range
      << " q_range:" << settings_.q_range << " sync:" << settings_.hard_sync
      << " detune:" << settings_.detune_cents << " osc2.cents:" << osc2_->m_cents
-     << " pw:" << settings_.pulse_width_pct << std::endl;
+     << " pw:" << settings_.pulse_width_pct << " pb:" << settings_.pitch_bend
+     << std::endl;
   ss << "     osc1:" << GetOscType(settings_.osc1_wav) << "("
      << settings_.osc1_wav << ")"
      << " o1amp:" << settings_.osc1_amp << " o1ratio:" << settings_.osc1_ratio
@@ -384,10 +405,16 @@ std::string DrumSynth::Info() {
   ss << COOL_COLOR_YELLOW_MELLOW
      << "     eg_o1_ptch:" << settings_.eg_osc1_pitch_enable << std::endl;
   ss << "     eg_o2_ptch:" << settings_.eg_osc2_pitch_enable << std::endl;
+  ss << "     eg_o3_ptch:" << settings_.eg_osc3_pitch_enable << std::endl;
   ss << "     eg_f1_fc:" << settings_.eg_filter1_freq_enable << std::endl;
   ss << "     eg_f1_q:" << settings_.eg_filter1_q_enable << std::endl;
   ss << "     eg_f2_fc:" << settings_.eg_filter2_freq_enable << std::endl;
   ss << "     eg_f2_q:" << settings_.eg_filter2_q_enable << std::endl;
+  ss << "     eg_f3_fc:" << settings_.eg_filter3_freq_enable << std::endl;
+  ss << "     eg_f3_q:" << settings_.eg_filter3_q_enable << std::endl;
+  ss << "     eg_master_fc:" << settings_.eg_master_filter_freq_enable
+     << std::endl;
+  ss << "     eg_master_q:" << settings_.eg_master_filter_q_enable << std::endl;
   ss << COOL_COLOR_PINK2
      << "     lfowav:" << k_lfo_wave_names[settings_.lfo_wave] << "("
      << settings_.lfo_wave << ")"
@@ -399,12 +426,20 @@ std::string DrumSynth::Info() {
   ss << "     lfo_pw:" << settings_.lfo_pw_enable << std::endl;
   ss << "     lfo_osc1:" << settings_.lfo_osc1_pitch_enable << std::endl;
   ss << "     lfo_osc2:" << settings_.lfo_osc2_pitch_enable << std::endl;
+  ss << "     lfo_osc3:" << settings_.lfo_osc3_pitch_enable << std::endl;
   ss << "     lfo_filter1_fc:" << settings_.lfo_filter1_freq_enable
      << std::endl;
   ss << "     lfo_filter1_q:" << settings_.lfo_filter1_q_enable << std::endl;
   ss << "     lfo_filter2_fc:" << settings_.lfo_filter2_freq_enable
      << std::endl;
   ss << "     lfo_filter2_q:" << settings_.lfo_filter2_q_enable << std::endl;
+  ss << "     lfo_filter3_fc:" << settings_.lfo_filter3_freq_enable
+     << std::endl;
+  ss << "     lfo_filter3_q:" << settings_.lfo_filter3_q_enable << std::endl;
+  ss << "     lfo_master_fc:" << settings_.lfo_master_filter_freq_enable
+     << std::endl;
+  ss << "     lfo_master_q:" << settings_.lfo_master_filter_q_enable
+     << std::endl;
   ss << COOL_COLOR_PINK2
      << "     master_filter_en:" << settings_.master_filter_enable
      << " mf_type:" << k_filter_type_names[settings_.master_filter_type] << "("
@@ -453,10 +488,16 @@ void DrumSynth::NoteOn(midi_event ev) {
   frequency_diff_ = starting_frequency_ - base_frequency_;
 
   // if (!osc1_->m_note_on) {
-  osc1_->m_osc_fo = starting_frequency_;
+  if (settings_.pitch_bend)
+    osc1_->m_osc_fo = starting_frequency_;
+  else
+    osc1_->m_osc_fo = base_frequency_;
   osc1_->StartOscillator();
 
-  osc2_->m_osc_fo = starting_frequency_;
+  if (settings_.pitch_bend)
+    osc2_->m_osc_fo = starting_frequency_;
+  else
+    osc2_->m_osc_fo = base_frequency_;
   osc2_->StartOscillator();
 
   osc3_->m_osc_fo = base_frequency_;
@@ -489,6 +530,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "sync=" << settings_.hard_sync << kSEP;
   presetzzz << "detune=" << settings_.detune_cents << kSEP;
   presetzzz << "pw=" << settings_.pulse_width_pct << kSEP;
+  presetzzz << "pb=" << settings_.pitch_bend << kSEP;
   presetzzz << "osc1_wav=" << settings_.osc1_wav << kSEP;
   presetzzz << "osc1_amp=" << settings_.osc1_amp << kSEP;
   presetzzz << "osc1_ratio=" << settings_.osc1_ratio << kSEP;
@@ -529,12 +571,21 @@ void DrumSynth::Save(std::string new_preset_name) {
             << kSEP;
   presetzzz << "eg_osc2_pitch_enable=" << settings_.eg_osc2_pitch_enable
             << kSEP;
+  presetzzz << "eg_osc3_pitch_enable=" << settings_.eg_osc3_pitch_enable
+            << kSEP;
   presetzzz << "eg_filter1_freq_enable=" << settings_.eg_filter1_freq_enable
             << kSEP;
   presetzzz << "eg_filter1_q_enable=" << settings_.eg_filter1_q_enable << kSEP;
   presetzzz << "eg_filter2_freq_enable=" << settings_.eg_filter2_freq_enable
             << kSEP;
   presetzzz << "eg_filter2_q_enable=" << settings_.eg_filter2_q_enable << kSEP;
+  presetzzz << "eg_filter3_freq_enable=" << settings_.eg_filter3_freq_enable
+            << kSEP;
+  presetzzz << "eg_filter3_q_enable=" << settings_.eg_filter3_q_enable << kSEP;
+  presetzzz << "eg_master_freq_enable="
+            << settings_.eg_master_filter_freq_enable << kSEP;
+  presetzzz << "eg_master_q_enable=" << settings_.eg_master_filter_q_enable
+            << kSEP;
 
   presetzzz << "lfo_master_amp_enable=" << settings_.lfo_master_amp_enable
             << kSEP;
@@ -550,6 +601,10 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "lfo_filter2_freq_enable=" << settings_.lfo_filter2_freq_enable
             << kSEP;
   presetzzz << "lfo_filter2_q_enable=" << settings_.lfo_filter2_q_enable
+            << kSEP;
+  presetzzz << "lfo_filter3_freq_enable=" << settings_.lfo_filter3_freq_enable
+            << kSEP;
+  presetzzz << "lfo_filter3_q_enable=" << settings_.lfo_filter3_q_enable
             << kSEP;
 
   presetzzz << std::endl;
@@ -699,6 +754,7 @@ void DrumSynth::Randomize() {
   rand_settings.distortion_threshold = 0.7;
   rand_settings.amplitude = 1;
 
+  rand_settings.pitch_bend = BoolGen();
   rand_settings.pitch_range = rand() % 30 + 10;
   rand_settings.q_range = rand() % 7 + 1;
 
@@ -717,6 +773,14 @@ void DrumSynth::Randomize() {
   rand_settings.filter2_fc = rand() % 10000 + 2000;
   rand_settings.filter2_q = rand() % 8 + 1;
   rand_settings.osc2_ratio = rand() % 4 + 1;
+
+  rand_settings.osc3_wav = rand() % MAX_OSC;
+  rand_settings.osc3_amp = (float)rand() / RAND_MAX;
+  rand_settings.filter3_enable = BoolGen();
+  rand_settings.filter3_type = rand() % NUM_FILTER_TYPES;
+  rand_settings.filter3_fc = rand() % 10000 + 3000;
+  rand_settings.filter3_q = rand() % 8 + 1;
+  rand_settings.osc3_ratio = rand() % 4 + 1;
 
   // rand_settings.master_filter_enable = BoolGen();
   // rand_settings.master_filter_type = rand() % NUM_FILTER_TYPES;
@@ -773,6 +837,8 @@ DrumSettings Map2DrumSettings(std::string name,
     std::cout << "KEY:" << key << " VAL:" << dval << std::endl;
     if (key == "distortion_threshold")
       preset.distortion_threshold = dval;
+    else if (key == "pb")
+      preset.pitch_bend = dval;
     else if (key == "pitch_range")
       preset.pitch_range = dval;
     else if (key == "q_range")
@@ -811,6 +877,20 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.filter2_fc = dval;
     else if (key == "filter2_q")
       preset.filter2_q = dval;
+    else if (key == "osc3_wav")
+      preset.osc3_wav = dval;
+    else if (key == "osc3_amp")
+      preset.osc3_amp = dval;
+    else if (key == "osc3_ratio")
+      preset.osc3_ratio = dval;
+    else if (key == "filter3_enable")
+      preset.filter3_enable = dval;
+    else if (key == "filter3_type")
+      preset.filter3_type = dval;
+    else if (key == "filter3_fc")
+      preset.filter3_fc = dval;
+    else if (key == "filter3_q")
+      preset.filter3_q = dval;
     else if (key == "eg_attack_ms")
       preset.eg_attack_ms = dval;
     else if (key == "eg_decay_ms")
@@ -834,6 +914,8 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.eg_osc1_pitch_enable = dval;
     else if (key == "eg_osc2_pitch_enable")
       preset.eg_osc2_pitch_enable = dval;
+    else if (key == "eg_osc3_pitch_enable")
+      preset.eg_osc3_pitch_enable = dval;
     else if (key == "eg_filter1_freq_enable")
       preset.eg_filter1_freq_enable = dval;
     else if (key == "eg_filter1_q_enable")
@@ -842,6 +924,10 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.eg_filter2_freq_enable = dval;
     else if (key == "eg_filter2_q_enable")
       preset.eg_filter2_q_enable = dval;
+    else if (key == "eg_filter3_freq_enable")
+      preset.eg_filter3_freq_enable = dval;
+    else if (key == "eg_filter3_q_enable")
+      preset.eg_filter3_q_enable = dval;
     else if (key == "eg_master_filter_freq_enable")
       preset.eg_master_filter_freq_enable = dval;
     else if (key == "eg_master_filter_q_enable")

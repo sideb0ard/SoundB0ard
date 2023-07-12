@@ -42,6 +42,7 @@ struct DrumSettings {
   double pulse_width_pct{50};
 
   // MOD RANGES
+  bool pitch_bend{true};
   double pitch_range{30};
   double q_range{7};
 
@@ -95,19 +96,25 @@ struct DrumSettings {
   // EG ->
   bool eg_osc1_pitch_enable{false};
   bool eg_osc2_pitch_enable{false};
+  bool eg_osc3_pitch_enable{false};
   bool eg_filter1_freq_enable{false};
   bool eg_filter1_q_enable{false};
   bool eg_filter2_freq_enable{false};
   bool eg_filter2_q_enable{false};
+  bool eg_filter3_freq_enable{false};
+  bool eg_filter3_q_enable{false};
   bool eg_master_filter_freq_enable{false};
   bool eg_master_filter_q_enable{false};
   // LFO ->
   bool lfo_osc1_pitch_enable{false};
   bool lfo_osc2_pitch_enable{false};
+  bool lfo_osc3_pitch_enable{false};
   bool lfo_filter1_freq_enable{false};
   bool lfo_filter1_q_enable{false};
   bool lfo_filter2_freq_enable{false};
   bool lfo_filter2_q_enable{false};
+  bool lfo_filter3_freq_enable{false};
+  bool lfo_filter3_q_enable{false};
   bool lfo_master_filter_freq_enable{false};
   bool lfo_master_filter_q_enable{false};
   bool lfo_master_amp_enable{false};

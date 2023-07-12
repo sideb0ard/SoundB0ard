@@ -362,6 +362,22 @@ let stepper = fn(sg, pat, read_idx, play_idx, d)
     }
   }
 }
+let dstepper = fn(sg, sg2, pat, read_idx, play_idx, d)
+{
+  if (type(pat[read_idx]) == "ARRAY") {
+    note_on_at(sg, pat[read_idx][0], play_idx * pp);
+  } else {
+    if (pat[read_idx] > 0) {
+      let v = 100 + rand(27);
+      if (play_idx % 2 == 0) {
+        v = 127;
+      }
+      note_on_at(sg, pat[read_idx], play_idx * pp, dur = d, vel = v);
+    } else {
+      note_on_at(sg2, pat[rand(len(pat))], play_idx * pp, dur = d, vel = v);
+    }
+  }
+}
 let cstepper = fn(sg, pat, read_idx, play_idx)
 {
   if (type(pat[read_idx]) == "ARRAY") {
