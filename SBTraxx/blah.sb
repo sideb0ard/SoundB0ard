@@ -1,0 +1,70 @@
+
+let hhdrumbeat = [0, 3, 10];
+let hhsnrbeat1 = [4, 12];
+#let hhsnrbeat2 = [4, 12, 20, 23, 25, 28, 30];
+
+let dnote = 4;
+let snote = 10;
+
+let randomOffset = fn()
+{
+  return rand(pp/2) - pp/2;
+}
+
+let beeeat = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    let doofset = randomOffset();
+    let soofset = randomOffset();
+    if (count % 8 < 7) {
+      for (i = 0; i < len(hhdrumbeat); ++i) {
+        note_on_at(bd, dnote, hhdrumbeat[i] * pp + doofset);
+      }
+    }
+    if (count % 15 < 13) {
+      for (i = 0; i < len(hhsnrbeat1); ++i) {
+        note_on_at(sd, snote, hhsnrbeat1[i] * pp + soofset);
+      }
+    }
+
+    if (count % 2 == 1) {
+      note_on_at(bd, dnote, 13 * pp + doofset);
+      note_on_at(sd, snote, 15 * pp + soofset);
+      if (rand(100) > 60) {
+        note_on_at(sd, snote, 7 * pp + soofset);
+        note_on_at(sd, snote, 9 * pp + soofset);
+      }
+    }
+
+  }
+}
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let mel = [34, 0, 30, 0, 33, 0, 35, 0, 25, 0, 37, 0, 32, 0, 35, 0];
+    #let mel = [54, 0, 50, 0, 43, 0, 55, 0, 45, 0, 47, 0, 52, 0, 45, 0];
+    let mmax = 3;
+    let ix = 0;
+    let d = 50;
+  }
+  run()
+  {
+    if (count % 8 < 6 ) {
+      for (i = 0; i < 16; ++i) {
+        stepper(hh, mel, ix, i, d);
+        ix = incr(ix, 0, mmax);
+        d = d + 10;
+        if (d > 400) {
+          d = 50;
+        }
+      }
+      mmax = incr(mmax, 3, 16);
+    }
+  }
+}

@@ -823,7 +823,7 @@ DrumSettings Map2DrumSettings(std::string name,
   preset.name = name;
 
   for (auto &[key, dval] : preset_vals) {
-    std::cout << "KEY:" << key << " VAL:" << dval << std::endl;
+    // std::cout << "KEY:" << key << " VAL:" << dval << std::endl;
     if (key == "distortion_threshold")
       preset.distortion_threshold = dval;
     else if (key == "pb")

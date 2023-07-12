@@ -1,0 +1,92 @@
+
+# C1
+let Key = 24;
+let bdnote = 12;
+let sdnote = 36;
+
+let drmz_gen = gen()
+{
+  setup()
+  {
+    let bjz = [3, 5, 7, 11];
+    let bx = 0;
+    let dr = 50;
+  }
+  run()
+  {
+    if (count % 16 == 15) {
+      play_array(bd, combinor(bjork(bjz[bx],16), [bdnote]));
+      bx = incr(bx, 0, len(bjz));
+    } else {
+      for (i = 0; i < 16; ++i) {
+        if (i % 8 == 0) {
+          note_on_at(bd, bdnote, i * pp);
+        }
+        if (i % 8 == 6) {
+          note_on_at(sd, sdnote, i * pp - 30, dur = dr);
+        }
+      }
+      dr = dr + 100;
+      if (dr > 1000) {
+        dr = 100;
+      }
+      if (count % 4 == 0) {
+        note_on_at(bd, bdnote + 12, 14 * pp + rand(30) - 15, vel = 120, dur = 1000);
+        if (rand(100) > 60) {
+          note_on_at(bd, bdnote + 12, 13 * pp + rand(30) - 15, vel = rand(120), dur = 1000);
+        }
+        note_on_at(sd, sdnote, 10 * pp, vel = 60, dur = dr);
+        note_on_at(sd, sdnote, 11 * pp - rand(70), vel = 50, dur = dr);
+      }
+    }
+  }
+}
+
+# p4 < osc 4 "0.1 0.5" "send(0, [sd, hh], %);"
+let hhnote = 48;
+let hhblah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [16, 8, 12, 2, 4, 16];
+    let lx = 0;
+    let sw = 20;
+  }
+  run()
+  {
+    if (count % 13 < 12) {
+      let pp = 3840 / lenz[lx];
+      for (i = 0; i < lenz[lx]; ++i) {
+        let off = 0;
+        if (i % 2 == 1) {
+          off = sw;
+        }
+        note_on_at(hh, hhnote, i * pp + off);
+      }
+      lx = incr(lx, 0, len(lenz));
+    }
+  }
+}
+
+let pblah_gen = gen()
+{
+  setup()
+  {
+    let mel = notes_in_key(24);
+    let pat = rand_array(16, 0, 4);
+    # let percz = [per1, per2, cb, cl];
+    let percz = [per1, cb];
+  }
+  run()
+  {
+    if (count % 8 == 0) {
+      pat = rand_array(16, 0, 4);
+    }
+    for (i = 0; i < 16; ++i) {
+      if (pat[i] < len(percz)) {
+        note_on_at(percz[pat[i]], 12, i * pp);
+      }
+    }
+  }
+}
+

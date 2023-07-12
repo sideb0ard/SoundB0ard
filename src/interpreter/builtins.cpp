@@ -1899,48 +1899,50 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
        return evaluator::NULLL;
      })},
-    {"kit", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
-                    -> std::shared_ptr<object::Object> {
-                  (void)args;
-                  std::string cmd = "let bd = drum();";
-                  eval_command_queue.push(cmd);
+    {"kit",
+     std::make_shared<
+         object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)
+                              -> std::shared_ptr<object::Object> {
+       (void)args;
+       std::string cmd = "let bd = drum(); load_preset(bd,\"baDUM\");";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let sd = drum(); vol sd 0.3";
-                  eval_command_queue.push(cmd);
+       cmd = "let sd = drum(); load_preset(sd, \"CLP\");";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let cp = drum(); vol cp 0.5;";
-                  eval_command_queue.push(cmd);
+       cmd = "let cp = drum(); vol cp 0.7;";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let cl = drum(); vol cl 0.5;";
-                  eval_command_queue.push(cmd);
+       cmd = "let cl = drum(); vol cl 0.7;";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let cb = drum(); vol cb 0.5;";
-                  eval_command_queue.push(cmd);
+       cmd = "let cb = drum(); vol cb 0.7; load_preset(cb, \"MFFF\");";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let hh = drum(); vol hh 0.3;";
-                  eval_command_queue.push(cmd);
+       cmd = "let hh = drum(); vol hh 0.3; load_preset(hh, \"HIZHZ\");";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let oh = drum(); vol oh 0.3;";
-                  eval_command_queue.push(cmd);
+       cmd = "let oh = drum(); vol oh 0.3;";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let per1 = drum(); vol per1 0.5;";
-                  eval_command_queue.push(cmd);
+       cmd = "let per1 = drum(); vol per1 0.7; load_preset(per1, \"GALZIAN\");";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let per2 = drum(); vol per2 0.5;";
-                  eval_command_queue.push(cmd);
+       cmd =
+           "let per2 = drum(); vol per2 0.5; load_preset(per2, \"WEIRDBIT\");";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let per3 = drum(); vol per3 0.5;";
-                  eval_command_queue.push(cmd);
+       cmd = "let per3 = drum(); vol per3 0.5;";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let dx = fm(); vol dx 0.8;";
-                  eval_command_queue.push(cmd);
+       cmd = "let dx = fm(); vol dx 0.8;";
+       eval_command_queue.push(cmd);
 
-                  cmd = "let dx2 = fm(); vol dx2 0.7;";
-                  eval_command_queue.push(cmd);
+       cmd = "let dx2 = fm(); vol dx2 0.7; load_preset(dx2, \"fnc\");";
+       eval_command_queue.push(cmd);
 
-                  return evaluator::NULLL;
-                })},
+       return evaluator::NULLL;
+     })},
     {"load_dir", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
@@ -2290,8 +2292,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              } else {
                std::cerr << "OOFT, NEED AN ARRAY TAE PLAY!\n";
              }
-           } else
+           } else {
              play_array(args[0], 1, dur, vel);
+           }
 
            return evaluator::NULLL;
          })},
