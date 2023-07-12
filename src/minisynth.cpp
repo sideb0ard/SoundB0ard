@@ -1083,14 +1083,6 @@ void MiniSynth::Save(std::string new_preset_name) {
   return;
 }
 
-void MiniSynth::ListPresets() {
-  // TODO - implement this properly!
-  auto preset_names = GetSynthPresets(MINISYNTH_TYPE);
-  for (const auto &n : preset_names) {
-    std::cout << n << std::endl;
-  }
-}
-
 void MiniSynth::LoadPreset(std::string preset_name,
                            std::map<std::string, double> preset) {
   strncpy(m_settings.m_settings_name, preset_name.c_str(), 256);

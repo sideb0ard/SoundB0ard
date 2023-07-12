@@ -1468,21 +1468,24 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                                   << args_size << std::endl;
                       return evaluator::NULLL;
                     })},
-    {"list_presets", std::make_shared<object::BuiltIn>(
-                         [](std::vector<std::shared_ptr<object::Object>> args)
-                             -> std::shared_ptr<object::Object> {
-                           int args_size = args.size();
-                           if (args_size == 1) {
-                             auto cmd_name =
-                                 std::make_shared<object::String>("list");
-                             args.push_back(cmd_name);
-                             auto action = std::make_unique<AudioActionItem>(
-                                 AudioAction::LIST_PRESETS);
-                             action->args = args;
-                             audio_queue.push(std::move(action));
-                           }
-                           return evaluator::NULLL;
-                         })},
+    {"list_presets",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+
+           if (args_size == 1) {
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             auto sg_type = soundgen->soundgenerator_type;
+             if (HasPresets(sg_type)) {
+               auto preset_names = GetSynthPresets(sg_type);
+
+               for (const auto &p : preset_names) std::cout << p << std::endl;
+             }
+           }
+           return evaluator::NULLL;
+         })},
     {"load_preset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

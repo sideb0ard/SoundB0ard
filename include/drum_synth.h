@@ -142,7 +142,6 @@ class DrumSynth : public SoundGenerator {
   void LoadPreset(std::string name,
                   std::map<std::string, double> preset_vals) override;
   void Save(std::string name) override;
-  void ListPresets() override;
   void Update();
 
   void LoadSettings(DrumSettings settings);

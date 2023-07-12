@@ -39,8 +39,6 @@ class SoundGenerator {
     (void)preset_name;
     (void)preset;
   }
-  virtual void ListPresets();
-
   virtual void Control(midi_event ev) { (void)ev; };
   virtual void PitchBend(midi_event ev) { (void)ev; };
   virtual void Randomize(){};

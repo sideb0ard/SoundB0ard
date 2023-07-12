@@ -665,17 +665,6 @@ void DrumSynth::LoadSettings(DrumSettings settings) {
   Update();
 }
 
-void DrumSynth::ListPresets() {
-  FILE *presetzzz = fopen(DRUM_PRESET_FILENAME, "r+");
-  if (presetzzz == NULL) return;
-
-  char line[256];
-  while (fgets(line, sizeof(line), presetzzz)) {
-    printf("%s\n", line);
-  }
-
-  fclose(presetzzz);
-}
 void DrumSynth::PrintSettings(DrumSettings settingz) {
   std::cout << "AAIIGht, settings for" << settingz.name << std::endl;
 

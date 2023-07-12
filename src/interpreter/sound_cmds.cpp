@@ -85,14 +85,9 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args) {
       std::shared_ptr<object::String> str_obj =
           std::dynamic_pointer_cast<object::String>(args[1]);
       if (str_obj) {
-        if (str_obj->value_ == "list") {
-          mixr->sound_generators_[soundgen->soundgen_id_]->ListPresets();
-        } else if (args.size() == 3) {
+        if (args.size() == 3) {
           std::shared_ptr<object::String> str_cmd =
               std::dynamic_pointer_cast<object::String>(args[2]);
-          // if (str_cmd->value_ == "load")
-          //   sg->Load(str_obj->value_);
-          //   TODO - OFFLOAD THIS FROM AUDIO THREAD
           if (str_cmd->value_ == "save")
             mixr->sound_generators_[soundgen->soundgen_id_]->Save(
                 str_obj->value_);

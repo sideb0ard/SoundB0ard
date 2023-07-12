@@ -1383,11 +1383,4 @@ void DXSynth::SetParam(std::string name, double val) {
   Update();
 }
 
-void DXSynth::ListPresets() {
-  auto preset_names = GetSynthPresets(DXSYNTH_TYPE);
-  for (const auto &n : preset_names) {
-    std::cout << n << std::endl;
-  }
-}
-
 }  // namespace SBAudio

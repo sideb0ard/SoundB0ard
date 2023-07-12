@@ -190,7 +190,6 @@ class MiniSynth : public SoundGenerator {
   void Randomize() override;
   void SetParam(std::string name, double val) override;
   void Save(std::string preset_name) override;
-  void ListPresets() override;
   void LoadPreset(std::string preset_name,
                   std::map<std::string, double> preset) override;
 

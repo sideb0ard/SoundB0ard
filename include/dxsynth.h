@@ -106,7 +106,6 @@ class DXSynth : public SoundGenerator {
   void LoadPreset(std::string preset_name,
                   std::map<std::string, double> preset) override;
   void Save(std::string preset_name) override;
-  void ListPresets() override;
 
  public:
   std::array<std::shared_ptr<DXSynthVoice>, MAX_VOICES> voices_;
