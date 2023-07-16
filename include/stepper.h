@@ -4,7 +4,7 @@
 
 namespace SBAudio {
 
-enum class Direction {
+enum Direction {
   Forward,
   Back,
 };
@@ -14,22 +14,29 @@ enum class BoundaryBehavior {
   BounceBack,
 };
 
-class Dealer {
+class Stepper {
  public:
-  Dealer() = default;
-  Dealer(std::vector<double> sequence) : sequence_{sequence} {}
-  ~Dealer() = default;
+  Stepper() = default;
+  Stepper(std::vector<double> sequence)
+      : sequence_{sequence}, count_to_{sequence.size()} {}
+  ~Stepper() = default;
 
-  void SetSequence(std::vector<double> sequence) { sequence_ = sequence; }
+  void SetSequence(std::vector<double> sequence) {
+    sequence_ = sequence;
+    count_to_ = sequence.size();
+  }
   void SetParam(std::string param, double value);
   double GenNext();
 
  public:
   std::vector<double> sequence_;
-  Direction direction_{Direction::Forward};
   BoundaryBehavior behavior_{BoundaryBehavior::BounceBack};
   int step_{1};
+  int start_at_{0};
+  size_t count_to_{0};
+
   int idx_{0};
+  Direction direction_{Direction::Forward};
 };
 
 }  // namespace SBAudio

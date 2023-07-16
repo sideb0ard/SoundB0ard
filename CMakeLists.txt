@@ -75,17 +75,17 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 #
 add_executable(
-  dealer_test
-  tests/dealer_test.cpp
-  src/dealer.cpp
+  stepper_test
+  tests/stepper_test.cpp
+  src/stepper.cpp
 )
 
-target_include_directories(dealer_test PRIVATE ${Sbsh_INCLUDE_DIRS})
-target_include_directories(dealer_test PRIVATE ${HomebrewIncDir})
+target_include_directories(stepper_test PRIVATE ${Sbsh_INCLUDE_DIRS})
+target_include_directories(stepper_test PRIVATE ${HomebrewIncDir})
 target_link_libraries(
-  dealer_test
+  stepper_test
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(dealer_test)
+gtest_discover_tests(stepper_test)

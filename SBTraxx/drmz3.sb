@@ -1,0 +1,48 @@
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let d= 50;
+    let drift = 10;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (i % 8 == 4) {
+        note_on_at(hh, 10, i * pp, vel = 20);
+      }
+      if (i % 16 == 0) {
+        note_on_at(bd, 11, i*pp);
+      }
+      if (count % 2 == 0 && i == 12) {
+        note_on_at(per1, 23, i * pp + drift, dur = d);
+        d = d + 50;
+        if (d > 500) {
+          d = 50;
+        }
+      }
+
+    }
+    if (count % 2 == 0) {
+      note_on_at(bd, 11, 11*pp + drift, vel = 80, dur = d);
+    }
+    if (count % 3 == 0) {
+      note_on_at(bd, 11, 3*pp + drift, vel = 60);
+      note_on_at(bd, 11, 9*pp + drift, vel = 80, dur =d);
+      note_on_at(hh, 10, 15 * pp, vel = 20);
+    }
+
+    drift = drift + 20;
+    if (drift > 100) {
+      drift = 10;
+    }
+
+    if (count % 8 == 6) {
+      note_on_at(per1, 35, 1 * pp + drift, dur = d);
+      note_on_at(dx2, 11, 2 * pp + drift, dur = d, vel = 20);
+    }
+
+  }
+}
+
