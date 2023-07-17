@@ -217,6 +217,16 @@ class SynthExpression : public Expression {
   std::string sample_path_{};  // used in digi synth
 };
 
+class StepSequencerExpression : public Expression {
+ public:
+  StepSequencerExpression() {}
+  explicit StepSequencerExpression(Token token) : Expression{token} {}
+  std::string String() const override;
+
+ public:
+  std::shared_ptr<Expression> sequence_{nullptr};
+};
+
 class SynthPresetExpression : public Expression {
  public:
   SynthPresetExpression() {}

@@ -2,15 +2,16 @@
 
 #include <array>
 #include <functional>
-#include <interpreter/ast.hpp>
 #include <map>
 #include <memory>
-#include <pattern_parser/ast.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "defjams.h"
+#include "interpreter/ast.hpp"
+#include "pattern_parser/ast.hpp"
+#include "stepper.h"
 
 namespace object {
 
@@ -40,6 +41,7 @@ constexpr char HASH_OBJ[] = "HASH";
 
 constexpr char PROCESS_OBJ[] = "PROCESS";
 constexpr char PATTERN_OBJ[] = "PATTERN";
+constexpr char STEP_SEQUENCER_OBJ[] = "STEP SEQUENCER";
 
 constexpr char SYNTH_OBJ[] = "SYNTH";
 constexpr char SAMPLE_OBJ[] = "SAMPLE";
@@ -356,6 +358,17 @@ class BuiltIn : public Object {
 
  public:
   BuiltInFunc func_;
+};
+
+class StepSequencer : public Object {
+ public:
+  StepSequencer(std::vector<double> sequence) : steppa_{sequence} {}
+  ~StepSequencer() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
+
+ public:
+  SBAudio::Stepper steppa_;
 };
 
 /////////////////////////////////////////////////

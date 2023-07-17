@@ -39,6 +39,9 @@ std::shared_ptr<object::Object> EvalProcessSetStatement(
     std::shared_ptr<ast::ProcessSetStatement> proc,
     std::shared_ptr<object::Environment> env);
 
+std::shared_ptr<object::Object> EvalStepSequencerExpression(
+    std::shared_ptr<object::Object> seq);
+
 std::shared_ptr<object::Object> EvalPrefixExpression(
     std::string op, std::shared_ptr<object::Object> obj);
 

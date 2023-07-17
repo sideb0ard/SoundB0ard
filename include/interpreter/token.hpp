@@ -112,6 +112,8 @@ const TokenType SLANG_HASH = "#";    // values in pattern, targets follow
 
 const TokenType SLANG_PIPE = "|";  // separtes pattern functions from pattern
 
+const TokenType SLANG_STEP_SEQUENCER = "STEP_SEQUENCER";
+
 class Token {
  public:
   Token() {}

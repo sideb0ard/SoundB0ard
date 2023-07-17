@@ -280,6 +280,13 @@ std::string MidiArrayExpression::String() const {
   return ss.str();
 }
 
+std::string StepSequencerExpression::String() const {
+  std::stringstream ss;
+  ss << "STEPPA:" << token_.literal_;
+
+  return ss.str();
+}
+
 std::string SynthExpression::String() const {
   std::stringstream ss;
   ss << "SYNTH:" << token_.literal_;

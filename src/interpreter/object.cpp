@@ -123,6 +123,22 @@ ObjectType Break::Type() { return BREAK_OBJ; }
 std::string Null::Inspect() { return "null"; }
 ObjectType Null::Type() { return NULL_OBJ; }
 
+std::string StepSequencer::Inspect() {
+  std::stringstream ss;
+  ss << "Step Sequencer. count_by:" << steppa_.count_by_
+     << " start_at:" << steppa_.start_at_ << " count_to:" << steppa_.count_to_
+     << " bounce:"
+     << (steppa_.behavior_ == SBAudio::BoundaryBehavior::BounceBack ? 1 : 0)
+     << std::endl;
+  ss << " [ ";
+  for (const auto &i : steppa_.sequence_) ss << i << " ";
+  ss << "]";
+
+  return ss.str();
+}
+
+ObjectType StepSequencer::Type() { return STEP_SEQUENCER_OBJ; }
+
 FMSynth::FMSynth() {
   soundgen_id_ = AddSoundGenerator(DXSYNTH_TYPE);
   soundgenerator_type = DXSYNTH_TYPE;

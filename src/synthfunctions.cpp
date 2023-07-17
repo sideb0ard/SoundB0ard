@@ -54,8 +54,6 @@ double calculate_dx_amp(double dx_level) {
 }
 
 std::map<std::string, double> GetPreset(int id, std::string preset_name) {
-  std::cout << "YO, GET PRESET!" << preset_name << " for id:" << id << "\n";
-
   std::map<std::string, double> preset_vals;
 
   std::ifstream preset_file;

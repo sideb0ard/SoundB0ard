@@ -574,6 +574,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
            cur_token_.type_ == token::SLANG_DIGI_SYNTH ||
            cur_token_.type_ == token::SLANG_DRUM_SYNTH)
     return ParseSynthExpression();
+  else if (cur_token_.type_ == token::SLANG_STEP_SEQUENCER)
+    return ParseStepSequencerExpression();
   else if (cur_token_.type_ == token::SLANG_PATTERN)
     return ParsePatternExpression();
   else if (cur_token_.type_ == token::SLANG_SAMPLE)
@@ -792,6 +794,25 @@ std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral() {
   }
 
   return lit;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseStepSequencerExpression() {
+  auto stepper = std::make_shared<ast::StepSequencerExpression>(cur_token_);
+
+  std::cout << "STEPPA!\n";
+  if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
+  if (!ExpectPeek(token::SLANG_IDENT)) return nullptr;
+
+  stepper->sequence_ = ParseIdentifier();
+
+  NextToken();
+
+  if (!CurTokenIs(token::SLANG_RPAREN)) {
+    std::cout << "OOFT! where ya PAREN?\n";
+    return nullptr;
+  }
+
+  return stepper;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseSynthExpression() {

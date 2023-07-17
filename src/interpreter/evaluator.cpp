@@ -274,6 +274,16 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       return NULLL;
     }
 
+    auto stepper = std::dynamic_pointer_cast<object::StepSequencer>(target);
+    if (stepper) {
+      try {
+        double param_val = std::stod(val);
+        stepper->steppa_.SetParam(set_stmt->param_, param_val);
+      } catch (std::invalid_argument const &ex) {
+        std::cerr << "Not a number:" << val << " " << ex.what() << std::endl;
+      }
+    }
+
     if (target->Type() == "ERROR") {
       // this section allows use of sX type identifier e.g. 's0' - needed
       // to address and disable a sound generator when i accidentally
@@ -331,6 +341,32 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
           ImportFileContents(action->buffer, action->preview_filename);
       audio_queue.push(std::move(action));
     }
+  }
+
+  auto step_expr =
+      std::dynamic_pointer_cast<ast::StepSequencerExpression>(node);
+  if (step_expr) {
+    auto sequ = Eval(step_expr->sequence_, env);
+    auto sequ_array = std::dynamic_pointer_cast<object::Array>(sequ);
+    if (sequ_array) {
+      std::vector<double> the_vals{};
+      for (const auto &i : sequ_array->elements_) {
+        auto num = std::dynamic_pointer_cast<object::Number>(i);
+        if (num) the_vals.push_back(num->value_);
+      }
+      return std::make_shared<object::StepSequencer>(the_vals);
+    }
+    // if seq == Array ->
+    //  construct a vector from elements
+    //  and create a new StepSequencer
+    // if (!play_expr->path_.empty()) {
+    //  //  import file and add decoded content
+    //  auto action = std::make_unique<AudioActionItem>(AudioAction::PREVIEW);
+    //  action->preview_filename = play_expr->path_;
+    //  action->audio_buffer_details =
+    //      ImportFileContents(action->buffer, action->preview_filename);
+    //  audio_queue.push(std::move(action));
+    //}
   }
 
   std::shared_ptr<ast::PsStatement> ps_expr =

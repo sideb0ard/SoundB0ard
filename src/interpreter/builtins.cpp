@@ -612,6 +612,24 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            return evaluator::NULLL;
          })},
+    {"stepn", std::make_shared<object::BuiltIn>(
+                  [](std::vector<std::shared_ptr<object::Object>> input)
+                      -> std::shared_ptr<object::Object> {
+                    if (input.size() != 1)
+                      return evaluator::NewError(
+                          "`stepn` requires one arg - a Step Sequencer.");
+
+                    auto step_obj =
+                        std::dynamic_pointer_cast<object::StepSequencer>(
+                            input[0]);
+
+                    if (step_obj) {
+                      double retval = step_obj->steppa_.GenNext();
+                      return std::make_shared<object::Number>(retval);
+                    }
+
+                    return evaluator::NULLL;
+                  })},
     {"is_in",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
