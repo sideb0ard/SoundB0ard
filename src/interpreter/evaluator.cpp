@@ -1051,14 +1051,22 @@ std::shared_ptr<object::Object> EvalMultiplyArrayExpression(
 
 std::shared_ptr<object::Object> EvalBangOperatorExpression(
     std::shared_ptr<object::Object> right) {
-  if (right == TTRUE)
+  if (right == TTRUE) {
     return FFALSE;
-  else if (right == FFALSE)
+  } else if (right == FFALSE) {
     return TTRUE;
-  else if (right == NULLL)
+  } else if (right == NULLL) {
     return TTRUE;
-  else
+  } else {
+    auto bool_obj = std::dynamic_pointer_cast<object::Boolean>(right);
+    if (bool_obj) {
+      if (bool_obj->value_)
+        return FFALSE;
+      else
+        return TTRUE;
+    }
     return FFALSE;
+  }
 }
 
 std::shared_ptr<object::Object> EvalNotOperatorExpression(

@@ -647,8 +647,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            if (item && array_obj) {
              for (const auto &e : array_obj->elements_) {
-               if (item->Inspect() == e->Inspect())
+               if (item->Inspect() == e->Inspect()) {
                  return std::make_shared<object::Boolean>(true);
+               }
              }
              return std::make_shared<object::Boolean>(false);
            }

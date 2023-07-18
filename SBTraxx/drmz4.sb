@@ -47,7 +47,7 @@ let boolah_gen = gen()
         if (rf[i] > 0) {
           print("YO i is in plnz?", i, is_in(plnz, i));
           if (!is_in(plnz, i)) {
-            print("YO i is in plnz?", i, plnz, is_in(plnz, i));
+            print("YOYO i is in plnz?", i, plnz, is_in(plnz, i));
             note_on_at(per2, rf[i], i * pp);
           }
         }
