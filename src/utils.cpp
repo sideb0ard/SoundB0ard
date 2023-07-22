@@ -634,6 +634,10 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
   double blep = 0.0;
   double t = 0.0;
 
+  if (inc <= 0) {
+    return 0;
+  }
+
   for (int i = 1; i <= (int)points_per_side; i++) {
     if (modulo > 1.0 - (double)i * inc) {
       t = (modulo - 1.0) / (points_per_side * inc);

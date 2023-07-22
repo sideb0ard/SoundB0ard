@@ -115,6 +115,7 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
       stutter_pending_ = false;
     } else
       stutter_mode_ = false;
+
     if (reverse_pending_) {
       reverse_mode_ = true;
       reverse_pending_ = false;
@@ -322,6 +323,7 @@ void Granulator::SetAudioBufferReadIdx(size_t pos) {
     return;
   }
   audio_buffer_read_idx_ = pos;
+  std::cout << "YO SETTIN READ IDX TO : " << pos << std::endl;
 }
 
 void Granulator::SetGranularSpray(int spray_ms) {
@@ -417,7 +419,7 @@ void Granulator::SetParam(std::string name, double val) {
     SetLoopMode(val);
   } else if (name == "idx") {
     if (val <= 100) {
-      double pos = audio_buffer_.size() / 100. * val;
+      double pos = val / 100. * audio_buffer_.size();
       SetAudioBufferReadIdx(pos);
     }
   } else if (name == "len")

@@ -821,3 +821,15 @@ let gcmelody = fn(num_steps, notez, loop_len)
 }
 
 kit();
+
+let take_n = fn(an_array, num_to_take) {
+  let numz = [];
+  if (num_to_take > len(an_array)) {
+    return numz;
+  }
+  for (i = 0; i < num_to_take; ++i) {
+    push(numz, an_array[rand(len(an_array))]);
+  }
+  return numz;
+}
+

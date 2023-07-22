@@ -260,7 +260,7 @@ void DynamicsProcessor::SetExternalSource(unsigned int val) {
 }
 
 void DynamicsProcessor::SetDefaultSidechainParams() {
-  SetThreshold(-36);
+  SetThreshold(-30);
   SetAttackMs(1);
   SetReleaseMs(55);
   SetRatio(2.5);
