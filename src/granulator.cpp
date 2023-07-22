@@ -74,12 +74,10 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
       if (reverse_mode_)
         new_read_idx = (audio_buffer_.size() - 1) - new_read_idx;
 
-      // std::cout << "READIDX: " << new_read_idx << std::endl;
       new_read_idx = fmodf(
           (fmodf(new_read_idx, size_of_sixteenth_ * plooplen_ * loop_len_) +
            poffset_ * size_of_sixteenth_),
           audio_buffer_.size());
-      // std::cout << "PLOOPED READIDX: " << new_read_idx << std::endl;
 
       // this ensures new_read_idx is even
       if (num_channels_ == 2) new_read_idx -= ((int)new_read_idx & 1);
@@ -89,8 +87,10 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
       int rel_pos_within_a_sixteenth =
           fmod(audio_buffer_read_idx_, size_of_sixteenth_);
 
-      // audio_buffer_read_idx_ =
-      //     (cur_sixteenth_ * size_of_sixteenth_) + rel_pos_within_a_sixteenth;
+      if (stutter_mode_ || scramble_mode_) {
+        audio_buffer_read_idx_ =
+            (cur_sixteenth_ * size_of_sixteenth_) + rel_pos_within_a_sixteenth;
+      }
     }
   }
 
@@ -218,14 +218,8 @@ StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
 
   if (tinfo.cur_sample == start_xfade_at_frame_time_) {
     xfader_active_ = true;
-    if (launch_count < 10) {
-      std::cout << "START NEXT XFADE TIME!:" << tinfo.cur_sample << std::endl;
-    }
   }
   if (tinfo.cur_sample == stop_xfade_at_frame_time_) {
-    if (launch_count < 10) {
-      std::cout << "STOP THIS XFADE TIME!:" << tinfo.cur_sample << std::endl;
-    }
     SwitchXFadeGrains();
     xfader_active_ = false;
     xfader_.Reset(xfade_time_in_frames_);
@@ -406,12 +400,8 @@ void Granulator::NoteOff(midi_event ev) {
   eg_.NoteOff();
 }
 
-void Granulator::SetPidx(int val) {
-  if (val >= 0 && val <= 15) {
-    std::cout << "YO PIDX :" << val << std::endl;
-    cur_sixteenth_ = val;
-  }
-}
+void Granulator::SetPidx(int val) { poffset_ = abs(val - cur_sixteenth_) % 16; }
+
 void Granulator::SetPOffset(int poffset) {
   if (poffset >= 0 && poffset <= 15) {
     poffset_ = poffset;
