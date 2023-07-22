@@ -9,8 +9,8 @@ class StepperTest : public ::testing::Test {
 };
 
 TEST_F(StepperTest, StepperInitialSettings) {
-  EXPECT_EQ(stepper_.count_by_, 1);
-  EXPECT_EQ(stepper_.idx_, 0);
+  EXPECT_EQ(stepper_.sequencer_.count_by_, 1);
+  EXPECT_EQ(stepper_.sequencer_.idx_, 0);
   EXPECT_EQ(stepper_.sequence_.size(), 0);
 }
 
@@ -35,7 +35,7 @@ TEST_F(StepperTest, SequenceOfTwoBounceBack) {
 
 TEST_F(StepperTest, SequenceOfTwoBounceBackStep2) {
   stepper_.SetSequence({0, 1});
-  stepper_.count_by_ = 2;
+  stepper_.sequencer_.count_by_ = 2;
   EXPECT_EQ(stepper_.sequence_.size(), 2);
   for (int i = 0; i < 5; i++) {
     EXPECT_EQ(stepper_.GenNext(), 0);
@@ -44,7 +44,7 @@ TEST_F(StepperTest, SequenceOfTwoBounceBackStep2) {
 
 TEST_F(StepperTest, SequenceOfTwoCycleRound) {
   stepper_.SetSequence({0, 1});
-  stepper_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
+  stepper_.sequencer_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
 
   EXPECT_EQ(stepper_.sequence_.size(), 2);
   for (int i = 0; i < 5; i++) {
@@ -54,8 +54,8 @@ TEST_F(StepperTest, SequenceOfTwoCycleRound) {
 
 TEST_F(StepperTest, SequenceOfTwoCycleRoundStep2) {
   stepper_.SetSequence({0, 1});
-  stepper_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
-  stepper_.count_by_ = 2;
+  stepper_.sequencer_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
+  stepper_.sequencer_.count_by_ = 2;
 
   EXPECT_EQ(stepper_.sequence_.size(), 2);
   for (int i = 0; i < 5; i++) {
@@ -78,7 +78,7 @@ TEST_F(StepperTest, SequenceOfThreeBounceBack) {
 
 TEST_F(StepperTest, SequenceOfThreeBounceBackStep2) {
   stepper_.SetSequence({0, 1, 2});
-  stepper_.count_by_ = 2;
+  stepper_.sequencer_.count_by_ = 2;
   EXPECT_EQ(stepper_.sequence_.size(), 3);
   EXPECT_EQ(stepper_.GenNext(), 0);
   EXPECT_EQ(stepper_.GenNext(), 2);
@@ -88,7 +88,7 @@ TEST_F(StepperTest, SequenceOfThreeBounceBackStep2) {
 
 TEST_F(StepperTest, SequenceOfThreeBounceBackStep3) {
   stepper_.SetSequence({0, 1, 2});
-  stepper_.count_by_ = 3;
+  stepper_.sequencer_.count_by_ = 3;
   EXPECT_EQ(stepper_.sequence_.size(), 3);
   EXPECT_EQ(stepper_.GenNext(), 0);
   EXPECT_EQ(stepper_.GenNext(), 1);
@@ -99,7 +99,7 @@ TEST_F(StepperTest, SequenceOfThreeBounceBackStep3) {
 
 TEST_F(StepperTest, SequenceOfThreeCycleRound) {
   stepper_.SetSequence({0, 1, 2});
-  stepper_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
+  stepper_.sequencer_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
 
   EXPECT_EQ(stepper_.sequence_.size(), 3);
   EXPECT_EQ(stepper_.GenNext(), 0);
@@ -110,8 +110,8 @@ TEST_F(StepperTest, SequenceOfThreeCycleRound) {
 
 TEST_F(StepperTest, SequenceOfThreeCycleRoundStep2) {
   stepper_.SetSequence({0, 1, 2});
-  stepper_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
-  stepper_.count_by_ = 2;
+  stepper_.sequencer_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
+  stepper_.sequencer_.count_by_ = 2;
 
   EXPECT_EQ(stepper_.sequence_.size(), 3);
 
@@ -134,7 +134,7 @@ TEST_F(StepperTest, SequenceOfTenBounceBack) {
 
 TEST_F(StepperTest, SequenceOfTenCycleRound) {
   stepper_.SetSequence({0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
-  stepper_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
+  stepper_.sequencer_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
 
   EXPECT_EQ(stepper_.sequence_.size(), 10);
   for (int i = 0; i < 20; i++) {
@@ -144,7 +144,7 @@ TEST_F(StepperTest, SequenceOfTenCycleRound) {
 
 TEST_F(StepperTest, SequenceOfTenBounceBackStep2) {
   stepper_.SetSequence({0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
-  stepper_.count_by_ = 2;
+  stepper_.sequencer_.count_by_ = 2;
 
   EXPECT_EQ(stepper_.sequence_.size(), 10);
   for (int i = 0; i < 8; i++) {
@@ -155,8 +155,8 @@ TEST_F(StepperTest, SequenceOfTenBounceBackStep2) {
 
 TEST_F(StepperTest, SequenceOfTenCycleRoundStep2) {
   stepper_.SetSequence({0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
-  stepper_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
-  stepper_.count_by_ = 2;
+  stepper_.sequencer_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
+  stepper_.sequencer_.count_by_ = 2;
 
   EXPECT_EQ(stepper_.sequence_.size(), 10);
   for (int i = 0; i < 8; i++) {
@@ -167,7 +167,7 @@ TEST_F(StepperTest, SequenceOfTenCycleRoundStep2) {
 
 TEST_F(StepperTest, SequenceOfTenBounceBackStep3) {
   stepper_.SetSequence({0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
-  stepper_.count_by_ = 3;
+  stepper_.sequencer_.count_by_ = 3;
 
   EXPECT_EQ(stepper_.sequence_.size(), 10);
 
@@ -183,8 +183,8 @@ TEST_F(StepperTest, SequenceOfTenBounceBackStep3) {
 
 TEST_F(StepperTest, SequenceOfTenCycleRoundStep3) {
   stepper_.SetSequence({0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
-  stepper_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
-  stepper_.count_by_ = 3;
+  stepper_.sequencer_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
+  stepper_.sequencer_.count_by_ = 3;
 
   EXPECT_EQ(stepper_.sequence_.size(), 10);
 
@@ -214,7 +214,7 @@ TEST_F(StepperTest, StartAtPosition2BounceBack) {
 
 TEST_F(StepperTest, StartAtPosition2CycleRound) {
   stepper_.SetSequence({0, 1, 2, 3, 4, 5});
-  stepper_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
+  stepper_.sequencer_.behavior_ = SBAudio::BoundaryBehavior::CycleRound;
   stepper_.SetParam("start_at", 2);
 
   EXPECT_EQ(stepper_.sequence_.size(), 6);

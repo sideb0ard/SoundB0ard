@@ -125,10 +125,12 @@ ObjectType Null::Type() { return NULL_OBJ; }
 
 std::string StepSequencer::Inspect() {
   std::stringstream ss;
-  ss << "Step Sequencer. count_by:" << steppa_.count_by_
-     << " start_at:" << steppa_.start_at_ << " count_to:" << steppa_.count_to_
-     << " bounce:"
-     << (steppa_.behavior_ == SBAudio::BoundaryBehavior::BounceBack ? 1 : 0)
+  ss << "Step Sequencer. count_by:" << steppa_.sequencer_.count_by_
+     << " start_at:" << steppa_.sequencer_.start_at_
+     << " count_to:" << steppa_.sequencer_.count_to_ << " bounce:"
+     << (steppa_.sequencer_.behavior_ == SBAudio::BoundaryBehavior::BounceBack
+             ? 1
+             : 0)
      << std::endl;
   ss << " [ ";
   for (const auto &i : steppa_.sequence_) ss << i << " ";

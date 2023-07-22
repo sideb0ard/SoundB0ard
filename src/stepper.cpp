@@ -4,11 +4,10 @@
 
 namespace SBAudio {
 
-double Stepper::GenNext() {
-  if (sequence_.size() == 0) return 0;
-  if (sequence_.size() == 1) return sequence_[0];
+int Sequencer::GenNext() {
+  if (count_to_ == 0 || count_to_ == 1) return 0;
 
-  double return_val = sequence_.at(idx_);
+  int return_val = idx_;
 
   int steps = count_by_;
   while (steps > 0) {
@@ -38,11 +37,11 @@ double Stepper::GenNext() {
   return return_val;
 }
 
-void Stepper::SetParam(std::string param, double value) {
+void Sequencer::SetParam(std::string param, double value) {
   if (param == "count_by") {
-    if (value <= sequence_.size()) count_by_ = value;
+    if (value <= count_to_) count_by_ = value;
   } else if (param == "count_to") {
-    if (value > start_at_ && value <= sequence_.size()) {
+    if (value > start_at_) {
       count_to_ = value;
       if (idx_ >= count_to_) idx_ = start_at_;
     }

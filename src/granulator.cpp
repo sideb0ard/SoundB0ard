@@ -50,10 +50,24 @@ Granulator::Granulator(std::string filename, unsigned int loop_mode) {
 
 void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   (void)event;
+
+  if (!started_ && tinfo.is_start_of_loop) {
+    LaunchGrain(active_grain_, tinfo);
+    eg_.StartEg();
+    started_ = true;
+  }
+  if (!started_) return;
+
+  // if (tinfo.is_start_of_loop) {
+  //   std::cout << "YO<START OF LOOP: Midi IDX:" << cur_midi_idx_
+  //             << " sizteen:" << cur_sixteenth_ << " SAMP:" <<
+  //             tinfo.cur_sample
+  //             << std::endl;
+  // }
+
   double decimal_percent_of_loop = 0;
   if (tinfo.is_midi_tick) {
-    if (started_)
-      cur_midi_idx_ = fmodf(cur_midi_idx_ + incr_speed_, PPBAR * loop_len_);
+    cur_midi_idx_ = fmodf(cur_midi_idx_ + incr_speed_, PPBAR * loop_len_);
     if (loop_mode_ == LoopMode::loop_mode) {
       decimal_percent_of_loop = cur_midi_idx_ / (PPBAR * loop_len_);
       double new_read_idx = decimal_percent_of_loop * audio_buffer_.size();
@@ -75,22 +89,10 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
       int rel_pos_within_a_sixteenth =
           fmod(audio_buffer_read_idx_, size_of_sixteenth_);
 
-      if (scramble_mode_ || pinc_ != 1) {
-        audio_buffer_read_idx_ = (current_sixteenth_ * size_of_sixteenth_) +
-                                 rel_pos_within_a_sixteenth;
-      } else if (stutter_mode_) {
-        audio_buffer_read_idx_ =
-            (stutter_idx_ * size_of_sixteenth_) + rel_pos_within_a_sixteenth;
-      }
+      // audio_buffer_read_idx_ =
+      //     (cur_sixteenth_ * size_of_sixteenth_) + rel_pos_within_a_sixteenth;
     }
   }
-
-  if (!started_ && tinfo.is_start_of_loop) {
-    eg_.StartEg();
-    started_ = true;
-    LaunchGrain(active_grain_, tinfo);
-  }
-  if (!started_) return;
 
   if (tinfo.is_end_of_loop) {
     if (stop_count_pending_) {
@@ -123,36 +125,33 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
       reverse_mode_ = false;
   }
 
-  // used to track which 16th we're on if loop != 1 bar
   float loop_num = fmod(loop_counter_, loop_len_);
   if (loop_num < 0) loop_num = 0;
 
   if (tinfo.is_sixteenth) {
-    if (pinc_ != 1) {
-      current_sixteenth_ = (current_sixteenth_ + pinc_) % 16;
-    } else {
-      current_sixteenth_ = tinfo.sixteenth_note_tick % 16;
-    }
+    cur_sixteenth_ = (cur_sixteenth_ + pinc_) % (int)(16 * loop_len_);
     if (scramble_mode_) {
-      if (current_sixteenth_ % 2 != 0) {
+      if (cur_sixteenth_ % 2 != 0) {
         int randy = rand() % 100;
         if (randy < 25)  // repeat the third 16th
-          current_sixteenth_ = 3;
+          cur_sixteenth_ = 3;
         else if (randy > 25 && randy < 50)  // repeat the 4th sixteenth
-          current_sixteenth_ = 4;
+          cur_sixteenth_ = 4;
         else if (randy > 50 && randy < 75)  // repeat the 7th sixteenth
-          current_sixteenth_ = 7;
+          cur_sixteenth_ = 7;
       }
     }
     if (stutter_mode_) {
-      if (rand() % 100 > 75) stutter_idx_++;
-      if (stutter_idx_ == 16) stutter_idx_ = 0;
+      if (rand() % 100 > 75) cur_sixteenth_++;
+      if (cur_sixteenth_ == (int)(16 * loop_len_)) cur_sixteenth_ = 0;
     }
   }
 }
 
 // for debugging only
 int launch_count = 0;
+int samp_diff = 0;
+int midi_diff = 0;
 
 void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   int duration_frames = grain_duration_frames_;
@@ -179,9 +178,19 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   grain_spacing_frames_ = duration_frames - xfade_time_in_frames_;
 
   next_grain_launch_sample_time_ = tinfo.cur_sample + grain_spacing_frames_;
+  //  if (launch_count < 10) {
+  //    std::cout << launch_count << " Mixer Samp#:" << tinfo.cur_sample
+  //              << " dur:" << duration_frames << " GRain IDX:" << grain_idx
+  //              << " NEXT LAYNC :" << next_grain_launch_sample_time_
+  //              << " MIDI:" << tinfo.midi_tick << " %16 " << tinfo.midi_tick %
+  //              16
+  //              << std::endl;
+  //    launch_count++;
+  //  }
 
   start_xfade_at_frame_time_ = next_grain_launch_sample_time_;
-  stop_xfade_at_frame_time_ = tinfo.cur_sample + xfade_time_in_frames_;
+  if (started_)
+    stop_xfade_at_frame_time_ = tinfo.cur_sample + xfade_time_in_frames_;
 }
 
 void Granulator::SwitchXFadeGrains() {
@@ -209,14 +218,20 @@ StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
 
   if (tinfo.cur_sample == start_xfade_at_frame_time_) {
     xfader_active_ = true;
+    if (launch_count < 10) {
+      std::cout << "START NEXT XFADE TIME!:" << tinfo.cur_sample << std::endl;
+    }
   }
   if (tinfo.cur_sample == stop_xfade_at_frame_time_) {
+    if (launch_count < 10) {
+      std::cout << "STOP THIS XFADE TIME!:" << tinfo.cur_sample << std::endl;
+    }
     SwitchXFadeGrains();
     xfader_active_ = false;
     xfader_.Reset(xfade_time_in_frames_);
   }
 
-  if (tinfo.cur_sample == next_grain_launch_sample_time_) {  // new grain time
+  if (tinfo.cur_sample >= next_grain_launch_sample_time_) {  // new grain time
     LaunchGrain(incoming_grain_, tinfo);
   }
 
@@ -373,7 +388,7 @@ void Granulator::SetReversePending() { reverse_pending_ = true; }
 void Granulator::SetLoopLen(double bars) {
   if (bars != 0) {
     loop_len_ = bars;
-    size_of_sixteenth_ = audio_buffer_.size() / 16 / bars;
+    size_of_sixteenth_ = audio_buffer_.size() / bars / 16.;
   }
 }
 
@@ -391,6 +406,12 @@ void Granulator::NoteOff(midi_event ev) {
   eg_.NoteOff();
 }
 
+void Granulator::SetPidx(int val) {
+  if (val >= 0 && val <= 15) {
+    std::cout << "YO PIDX :" << val << std::endl;
+    cur_sixteenth_ = val;
+  }
+}
 void Granulator::SetPOffset(int poffset) {
   if (poffset >= 0 && poffset <= 15) {
     poffset_ = poffset;
@@ -424,6 +445,8 @@ void Granulator::SetParam(std::string name, double val) {
     }
   } else if (name == "len")
     SetLoopLen(val);
+  else if (name == "pidx")
+    SetPidx(val);
   else if (name == "poffset")
     SetPOffset(val);
   else if (name == "plooplen")

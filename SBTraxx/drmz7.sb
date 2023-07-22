@@ -1,0 +1,18 @@
+
+let stepblah_gen = gen()
+{
+  setup()
+  {
+    let sx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      set ish:idx 0 at=i*pp;
+      #if (i % 4 == 0) {
+        #}
+    }
+
+  }
+}
+

@@ -1,10 +1,12 @@
 #pragma once
 
-#include <envelope_generator.h>
-#include <fx/ramp.h>
-#include <grains.h>
-#include <soundgenerator.h>
 #include <stdbool.h>
+
+#include "envelope_generator.h"
+#include "fx/ramp.h"
+#include "grains.h"
+#include "soundgenerator.h"
+#include "stepper.h"
 
 namespace SBAudio {
 
@@ -80,17 +82,15 @@ class Granulator : public SoundGenerator {
 
   bool scramble_mode_{false};
   bool scramble_pending_{false};
-  int current_sixteenth_{0};
 
   bool stutter_mode_{false};
   bool stutter_pending_{false};
-  int stutter_idx_{0};
 
   bool stop_pending_{false};  // allow eg to stop
 
   int degrade_by_{0};  // percent change to drop bits
 
-  int cur_sixteenth_{0};  // used to track scramble
+  int cur_sixteenth_{0};
 
   double incr_speed_{1};
   double cur_midi_idx_{0};
@@ -124,6 +124,7 @@ class Granulator : public SoundGenerator {
   void SetGrainSlopePct(int percent);
   void SetDegradeBy(int degradation);
 
+  void SetPidx(int val);
   void SetPOffset(int poffset);
   void SetPlooplen(int plooplen);
   void SetPinc(int pinc);
