@@ -1,3 +1,26 @@
+let rand_octave = fn()
+{
+  let octz = [0, 12, 24];
+  let the_oct = octz[rand(len(octz))];
+  if (rand(2)) {
+    return the_oct * -1;
+  }
+  return the_oct;
+}
+
+let gimme_some_notes = fn(how_many, notes_to_start)
+{
+  let return_notez = rand_array(how_many, 0, 0);
+  let nx = 0;
+
+  for (i = 0; i < how_many; ++i) {
+    return_notez[i] = notes_to_start[nx] + rand_octave();
+  }
+  return return_notez;
+}
+
+
+
 # let one = loop(JUNALGOGZ/onetimeTSTM.wav); vol one 0.7; set one:len 2; p10 $ oneblah_gen
 let oneblah_gen = gen()
 {
@@ -77,29 +100,7 @@ let bdlah_gen = gen()
   }
 }
 
-let rand_octave = fn()
-{
-  let octz = [0, 12, 24];
-  let the_oct = octz[rand(len(octz))];
-  if (rand(2)) {
-    return the_oct * -1;
-  }
-  return the_oct;
-}
-
-let gimme_some_notes = fn(how_many, notes_to_start)
-{
-  let return_notez = rand_array(how_many, 0, 0);
-  let nx = 0;
-
-  for (i = 0; i < how_many; ++i) {
-    return_notez[i] = notes_to_start[nx] + rand_octave();
-  }
-  return return_notez;
-}
-
-# load_preset(per1, "glotch"); vol per1 0.7;
-# load_preset(sd, "BADUM"); vol sd 0.5;
+# load_preset(per1, "glotch"); vol per1 0.7; load_preset(sd, "BADUM"); vol sd 0.5;
 # p3 < ramp 8 "1 0" "vol one %";
 # WAIT..
 # p2 $ modxblah_gen

@@ -1,54 +1,107 @@
-# let bsqr = loop(bombz/BSQWASPR8.wav); set bsqr:len 6;
+# let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8
+# p15 < osc 4 "0.2 0.9" "send(0, jon, %)"
 
-# cl = NUURF and cp HIGHWR // vol cl 0.8 ; vol cp 0.8
-# load_preset(cl, "NUURF") ; vol cl 0.7;  load_preset(cp, "HIGHWR"); vol cp 0.8;
 
-let mel = [23, 0, 23, 17, 0, 14, 0, 0, 0, 13, 0, 0, 7, 24, 24, 0];
-let dhhblah_gen = gen()
+let hh = sample(ch/hh13.aif);
+# let js = loop(JUNALGOGZ/JSFTYmylove.wav);
+# p6 $ hhblah_gen;
+let hhblah_gen = gen()
 {
   setup()
   {
-    let mx = 0;
-    let mmax = 3;
-    let durz = [200, 250, 300, 500, 700, 1000];
-    let drx = 0;
+    let offz = 1;
+    let piz = [0.8, 1, 1.2, 1.5];
+    let pix = 0;
   }
   run()
   {
-    if (count % 2 == 1) {
+    offz = incr(offz, 0, 12);
+    if (count % 4 == 3) {
+      set js:scramble 1;
+      pix = incr(pix, 0, len(piz));
+    }
+    if (count % 16 == 15) {
+      set js:reverse 1;
+    }
+    if (count % 8 < 6) {
       for (i = 0; i < 16; ++i) {
-        stepper(cl, mel, mx, i, durz[drx]);
-        drx = incr(drx, 0, len(durz));
-        mx = incr(mx, 0, mmax);
+        if (i % 4 == 2) {
+          note_on_at(hh, 1, i * pp);
+        }
       }
-      mmax = incr(mmax, 3, 16);
     }
   }
 }
 
-let wahblah_gen = gen()
+
+#  let bonz = loop(JUNALGOGZ/bongOS.wav)
+# xassign(0, ab); xassign(1, fl)
+
+let endblah_gen = gen()
 {
   setup()
   {
-    let mel = gamelody(16, 23);
-    let mx = 0;
-    let mmax = 3;
+  }
+  run()
+  {
+    #if (count % 2 == 0) {
+      #  set jon:stutter 1;
+      #  set reg:scramble 1;
+      #}
+    if (count % 3 == 0) {
+      set bonz:stutter 1;
+    }
+  }
+}
+
+# p3 < ramp 8 "1 0" "vol jon %";
+# per3 - default - bring up volume
+let dooblah_gen = gen()
+{
+  setup()
+  {
+    let m = gamelody(16, 23);
+    let ix = 0;
+    let imx = 3;
+    let dr = 100;
   }
   run()
   {
     for (i = 0; i < 16; ++i) {
-      stepper(cp, mel, mx, i, 300);
-      mx = incr(mx, 0, mmax);
+      stepper(per3, m, ix, i, dr);
+      ix = incr(ix, 0, imx);
     }
-    mmax = incr(mmax, 3, 16);
-    if (count % 10 == 0) {
-      mel = gamelody(16, 23);
+    imx = incr(imx, 3, 16);
+
+    if (count % 8 == 0) {
+      m = gamelody(16, 23);
     }
   }
 }
 
-# let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8
-# p15 < osc 4 "0.2 0.9" "send(0, jon, %)"
+# oh - NUURF; load_preset(oh, "NUURF")
+let doo3blah_gen = gen()
+{
+  setup()
+  {
+    let m = gamelody(16, 24);
+    let ix = 0;
+    let imx = 3;
+    let dr = 100;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(oh, m, ix, i, dr);
+      ix = incr(ix, 0, imx);
+    }
+    imx = incr(imx, 3, 16);
+
+    if (count % 8 == 0) {
+      m = gamelody(16, 23);
+    }
+  }
+}
 
 # let drr = loop(JUNALGOGZ/drumROLLZ.wav); set drr:len 2; p4 $ regblah_gen
 let regblah_gen = gen()
@@ -67,57 +120,3 @@ let regblah_gen = gen()
     }
   }
 }
-
-let hh = sample(ch/hh13.aif);
-# let ab = loop(voices/abouttafeel.wav); set ab:len 4
-# let js = loop(JUNALGOGZ/JSFTYmylove.wav);
-# vol js 1; p6 $ hhblah_gen; send(2, js, 0.2);
-let hhblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    set ab:stutter 1;
-    if (count % 4 == 3) {
-      set js:scramble 1;
-      set ab:stutter 1;
-    }
-    if (count % 16 == 15) {
-      set js:reverse 1;
-    }
-    if (count % 8 < 6) {
-      for (i = 0; i < 16; ++i) {
-        if (i % 4 == 2) {
-          note_on_at(hh, 1, i * pp);
-        }
-      }
-    }
-  }
-}
-
-
-# let reg = loop(JUNALGOGZ/reaggaeGUITR.wav) ; set reg:len 2
-#  let bonz = loop(JUNALGOGZ/bongOS.wav)
-
-
-# let fl = loop(voices/feelmeflow.wav); set fl:len 2; vol js 1
-let endblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 2 == 0) {
-      set jon:stutter 1;
-      set reg:scramble 1;
-    }
-    if (count % 3 == 0) {
-      set bonz:stutter 1;
-      set fl:scramble 1;
-    }
-  }
-}
-

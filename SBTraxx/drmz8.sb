@@ -1,0 +1,57 @@
+# key g# 20 32 44
+
+let rootkeyz = [21];
+let rx = 0;
+
+let its = sample(aaassembly/itsSuicideVoice.wav);
+let pblah_gen = gen()
+{
+  setup()
+  {
+    let dz = [500, 1000, 2000, 3000];
+    let dzx = 0;
+  }
+  run()
+  {
+
+    if (count % 3 == 0) {
+      set bb:scramble 1;
+      set hip:stutter 1;
+      vol poi 0;
+    }
+    if (count % 4 == 0) {
+      set bb:stutter 1;
+      set hip:scramble 1;
+      note_on(its, 1, dur=dz[dzx]);
+      dzx = incr(dzx, 0, len(dz));
+    }
+  }
+}
+
+# GHOSTXZ // scicczr // flair
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let mel = gamelody(16, rootkeyz[rx]);
+  }
+  run()
+  {
+    if (count % 8 < 6) {
+      if (count % 8 == 7) {
+        rx = incr(rx, 0, len(rootkeyz));
+        mel = gamelody(16, rootkeyz[rx]);
+      }
+      for (i = 0; i < 16; ++i) {
+        if (mel[i] > 0) {
+          note_on_at(per1, mel[i], i * pp);
+          #set hip:pidx i at=i*pp;
+          set bb:pidx i at=i*pp;
+          set poi:pidx i at=i*pp;
+        }
+      }
+    }
+
+  }
+}
+

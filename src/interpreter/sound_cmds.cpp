@@ -113,27 +113,47 @@ std::vector<int> GetNotesInKey(int root, int scale_type) {
   std::vector<int> notes;
 
   switch (scale_type) {
-    case (0):  // MAJOR
-      notes.push_back(root + 0);
-      notes.push_back(root + 2);
-      notes.push_back(root + 4);
-      notes.push_back(root + 5);
-      notes.push_back(root + 7);
-      notes.push_back(root + 9);
-      notes.push_back(root + 11);
-      notes.push_back(root + 12);
+    case (0):                      // MAJOR
+      notes.push_back(root + 0);   // 1
+      notes.push_back(root + 2);   // 2
+      notes.push_back(root + 4);   // 3
+      notes.push_back(root + 5);   // 4
+      notes.push_back(root + 7);   // 5
+      notes.push_back(root + 9);   // 6
+      notes.push_back(root + 11);  // 7
+      notes.push_back(root + 12);  // 8
       break;
-    case (1):  // MINOR
-      notes.push_back(root + 0);
-      notes.push_back(root + 2);
-      notes.push_back(root + 3);
-      notes.push_back(root + 5);
-      notes.push_back(root + 7);
-      notes.push_back(root + 8);
-      notes.push_back(root + 10);
-      notes.push_back(root + 12);
+    case (1):                      // NATURAL MINOR
+      notes.push_back(root + 0);   // 1
+      notes.push_back(root + 2);   // 2
+      notes.push_back(root + 3);   // 3
+      notes.push_back(root + 5);   // 4
+      notes.push_back(root + 7);   // 5
+      notes.push_back(root + 8);   // 6
+      notes.push_back(root + 10);  // 7
+      notes.push_back(root + 12);  // 8
       break;
-    case (2):  // PHRYGIAN
+    case (2):                      // HARMONIC MINOR
+      notes.push_back(root + 0);   // 1
+      notes.push_back(root + 2);   // 2
+      notes.push_back(root + 3);   // 3
+      notes.push_back(root + 5);   // 4
+      notes.push_back(root + 7);   // 5
+      notes.push_back(root + 8);   // 6
+      notes.push_back(root + 11);  // 7
+      notes.push_back(root + 12);  // 8
+      break;
+    case (3):                      // MELODIC MINOR
+      notes.push_back(root + 0);   // 1
+      notes.push_back(root + 2);   // 2
+      notes.push_back(root + 3);   // 3
+      notes.push_back(root + 5);   // 4
+      notes.push_back(root + 7);   // 5
+      notes.push_back(root + 9);   // 6
+      notes.push_back(root + 10);  // 7
+      notes.push_back(root + 12);  // 8
+      break;
+    case (4):  // PHRYGIAN
       notes.push_back(root + 0);
       notes.push_back(root + 1);
       notes.push_back(root + 3);

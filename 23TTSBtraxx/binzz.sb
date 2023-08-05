@@ -100,11 +100,12 @@ let bablah_gen = gen()
     play_array(bddd, bjork(bjz[bx], 16), dur=900);
     bx = incr(bx, 0, len(bjz));
     set awk:on 1;
+    set awk:poffset 12;
     if (count % 4 == 3) {
       let bt = bjork(bjz[bx], 16);
       play_array(cppz[cpx], bt, 16));
       cpx = incr(cpx, 0, len(cppz));
-      play_array(awk, invert(bt), 16));
+      set awk:pidx 12;
     }
     if (count % 3 == 0) {
       set awk:stutter 1;
@@ -146,7 +147,8 @@ let dabblah = gen()
           off = 48;
         }
         if (the_mel[i] > 0 ) {
-          note_on_at(cp, the_mel[i], i*pp + off, vel = v, dur = d);
+          note_on_at(cp, the_mel[i]+36, i*pp + off, vel = 127, dur = 1000);
+          #note_on_at(cp, 77, i * pp);
         }
       }
       d = d + 50;
@@ -166,6 +168,7 @@ let dabblah = gen()
 
 #p13 < osc 8 "0.1 0.5" "send(0, ok, %)";
 
+# dx ? ssharp
 # sd = BDLOW
 # load_preset(sd, "BDLOW")
 let compblah_gen = gen()
@@ -211,3 +214,36 @@ let compblah_gen = gen()
 
 #vol awk 0;
 # off bablah_gen
+
+# per2 - GALZIAN  // BONG0
+let dahmelblah_gen = gen()
+{
+  setup()
+  {
+    let nx = 0;
+    let dnz = [0, 12, 24];
+    let dnx = 0;
+    let mel = gamelody(16, notez[0]-24);
+    let ix = 0;
+    let imx = 3;
+    let dr = 100;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(per2, mel, ix, i, dr);
+      ix = incr(ix, 0, imx);
+    }
+    imx = incr(imx, 3, 16);
+    dr = dr + 30;
+    if (dr > 500) {
+      dr = 75;
+    }
+    if (count % 8 == 0) {
+      mel = gamelody(16, notez[0] - dnz[dnx]);
+      dnx = incr(dnx, 0, len(dnz));
+    }
+
+  }
+}
+

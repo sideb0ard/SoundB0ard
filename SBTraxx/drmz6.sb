@@ -9,67 +9,30 @@ let chrdz = [ [36, 43], [29, 36], [38] ];
 let crx = 0;
 let ntx = 0;
 
-let beat = bjork(5, 16);
+let beat = rand_beat();
 
-# bd - BONG0 // load_preset(bd, "BONG0");
-# per3 glotch // DUUSRTY // load_preset(per3, "DUUSRTY")
 # let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen
 
 let wblah_gen = gen()
 {
   setup() {
-    let numz = [3, 5, 3, 5, 2];
-    let nx = 0;
     let sw = 100;
     let dr = 50;
   }
   run()
   {
-    if (count % 8 < 7) {
-      for (i = 0; i < 16; ++i) {
-        let offset = 0;
-        if (i % 2 == 1) {
-          offset = sw;
-        }
-        if (beat[i] == 1) {
-          note_on_at(bd, chrdz[crx][ntx], i * pp + offset);
-          ntx = incr(ntx, 0, len(chrdz[crx]));
-          # let prc = 100 / 3840 * (i*pp);
-          # set bx:idx prc at=i*pp;
-
-          if (count % 4 == 3) {
-            note_on_at(per3, chrdz[crx][ntx] - 12, i * pp + offset, dur = dr);
-            dr = dr + 40;
-            if (dr > 400) {
-              dr = 50;
-            }
-          }
-        }
-      }
+    if (count% 8 == 7) {
+      set bx:scramble 1;
     }
-    sw = sw + 10;
-    if (sw > 150) {
-      sw = 100;
-    }
-
-    #if (count % 3 == 0) {
-      #  beat = rotate(beat, 2);
-      #}
-
-    if (count % 4 == 0) {
-      crx = incr(crx, 0, len(chrdz));
-      set bx:stutter 1;
-    }
-    if (count % 7 == 4) {
-      beat = bjork(numz[nx], 16);
-      nx = incr(nx, 0, len(numz));
+    if (count% 16 == 15) {
+      set bx:reverse 1;
     }
   }
 }
 
 
 # per2 - BUTTR // WAARHD // scicczr
-# load_preset(per2, "scicczr");
+# load_preset(per2, "GHOSTXZ");
 let ddblah_gen = gen()
 {
   setup()
@@ -86,29 +49,28 @@ let ddblah_gen = gen()
   run()
   {
     let ins = per1;
-    if (count % 8 > 6) {
-      ins = per2;
-    }
-    for (i = 0; i < 16; ++i) {
-      let off = 0;
-      if (i % 2 == 1) {
-        off = offr;
-      }
-      if (melz[mx][i] > 0) {
-        if (!is_in(beat, i)) {
-          let n =  melz[mx][i];
-          if (count % 8 == 7) {
-            n = n + 12;
-          }
-          note_on_at(ins, n, i * pp + off, dur = d);
+    if (count % 4 < 3) {
+      for (i = 0; i < 16; ++i) {
+        let off = 0;
+        if (i % 2 == 1) {
+          off = offr;
         }
-        d = d + 20;
+        if (melz[mx][i] > 0) {
+          if (!is_in(beat, i)) {
+            let n =  melz[mx][i];
+            if (count % 8 == 7) {
+              n = n + 12;
+            }
+            note_on_at(ins, n, i * pp + off, dur = d);
+          }
+          d = d + 20;
+        }
       }
+      if (d > 400) {
+        d = 100;
+      }
+      mx = incr(mx, 0, len(melz));
     }
-    if (d > 400) {
-      d = 100;
-    }
-    mx = incr(mx, 0, len(melz));
   }
 }
 
@@ -146,7 +108,7 @@ let hhblah_gen = gen()
   }
 }
 
-# let vrv = loop(JUNALGOGZ/VIBErev.wav); set vrv:len 4; add_fx(vrv, "sidechain", bd);
+# let vrv = loop(JUNALGOGZ/VIBErev.wav); set vrv:len 4; add_fx(vrv, "sidechain", bx);
 # let nots = loop(voices/notstayinghome.wav); set nots:len 2; p6 $ vblah_gen
 let vblah_gen = gen()
 {
@@ -158,7 +120,7 @@ let vblah_gen = gen()
 
     #unsolo();
     if (count % 2 == 0) {
-      #vol nots 0.6;
+      #vol nots 0.3;
       set vrv:scramble 1;
       set nots:stutter 1;
     }
@@ -174,7 +136,7 @@ let dxxxblah_gen = gen()
 {
   setup()
   {
-    let ch = chrdz[crx];
+    let ch = down(chrdz[crx], 12);
     let be = combinor(rand_beat(), ch);
     let ix = 0;
     let mxx = 3;
