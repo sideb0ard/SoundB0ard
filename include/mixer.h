@@ -76,6 +76,8 @@ struct Mixer {
 
   bool debug_mode{false};
 
+  bool eq_send_{false};
+
   double bpm{140};
   double bpm_to_be_updated{0};
 

@@ -69,6 +69,7 @@ extern Tsqueue<std::string> repl_queue;
 extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
 extern Tsqueue<std::string> eval_command_queue;
+extern Tsqueue<StereoVal> webrtc_output_queue;
 
 const auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
 
@@ -539,6 +540,11 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     output_left += (delay_val.left + reverb_val.left + distort_val.left);
     output_right += (delay_val.right + reverb_val.right + distort_val.right);
 
+    if (eq_send_) {
+      StereoVal forEq{output_left, output_right};
+      webrtc_output_queue.try_push(forEq);
+    }
+
     // out[j] = volume * (output_left / 1.53);
     // out[j + 1] = volume * (output_right / 1.53);
     out[j] = volume * output_left;
@@ -715,6 +721,10 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
     }
   } else if (action->type == AudioAction::BPM) {
     UpdateBpm(action->new_bpm);
+  } else if (action->type == AudioAction::ENABLE_EQ) {
+    eq_send_ = true;
+  } else if (action->type == AudioAction::DISABLE_EQ) {
+    eq_send_ = false;
   } else if (action->type == AudioAction::VOLUME) {
     VolChange(action->new_volume);
   } else if (action->type == AudioAction::MIDI_EVENT_ADD ||

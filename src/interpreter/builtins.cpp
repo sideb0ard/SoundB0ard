@@ -1,9 +1,3 @@
-#include <audio_action_queue.h>
-#include <audioutils.h>
-#include <midi_cmds.h>
-#include <mixer.h>
-#include <utils.h>
-
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
@@ -19,8 +13,14 @@
 #include <vector>
 
 #include "PerlinNoise.hpp"
+#include "audio_action_queue.h"
+#include "audioutils.h"
+#include "midi_cmds.h"
 #include "midi_device.h"
 #include "midi_freq_table.h"
+#include "mixer.h"
+#include "utils.h"
+#include "webrtc_server.h"
 
 namespace fs = std::filesystem;
 
@@ -28,6 +28,8 @@ extern Mixer *mixr;
 extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
+extern Tsqueue<StereoVal> webrtc_output_queue;
+
 extern siv::PerlinNoise perlinGenerator;
 
 const std::vector<std::string> FILES_TO_IGNORE = {".DS_Store"};
@@ -2739,6 +2741,34 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                           }
                           return evaluator::NULLL;
                         })},
+    {"enable_eq",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 1) {
+             auto should_enable_obj =
+                 std::dynamic_pointer_cast<object::Boolean>(args[0]);
+             if (should_enable_obj) {
+               bool should_enable = should_enable_obj->value_;
+               if (should_enable) {
+                 std::cout << "Enabling EQ!\n";
+                 std::thread(web_rtc_server_thread).detach();
+                 auto action =
+                     std::make_unique<AudioActionItem>(AudioAction::ENABLE_EQ);
+                 audio_queue.push(std::move(action));
+               } else {
+                 std::cout << "Disabling EQ!\n";
+                 StereoVal stereo_stop = {-99.0, -99.0};
+                 webrtc_output_queue.push(stereo_stop);
+                 auto action =
+                     std::make_unique<AudioActionItem>(AudioAction::DISABLE_EQ);
+                 audio_queue.push(std::move(action));
+               }
+             }
+           }
+           return evaluator::NULLL;
+         })},
 };
 
 }  // namespace builtin

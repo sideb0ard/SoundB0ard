@@ -1,0 +1,125 @@
+# let key = F 17
+# minor scale -  [17, 19, 20, 22, 24, 25, 27, 29]
+
+
+# let sup = loop(Riser77/amaSuperhero.wav); set sup:len 2;
+#let creb = loop(Riser77/maCrewBEAT.wav); xassign(0, sup); xassign(1, creb);
+
+# load_preset(sd, "FWUMPE")
+let bee_gen = gen()
+{
+  setup()
+  {
+    let v = 90;
+    let something_on = 1;
+    let sdz = [2, 20, 32, 17];
+    let sdx = 0;
+  }
+  run()
+  {
+    if (count % 4 < 3) {
+      let sw = 260;
+      for (i = 0; i < 16; ++i) {
+        let offset = 0;
+        if (i % 2 == 1) {
+          offset = sw;
+        }
+        note_on_at(hh, 17, i * pp + sw, vel = v);
+        v = incr(v, 80, 127);
+      }
+    }
+
+
+    # if (count % 4 == 0) {
+      #   set bd:eg_o1_ptch something_on;
+      #   something_on = 1 - something_on;
+      # }
+    # if (count % 3== 0) {
+      #   set bd:f1_en something_on;
+      #   something_on = 1 - something_on;
+      # }
+
+    #dmbeat(bd, 10);
+    if (count % 2 == 1) {
+      cmbeat(sd, sdz[sdx]);
+    }
+    #sdx = incr(sdx, 0, len(sdz));
+  }
+}
+
+let supblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 8 == 6) {
+      set creb:scramble 1;
+    }
+    if (count % 8 == 7) {
+      set creb:reverse 1;
+    }
+  }
+}
+
+# p4 < osc 8 "0 0.7" "send(0, creb, %)"
+# p5 < osc 8 "0 0.7" "send(1, sup, %)"
+
+# per1 = WARSND // GOOGD
+let stoooblah_gen = gen()
+{
+  setup()
+  {
+    let rnote = 33;
+    let ntz =  gamelody(16, rnote);
+    let nx = 0;
+    let nmax = 3;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      let rn = rnote;
+      if (count % 8 == 0) {
+        rn = rnote - 24;
+      }
+      ntz =  gamelody(16, rn);
+    }
+    for (i = 0; i < 16; ++i) {
+      stepper(per1, ntz, nx, i, 350);
+      nx = incr(nx, 0, nmax);
+    }
+    nmax = incr(nmax, 3, 16);
+  }
+}
+
+# let ish = loop(riser77/isHouse.wav); set ish:len 2; set ish:pitch 0.7
+let kblah_gen = gen()
+{
+  setup()
+  {
+    let suplen = 2;
+    let ishlen = 1;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (i % 4 == 0) {
+        note_on_at(bd, 40, i*pp);
+      }
+      if (i % 4 == 3) {
+        note_on_at(sup, 40, i*pp, dur = suplen * pp);
+      }
+      if (i % 4 == 2) {
+        note_on_at(ish, 40, i*pp, dur = ishlen * pp);
+      }
+    }
+
+    suplen = incr(suplen, 2, 4);
+    ishlen = incr(ishlen, 1, 3);
+
+
+
+  }
+}
+

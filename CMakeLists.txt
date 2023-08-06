@@ -22,10 +22,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set (AbletonLinkPath "/Users/thorstensideboard/Code/link/")
 set (HomebrewIncDir "/opt/homebrew/include/")
 set (ReadlineIncDir "/opt/homebrew/opt/readline/include")
+set (JsonIncDir "/opt/homebrew/Cellar/nlohmann-json/3.11.2/include")
 set (PerlinIncDir "/Users/thorstensideboard/Code/PerlinNoise")
 
 set (READLINE_LIB "/opt/homebrew/opt/readline/lib/libreadline.dylib")
 set (HISTORY_LIB "/opt/homebrew/opt/readline/lib/libhistory.dylib")
+
+set (RTCIncDir "/Users/thorstensideboard/pkgz/include")
+list(APPEND CMAKE_PREFIX_PATH "/Users/thorstensideboard/pkgz/")
 ######################################################################
 
 project(Sbsh VERSION 3.0
@@ -47,11 +51,14 @@ add_executable(Sbsh ${Sbsh_SOURCES})
 find_library(PORTAUDIO_LIB portaudio)
 find_library(PORTMIDI_LIB portmidi)
 find_library(SNDFILE_LIB sndfile)
+find_package(LibDataChannel REQUIRED)
 
 target_include_directories(Sbsh PRIVATE ${Sbsh_INCLUDE_DIRS})
 target_include_directories(Sbsh PRIVATE ${HomebrewIncDir})
 target_include_directories(Sbsh PRIVATE ${ReadlineIncDir})
 target_include_directories(Sbsh PRIVATE ${PerlinIncDir})
+target_include_directories(Sbsh PRIVATE ${JsonIncDir})
+target_include_directories(Sbsh PRIVATE ${RTCIncDir})
 
 include(${AbletonLinkPath}/AbletonLinkConfig.cmake)
 target_link_libraries(Sbsh Ableton::Link)
@@ -60,6 +67,7 @@ target_link_libraries(Sbsh ${PORTMIDI_LIB})
 target_link_libraries(Sbsh ${READLINE_LIB})
 target_link_libraries(Sbsh ${HISTORY_LIB})
 target_link_libraries(Sbsh ${SNDFILE_LIB})
+target_link_libraries(Sbsh LibDataChannel::LibDataChannel)
 
 
 #################################################################

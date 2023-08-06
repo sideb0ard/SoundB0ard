@@ -12,18 +12,19 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include <AudioPlatform.hpp>
-#include <PerlinNoise.hpp>
-#include <interpreter/evaluator.hpp>
-#include <interpreter/lexer.hpp>
-#include <interpreter/object.hpp>
-#include <interpreter/parser.hpp>
-#include <interpreter/token.hpp>
 #include <iomanip>
 #include <iostream>
-#include <process.hpp>
 #include <thread>
-#include <tsqueue.hpp>
+
+#include "AudioPlatform.hpp"
+#include "PerlinNoise.hpp"
+#include "interpreter/evaluator.hpp"
+#include "interpreter/lexer.hpp"
+#include "interpreter/object.hpp"
+#include "interpreter/parser.hpp"
+#include "interpreter/token.hpp"
+#include "process.hpp"
+#include "tsqueue.hpp"
 
 extern Mixer *mixr;
 
@@ -32,6 +33,7 @@ Tsqueue<int> audio_reply_queue;  // for reply from adding SoundGenerator
 Tsqueue<std::string> eval_command_queue;
 Tsqueue<std::string> repl_queue;
 Tsqueue<event_queue_item> process_event_queue;
+Tsqueue<StereoVal> webrtc_output_queue;
 
 siv::PerlinNoise perlinGenerator;  // only for use by eval thread
 

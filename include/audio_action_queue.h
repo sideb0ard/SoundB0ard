@@ -15,6 +15,8 @@ enum AudioAction {
   ADD,
   ADD_FX,
   BPM,
+  ENABLE_EQ,
+  DISABLE_EQ,
   INFO,
   HELP,
   LIST_PRESETS,

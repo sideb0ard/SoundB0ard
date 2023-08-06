@@ -23,6 +23,8 @@ http://portmedia.sourceforge.net/portmidi/
 http://www.mega-nerd.com/libsndfile/
 http://ctags.sourceforge.net/
 https://github.com/Reputeless/PerlinNoise
+https://github.com/nlohmann/json
+https://github.com/paullouisageneau/libdatachannel
 
 I still need to do some more work to make it portable. For the moment I've only been developing on OSX.
 I've recently moved the project to CMake and using c++20. Edit the CMakeLists.txt and adjust any paths required.
@@ -39,4 +41,20 @@ then run it from the top level directory (so it can find sample dir):
 Demo here --
 
 [![Alt text](https://img.youtube.com/vi/wNFlijArs2g/0.jpg)](https://www.youtube.com/watch?v=VRMtDkt9qRY)
+
+
+
+############
+Dumbo CmakeFile tutorial
+This is a personal note as i struggled to link against another CMake project - libdatachannel
+
+In the program you want to link against, follow the build instructions.  
+The crucial part is to actually install:  
+`cmake --install . --prefix="/Users/thorstensideboard/pkgz"`   
+^ this creates the files you need for your own CMakeLists.txt file
+then in your CMakeLists.txt file, add
+`list(APPEND CMAKE_PREFIX_PATH "/Users/thorstensideboard/pkgz/")`
+`find_package(LibDataChannel REQUIRED)`
+`target_link_libraries(Sbsh LibDataChannel::LibDataChannel)`
+
 
