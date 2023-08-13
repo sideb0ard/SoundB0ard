@@ -75,6 +75,8 @@ let melblah_gen = gen()
     let bjz = [3, 7, 11];
     let bx = 0;
     let beat = bjork(bjz[bx], 16);
+    let drz = [100, 250, 600, 900];
+    let drx = 0;
   }
   run()
   {
@@ -96,7 +98,8 @@ let melblah_gen = gen()
       for (i = 0; i < 16; ++i) {
         if (mel[i] > 0) {
           #note_on_at(per1, mel[i], i * pp);
-          note_on_at(dx2, mel[i], i * pp);
+          note_on_at(dx2, mel[i], i * pp, dur = drz[drx]);
+          drx = incr(drx, 0, len(drz));
           set hhb:pidx i at=i*pp;
         }
       }
@@ -150,7 +153,7 @@ let fblah_gen = gen()
 {
   setup()
   {
-    let bs = combinor(bassgen(),[27,24]);
+    let bs = combinor(bassgen(),[27,24, 31]);
     let ix = 0;
     let imx = 3;
     let dr = 100;

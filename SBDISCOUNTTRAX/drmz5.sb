@@ -3,6 +3,11 @@
 # per2 cwy DUUSRTY  // per1 BONG0
 # per2 GHOSTXZ // per1 BONG0
 # load_preset(per2, "GHOSTXZ"); load_preset(per1, "BONG0"); load_preset(bd, "FWUMPE");
+
+
+let cb = loop(dloops/NeedleClickBeatJump.aiff);
+
+
 let bt = bjork(5, 16);
 
 let d00blah_gen = gen()
@@ -73,7 +78,7 @@ let bbblah_gen = gen()
     let bx = 0;
     let dc = 10;
     let d= 100;
-    let v = 80;
+    let v = 127;
   }
   run()
   {
@@ -83,11 +88,7 @@ let bbblah_gen = gen()
     }
     for (i = 0; i < 16; ++i) {
       if (bt[i] == 1) {
-        note_on_at(bd, 23, i * pp, vel = v);
-        v = v + 90;
-        if (v > 120) {
-          v = 80;
-        }
+        note_on_at(bd, 27, i * pp, vel = v);
       }
     }
   }

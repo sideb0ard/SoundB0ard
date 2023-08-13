@@ -1279,7 +1279,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                audio_queue.push(std::move(action));
              }
            }
-
            for (size_t i = 0; i < args.size(); i++) {
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[i]);
@@ -1296,9 +1295,19 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"unsolo", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object> {
-                     (void)args;
+                     auto at_obj =
+                         std::find_if(args.begin(), args.end(),
+                                      [](std::shared_ptr<object::Object> o) {
+                                        return o->Type() == object::AT_OBJ;
+                                      });
+                     int delayed_by{0};
+                     if (at_obj != args.end()) {
+                       auto at = std::dynamic_pointer_cast<object::At>(*at_obj);
+                       if (at) delayed_by = at->value_;
+                     }
                      auto action =
                          std::make_unique<AudioActionItem>(AudioAction::UNSOLO);
+                     action->delayed_by = delayed_by;
                      audio_queue.push(std::move(action));
                      return evaluator::NULLL;
                    })},
@@ -1935,7 +1944,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
        cmd = "let cl = drum(); vol cl 0.7;";
        eval_command_queue.push(cmd);
 
-       cmd = "let cb = drum(); vol cb 0.7; load_preset(cb, \"MFFF\");";
+       cmd = "let cb = drum(); vol cb 0.7; load_preset(cb, \"WARSND\");";
        eval_command_queue.push(cmd);
 
        cmd = "let hh = drum(); vol hh 0.3; load_preset(hh, \"HIZHZ\");";

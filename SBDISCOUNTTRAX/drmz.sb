@@ -147,6 +147,16 @@ let woblah_gen = gen()
   }
 }
 
+let crewblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+
 let dxblah_gen = gen()
 {
   setup()
@@ -159,6 +169,7 @@ let dxblah_gen = gen()
   }
   run()
   {
+    set creb:poffset 0;
     if (count % 2 == 0) {
       for (i = 0; i < 16; ++i) {
         let v = 80 + rand(20);
@@ -167,6 +178,7 @@ let dxblah_gen = gen()
         }
         if (mel[i] > 0) {
           note_on_at(insz[ix], mel[i], i * pp, vel = v, dur = d);
+          set creb:pidx i;
         }
         if (i % ixlen == 0) {
           ix = incr(ix, 0, len(insz));
