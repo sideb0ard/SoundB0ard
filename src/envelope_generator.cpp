@@ -38,6 +38,12 @@ void EnvelopeGenerator::Reset() {
   }
 }
 
+void EnvelopeGenerator::SetState(unsigned int state) {
+  if (state < MAX_NUM_STATES) {
+    m_state = state;
+  }
+}
+
 void EnvelopeGenerator::SetEgMode(unsigned int mode) {
   m_eg_mode = mode;
   if (m_eg_mode == ANALOG) {

@@ -1,4 +1,7 @@
 # KEY OF F# - 18 - [18, 20, 22, 23, 25, 27, 29, 30]
+# F#
+let key = 18 ;
+let notz = notes_in_key(key);
 
 # per1  DURTH per2 PHART // Srqttx
 # let esk = loop(dloops/EKSIbeat.aiff); set esk:len 2
@@ -8,26 +11,15 @@ let boolah_gen = gen()
 {
   setup()
   {
-    let numz = [2, 3, 5, 3, 1, 0];
-    let nx = 0;
-    let melntz = [23, 27, 18, 30];
-
-    let bt = bjork(numz[nx], 8);
-    nx = incr(nx, 0, len(numz));
-    bt = bt +  bjork(numz[nx], 8);
-    let mel = combinor(bt, melntz);
+    let mel = key_riff(key);
     let steppa = sseq(mel);
-
     let stepz = 1;
   }
   run()
   {
 
     if (count % 4 == 0) {
-      bt = bjork(numz[nx], 8);
-      nx = incr(nx, 0, len(numz));
-      bt = bt +  bjork(numz[nx], 8);
-      mel = combinor(bt, melntz);
+      mel = key_riff(key);
       steppa = sseq(mel);
     }
 

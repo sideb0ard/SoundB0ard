@@ -18,7 +18,8 @@ enum {
   DECAY,
   SUSTAIN,
   RELEASE,
-  SHUTDOWN
+  SHUTDOWN,
+  MAX_NUM_STATES,
 };
 
 class EnvelopeGenerator {

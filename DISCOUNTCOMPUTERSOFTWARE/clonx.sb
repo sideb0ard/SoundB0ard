@@ -9,7 +9,7 @@ let bd1 = sample(bd/solid.aiff);
 let bd2 = sample(bd/LOUkick.aiff);
 let bd3 = sample(bd/garageKick.aiff);
 
-# let wrb = loop(JUNALGOGZ/WARHSBeat.wav); send(2, wrb, 0.4) ;
+# let fnk = loop(JUNALGOGZ/funkyBeat.wav); set fnk:len 4
 
 let kblah_gen = gen()
 {
@@ -35,6 +35,10 @@ let kblah_gen = gen()
   run()
   {
 
+    if (count % (lx + 1) == 0) {
+      set fnk:stutter 1;
+    }
+
     if (count % 8 == 7) {
       nx = incr(nx, 0, len(nomz));
       beat = bjork(nomz[nx], 16);
@@ -45,6 +49,16 @@ let kblah_gen = gen()
       hs = 0;
     }
 
+    set fnk:poffset 0;
+    if (count % 4 == 3) {
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          set fnk:pidx 16 - beat[i];
+        }
+      }
+    }
+
+    #set fnk:on 1;
     if (count % 8 < 7) {
       for (i = 0; i < 16; ++i) {
         stepper(bdz[bdx], beat, lx, i, dzz[dzx]);
@@ -56,8 +70,10 @@ let kblah_gen = gen()
       }
       lmax = incr(lmax, 2, 16);
     } else {
+      # play_array(fnk, beat);
       perky(invert(beat*2), bdz);
       perky(beat*2, hatz);
+      set fnk:scramble 1;
     }
 
   }
@@ -180,7 +196,7 @@ let ppblah_gen = gen()
   setup()
   {
     let pat = rand_array(16, 0, 5);
-    let dr = 100;
+    let dr = 200;
     let vr = 110;
   }
   run()
@@ -191,11 +207,11 @@ let ppblah_gen = gen()
           note_on_at(percz[pat[i]], 1, i*pp, dur = dr, vel = vr);
           vr = vr + 7;
           if (vr > 125) {
-            vr = 50 + rand(20);
+            vr = 100 + rand(20);
           }
-          dr = dr + 7;
-          if (dr > 225) {
-            dr = 50 + rand(20);
+          dr = dr + 27;
+          if (dr > 725) {
+            dr = 150 + rand(20);
           }
         }
       }
@@ -203,6 +219,16 @@ let ppblah_gen = gen()
     if (count % 11 == 0) {
       pat = rand_array(16, 0, 5);
     }
+  }
+}
+
+let ddblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
   }
 }
 

@@ -104,7 +104,7 @@ let bdlah_gen = gen()
   }
 }
 
-# let disc = loop(dloops/keeponDancingDiscoLoop.aiff)
+#  let hhb = loop(JUNALGOGZ/hhb.wav);
 
 # load_preset(per1, "glotch"); vol per1 0.7; load_preset(sd, "BADUM"); vol sd 0.5;
 # p3 < ramp 8 "1 0" "vol one %";
@@ -157,8 +157,13 @@ let modxblah_gen = gen()
 }
 
 # let mac = loop(aaassembly/onBEATMARCUS.wav); send(2, mac, 0.5);
+# let disc = loop(dloops/keeponDancingDiscoLoop.aiff)
+
 # xassign(0, mac); xassign(1, disc);
 
+# p2 $ missy_gen
+
+# p5 $ modxblah_gen
 
 let hh1 = sample(voices/yo.wav);
 let uf = sample(voices/uhUmf.aiff);
@@ -239,9 +244,7 @@ let beatwablah_gen = gen()
   }
 }
 
-# load_preset(per3, "MFFF"); vol per3 0.3; p11 $ mooblah_gen
-# load_preset(per3, "Srqttx"); vol per3 0.6
-# xassign(0, mac); xassign(1, wrb)
+# load_preset(per3, "MFFF"); vol per3 0.8; p11 $ mooblah_gen
 
 let mooblah_gen = gen()
 {

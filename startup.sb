@@ -359,7 +359,9 @@ let stepper = fn(sg, pat, read_idx, play_idx, d)
         v = 127;
       }
       note_on_at(sg, pat[read_idx], play_idx * pp, dur = d, vel = v);
+      return true;
     }
+    return false;
   }
 }
 let dstepper = fn(sg, sg2, pat, read_idx, play_idx, d)
@@ -833,3 +835,27 @@ let take_n = fn(an_array, num_to_take) {
   return numz;
 }
 
+let mashup = fn(sndgenz)
+{
+
+  if (type(sndgenz) != "ARRAY") {
+    print("WHOA", type(sngenz));
+    return;
+  }
+  if (len(sndgenz) == 0) {
+    return;
+  }
+  for (i = 0; i < len(sndgenz); ++i) {
+    xassign(i % 2, sndgenz[i]);
+  }
+
+  let poz = [-1, 1];
+  let px = 0;
+  for (i = 0; i < 16; ++i) {
+    if (i % 4 == 0) {
+      set mixer:xfader:xpos poz[px] at=i*pp;
+      px = incr(px, 0, len(poz));
+    }
+  }
+  solo(sndgenz[rand(len(sndgenz))], at = 12*pp) ;
+}
