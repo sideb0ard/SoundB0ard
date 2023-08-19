@@ -802,7 +802,7 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
         std::cerr << "WHOE NELLY! Naw SG! bailing out!\n";
         return;
       }
-      if (action->param_name == "volume")
+      if (action->param_name == "volume" || action->param_name == "vol")
         sg->SetVolume(param_val);
       else if (action->param_name == "pan")
         sg->SetPan(param_val);
