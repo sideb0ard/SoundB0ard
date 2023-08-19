@@ -1,0 +1,100 @@
+# f
+#let key = 40;
+#let key = 30;
+let key = 30;
+
+let jdy = sample(aaassembly/heyJODY.wav);
+# let joeyp = loop(aaassembly/joeyPIENO.wav); set joeyp:len 2;
+# let boop = loop(aaassembly/boopboop.wav);
+# let hih = loop(legowelt/Synth-HiWayOne.wav); set hih:len 2;
+# let ny = loop(aaassembly/NYhouseJOEY.wav);
+# let hka = loop(aaassembly/hooka.wav)
+
+let jblah_gen = gen()
+{
+  setup()
+  {
+    let d = 10000;
+    let hkvol = 1;
+  }
+  run()
+  {
+    if (count % 8 == 0) {
+      let b = rand_beat();
+
+      vol hka 0;
+      if (hkvol > 0) {
+        vol hka 1;
+      }
+      hkvol = 1 - hkvol;
+
+      for (i = 0; i < 16; ++i) {
+        if (b[i] == 1) {
+          note_on_at(jdy, 1, i * pp, dur = d);
+        }
+      }
+
+      d = d + 1000;
+      if (d > 50000) {
+        d = 100;
+      }
+    }
+
+    if (count % 4 == 0) {
+      set hih:stutter 1;
+      set ny:scramble 1;
+    }
+
+    if (count % 8 == 7) {
+      mashup([hih, ny, hka]);
+    }
+  }
+}
+
+# let jb = loop(aaassembly/jungleBREAKDOWN.wav); set jb:len 4;
+
+# dx = ZApzz
+let mmblah_gen = gen()
+{
+  setup()
+  {
+    let mel = key_riff(key);
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      for (i = 0; i < 16; ++i) {
+        if (mel[i] > 0) {
+          note_on_at(dx, mel[i], i * pp);
+        }
+      }
+    } else {
+      mel = key_riff(key);
+    }
+  }
+}
+
+# let hh1 = loop(aaassembly/hiphouse1.wav); vol hh1 0;
+# let hh2 = loop(aaassembly/hiphouse2.wav); vol hh2 0;
+# let hhacid = loop(aaassembly/hiphouseACID.wav); vol hhacid 0;
+# let hhturn = loop(aaassembly/hiphouseTURNIOUT.wav); vol hhturn 0;
+let hhblah_gen = gen()
+{
+  setup()
+  {
+    let hhz = [hh1, hh2, hhacid, hhturn];
+    let hx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < len(hhz); ++i) {
+      vol hhz[hx] 0;
+      if (i == hx) {
+        vol hhz[hx] 1;
+      }
+    }
+    hx = incr(hx, 0, len(hhz));
+  }
+}
+
+
