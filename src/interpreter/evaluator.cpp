@@ -321,11 +321,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   if (pan_stmt) {
     auto target = Eval(pan_stmt->target_, env);
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(target);
-    if (soundgen) {
+    auto value = Eval(pan_stmt->value_, env);
+    if (soundgen && value) {
       auto action = std::make_unique<AudioActionItem>(AudioAction::UPDATE);
       action->mixer_soundgen_idx = soundgen->soundgen_id_;
       action->param_name = "pan";
-      action->param_val = pan_stmt->value_;
+      action->param_val = value->Inspect();
       audio_queue.push(std::move(action));
     }
   }
@@ -395,10 +396,15 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       std::dynamic_pointer_cast<ast::VolumeStatement>(node);
   if (vol_stmt) {
     auto action = std::make_unique<AudioActionItem>(AudioAction::UPDATE);
-    action->param_name = "volume", action->param_val = vol_stmt->value_;
+    action->param_name = "volume";
+
     auto target = Eval(vol_stmt->target_, env);
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(target);
-    if (soundgen) {
+
+    auto value = Eval(vol_stmt->value_, env);
+
+    if (soundgen && value) {
+      action->param_val = value->Inspect();
       action->mixer_soundgen_idx = soundgen->soundgen_id_;
       audio_queue.push(std::move(action));
     }

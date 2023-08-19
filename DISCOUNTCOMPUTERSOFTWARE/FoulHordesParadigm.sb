@@ -1,19 +1,36 @@
 # key f - 17, 29, 41, 53, 65, 77
+let blah_fn = fn()
+{
+}
 let key = 27;
 # [29, 31, 33, 34, 36, 38, 40, 41]
 # vi-ii-V-I [38, 41, 45] [31, 34, 38] [36, 40, 43] [29, 33, 36]
 
 # let chrdz = [ [38, 41, 45], [31, 34, 38], [36, 40, 43], [29, 33, 36] ];
 # let chrdz = [ [38, 45], [34, 38], [43], [29, 36] ];
-let chrdz = [ [36, 43], [29, 36], [38] ];
+let ntz_in_key = notes_in_key(key);
+let chrdz = [ notes_in_chord(key), notes_in_chord(ntz_in_key[3]), notes_in_chord(ntz_in_key[4])];
 let crx = 0;
 let ntx = 0;
 
 let beat = rand_beat();
 
-# bpm 160; load_preset(per2, "SNDCLNR")
-# bpm 160; load_preset(per2, "FRAK")
+# bpm 160; load_preset(per2, "wururrrp"); load_preset(dx2, "klonk");
 # let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen; p3 $ ddblah_gen
+
+
+let chordblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      crx = incr(crx, 0, len(chrdz));
+    }
+  }
+}
 
 let wblah_gen = gen()
 {
@@ -35,71 +52,6 @@ let wblah_gen = gen()
   }
 }
 
-# dx2 = wururrrp
-let ddblah_gen = gen()
-{
-  setup()
-  {
-    let d = 130;
-    let mel1 = key_riff(key);
-    let mel2 = key_riff(key);
-    let mel3 = key_riff(key);
-    let melz = [mel1, mel1, mel2];
-    let mx = 0;
-    let offr = 110;
-    let ioff = 2;
-  }
-  run()
-  {
-    if (count % 4 < 3) {
-      for (i = 0; i < 16; ++i) {
-        let off = 0;
-        if (i % 2 == 1) {
-          off = offr;
-        }
-        if (melz[mx][i] > 0) {
-          let v = 100 + rand(27);
-          if (i % 4 == 1) {
-            v = 127;
-          }
-          if (!is_in(beat, i)) {
-            let n =  melz[mx][i];
-            if (count % 8 == 7) {
-              n = n + 12;
-            }
-            note_on_at(dx2, n, i * pp + off, dur = d);
-
-            if (count % 4 == 0) {
-              let fourth= scale_note(n + 7, key);
-              note_on_at(dx2, fourth, i * pp + off, dur = d);
-            }
-          }
-          d = d + 20;
-        }
-      }
-      if (d > 400) {
-        d = 100;
-      }
-      mx = incr(mx, 0, len(melz));
-    }
-    set bx:poffset 0;
-    if (count % 3 == 0) {
-      for (i = 0; i < 16; ++i) {
-        if (beat[i] == 1) {
-          set bx:pidx i;
-        }
-      }
-    }
-
-    if (count % 8 == 0) {
-      beat = rand_beat();
-      mel1 = key_riff(k);
-      mel2 = key_riff(k);
-      mel3 = key_riff(k);
-      melz = [mel1, mel1, mel2];
-    }
-  }
-}
 
 # load_preset(oh, "OH"); p4 $ hhblah_gen
 let hhblah_gen = gen()
@@ -155,7 +107,7 @@ let vblah_gen = gen()
       set vrv:scramble 1;
       set nots:stutter 1;
     }
-    if (count % 8 == 7) {
+    if (count % 4 == 3) {
       set vrv:reverse 1;
       vol nots 0;
       #solo(vrv, at=8*pp);
@@ -169,7 +121,7 @@ let vblah_gen = gen()
     }
   }
 }
-# dx -  default
+# dx -  default // per2 wururrrp
 # let snp = loop(Riser77/snipHop.wav); set snp:len 2; p4 $ dxxxblah_gen
 let dxxxblah_gen = gen()
 {
@@ -199,8 +151,14 @@ let dxxxblah_gen = gen()
       }
     }
     mxx = incr(mxx, 2, 16);
+    if (count % 3 == 0) {
+      set snp:stutter 1;
+    }
   }
 }
+
+# let iget = loop(aaassembly/iegtMAD.wav);
+# let yoyo = loop(aaassembly/yoyoredman.wav);
 
 let kkbelah_gen = gen()
 {
@@ -211,9 +169,16 @@ let kkbelah_gen = gen()
   {
     if (count % 4 == 0) {
       set snp:stutter 1;
+      set supa:scramble 1;
+      set iget:stutter 1;
     }
     if (count % 6 == 0) {
       set snp:scramble 1;
+      mashup([snp, yoyo, iget, dx, dx2]);
+    }
+    if (count % 8 == 0) {
+      set supa:stutter 1;
+      mashup([snp, yoyo, iget, dx, dx2]);
     }
     if (count % 16 == 15) {
       set snp:reverse 1;
@@ -226,9 +191,28 @@ let melblah_gen = gen()
 {
   setup()
   {
+    let idx = 0;
+    let beat = rand_beat();
+    let d = 50;
   }
   run()
   {
+    if (count % 2 == 0) {
+      let c = chrdz[crx];
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          note_on_at(mo, c[idx]+12, i * pp, d);
+          idx = incr(idx, 0, len(c));
+          d = d + 50;
+          if (d > 500) {
+            d = 50;
+          }
+        }
+      }
+    }
+    if (count % 8 == 0) {
+      beat = rand_beat();
+    }
   }
 }
 

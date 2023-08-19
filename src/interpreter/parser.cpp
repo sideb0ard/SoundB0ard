@@ -294,18 +294,14 @@ std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement() {
   std::shared_ptr<ast::VolumeStatement> stmt =
       std::make_shared<ast::VolumeStatement>(cur_token_);
 
-  if (PeekTokenIs(token::SLANG_IDENT)) {
-    NextToken();
-    stmt->target_ = ParseIdentifier();
-  }
-
-  if (PeekTokenIs(token::SLANG_NUMBER)) {
-    NextToken();
-    stmt->value_ = cur_token_.literal_;
-  } else {
-    std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_ << std::endl;
+  if (!ExpectPeek(token::SLANG_IDENT)) {
     return nullptr;
   }
+  stmt->target_ = ParseIdentifier();
+
+  NextToken();
+  stmt->value_ = ParseExpression(Precedence::LOWEST);
+  if (!stmt->value_) return nullptr;
 
   if (PeekTokenIs(token::SLANG_SEMICOLON)) NextToken();
 
@@ -317,23 +313,13 @@ std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement() {
       std::make_shared<ast::PanStatement>(cur_token_);
 
   if (!ExpectPeek(token::SLANG_IDENT)) {
-    // std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_ <<
-    // std::endl;
     return nullptr;
   }
   stmt->target_ = ParseIdentifier();
 
-  if (PeekTokenIs(token::SLANG_NUMBER)) {
-    NextToken();
-    stmt->value_ = cur_token_.literal_;
-  } else if (PeekTokenIs(token::SLANG_MINUS)) {
-    NextToken();
-    NextToken();
-    stmt->value_ = "-" + cur_token_.literal_;
-  } else {
-    std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_ << std::endl;
-    return nullptr;
-  }
+  NextToken();
+  stmt->value_ = ParseExpression(Precedence::LOWEST);
+  if (!stmt->value_) return nullptr;
 
   if (PeekTokenIs(token::SLANG_SEMICOLON)) NextToken();
 

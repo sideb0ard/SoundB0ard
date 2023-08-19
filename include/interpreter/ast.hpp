@@ -556,7 +556,7 @@ class VolumeStatement : public Statement {
 
  public:
   std::shared_ptr<Expression> target_{nullptr};
-  std::string value_;
+  std::shared_ptr<Expression> value_{nullptr};
 };
 
 class PanStatement : public Statement {
@@ -566,7 +566,7 @@ class PanStatement : public Statement {
 
  public:
   std::shared_ptr<Expression> target_{nullptr};
-  std::string value_;
+  std::shared_ptr<Expression> value_{nullptr};
 };
 
 // ROOT //////////////////////

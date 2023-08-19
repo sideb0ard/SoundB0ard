@@ -1,6 +1,7 @@
 # KEY OF F# - 18 - [18, 20, 22, 23, 25, 27, 29, 30]
 # F#
-let key = 18 ;
+# let key = 18 ;
+let key = 24;
 let notz = notes_in_key(key);
 
 # per1  DURTH per2 PHART // Srqttx
@@ -48,24 +49,24 @@ let boolah_gen = gen()
   }
 }
 
-# let eskblah_gen = gen()
-# {
-#   setup()
-#   {
-#   }
-#   run()
-#   {
-#     if (count % 2 == 0) {
-#       set esk:scramble 1;
-#     }
-#     if (count % 7 == 0) {
-#       set esk:stutter 1;
-#     }
-#     if (count % 15 == 0) {
-#       set esk:reverse 1;
-#     }
-#   }
-# }
+let eskblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set esk:scramble 1;
+    }
+    if (count % 7 == 0) {
+      set esk:stutter 1;
+    }
+    if (count % 15 == 0) {
+      set esk:reverse 1;
+    }
+  }
+}
 #
 # let bblah_gen = gen()
 # {

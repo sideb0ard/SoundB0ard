@@ -115,6 +115,7 @@ let countr = gen()
   run()
   {
     ++count;
+    unsolo();
   }
 }
 let xfade_gen = gen()
@@ -838,6 +839,7 @@ let take_n = fn(an_array, num_to_take) {
 let mashup = fn(sndgenz)
 {
 
+  xclear();
   if (type(sndgenz) != "ARRAY") {
     print("WHOA", type(sngenz));
     return;
