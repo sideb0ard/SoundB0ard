@@ -116,6 +116,7 @@ let countr = gen()
   {
     ++count;
     unsolo();
+    xclear();
   }
 }
 let xfade_gen = gen()

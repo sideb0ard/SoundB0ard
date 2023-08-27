@@ -1,8 +1,7 @@
 # key f - 17, 29, 41, 53, 65, 77
-let blah_fn = fn()
-{
-}
+
 let key = 27;
+
 # [29, 31, 33, 34, 36, 38, 40, 41]
 # vi-ii-V-I [38, 41, 45] [31, 34, 38] [36, 40, 43] [29, 33, 36]
 
@@ -14,10 +13,6 @@ let crx = 0;
 let ntx = 0;
 
 let beat = rand_beat();
-
-# bpm 160; load_preset(per2, "wururrrp"); load_preset(dx2, "klonk");
-# let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen; p3 $ ddblah_gen
-
 
 let chordblah_gen = gen()
 {
@@ -32,66 +27,7 @@ let chordblah_gen = gen()
   }
 }
 
-let wblah_gen = gen()
-{
-  setup() {
-    let sw = 100;
-    let dr = 50;
-  }
-  run()
-  {
-    if (count% 8 == 7) {
-      set bx:scramble 1;
-    }
-    if (count% 16 == 15) {
-      set bx:reverse 1;
-    }
-    if (count% 12 == 0) {
-      set bx:stutter 1;
-    }
-  }
-}
-
-
-# load_preset(oh, "OH"); p4 $ hhblah_gen
-let hhblah_gen = gen()
-{
-  setup()
-  {
-    let hpat = rand_array(16, 0, 1);
-    let offr = 10;
-  }
-  run()
-  {
-    for (i = 0; i < 16; ++i) {
-      let off = 0;
-      if (i % 2 == 1) {
-        off = offr;
-      }
-      if (hpat[i] == 1) {
-        note_on_at(hh, 17, i * pp + off);
-      }
-    }
-    offr = offr + 10;
-    if (offr > 160) {
-      offr = 20;
-    }
-    if (count % 4 == 0) {
-      hpat = rand_array(16, 0, 1);
-    }
-    vol bx 1;
-    if (count % 16 == 15) {
-      vol bx 0 at=12*pp;
-    }
-    for (i = 0; i < 16; ++i) {
-      if (i % 4 == 0) {
-        note_on_at(oh, 23, i * pp);
-      }
-    }
-  }
-}
-
-# let vrv = loop(JUNALGOGZ/VIBErev.wav); set vrv:len 4; add_fx(vrv, "sidechain", bx);
+# let vrv = loop(JUNALGOGZ/VIBErev.wav); set vrv:len 4;
 # let nots = loop(voices/notstayinghome.wav); set nots:len 2; p6 $ vblah_gen
 let vblah_gen = gen()
 {
@@ -103,25 +39,24 @@ let vblah_gen = gen()
 
     unsolo();
     if (count % 2 == 0) {
-      #vol nots 0.3;
       set vrv:scramble 1;
       set nots:stutter 1;
     }
     if (count % 4 == 3) {
       set vrv:reverse 1;
       vol nots 0;
-      #solo(vrv, at=8*pp);
     }
-    if (count % 4 == 0) {
+    if (count % 6 == 0) {
       vol vrv 1;
     }
-    if (count % 15 == 3) {
+    if (count % 8 == 7) {
       solo(vrv, at=14*pp);
       vol vrv 0 at = 16*pp;
     }
   }
 }
-# dx -  default // per2 wururrrp
+# dx -  default // per2 wururrrp Srqttx
+# dx wururrrp // M00n
 # let snp = loop(Riser77/snipHop.wav); set snp:len 2; p4 $ dxxxblah_gen
 let dxxxblah_gen = gen()
 {
@@ -137,7 +72,7 @@ let dxxxblah_gen = gen()
     let be = combinor(beat, ch);
     if (count % 8 < 6) {
       for (i = 0; i < 16; ++i) {
-        if (stepper(dx, be, ix, i, dr)) {
+        if (stepper(dx, down(be,12), ix, i, dr)) {
         } else {
           if (i > 8) {
             note_on_at(per2, ch, i * pp, dur = dr);
@@ -157,8 +92,9 @@ let dxxxblah_gen = gen()
   }
 }
 
-# let iget = loop(aaassembly/iegtMAD.wav);
-# let yoyo = loop(aaassembly/yoyoredman.wav);
+# let iget = loop(aaassembly/iegtMAD.wav); vol iget 0;
+# let yoyo = loop(aaassembly/yoyoredman.wav); vol yoyo 0;
+# p3 $ kkbelah_gen
 
 let kkbelah_gen = gen()
 {
@@ -168,24 +104,45 @@ let kkbelah_gen = gen()
   run()
   {
     if (count % 4 == 0) {
+      set iget:vol 1;
+      set snp:vol 1;
+      set yoyo:vol 1;
       set snp:stutter 1;
-      set supa:scramble 1;
       set iget:stutter 1;
     }
     if (count % 6 == 0) {
       set snp:scramble 1;
-      mashup([snp, yoyo, iget, dx, dx2]);
     }
     if (count % 8 == 0) {
-      set supa:stutter 1;
-      mashup([snp, yoyo, iget, dx, dx2]);
+      mashup([snp, yoyo, iget, dx]);
     }
     if (count % 16 == 15) {
       set snp:reverse 1;
     }
+    if (count % 6 == 5) {
+      set yoyo:vol 0;
+    }
+    if (count % 7 == 5) {
+      set iget:vol 0;
+    }
   }
 }
 
+
+# let bszz = sample(bombz/BSQ_BASSDROP.wav); p5 $ bsslah_gen
+let bsslah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 16 == 0) {
+      solo(bszz);
+      note_on_at(bszz, 1, 0, dur= 5000);
+    }
+  }
+}
 
 let melblah_gen = gen()
 {

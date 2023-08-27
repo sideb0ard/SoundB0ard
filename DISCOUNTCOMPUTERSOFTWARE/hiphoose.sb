@@ -1,0 +1,52 @@
+#let hh1 = loop(aaassembly/hiphouse1.wav); vol hh1 0;
+#let hh2 = loop(aaassembly/hiphouse2.wav); vol hh2 0;
+#let hhacid = loop(aaassembly/hiphouseACID.wav); vol hhacid 0;
+#let hhturn = loop(aaassembly/hiphouseTURNIOUT.wav); vol hhturn 0;
+
+let hhblahup_fn = fn()
+{
+  vol hh1 1;
+  vol hh2 1;
+  vol hhacid2 1;
+  vol hhturn 1;
+}
+
+let hhblah_gen = gen()
+{
+  setup()
+  {
+    let hhz = [hh1, hh2, hhacid, hhturn];
+    let hx = 0;
+    let hmax = 1;
+    let cnt = 1;
+  }
+  run()
+  {
+    hhblahup_fn();
+    if (count % 4 < 3) {
+      for (i = 0; i < 16; ++i) {
+        if (i % cnt == 0) {
+          for (j = 0; j < len(hhz); ++j) {
+            set hhz[j]:vol 0.1 at=i*pp;
+          }
+          set hhz[hx]:vol 1 at=i*pp;
+          hx = incr(hx, 0, hmax);
+        }
+      }
+    } else {
+      hhblahup_fn();
+      mashup(hhz);
+    }
+    if (count % 2 == 0) {
+      hmax = incr(hmax, 1, len(hhz));
+    }
+    if (count % 8 == 0) {
+      vol hhz[hx] 1;
+      set hhz[hx]:reverse 1 at=12*pp;
+      solo(hhz[hhx], at=12*pp);
+    }
+    cnt = incr(cnt, 1, 16);
+  }
+}
+
+
