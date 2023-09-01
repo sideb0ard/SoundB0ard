@@ -3,6 +3,9 @@
 let rootkeyz = [21];
 let rx = 0;
 
+# let rvb = loop(dloops/phoeneciaE1bar1.aif); set rvb:len 2
+# let poi = loop(aaassembly/POiSION.wav); set poi:len 2;
+# let tecn = loop(dloops/technB.wav); set tecn:len 2; p2 $ pblah_gen;
 let its = sample(aaassembly/itsSuicideVoice.wav);
 let pblah_gen = gen()
 {
@@ -15,15 +18,18 @@ let pblah_gen = gen()
   {
 
     if (count % 3 == 0) {
-      set bb:scramble 1;
-      set hip:stutter 1;
+      set rvb:scramble 1;
+      set tecn:stutter 1;
       vol poi 0;
     }
     if (count % 4 == 0) {
-      set bb:stutter 1;
-      set hip:scramble 1;
+      set rvb:stutter 1;
+      set tecn:scramble 1;
       note_on(its, 1, dur=dz[dzx]);
       dzx = incr(dzx, 0, len(dz));
+      vol poi 1;
+      mashup([poi, rvb, tecn]);
+      set poi:scramble 1;
     }
   }
 }

@@ -89,6 +89,9 @@ class Granulator : public SoundGenerator {
   bool stop_pending_{false};  // allow eg to stop
 
   int degrade_by_{0};  // percent change to drop bits
+                       //
+
+  std::array<int, 16> scrambled_pattern_{0};
 
   int cur_sixteenth_{0};
 

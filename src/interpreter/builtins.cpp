@@ -1969,6 +1969,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
        cmd = "let dx2 = fm(); vol dx2 0.7; load_preset(dx2, \"fnc\");";
        eval_command_queue.push(cmd);
 
+       cmd = "let mo = moog();";
+       eval_command_queue.push(cmd);
+
        return evaluator::NULLL;
      })},
     {"load_dir", std::make_shared<object::BuiltIn>(

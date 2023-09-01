@@ -1,0 +1,66 @@
+# let mw = loop(dloops/moWaxBeatStrings.aiff); vol mw 0;
+# let mws = loop(dloops/moWax90sSlink.aiff); set mws:pitch 2; vol mws 0;
+# let bbbr = loop(aaassembly/bassbeatLONGER.wav); set bbbr:len 2; vol bbbr 0;
+let xfadlah_gen = gen()
+{
+  setup()
+  {
+    let qx = 1;
+    let instz = [ mw, mws, tdd];
+    let ix1 = 0;
+    let ix2 = 1;
+  }
+  run()
+  {
+    set instz[ix1]:vol 1;
+    set instz[ix2]:vol 1;
+    if (count % 4 == 3 ) {
+      set instz[ix1]:vol 1;
+      set instz[ix2]:vol 0;
+      set instz[ix1]:vol 0 at=(16-qx)*pp;
+      set instz[ix2]:vol 1 at=(16-qx)*pp;
+      qx = incr(qx, 1, 16);
+    }
+    if (count % 4 == 1 ) {
+      mashup(instz);
+    }
+    if (count % 4 == 2 ) {
+      set instz[ix1]:vol 0;
+      set instz[ix2]:vol 0;
+      let b = rand_beat();
+      for (i = 0; i < 16; ++i) {
+        if (b[i] == 1) {
+          set instz[ix1]:vol 1 at = i* pp;
+          set instz[ix2]:vol 0 at = i*pp;
+        } else {
+          set instz[ix1]:vol 0 at = i* pp;
+          set instz[ix2]:vol 1 at = i*pp;
+        }
+      }
+    }
+    ix1 = incr(ix1, 0, len(instz));
+    ix2 = incr(ix2, 0, len(instz));
+  }
+}
+
+# let matrx = loop(voices/back2basiccRAPAMP.wav); set matrx:len 4; p3 $ rrrpplah_gen
+let rrrpplah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    vol duboc 0;
+    if (count % 8 == 6) {
+      vol duboc 1;
+    }
+    set matrx:vol 0;
+    if (count % 4 < 2 ) {
+      set duboc:stutter 1;
+      #set matrx:vol 1;
+      set matrx:scramble;
+    }
+  }
+}
+

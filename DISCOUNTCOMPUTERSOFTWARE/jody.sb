@@ -7,10 +7,9 @@ let jdy = sample(aaassembly/heyJODY.wav);
 
 # bpm 120
 # let intr = loop(legowelt/Synth-InterBellumAtmo.wav); set intr:len 2
-# let rkk = loop(dloops/rockafellayall2bar.aiff); set rkk:len 2;
+# let rkk = loop(dloops/rockafellayall2bar.aiff); set rkk:len 2; set rkk:pitch 1.2
 # let rks = loop(dloops/rocksteady_vocal.aif);
-
-# let say2 = loop(dloops/sayprayer2.aif); set say2:len 2
+# p2 $ jblah_gen
 
 let jblah_gen = gen()
 {
@@ -45,37 +44,61 @@ let jblah_gen = gen()
     }
 
     if (count % 8 == 5) {
+      set intr:vol 0;
       mashup([rkk, intr, rks]);
+    }
+    if (count % 12 == 11) {
+      set intr:vol 0.7;
+      solo(intr, at=8*pp);
     }
   }
 }
+# p4 < osc 8 "0 0.5" "send(0, [jdy, intr], %)"
+# p5 < osc 7 "0 0.5" "send(1, [jdy, intr], %)"
 
 # let jb = loop(aaassembly/jungleBREAKDOWN.wav); set jb:len 4;
 
-# dx = ZApzz
-# per1 - TRASHP Blkingz BLELLdx
-# load_preset(per1, "BLELLdx") ; load_preset(per2, "TRASHP");
-let mmblah_gen = gen()
+
+# mo = RUBBERduck
+
+let bassblah_gen = gen()
 {
   setup()
   {
-    let mel = key_riff(key);
-    let prz = [per1, per2];
-    let px = 0;
+    let mel1 = [30, 0, 0, 32, 0, 0, 32, 0, 0, 40, 0, 40, 41, 0, 30, 0];
+    let mel2 = [40, 0, 0, 33, 0, 40, 0, 41, 0, 0, 32, 0, 40, 0, 30, 0];
+    let melz = [mel1, mel2];
+    let mx = 0;
+
+    let midx = 0;
+    let midxmax = 3;
+
+    let dr = 200;
   }
   run()
   {
     if (count % 3 == 0) {
-      px = incr(px, 0, len(prz));
+      mx = incr(mx, 0, len(melz));
     }
-    if (count % 6 < 4) {
+    if (count % 4 < 2) {
+      let mel = melz[mx];
       for (i = 0; i < 16; ++i) {
         if (mel[i] > 0) {
-          note_on_at(prz[px], mel[i], i * pp);
+          note_on_at(mo, mel[i], i * pp, dur = dr);
         }
       }
-    } else {
-      mel = key_riff(key);
+    }
+    if (count % 4 == 3) {
+      let mel = melz[mx];
+      for (i = 0; i < 16; ++i) {
+        stepper(mo, mel, midx, i, dur = dr);
+        midx = incr(midx, 0, midxmax);
+      }
+      midxmax = incr(midxmax, 3, 16);
+    }
+    dr = dr + 50;
+    if (dr > 400) {
+      dr = 100;
     }
   }
 }

@@ -12,6 +12,40 @@
 
 namespace SBAudio {
 
+namespace {
+
+void ClearPattern(std::array<int, 16> &pattern) {
+  for (int i = 0; i < 16; ++i) {
+    pattern[i] = 0;
+  }
+}
+void StutterPattern(std::array<int, 16> &pattern) {
+  ClearPattern(pattern);
+
+  int idx = 0;
+  for (int i = 0; i < 16; ++i) {
+    if (rand() % 100 > 70) idx++;
+    pattern[i] = idx;
+  }
+}
+
+void ScramblePattern(std::array<int, 16> &pattern) {
+  ClearPattern(pattern);
+
+  for (int i = 0; i < 16; ++i) {
+    pattern[i] = i;
+    if (i % 4 > 0) {
+      pattern[i] = rand() % 16;
+    }
+    if (rand() % 100 > 90) {
+      pattern[i] = 0;
+    }
+  }
+  pattern[15] = 0;
+}
+
+}  // namespace
+
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 void Granulator::Reset() {
@@ -89,7 +123,9 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
 
       if (stutter_mode_ || scramble_mode_) {
         audio_buffer_read_idx_ =
-            (cur_sixteenth_ * size_of_sixteenth_) + rel_pos_within_a_sixteenth;
+            fmodf((scrambled_pattern_[cur_sixteenth_] * size_of_sixteenth_) +
+                      rel_pos_within_a_sixteenth,
+                  audio_buffer_.size());
       }
     }
   }
@@ -129,22 +165,7 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   if (loop_num < 0) loop_num = 0;
 
   if (tinfo.is_sixteenth) {
-    cur_sixteenth_ = (cur_sixteenth_ + pinc_) % (int)(16 * loop_len_);
-    if (scramble_mode_) {
-      if (cur_sixteenth_ % 2 != 0) {
-        int randy = rand() % 100;
-        if (randy < 25)  // repeat the third 16th
-          cur_sixteenth_ = 3;
-        else if (randy > 25 && randy < 50)  // repeat the 4th sixteenth
-          cur_sixteenth_ = 4;
-        else if (randy > 50 && randy < 75)  // repeat the 7th sixteenth
-          cur_sixteenth_ = 7;
-      }
-    }
-    if (stutter_mode_) {
-      if (rand() % 100 > 75) cur_sixteenth_++;
-      if (cur_sixteenth_ == (int)(16 * loop_len_)) cur_sixteenth_ = 0;
-    }
+    cur_sixteenth_ = tinfo.sixteenth_note_tick % 16;
   }
 }
 
@@ -368,7 +389,10 @@ void Granulator::SetLoopMode(unsigned int m) {
       granular_spray_frames_ = 441;  // 10ms * (44100/1000)
   }
 }
-void Granulator::SetScramblePending() { scramble_pending_ = true; }
+void Granulator::SetScramblePending() {
+  scramble_pending_ = true;
+  ScramblePattern(scrambled_pattern_);
+}
 
 void Granulator::SetStopPending(int loops) {
   stop_count_pending_ = true;
@@ -376,7 +400,10 @@ void Granulator::SetStopPending(int loops) {
   stop_countr_ = 0;
 }
 
-void Granulator::SetStutterPending() { stutter_pending_ = true; }
+void Granulator::SetStutterPending() {
+  stutter_pending_ = true;
+  StutterPattern(scrambled_pattern_);
+}
 void Granulator::SetReversePending() { reverse_pending_ = true; }
 
 void Granulator::SetLoopLen(double bars) {
