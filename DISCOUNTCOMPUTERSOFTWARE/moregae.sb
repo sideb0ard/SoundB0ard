@@ -1,4 +1,4 @@
-# let mw = loop(dloops/moWaxBeatStrings.aiff); vol mw 0;
+# let mw = loop(dloops/moWaxBeatStrings.aiff); vol mw 0; set mw:pitch 2;
 # let mws = loop(dloops/moWax90sSlink.aiff); set mws:pitch 2; vol mws 0;
 # let bbbr = loop(aaassembly/bassbeatLONGER.wav); set bbbr:len 2; vol bbbr 0;
 let xfadlah_gen = gen()
@@ -6,7 +6,7 @@ let xfadlah_gen = gen()
   setup()
   {
     let qx = 1;
-    let instz = [ mw, mws, tdd];
+    let instz = [ mw, mws, bbbr];
     let ix1 = 0;
     let ix2 = 1;
   }
@@ -39,7 +39,7 @@ let xfadlah_gen = gen()
       }
     }
     ix1 = incr(ix1, 0, len(instz));
-    ix2 = incr(ix2, 0, len(instz));
+    ix2 = incr(ix2, 1, len(instz));
   }
 }
 
@@ -55,11 +55,19 @@ let rrrpplah_gen = gen()
     if (count % 8 == 6) {
       vol duboc 1;
     }
-    set matrx:vol 0;
     if (count % 4 < 2 ) {
       set duboc:stutter 1;
-      #set matrx:vol 1;
-      set matrx:scramble;
+      set maw10:scramble 1;
+      play_array(matrx, rand_beat(), 1500);
+    }
+    if (count % 3 == 0) {
+      set rm:scramble 1;
+      set maw10:stutter 1;
+      set duboc:stutter 1;
+    }
+
+    if (count % 8 == 7) {
+      mashup([rm, maw10, gong]);
     }
   }
 }

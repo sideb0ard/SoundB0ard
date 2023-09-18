@@ -561,8 +561,18 @@ let dbeat = fn(bd)
 }
 let dmbeat = fn(bd, midi_num)
 {
-  let probz = {0:90, 6:90, 11:50, 14:50};
-  let parray = map_to_array(probz, 16);
+  let prob = rand(100);
+  if (prob < 20) {
+    return;
+  }
+
+  let parray = "";
+  if (prob < 80) {
+    let probz = {0:90, 4:30, 6:90, 8:30, 11:50, 12:20, 14:50, 15:10};
+    parray = map_to_array(probz, 16);
+  } else {
+    parray = combinor(rand_beat(), [90]);
+  }
   for (i = 0; i < 16; ++i) {
     if (parray[i] > 0 && parray[i] > rand(100)) {
       let v = 100 + rand(28);
@@ -574,9 +584,9 @@ let dmbeat = fn(bd, midi_num)
       }
       let offset = 0;
       if (i > 0) {
-        offset = rand(25);
+        offset = rand(45);
       }
-      note_on_at(bd, midi_num, i * pp + offset, vel = v);
+      note_on_at(bd, midi_num, i * pp + offset, vel = v, dur = 100 + rand(2000));
     }
   }
 }
@@ -779,10 +789,10 @@ let garmelody = fn(num_steps, notez, loop_len)
 let gamelody = fn(num_steps, root_key)
 {
   let melody = rand_array(num_steps, 0, 0);
-  let notez = notes_in_key(root_key);
+  let notez = take_random_n(notes_in_key(root_key), 3);
 
   for (i = 0; i < len(melody); ++i) {
-    if (rand(100)> 10) {
+    if (rand(100)> 30) {
       let note = notez[rand(len(notez))];
       if (i == 0 || i == len(melody) -1) {
         note = root_key;

@@ -91,7 +91,7 @@ let bassblah_gen = gen()
     if (count % 4 == 3) {
       let mel = melz[mx];
       for (i = 0; i < 16; ++i) {
-        stepper(mo, mel, midx, i, dur = dr);
+        stepper(per2, mel, midx, i, dr);
         midx = incr(midx, 0, midxmax);
       }
       midxmax = incr(midxmax, 3, 16);
@@ -99,6 +99,68 @@ let bassblah_gen = gen()
     dr = dr + 50;
     if (dr > 400) {
       dr = 100;
+    }
+  }
+}
+
+# dx = wuurpr
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    let ocz = [ 4, 16];
+    let ox = 0;
+    let dxmel = gamelody(16, ocz[ox]);
+    let sx = 0;
+    let smx = 3;
+    let dr = 100;
+  }
+  run()
+  {
+
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        if (dxmel[i] > 0) {
+          let v = 80 + rand(47);
+          if (i % 8 == 0) {
+            v = 127;
+          }
+          note_on_at(dx, dxmel[i], i*pp, vel = v, dur = dr);
+        }
+      }
+    }
+    if (count % 12 == 0) {
+      let dxmel = gamelody(16, ocz[ox]);
+      ox = incr(ox, 0, len(ocz));
+    }
+    if (count % 8 == 6) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, dxmel, sx, i, dr);
+        sx = incr(sx, 0, smx);
+      }
+    }
+    smx = incr(smx, 3, 16);
+    dr = dr + 20;
+    if (dr > 270) {
+      dr = 50;
+    }
+  }
+}
+
+# let prd = loop(dloops/PARANOIDlondon2TRIM.aiff); set prd:len 0.5;
+let pblah_gen = gen()
+{
+  setup()
+  {
+
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set prd:reverse 1;
+    }
+    if (count % 2 == 0) {
+      set prd:stutter 1;
     }
   }
 }
