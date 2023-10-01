@@ -5,13 +5,13 @@ let key = 25;
 # [29, 31, 33, 34, 36, 38, 40, 41]
 # vi-ii-V-I [38, 41, 45] [31, 34, 38] [36, 40, 43] [29, 33, 36]
 
-# bpm 160; load_preset(dx, "wahaio"); load_preset(per3, "PHRANK");
+# bpm 110; load_preset(dx, "ETZ"); load_preset(per3, "scicczr");
 # p3 $ dxxxblah_gen; p4 $ melblah_gen
 
-#let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen; set bx:pitch 0.8
 
 #let sal = loop(dloops/sadLIB.aiff);
 #let krs = loop(dloops/krushSnareRoll.aiff); p5 $ drumblah_gen
+#let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen; set bx:pitch 0.8
 
 let wblah_gen = gen()
 {
@@ -50,7 +50,6 @@ let vblah_gen = gen()
   run()
   {
 
-    unsolo();
     if (count % 2 == 0) {
       set vrv:scramble 1;
       set nots:stutter 1;
@@ -64,7 +63,7 @@ let vblah_gen = gen()
     }
     if (count % 6 == 0) {
       vol vrv 1;
-      vol nots 1;
+      #vol nots 1;
     }
     if (count % 8 == 7) {
       solo(vrv, at=14*pp);
@@ -72,7 +71,7 @@ let vblah_gen = gen()
     }
   }
 }
-#load_preset(dx, "garage"); // halien // bassTFumpoctMin1 // ETZ // wahaio
+# load_preset(dx, "wahaio");
 let dxxxblah_gen = gen()
 {
   setup()
@@ -105,8 +104,7 @@ let dxxxblah_gen = gen()
 }
 
 # let iget = loop(aaassembly/iegtMAD.wav); vol iget 0;
-# let yoyo = loop(aaassembly/yoyoredman.wav); vol yoyo 0;
-# p4 $ kkbelah_gen
+# let yoyo = loop(aaassembly/yoyoredman.wav); vol yoyo 0;  p4 $ kkbelah_gen
 
 let kkbelah_gen = gen()
 {
@@ -138,7 +136,9 @@ let kkbelah_gen = gen()
 }
 
 
-# mo = swqSAW or sandepp Esgr
+# vol sal 0; p5 $ ""; vol bx 0;
+# jump to sql BELOW
+
 let melblah_gen = gen()
 {
   setup()
@@ -207,23 +207,10 @@ let drumblah_gen = gen()
   }
 }
 
-let wnah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
-    if (count % 4 == 0) {
-      set sql:scramble 1;
-    }
-    if (count % 3 == 0) {
-      set wnk:stutter 1;
-    }
-    if (count % 8 == 7) {
-      set wnk:reverse 1;
-      set wnk:sql 1;
-    }
-  }
-}
+# p6 $ ""; vol vrv 0; p3 $""
+# let sql = loop(glitchedVinyl/sqellwheelmeloddel.wav); set sql:len 4
+# p15 < osc 8 "0.3 0.7"  "send(0, sql, %)"
+# p16 < osc 7 "0.3 0.7"  "send(1, sql, %)"
+
+# p4 $ ""
 

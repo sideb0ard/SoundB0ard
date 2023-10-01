@@ -1,0 +1,122 @@
+# KEY OF F# - 18 - [18, 20, 22, 23, 25, 27, 29, 30]
+# F#
+# let key = 18 ;
+let key = 21;
+let notz = notes_in_key(key);
+
+# per1  DURTH per2 PHART // Srqttx
+# let esk = loop(dloops/EKSIbeat.aiff); set esk:len 2
+# dloops/EKSIbeat.aiff
+
+let boolah_gen = gen()
+{
+  setup()
+  {
+    let mel = key_riff(key);
+    let steppa = sseq(mel);
+    let stepz = 1;
+  }
+  run()
+  {
+
+    if (count % 4 == 0) {
+      mel = key_riff(key);
+      steppa = sseq(mel);
+    }
+
+    if (count % 2 == 0) {
+      let plnz =[];
+      for (i = 0; i < 16; ++i) {
+        let nt = stepn(steppa);
+        if (nt > 0) {
+          push(plnz, i);
+          note_on_at(per1, nt, i*pp);
+        }
+      }
+    }
+  }
+}
+
+let eskblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set esk:scramble 1;
+    }
+    if (count % 7 == 0) {
+      set esk:stutter 1;
+    }
+    if (count % 15 == 0) {
+      set esk:reverse 1;
+    }
+  }
+}
+#
+# let bblah_gen = gen()
+# {
+#   setup()
+#   {
+#     let bsw = 10;
+#     let ssw = 50;
+#   }
+#   run()
+#   {
+#     for (i = 0; i < 16; ++i) {
+#       if (i % 4 == 0) {
+#         let off = 0;
+#         if (i == 4 || i == 12) {
+#           off = bsw;
+#         }
+#         note_on_at(bd, 20, i * pp + off);
+#       }
+#       if (i % 8 == 4) {
+#         note_on_at(sd, 40, i * pp - 200);
+#       }
+#     }
+#
+#     bsw = bsw + 10;
+#     if (bsw > 50) {
+#       bsw = 0;
+#     }
+#     ssw = ssw + 20;
+#     if (ssw > 150) {
+#       ssw = 0;
+#     }
+#
+#   }
+# }
+#
+# let hhblah_gen = gen()
+# {
+#   setup()
+#   {
+#     let sw = 20;
+#     let lenz = [0.5, 1, 2];
+#     let lx = 0;
+#   }
+#   run()
+#   {
+#     set sh:len lenz[lx];
+#     lx = incr(lx, 0, len(lenz));
+#     if (count % 2 == 0) {
+#       set sh:stutter 1;
+#     }
+#     if (count % 8 == 7) {
+#       set sh:reverse 1;
+#     }
+#     for (i = 0; i < 16; ++i) {
+#       let off = 0;
+#       if (i % 2 == 1) {
+#         off = sw;
+#       }
+#       note_on_at(hh, 74, i * pp + off, dur = 50);
+#     }
+#   }
+#
+# }
+# }
+#
