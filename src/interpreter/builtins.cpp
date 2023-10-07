@@ -134,6 +134,16 @@ std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz) {
   }
   return midi_nums;
 }
+
+void SendMixerActionGeneral(AudioAction action_type, bool val) {
+  std::cout << "Sending action type: " << action_type << " - set to " << val
+            << std::endl;
+  auto action = std::make_unique<AudioActionItem>(action_type);
+  action->general_val = val;
+
+  audio_queue.push(std::move(action));
+}
+
 void SendMidiMappingShow() {
   std::cout << "sending a midi map SHOW\n";
   auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_MAP_SHOW);
@@ -2631,6 +2641,21 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            return evaluator::NULLL;
          })},
+    {"websock", std::make_shared<object::BuiltIn>(
+                    [](std::vector<std::shared_ptr<object::Object>> args)
+                        -> std::shared_ptr<object::Object> {
+                      std::cout << "Websocket enable yo!\n";
+                      int args_size = args.size();
+                      if (args_size == 1) {
+                        auto val =
+                            std::dynamic_pointer_cast<object::Boolean>(args[0]);
+                        if (val) {
+                          SendMixerActionGeneral(AudioAction::ENABLE_WEBSOCKET,
+                                                 val->value_);
+                        }
+                      }
+                      return evaluator::NULLL;
+                    })},
     {"midi_at",
      std::make_shared<object::BuiltIn>(  // TODO - better name!
          [](std::vector<std::shared_ptr<object::Object>> args)

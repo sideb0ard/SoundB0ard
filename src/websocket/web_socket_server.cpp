@@ -74,6 +74,10 @@ void WebsocketServer::sendMessage(ClientConnection conn,
                       websocketpp::frame::opcode::text);
 }
 
+void WebsocketServer::sendData(ClientConnection conn) {
+  // this->endpoint.send(conn, 999999);
+}
+
 void WebsocketServer::broadcastMessage(const string& messageType,
                                        const Json::Value& arguments) {
   // Prevent concurrent access to the list of open connections from multiple

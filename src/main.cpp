@@ -188,66 +188,6 @@ int main() {
   //// Eval loop
   std::thread eval_thread(eval_queue);
 
-  // boost::asio::io_service mainEventLoop;
-  // WebsocketServer server;
-
-  // server.connect([&mainEventLoop, &server](ClientConnection conn) {
-  //   mainEventLoop.post([conn, &server]() {
-  //     std::clog << "Connection opened." << std::endl;
-  //     std::clog << "There are now " << server.numConnections()
-  //               << " open connections." << std::endl;
-  //     server.sendMessage(conn, "HELLO", Json::Value());
-  //   });
-  // });
-  // server.disconnect([&mainEventLoop, &server](ClientConnection conn) {
-  //   mainEventLoop.post([conn, &server]() {
-  //     std::clog << "Connection CLOSEDc!" << std::endl;
-  //     std::clog << "There are now " << server.numConnections()
-  //               << " open connections." << std::endl;
-  //   });
-  // });
-  // server.message("message", [&mainEventLoop, &server](ClientConnection conn,
-  //                                                     const Json::Value
-  //                                                     &args) {
-  //   mainEventLoop.post([conn, args, &server]() {
-  //     std::clog << "Message handlerrr!!" << std::endl;
-  //     std::clog << "Message payload!!" << std::endl;
-  //     for (auto key : args.getMemberNames()) {
-  //       std::clog << "\t" << key << ": " << args[key].asString() <<
-  //       std::endl;
-  //     }
-  //     server.sendMessage(conn, "message", args);
-  //   });
-  // });
-
-  // std::thread websocket_server_thread([&server]() { server.run(kPortNumber);
-  // });
-
-  //// Start a keyboard input thread that reads from stdin
-  // std::thread inputThread([&server, &mainEventLoop]() {
-  //   string input;
-  //   while (1) {
-  //     // Read user input from stdin
-  //     std::getline(std::cin, input);
-
-  //    // Broadcast the input to all connected clients (is sent on the network
-  //    // thread)
-  //    Json::Value payload;
-  //    payload["input"] = input;
-  //    server.broadcastMessage("userInput", payload);
-
-  //    // Debug output on the main thread
-  //    mainEventLoop.post([]() {
-  //      std::clog << "User input debug output on the main thread" <<
-  //      std::endl;
-  //    });
-  //  }
-  //});
-
-  // boost::asio::io_service::work work(mainEventLoop);
-  // std::cout << "YO WORK CREATED - ABOUT TO RUN\n";
-  // mainEventLoop.run();
-
   //////////////// shutdown
 
   repl_thread.join();

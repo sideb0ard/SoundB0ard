@@ -76,6 +76,8 @@ struct Mixer {
 
   bool debug_mode{false};
 
+  bool websocket_enabled_{false};
+
   double bpm{140};
   double bpm_to_be_updated{0};
 
@@ -152,6 +154,9 @@ struct Mixer {
   void ProcessActionMessage(std::unique_ptr<AudioActionItem> action);
 
   void AddFileToMonitor(std::string filepath);
+
+  // for sending websocket to p5.js
+  void EnableWebSocket(bool en) { websocket_enabled_ = en; }
 };
 
 #endif  // MIXER_H

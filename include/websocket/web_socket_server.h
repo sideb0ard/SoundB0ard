@@ -68,6 +68,8 @@ class WebsocketServer {
   void broadcastMessage(const string& messageType,
                         const Json::Value& arguments);
 
+  void sendData(ClientConnection conn);
+
  protected:
   static Json::Value parseJson(const string& json);
   static string stringifyJson(const Json::Value& val);

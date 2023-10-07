@@ -115,6 +115,8 @@ std::string Mixer::StatusMixr() {
      << COOL_COLOR_GREEN << " looplen:" << ANSI_COLOR_WHITE << 3840
      << COOL_COLOR_GREEN << " midi_device:" << ANSI_COLOR_WHITE
      << (have_midi_controller ? "true" : "false") << COOL_COLOR_GREEN
+     << " websock:" << ANSI_COLOR_WHITE
+     << (websocket_enabled_ ? "true" : "false") << COOL_COLOR_GREEN
      << " ::::::::::::::::::::::\n";
   ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
      << "delay: " << fx_[0]->Status() << std::endl;
@@ -545,6 +547,11 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     out[j + 1] = volume * output_right;
   }
 
+  // if (websocket_enabled) {
+  // WebsocketDataMessage msg {.data = out, .length = frames_per_buffer};
+  // websocket_queue.try_push(msg);
+  // }
+
   return return_bpm;
 }
 
@@ -694,7 +701,9 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
   }
   if (action->type == AudioAction::MIDI_MAP)
     AddMidiMapping(action->mapped_id, action->mapped_param);
-  if (action->type == AudioAction::MIDI_MAP_SHOW)
+  else if (action->type == AudioAction::ENABLE_WEBSOCKET)
+    EnableWebSocket(action->general_val);
+  else if (action->type == AudioAction::MIDI_MAP_SHOW)
     PrintMidiMappings();
   else if (action->type == AudioAction::HELP)
     mixr->Help();
