@@ -43,10 +43,10 @@ enum AudioAction {
   UNSOLO,
   UPDATE,
   VOLUME,
+  ENABLE_WEBSOCKET,
 };
 
-class AudioActionItem {
- public:
+struct AudioActionItem {
   AudioActionItem(AudioAction type) : type{type} {}
   ~AudioActionItem() = default;
   AudioAction type;
@@ -57,6 +57,9 @@ class AudioActionItem {
   std::vector<std::shared_ptr<Fx>> fx;
   unsigned int xfade_channel{99};
   unsigned int xfade_direction{99};
+
+  // can be used by simple action types rather than add specific field
+  bool general_val{false};
 
   std::string preset_name;
   std::map<std::string, double> preset;

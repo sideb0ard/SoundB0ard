@@ -14,6 +14,7 @@
 
 #include <AudioPlatform.hpp>
 #include <PerlinNoise.hpp>
+#include <asio/io_service.hpp>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/lexer.hpp>
 #include <interpreter/object.hpp>
@@ -24,6 +25,8 @@
 #include <process.hpp>
 #include <thread>
 #include <tsqueue.hpp>
+
+#include "websocket/web_socket_server.h"
 
 extern Mixer *mixr;
 
@@ -38,6 +41,8 @@ siv::PerlinNoise perlinGenerator;  // only for use by eval thread
 auto global_env = std::make_shared<object::Environment>();
 
 namespace {
+
+constexpr int kPortNumber = 8080;
 
 struct State {
   std::atomic<bool> running;
@@ -122,24 +127,82 @@ void *process_worker_thread() {
   return nullptr;
 }
 
+void *websocket_worker(WebsocketServer &server) {
+  std::cout << "AM A WEE WEBSOCKET THREAD!\n";
+  asio::io_service mainEventLoop;
+
+  server.connect([&mainEventLoop, &server](ClientConnection conn) {
+    mainEventLoop.post([conn, &server]() {
+      std::clog << "Connection opened." << std::endl;
+      std::clog << "There are now " << server.numConnections()
+                << " open connections." << std::endl;
+      server.sendMessage(conn, "HELLO", Json::Value());
+    });
+  });
+  server.disconnect([&mainEventLoop, &server](ClientConnection conn) {
+    mainEventLoop.post([conn, &server]() {
+      std::clog << "Connection CLOSEDc!" << std::endl;
+      std::clog << "There are now " << server.numConnections()
+                << " open connections." << std::endl;
+    });
+  });
+  // server.message("message", [&mainEventLoop, &server](ClientConnection conn,
+  // const Json::Value &args) {
+  // mainEventLoop.post([conn,
+  // args, &server]() {
+  //   std::clog <<
+  //   "Message
+  //   handlerrr!!" <<
+  //   std::endl;
+  //   std::clog <<
+  //   "Message payload!!"
+  //   << std::endl; for
+  //   (auto key :
+  //   args.getMemberNames())
+  //   {
+  //     std::clog << "\t"
+  //     << key << ": " <<
+  //     args[key].asString()
+  //     << std::endl;
+  //   }
+  //   server.sendMessage(conn,
+  //   "message", args);
+  // });
+  //});
+
+  std::thread websocket_server_thread([&server]() { server.run(kPortNumber); });
+
+  asio::io_service::work work(mainEventLoop);
+  std::cout << "YO WORK CREATED - ABOUT TO RUN\n";
+  mainEventLoop.run();
+
+  return nullptr;
+}
+
 int main() {
   srand(time(NULL));
-  signal(SIGINT, SIG_IGN);
+  // signal(SIGINT,
+  // SIG_IGN);
 
-  mixr = new Mixer();
+  WebsocketServer server;
+  mixr = new Mixer(server);
 
   State state(*mixr);
 
-  // REPL
+  //// REPL
   std::thread repl_thread(loopy);
 
-  // Processes
+  //// Processes
   std::thread worker_thread(process_worker_thread);
 
-  // Eval loop
+  //// WebSocket Server
+  std::thread websocket_worker_thread(websocket_worker, std::ref(server));
+
+  //// Eval loop
   std::thread eval_thread(eval_queue);
 
-  //////////////// shutdown
+  ////////////////
+  /// shutdown
 
   repl_thread.join();
 
@@ -148,6 +211,8 @@ int main() {
 
   eval_command_queue.close();
   eval_thread.join();
+
+  websocket_worker_thread.join();
 
   return 0;
 }
