@@ -41,7 +41,7 @@ siv::PerlinNoise perlinGenerator;  // only for use by eval thread
 auto global_env = std::make_shared<object::Environment>();
 
 namespace {
-//
+
 constexpr int kPortNumber = 8080;
 
 struct State {
@@ -127,10 +127,9 @@ void *process_worker_thread() {
   return nullptr;
 }
 
-void *websocket_worker() {
+void *websocket_worker(WebsocketServer &server) {
   std::cout << "AM A WEE WEBSOCKET THREAD!\n";
   asio::io_service mainEventLoop;
-  WebsocketServer server;
 
   server.connect([&mainEventLoop, &server](ClientConnection conn) {
     mainEventLoop.post([conn, &server]() {
@@ -147,17 +146,29 @@ void *websocket_worker() {
                 << " open connections." << std::endl;
     });
   });
-  server.message("message", [&mainEventLoop, &server](ClientConnection conn,
-                                                      const Json::Value &args) {
-    mainEventLoop.post([conn, args, &server]() {
-      std::clog << "Message handlerrr!!" << std::endl;
-      std::clog << "Message payload!!" << std::endl;
-      for (auto key : args.getMemberNames()) {
-        std::clog << "\t" << key << ": " << args[key].asString() << std::endl;
-      }
-      server.sendMessage(conn, "message", args);
-    });
-  });
+  // server.message("message", [&mainEventLoop, &server](ClientConnection conn,
+  // const Json::Value &args) {
+  // mainEventLoop.post([conn,
+  // args, &server]() {
+  //   std::clog <<
+  //   "Message
+  //   handlerrr!!" <<
+  //   std::endl;
+  //   std::clog <<
+  //   "Message payload!!"
+  //   << std::endl; for
+  //   (auto key :
+  //   args.getMemberNames())
+  //   {
+  //     std::clog << "\t"
+  //     << key << ": " <<
+  //     args[key].asString()
+  //     << std::endl;
+  //   }
+  //   server.sendMessage(conn,
+  //   "message", args);
+  // });
+  //});
 
   std::thread websocket_server_thread([&server]() { server.run(kPortNumber); });
 
@@ -170,9 +181,11 @@ void *websocket_worker() {
 
 int main() {
   srand(time(NULL));
-  // signal(SIGINT, SIG_IGN);
+  // signal(SIGINT,
+  // SIG_IGN);
 
-  mixr = new Mixer();
+  WebsocketServer server;
+  mixr = new Mixer(server);
 
   State state(*mixr);
 
@@ -183,12 +196,13 @@ int main() {
   std::thread worker_thread(process_worker_thread);
 
   //// WebSocket Server
-  std::thread websocket_worker_thread(websocket_worker);
+  std::thread websocket_worker_thread(websocket_worker, std::ref(server));
 
   //// Eval loop
   std::thread eval_thread(eval_queue);
 
-  //////////////// shutdown
+  ////////////////
+  /// shutdown
 
   repl_thread.join();
 

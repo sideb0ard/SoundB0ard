@@ -72,7 +72,7 @@ extern Tsqueue<std::string> eval_command_queue;
 
 const auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
 
-Mixer::Mixer() {
+Mixer::Mixer(WebsocketServer &server) : websocket_server_{server} {
   volume = 0.7;
   UpdateBpm(DEFAULT_BPM);
 
@@ -464,6 +464,8 @@ void Mixer::MidiTick() {
 // The number of microseconds that elapse between samples
 constexpr auto microsPerSample = 1e6 / SAMPLE_RATE;
 
+bool have_displayed = false;
+
 int Mixer::GenNext(float *out, int frames_per_buffer,
                    ableton::Link::SessionState &sessionState,
                    const double quantum,
@@ -509,9 +511,9 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     StereoVal fx_delay_send{};
     StereoVal fx_reverb_send{};
     StereoVal fx_distort_send{};
-    for (int i = 0; i < sound_generators_idx_; i++) {
-      auto &sg = sound_generators_[i];
-      soundgen_cur_val_[i] = sg->GenNext(timing_info);
+    for (int k = 0; k < sound_generators_idx_; k++) {
+      auto &sg = sound_generators_[k];
+      soundgen_cur_val_[k] = sg->GenNext(timing_info);
 
       bool collect_value = false;
       // if nothing is soloed, or this sg is in the solo group,
@@ -524,14 +526,14 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
       }
 
       if (collect_value) {
-        output_left += soundgen_cur_val_[i].left * xfader_.GetValueFor(i);
-        output_right += soundgen_cur_val_[i].right * xfader_.GetValueFor(i);
+        output_left += soundgen_cur_val_[k].left * xfader_.GetValueFor(k);
+        output_right += soundgen_cur_val_[k].right * xfader_.GetValueFor(k);
 
-        fx_delay_send += soundgen_cur_val_[i] * sg->mixer_fx_send_intensity_[0];
+        fx_delay_send += soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[0];
         fx_reverb_send +=
-            soundgen_cur_val_[i] * sg->mixer_fx_send_intensity_[1];
+            soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[1];
         fx_distort_send +=
-            soundgen_cur_val_[i] * sg->mixer_fx_send_intensity_[2];
+            soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[2];
       }
     }
 
@@ -547,10 +549,19 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     out[j + 1] = volume * output_right;
   }
 
-  // if (websocket_enabled) {
-  // WebsocketDataMessage msg {.data = out, .length = frames_per_buffer};
-  // websocket_queue.try_push(msg);
-  // }
+  if (websocket_enabled_) {
+    websocket_server_.sendData(out, 2 * frames_per_buffer * sizeof(float));
+    if (!have_displayed) {
+      have_displayed = true;
+      for (int i = 0; i < 10; i++) {
+        std::cout << out[i] << std::endl;
+      }
+      std::cout << "LAST 10:" << std::endl;
+      for (int i = 2 * frames_per_buffer - 10; i < 2 * frames_per_buffer; i++) {
+        std::cout << out[i] << std::endl;
+      }
+    }
+  }
 
   return return_bpm;
 }

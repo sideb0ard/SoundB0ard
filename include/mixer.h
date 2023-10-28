@@ -1,15 +1,9 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-#include <audio_action_queue.h>
-#include <defjams.h>
-#include <dxsynth.h>
-#include <fx/fx.h>
-#include <minisynth.h>
 #include <portaudio.h>
 #include <portmidi.h>
 #include <pthread.h>
-#include <soundgenerator.h>
 
 #include <ableton/Link.hpp>
 #include <array>
@@ -19,6 +13,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include "audio_action_queue.h"
+#include "defjams.h"
+#include "dxsynth.h"
+#include "fx/fx.h"
+#include "minisynth.h"
+#include "soundgenerator.h"
+#include "websocket/web_socket_server.h"
 #include "xfader.h"
 
 struct PreviewBuffer {
@@ -49,7 +50,7 @@ struct DelayedMidiEvent {
 
 struct Mixer {
  public:
-  Mixer();
+  Mixer(WebsocketServer &server);
 
   PreviewBuffer preview;
 
@@ -94,6 +95,8 @@ struct Mixer {
   bool midi_recording = {false};
   bool midi_print = {false};
   std::unordered_map<int, std::string> midi_mapped_controls_ = {};
+
+  WebsocketServer &websocket_server_;
 
   void AddMidiMapping(int id, std::string param);
   void ResetMidiMappings();

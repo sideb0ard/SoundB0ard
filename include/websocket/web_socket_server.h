@@ -6,19 +6,22 @@
 
 #include <json/json.h>
 
+#include <array>
 #include <functional>
 #include <map>
 #include <mutex>
 #include <string>
 #include <vector>
-// #include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/config/debug_asio_no_tls.hpp>
+#include <websocketpp/config/asio_no_tls.hpp>
+// #include <websocketpp/config/debug_asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 using std::map;
 using std::string;
 using std::vector;
 
-typedef websocketpp::server<websocketpp::config::debug_asio> WebsocketEndpoint;
+// typedef websocketpp::server<websocketpp::config::debug_asio>
+// WebsocketEndpoint;
+typedef websocketpp::server<websocketpp::config::asio> WebsocketEndpoint;
 typedef websocketpp::connection_hdl ClientConnection;
 
 class WebsocketServer {
@@ -68,7 +71,7 @@ class WebsocketServer {
   void broadcastMessage(const string& messageType,
                         const Json::Value& arguments);
 
-  void sendData(ClientConnection conn);
+  void sendData(float* data, size_t len);
 
  protected:
   static Json::Value parseJson(const string& json);

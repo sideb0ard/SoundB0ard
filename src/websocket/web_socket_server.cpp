@@ -36,6 +36,8 @@ WebsocketServer::WebsocketServer() {
                                                std::placeholders::_2));
 
   // Initialise the Asio library, using our own event loop object
+  this->endpoint.clear_access_channels(websocketpp::log::alevel::all);
+  this->endpoint.clear_error_channels(websocketpp::log::elevel::all);
   this->endpoint.init_asio(&(this->eventLoop));
 }
 WebsocketServer::~WebsocketServer() {
@@ -74,8 +76,18 @@ void WebsocketServer::sendMessage(ClientConnection conn,
                       websocketpp::frame::opcode::text);
 }
 
-void WebsocketServer::sendData(ClientConnection conn) {
-  // this->endpoint.send(conn, 999999);
+void WebsocketServer::sendData(float* data, size_t len) {
+  // std::vector<float> buffer(data, data + len);
+  //   TODO - POST ON OWN MESSAGE LOOP
+  //       this->connectHandlers.push_back(handler); });
+  //  this->eventLoop.post([this, buffer]() {
+  std::lock_guard<std::mutex> lock(this->connectionListMutex);
+  for (auto conn : this->openConnections) {
+    // this->endpoint.send(conn, &buffer, buffer.size(),
+    //                     websocketpp::frame::opcode::binary);
+    this->endpoint.send(conn, data, len, websocketpp::frame::opcode::binary);
+  }
+  //});
 }
 
 void WebsocketServer::broadcastMessage(const string& messageType,
