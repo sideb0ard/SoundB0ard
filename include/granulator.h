@@ -1,5 +1,6 @@
 #pragma once
 
+#include <signalsmith-stretch.h>
 #include <stdbool.h>
 
 #include "envelope_generator.h"
@@ -48,6 +49,8 @@ class Granulator : public SoundGenerator {
 
   SoundGrain *active_grain_;
   SoundGrain *incoming_grain_;
+
+  signalsmith::stretch::SignalsmithStretch<double> sstretch_;
 
   int granular_spray_frames_{0};  // random off-set from starting idx
   int quasi_grain_fudge_{0};      // random variation from length of grain

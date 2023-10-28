@@ -64,6 +64,7 @@ void Granulator::Reset() {
 
   degrade_by_ = 0;
 
+  sstretch_.presetDefault(2, 44100);
   active = true;
   started_ = false;
   stop_pending_ = false;
@@ -187,7 +188,6 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
       .dur_frames = duration_frames,
       .starting_idx = grain_idx,
       .reverse_mode = reverse_mode_,
-      .pitch = grain_pitch_,
       .num_channels = num_channels_,
       .degrade_by = degrade_by_,
       .audio_buffer = &audio_buffer_,

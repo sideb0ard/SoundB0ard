@@ -464,8 +464,6 @@ void Mixer::MidiTick() {
 // The number of microseconds that elapse between samples
 constexpr auto microsPerSample = 1e6 / SAMPLE_RATE;
 
-bool have_displayed = false;
-
 int Mixer::GenNext(float *out, int frames_per_buffer,
                    ableton::Link::SessionState &sessionState,
                    const double quantum,
@@ -551,16 +549,6 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
 
   if (websocket_enabled_) {
     websocket_server_.sendData(out, 2 * frames_per_buffer * sizeof(float));
-    if (!have_displayed) {
-      have_displayed = true;
-      for (int i = 0; i < 10; i++) {
-        std::cout << out[i] << std::endl;
-      }
-      std::cout << "LAST 10:" << std::endl;
-      for (int i = 2 * frames_per_buffer - 10; i < 2 * frames_per_buffer; i++) {
-        std::cout << out[i] << std::endl;
-      }
-    }
   }
 
   return return_bpm;
