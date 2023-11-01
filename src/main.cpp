@@ -181,8 +181,7 @@ void *websocket_worker(WebsocketServer &server) {
 
 int main() {
   srand(time(NULL));
-  // signal(SIGINT,
-  // SIG_IGN);
+  signal(SIGINT, SIG_IGN);
 
   WebsocketServer server;
   mixr = new Mixer(server);

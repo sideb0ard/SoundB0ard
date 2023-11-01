@@ -1,7 +1,6 @@
-#include <defjams.h>
-#include <granulator.h>
+#include "granulator.h"
+
 #include <libgen.h>
-#include <mixer.h>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +8,9 @@
 #include <utils.h>
 
 #include <iostream>
+
+#include "defjams.h"
+#include "mixer.h"
 
 namespace SBAudio {
 
@@ -64,16 +66,31 @@ void Granulator::Reset() {
 
   degrade_by_ = 0;
 
-  sstretch_.presetDefault(2, 44100);
   active = true;
   started_ = false;
   stop_pending_ = false;
 }
 
-Granulator::Granulator() { grain_type_ = SoundGrainType::Signal; }
+void Granulator::InitializeFFT() {
+  buffer_in_ = std::vector<double>(kBufferSize, 0);
+  buffer_out_ = std::vector<double>(kBufferSize, 0);
+
+  fft_double_in_ = std::vector<double>(kFFTSize, 0);
+  fft_double_out_ = std::vector<double>(kFFTSize, 0);
+  fft_fwd_plan_ = fftw_plan_dft_r2c_1d(kFFTSize, fft_double_in_.data(),
+                                       fft_complex_out_, FFTW_ESTIMATE);
+  fft_rvr_plan_ = fftw_plan_dft_c2r_1d(kFFTSize, fft_complex_out_,
+                                       fft_double_out_.data(), FFTW_ESTIMATE);
+}
+
+Granulator::Granulator() {
+  grain_type_ = SoundGrainType::Signal;
+  InitializeFFT();
+}
 
 Granulator::Granulator(std::string filename, unsigned int loop_mode) {
   type = LOOPER_TYPE;
+  InitializeFFT();
   grain_type_ = SoundGrainType::Sample;
   grain_a_ = std::make_unique<SoundGrainSample>();
   grain_b_ = std::make_unique<SoundGrainSample>();
@@ -81,6 +98,13 @@ Granulator::Granulator(std::string filename, unsigned int loop_mode) {
   ImportFile(filename_);
   SetLoopMode(loop_mode);
   Start();
+}
+
+Granulator::~Granulator() {
+  // TODO delete file
+  fftw_destroy_plan(fft_fwd_plan_);
+  fftw_destroy_plan(fft_rvr_plan_);
+  fftw_cleanup();
 }
 
 void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
@@ -224,6 +248,30 @@ void Granulator::SwitchXFadeGrains() {
   }
 }
 
+void Granulator::ProcessFFT() {
+  for (int i = 0; i < kFFTSize; i++) {
+    fft_double_in_[i] =
+        buffer_in_[(buffer_in_write_idx_ + i - kFFTSize + kBufferSize) %
+                   kBufferSize];
+  }
+
+  fftw_execute(fft_fwd_plan_);
+
+  //  for (int i = 0; i < kFFTSize; i++) {
+  //    fft_double_in_[i] =
+  //        buffer_in_[(buffer_in_write_idx_ + i - kFFTSize + kBufferSize) %
+  //                   kBufferSize];
+  //  }
+  // TODO something interesting
+
+  fftw_execute(fft_rvr_plan_);
+
+  for (int i = 0; i < kFFTSize; i++) {
+    int out_idx = (buffer_out_write_idx_ + i) % kBufferSize;
+    buffer_out_[out_idx] += fft_double_out_[i] / kFFTSize;
+  }
+}
+
 StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
   StereoVal val = {0., 0.};
   if (!started_ || !active) {
@@ -277,6 +325,37 @@ StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
   val.left = val.left * volume * eg_amp * pan_left;
   val.right = val.right * volume * eg_amp * pan_right;
 
+  //////////////// FFFFFFT! ///////////////////////
+  buffer_in_[buffer_in_write_idx_] = val.left;
+  buffer_in_write_idx_++;
+  if (buffer_in_write_idx_ >= kBufferSize) buffer_in_write_idx_ = 0;
+
+  double fft_out = buffer_out_[buffer_out_read_idx_];
+  buffer_out_[buffer_out_read_idx_] = 0;
+
+  fft_out *= (double)kHopSize / (double)kFFTSize;
+
+  buffer_out_read_idx_++;
+  if (buffer_out_read_idx_ >= kBufferSize) {
+    buffer_out_read_idx_ = 0;
+  }
+
+  fft_hop_count_++;
+  if (fft_hop_count_ % kHopSize == 0) {
+    ProcessFFT();
+    buffer_out_write_idx_ = (buffer_out_write_idx_ + kHopSize) % kBufferSize;
+  }
+
+  if (use_fft_) {
+    // std::cout << "val.left:" << val.left << " fft buff:" << fft_out
+    //           << std::endl;
+    val.left = fft_out;
+  }
+  // buffer_out_read_idx_++;
+  // if (buffer_out_read_idx_ >= kBufferSize) buffer_out_read_idx_ = 0;
+
+  /////////////////////////////////// FFS!
+
   val = Effector(val);
 
   return val;
@@ -324,10 +403,6 @@ void Granulator::Stop() {
   stop_pending_ = true;
 }
 
-Granulator::~Granulator() {
-  // TODO delete file
-}
-
 void Granulator::ImportFile(std::string filename) {
   AudioBufferDetails deetz = ImportFileContents(audio_buffer_, filename);
   num_channels_ = deetz.num_channels;
@@ -364,7 +439,11 @@ void Granulator::SetQuasiGrainFudge(int fudgefactor) {
   quasi_grain_fudge_ = fudgefactor;
 }
 
-void Granulator::SetGrainPitch(double pitch) { grain_pitch_ = pitch; }
+void Granulator::SetGrainPitch(double pitch) {
+  std::cout << "YO REPITCH YO!\n";
+  grain_pitch_ = pitch;
+}
+
 void Granulator::SetIncrSpeed(double speed) { incr_speed_ = speed; }
 void Granulator::SetReverseMode(bool b) { reverse_mode_ = b; }
 
@@ -492,6 +571,10 @@ void Granulator::SetParam(std::string name, double val) {
     eg_.SetDecayTimeMsec(val);
   else if (name == "release")
     eg_.SetReleaseTimeMsec(val);
+  else if (name == "fft") {
+    std::cout << "YO SET FFT:" << val << "\n";
+    use_fft_ = val;
+  }
 }
 
 }  // namespace SBAudio

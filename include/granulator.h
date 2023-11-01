@@ -1,6 +1,6 @@
 #pragma once
 
-#include <signalsmith-stretch.h>
+#include <fftw3.h>
 #include <stdbool.h>
 
 #include "envelope_generator.h"
@@ -10,6 +10,10 @@
 #include "stepper.h"
 
 namespace SBAudio {
+
+const int kFFTSize = 1024;
+const int kHopSize = 512;
+const int kBufferSize = kFFTSize * 16;
 
 enum LoopMode {
   loop_mode,
@@ -50,7 +54,24 @@ class Granulator : public SoundGenerator {
   SoundGrain *active_grain_;
   SoundGrain *incoming_grain_;
 
-  signalsmith::stretch::SignalsmithStretch<double> sstretch_;
+  int fft_hop_count_{0};
+
+  std::vector<double> buffer_in_;
+  int buffer_in_write_idx_{0};
+
+  std::vector<double> buffer_out_;
+  int buffer_out_read_idx_{0};
+  int buffer_out_write_idx_{kHopSize};
+
+  bool use_fft_{false};
+  // Fwd FFT
+  fftw_plan fft_fwd_plan_;
+  std::vector<double> fft_double_in_;
+  fftw_complex fft_complex_out_[kFFTSize / 2 + 1];
+
+  // Inverse FFT
+  fftw_plan fft_rvr_plan_;
+  std::vector<double> fft_double_out_;
 
   int granular_spray_frames_{0};  // random off-set from starting idx
   int quasi_grain_fudge_{0};      // random variation from length of grain
@@ -134,6 +155,9 @@ class Granulator : public SoundGenerator {
   void SetPOffset(int poffset);
   void SetPlooplen(int plooplen);
   void SetPinc(int pinc);
+
+  void InitializeFFT();
+  void ProcessFFT();
 };
 
 }  // namespace SBAudio
