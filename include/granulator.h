@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include "envelope_generator.h"
+#include "fft_processor.h"
 #include "fx/ramp.h"
 #include "grains.h"
 #include "soundgenerator.h"
@@ -48,6 +49,10 @@ class Granulator : public SoundGenerator {
 
   SoundGrain *active_grain_;
   SoundGrain *incoming_grain_;
+
+  bool use_fft_{false};
+  FFTProcessor fftp_left_chan_;
+  FFTProcessor fftp_right_chan_;
 
   int granular_spray_frames_{0};  // random off-set from starting idx
   int quasi_grain_fudge_{0};      // random variation from length of grain

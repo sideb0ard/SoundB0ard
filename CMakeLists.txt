@@ -74,6 +74,7 @@ target_link_libraries(Sbsh ${READLINE_LIB})
 target_link_libraries(Sbsh ${HISTORY_LIB})
 target_link_libraries(Sbsh ${SNDFILE_LIB})
 target_link_libraries(Sbsh ${JSON_LIB})
+target_link_libraries(Sbsh fftw3)
 
 
 #################################################################

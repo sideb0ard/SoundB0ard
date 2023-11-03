@@ -1,7 +1,6 @@
-#include <defjams.h>
-#include <granulator.h>
+#include "granulator.h"
+
 #include <libgen.h>
-#include <mixer.h>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +8,9 @@
 #include <utils.h>
 
 #include <iostream>
+
+#include "defjams.h"
+#include "mixer.h"
 
 namespace SBAudio {
 
@@ -80,6 +82,10 @@ Granulator::Granulator(std::string filename, unsigned int loop_mode) {
   ImportFile(filename_);
   SetLoopMode(loop_mode);
   Start();
+}
+
+Granulator::~Granulator() {
+  // TODO delete file
 }
 
 void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
@@ -187,7 +193,6 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
       .dur_frames = duration_frames,
       .starting_idx = grain_idx,
       .reverse_mode = reverse_mode_,
-      .pitch = grain_pitch_,
       .num_channels = num_channels_,
       .degrade_by = degrade_by_,
       .audio_buffer = &audio_buffer_,
@@ -277,6 +282,16 @@ StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
   val.left = val.left * volume * eg_amp * pan_left;
   val.right = val.right * volume * eg_amp * pan_right;
 
+  double fft_left_out = fftp_left_chan_.ProcessData(val.left);
+  double fft_right_out = fftp_right_chan_.ProcessData(val.right);
+
+  if (use_fft_) {
+    // std::cout << "val.left:" << val.left << " fft buff:" << fft_out
+    //           << std::endl;
+    val.left = fft_left_out;
+    val.right = fft_right_out;
+  }
+
   val = Effector(val);
 
   return val;
@@ -324,10 +339,6 @@ void Granulator::Stop() {
   stop_pending_ = true;
 }
 
-Granulator::~Granulator() {
-  // TODO delete file
-}
-
 void Granulator::ImportFile(std::string filename) {
   AudioBufferDetails deetz = ImportFileContents(audio_buffer_, filename);
   num_channels_ = deetz.num_channels;
@@ -364,7 +375,11 @@ void Granulator::SetQuasiGrainFudge(int fudgefactor) {
   quasi_grain_fudge_ = fudgefactor;
 }
 
-void Granulator::SetGrainPitch(double pitch) { grain_pitch_ = pitch; }
+void Granulator::SetGrainPitch(double pitch) {
+  std::cout << "YO REPITCH YO!\n";
+  grain_pitch_ = pitch;
+}
+
 void Granulator::SetIncrSpeed(double speed) { incr_speed_ = speed; }
 void Granulator::SetReverseMode(bool b) { reverse_mode_ = b; }
 
@@ -492,6 +507,10 @@ void Granulator::SetParam(std::string name, double val) {
     eg_.SetDecayTimeMsec(val);
   else if (name == "release")
     eg_.SetReleaseTimeMsec(val);
+  else if (name == "fft") {
+    std::cout << "YO SET FFT:" << val << "\n";
+    use_fft_ = val;
+  }
 }
 
 }  // namespace SBAudio
