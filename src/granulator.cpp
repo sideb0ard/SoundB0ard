@@ -304,7 +304,7 @@ std::string Granulator::Status() {
   else
     ss << ANSI_COLOR_RED;
   ss << filename_ << " vol:" << volume << " pan:" << pan
-     << " pitch:" << grain_pitch_
+     << " pitch:" << grain_pitch_ << " key:" << fftp_left_chan_.GetKey()
      << " idx:" << (int)(100. / audio_buffer_.size() * audio_buffer_read_idx_)
      << " mode:" << kLoopModeNames[loop_mode_] << "(" << loop_mode_ << ")"
      << " len:" << loop_len_ << ANSI_COLOR_RESET;
@@ -464,9 +464,7 @@ void Granulator::SetParam(std::string name, double val) {
     eg_.StartEg();
   } else if (name == "off") {
     eg_.NoteOff();
-  } else if (name == "pitch")
-    SetGrainPitch(val);
-  else if (name == "speed")
+  } else if (name == "speed")
     SetIncrSpeed(val);
   else if (name == "mode") {
     SetLoopMode(val);
@@ -507,9 +505,10 @@ void Granulator::SetParam(std::string name, double val) {
     eg_.SetDecayTimeMsec(val);
   else if (name == "release")
     eg_.SetReleaseTimeMsec(val);
-  else if (name == "fft") {
-    std::cout << "YO SET FFT:" << val << "\n";
+  else if (name == "pitch") {
     use_fft_ = val;
+    fftp_left_chan_.SetPitchSemitones(val);
+    fftp_right_chan_.SetPitchSemitones(val);
   }
 }
 
