@@ -478,6 +478,7 @@ static bool IsInfixOperator(token::TokenType type) {
       type == token::SLANG_SLASH || type == token::SLANG_ASTERISK ||
       type == token::SLANG_MODULO || type == token::SLANG_EQ ||
       type == token::SLANG_NOT_EQ || type == token::SLANG_LT ||
+      type == token::SLANG_LT_OR_EQ || type == token::SLANG_GT_OR_EQ ||
       type == token::SLANG_GT || type == token::SLANG_LPAREN ||
       type == token::SLANG_AND || type == token::SLANG_OR ||
       type == token::SLANG_LBRACKET || type == token::SLANG_BITWISE_AND ||

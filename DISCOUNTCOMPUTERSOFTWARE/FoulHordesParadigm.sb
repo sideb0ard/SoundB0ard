@@ -8,7 +8,7 @@ let key = 25;
 # bpm 160; load_preset(dx, "wahaio"); load_preset(per3, "PHRANK");
 # p3 $ dxxxblah_gen; p4 $ melblah_gen
 
-#let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen; set bx:pitch 0.8
+#let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen;
 
 #let sal = loop(dloops/sadLIB.aiff);
 #let krs = loop(dloops/krushSnareRoll.aiff); p5 $ drumblah_gen

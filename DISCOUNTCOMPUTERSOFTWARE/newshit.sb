@@ -1,0 +1,63 @@
+# bpm 96
+# let pnt = loop(dloops2/4point6newshit.wav);
+
+
+let newblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set pnt:on 1;
+    set pnt2:on 1;
+    if (count % 4 == 3) {
+      set pnt:stutter 1;
+      set pnt2:scramble 1;
+    }
+    if (count % 3 == 0) {
+      set pnt:scramble 1;
+      set pnt2:stutter 1;
+    }
+    if (count % 11 == 0) {
+      mashupToo(rand_beat(), [pnt, pnt2]);
+    }
+  }
+}
+
+# dx fnc // WHHXc
+let mblah_gen = gen()
+{
+  setup()
+  {
+    let key = 14;
+    let notz = notes_in_chord(key);
+    let nx = 0;
+    let mel = riff(key);
+    let dr = 350;
+
+    let mx = 0;
+    let mmx = 3;
+  }
+  run()
+  {
+
+    if (count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        stepper(dx, mel, mx, i, dr);
+        mx = incr(mx, 0, mmx);
+      }
+      mmx = incr(mmx, 3, 16);
+      dr = dr + 50;
+      if (dr > 770){
+        dr = 40;
+      }
+    }
+
+    if (count % 8 == 0) {
+      mel = riff(notz[nx]);
+      nx = incr(nx, 0, len(notz));
+    }
+  }
+}
+

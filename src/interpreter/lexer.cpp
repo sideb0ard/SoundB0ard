@@ -127,6 +127,10 @@ token::Token Lexer::NextToken() {
         ReadChar();
         tok.type_ = token::SLANG_BITWISE_LEFTSHIFT;
         tok.literal_ = "<<";
+      } else if (PeekChar() == '=') {
+        ReadChar();
+        tok.type_ = token::SLANG_LT_OR_EQ;
+        tok.literal_ = "<=";
       } else {
         tok.type_ = token::SLANG_LT;
         tok.literal_ = current_char_;
@@ -137,6 +141,10 @@ token::Token Lexer::NextToken() {
         ReadChar();
         tok.type_ = token::SLANG_BITWISE_LEFTSHIFT;
         tok.literal_ = ">>";
+      } else if (PeekChar() == '=') {
+        ReadChar();
+        tok.type_ = token::SLANG_GT_OR_EQ;
+        tok.literal_ = ">=";
       } else {
         tok.type_ = token::SLANG_GT;
         tok.literal_ = current_char_;

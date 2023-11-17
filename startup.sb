@@ -870,5 +870,17 @@ let mashup = fn(sndgenz)
       px = incr(px, 0, len(poz));
     }
   }
-  solo(sndgenz[rand(len(sndgenz))], at = 12*pp) ;
+  if (count % 4 == 3) {
+    solo(sndgenz[rand(len(sndgenz))], at = 14*pp) ;
+  }
 }
+
+let mashupToo = fn(pat, soundgz)
+{
+  for (i = 0; i < 16; ++i) {
+    if (pat[i] < len(soundgz)) {
+      note_on_at(soundgz[pat[i]], 1, i * pp);
+    }
+  }
+}
+

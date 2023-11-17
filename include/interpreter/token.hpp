@@ -25,7 +25,9 @@ const TokenType SLANG_SLASH = "/";
 const TokenType SLANG_MODULO = "%";
 
 const TokenType SLANG_LT = "<";
+const TokenType SLANG_LT_OR_EQ = "<=";
 const TokenType SLANG_GT = ">";
+const TokenType SLANG_GT_OR_EQ = ">=";
 
 const TokenType SLANG_COMMA = ",";
 const TokenType SLANG_COLON = ":";

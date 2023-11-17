@@ -1003,8 +1003,12 @@ std::shared_ptr<object::Object> EvalNumberInfixExpression(
     return std::make_shared<object::Number>(val);
   } else if (op.compare("<") == 0)
     return NativeBoolToBooleanObject(left->value_ < right->value_);
+  else if (op.compare("<=") == 0)
+    return NativeBoolToBooleanObject(left->value_ <= right->value_);
   else if (op.compare(">") == 0)
     return NativeBoolToBooleanObject(left->value_ > right->value_);
+  else if (op.compare(">=") == 0)
+    return NativeBoolToBooleanObject(left->value_ >= right->value_);
   else if (op.compare("==") == 0)
     return NativeBoolToBooleanObject(left->value_ == right->value_);
   else if (op.compare("!=") == 0)

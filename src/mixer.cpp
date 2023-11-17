@@ -519,7 +519,7 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
       if (soloed_sound_generator_idz.empty() ||
           std::find(soloed_sound_generator_idz.begin(),
                     soloed_sound_generator_idz.end(),
-                    i) != soloed_sound_generator_idz.end()) {
+                    k) != soloed_sound_generator_idz.end()) {
         collect_value = true;
       }
 

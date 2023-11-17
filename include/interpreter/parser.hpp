@@ -41,6 +41,8 @@ const std::unordered_map<token::TokenType, Precedence> precedences{
     {token::SLANG_NOT_EQ, Precedence::EQUALS},
     {token::SLANG_LT, Precedence::LESSGREATER},
     {token::SLANG_GT, Precedence::LESSGREATER},
+    {token::SLANG_LT_OR_EQ, Precedence::LESSGREATER},
+    {token::SLANG_GT_OR_EQ, Precedence::LESSGREATER},
     {token::SLANG_PLUS, Precedence::SUM},
     {token::SLANG_MINUS, Precedence::SUM},
     {token::SLANG_SLASH, Precedence::PRODUCT},
