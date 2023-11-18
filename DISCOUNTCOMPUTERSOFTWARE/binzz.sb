@@ -18,7 +18,7 @@ let bin_gen = gen()
     if (count % 8 < 7) {
       ((t/4)>>(t/4))>>(t>>(t/8))|t>>2;
       ++t;
-      #print(bits(t));
+      print(bits(t));
       perky(bits(t), kt);
       set kt[bx]:pitch ptz[px];
       bx = incr(bx, 0, len(kt));

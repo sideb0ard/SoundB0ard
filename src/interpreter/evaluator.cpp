@@ -1161,6 +1161,13 @@ std::shared_ptr<object::Boolean> NativeBoolToBooleanObject(bool input) {
   return FFALSE;
 }
 
+bool ObjectToNativeBool(std::shared_ptr<object::Object> obj) {
+  auto boolobj = std::dynamic_pointer_cast<object::Boolean>(obj);
+  if (boolobj) return boolobj->value_;
+  auto numobj = std::dynamic_pointer_cast<object::Number>(obj);
+  if (numobj) return numobj->value_;
+}
+
 std::shared_ptr<object::Object> EvalIdentifier(
     std::shared_ptr<ast::Identifier> ident,
     std::shared_ptr<object::Environment> env) {

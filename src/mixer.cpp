@@ -700,9 +700,11 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
   }
   if (action->type == AudioAction::MIDI_MAP)
     AddMidiMapping(action->mapped_id, action->mapped_param);
-  else if (action->type == AudioAction::ENABLE_WEBSOCKET)
+  else if (action->type == AudioAction::ENABLE_WEBSOCKET) {
+    std::cout << "GENERAL VAL:" << action->general_val << " is trei>?"
+              << std::endl;
     EnableWebSocket(action->general_val);
-  else if (action->type == AudioAction::MIDI_MAP_SHOW)
+  } else if (action->type == AudioAction::MIDI_MAP_SHOW)
     PrintMidiMappings();
   else if (action->type == AudioAction::HELP)
     mixr->Help();
@@ -900,8 +902,8 @@ void Mixer::CheckForExternalMidiEvents() {
         recording_buffer_[tic].push_back(ev);
       }
       if (midi_print) {
-        std::cout << "MIDI -- " << status << " " << data1 << " " << data2
-                  << std::endl;
+        std::cout << (timing_info.sixteenth_note_tick % 16) << " - MIDI -- "
+                  << status << " " << data1 << " " << data2 << std::endl;
       }
 
       // TODO - THESE SHOULD BE SHARED WITH MIDI MESSAGE PARSING

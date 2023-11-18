@@ -2647,11 +2647,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       std::cout << "Websocket enable yo!\n";
                       int args_size = args.size();
                       if (args_size == 1) {
-                        auto val =
-                            std::dynamic_pointer_cast<object::Boolean>(args[0]);
+                        auto val = evaluator::ObjectToNativeBool(args[0]);
+                        std::cout << "YO VAL IS:" << val << std::endl;
                         if (val) {
                           SendMixerActionGeneral(AudioAction::ENABLE_WEBSOCKET,
-                                                 val->value_);
+                                                 val);
                         }
                       }
                       return evaluator::NULLL;

@@ -4,23 +4,61 @@
 # 0 1 2 3 4 5 6 7 8  9  10  11  12  13  14  15
 # scale_melody
 
+let sclaeblah_fn = fn(root, num)
+{
+  num = num % 15;
+
+  if (num < 3) {
+    return root + num;
+  }
+  if (num < 7) {
+    return root + num + 1;
+  }
+  if (num < 10) {
+    return root + num + 2;
+  }
+  if (num < 14) {
+    return root + num + 3;
+  }
+  return root + num + 4;
+}
+
 let numblah_gen = gen()
 {
   setup()
   {
-    let key = 16;
+    let key = 24;
     # minor
     let key_type = 1;
     let num_numz = 0;
-    let num_hitz = 1;
+    let num_hitz = 3;
+    let idx1 = 0;
+    let idx2 = 15;
+    let idxz = rand_array(16, 0, 0);
+    let swng = 190;
   }
   run()
   {
+    if (count % 3 == 0) {
+      num_hitz = incr(num_hitz, 3, 11);
+    }
+    let dr = 3840 / num_hitz / 3;
 
-    let
-      for (i = 0; i < 16; ++i) {
+    for (i = 0; i < 16; ++i) {
+      if (i % num_hitz == 0) {
+        let offset = swng;
+        if (i % 2 == 0) {
+          offset = 0;
+        }
+        note_on_at(dx, sclaeblah_fn(key, idxz[i] - 12), i * pp + offset, dur = dr);
+        idxz[i] = incr(idxz[i], 0, 14);idxz[i] + i;
+      } else {
+        note_on_at(per1, sclaeblah_fn(key, idxz[i]), i * pp + offset, dur = dr);
       }
-
+      if (i%2 == 0) {
+        idxz[i] = idxz[i] - 1;
+      }
+    }
   }
 }
 

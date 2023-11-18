@@ -81,6 +81,7 @@ std::shared_ptr<object::Object> EvalIncrementOperatorExpression(
     std::shared_ptr<object::Object> right);
 
 std::shared_ptr<object::Boolean> NativeBoolToBooleanObject(bool input);
+bool ObjectToNativeBool(std::shared_ptr<object::Object> obj);
 
 std::shared_ptr<object::Object> EvalIfExpression(
     std::shared_ptr<ast::IfExpression> if_expr,
