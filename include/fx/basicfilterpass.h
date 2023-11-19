@@ -2,6 +2,7 @@
 
 #include <defjams.h>
 #include <filter_moogladder.h>
+#include <filter_sem.h>
 #include <fx/fx.h>
 #include <lfo.h>
 #include <stdbool.h>
@@ -23,7 +24,9 @@ class FilterPass : public Fx {
   void Update();
 
  private:
-  std::unique_ptr<MoogLadder> m_filter_;
+  // std::unique_ptr<MoogLadder> m_filter_;
+  std::unique_ptr<FilterSem> filter_left_;
+  std::unique_ptr<FilterSem> filter_right_;
 
   LFO m_lfo1_;  // route to freq
   bool m_lfo1_active_{false};

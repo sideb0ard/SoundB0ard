@@ -9,9 +9,13 @@
 
 FilterPass ::FilterPass() {
   type_ = BASICFILTER;
-  m_filter_ = std::make_unique<MoogLadder>();
-  m_filter_->SetFcControl(10000);
-  m_filter_->SetQControl(7);
+  // m_filter_ = std::make_unique<MoogLadder>();
+  filter_left_ = std::make_unique<FilterSem>();
+  filter_left_->SetFcControl(10000);
+  filter_left_->SetQControl(7);
+  filter_right_ = std::make_unique<FilterSem>();
+  filter_right_->SetFcControl(10000);
+  filter_right_->SetQControl(7);
 
   m_lfo1_.m_waveform = SINE;
   m_lfo1_.m_lfo_mode = LFOSYNC;
@@ -30,16 +34,17 @@ FilterPass ::FilterPass() {
 }
 
 void FilterPass::Update() {
-  m_filter_->Update();
+  filter_left_->Update();
+  filter_right_->Update();
   m_lfo1_.Update();
   m_lfo2_.Update();
 }
 
 std::string FilterPass::Status() {
   std::stringstream ss;
-  ss << "freq:" << m_filter_->m_fc_control;
-  ss << " q:" << m_filter_->m_q_control;
-  ss << " type:" << k_filter_type_names[m_filter_->m_filter_type];
+  ss << "freq:" << filter_left_->m_fc_control;
+  ss << " q:" << filter_left_->m_q_control;
+  ss << " type:" << k_filter_type_names[filter_left_->m_filter_type];
   ss << " lfo1_active:" << m_lfo1_active_;
   ss << " lfo1_type:" << m_lfo1_.m_waveform;
   ss << " lfo1_amp:" << m_lfo1_.m_amplitude << "\n";
@@ -55,33 +60,38 @@ StereoVal FilterPass::Process(StereoVal input) {
   double lfo1_val = 0.0;
   double lfo2_val = 0.0;
 
-  if (m_lfo1_active_) {
-    m_lfo1_.Update();
-    lfo1_val = m_lfo1_.DoOscillate(NULL);
-    m_filter_->SetFcMod(lfo1_val * FILTER_FC_MOD_RANGE);
-  }
+  // if (m_lfo1_active_) {
+  //   m_lfo1_.Update();
+  //   lfo1_val = m_lfo1_.DoOscillate(NULL);
+  //   m_filter_->SetFcMod(lfo1_val * FILTER_FC_MOD_RANGE);
+  // }
 
-  if (m_lfo2_active_) {
-    m_lfo2_.Update();
-    lfo2_val = m_lfo2_.DoOscillate(NULL);
-    m_filter_->SetQControl(bipolar_to_unipolar(lfo2_val));
-  }
+  // if (m_lfo2_active_) {
+  //   m_lfo2_.Update();
+  //   lfo2_val = m_lfo2_.DoOscillate(NULL);
+  //   m_filter_->SetQControl(bipolar_to_unipolar(lfo2_val));
+  // }
 
-  m_filter_->Update();
-  input.left = m_filter_->DoFilter(input.left);
-  input.right = input.left;
+  StereoVal output;
+  filter_left_->Update();
+  filter_right_->Update();
+  output.left = filter_right_->DoFilter(input.left);
+  output.right = filter_right_->DoFilter(input.right);
 
-  return input;
+  return output;
 }
 
 void FilterPass::SetParam(std::string name, double val) {
-  if (name == "freq")
-    m_filter_->SetFcControl(val);
-  else if (name == "q")
-    m_filter_->SetQControl(val);
-  else if (name == "type")
-    m_filter_->SetType(val);
-  else if (name == "lfo1_active")
+  if (name == "freq") {
+    filter_left_->SetFcControl(val);
+    filter_right_->SetFcControl(val);
+  } else if (name == "q") {
+    filter_left_->SetQControl(val);
+    filter_right_->SetQControl(val);
+  } else if (name == "type") {
+    filter_left_->SetType(val);
+    filter_right_->SetType(val);
+  } else if (name == "lfo1_active")
     SetLfoActive(1, val);
   else if (name == "lfo1_type")
     SetLfoType(1, val);

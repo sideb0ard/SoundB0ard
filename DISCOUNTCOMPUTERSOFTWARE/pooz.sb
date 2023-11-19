@@ -1,0 +1,140 @@
+
+# bpm 110
+let bd = sample(wavalc/dm02_909_kickdrum_006_drive.wav);
+
+let lt = sample(lt/Conga_Clean_Low_A_808_Fsharp.wav);
+let mt = sample(mt/hes23mt.aif);
+
+let cp = sample(cp/kNackr.aiff);
+
+# let deil = loop(dloops2/deilla.wav); add_fx(deil, "sidechain", bd); set deil:len 2;
+
+# let ara = loop(dloops2/aradisbeatiuz.wav); set ara:pitch -2; vol ara 0.6;
+let perblah_gen = gen()
+{
+  setup()
+  {
+    let tomz = [lt, mt];
+    let tx = 0;
+    let bjz = [1, 5, 3, 7];
+    let bjx = 0;
+    let dr = 10;
+  }
+  run()
+  {
+    let bet = bjork(bjz[bjx], 16);
+    for (i = 0; i < 16; ++i) {
+      if (bet[i] == 1) {
+        note_on_at(bd, 1, i * pp, dur = dr);
+      }
+    }
+    if (count % 4 == 3) {
+      let ibet = invert(bet);
+      for (i = 0; i < 16; ++i) {
+        if (ibet[i] == 1) {
+          note_on_at(ara, 1, i * pp);
+        }
+      }
+    }
+
+    if (count % 2 == 0) {
+      bjx = incr(bjx, 0, len(bjz));
+      let pat = bjork(bjz[bjx], 16);
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1 ) {
+          note_on_at(tomz[tx], 1, i*pp, dur = dr);
+          tx = incr(tx, 0, len(tomz));
+        }
+      }
+    }
+
+    dr = dr + 10;
+    if (dr > 400) {
+      dr = 10;
+    }
+
+    if (count % 3 == 0) {
+      cbeat(cp);
+    }
+  }
+}
+
+# dx swuuush
+# load_preset(dx, "swuuush"); add_fx(dx, "sidechain", bd)
+let dxblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      note_on_at(dx, 48, 0, dur= 3840 * 2 - 100, vel = 100);
+      solo(deil, at=12*pp);
+    }
+    if (count % 4 == 2) {
+      note_on_at(dx, 43, 0, dur = 1920  - 100 , vel = 90);
+      note_on_at(dx, 52, 1920, dur = 1920, vel = 80);
+    }
+  }
+}
+
+# per1 =
+# 52 47 40
+let ppblah_gen = gen()
+{
+  setup()
+  {
+    let rhym = mask(rand_array(16, 0, 1), rand_beat());
+    let notz = [52, 47, 40];
+    let nx = 0;
+    let dr = 20;
+    let offset = 220;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        let offs = offset;
+        if (i % 2 ==0) {
+          offs = 0;
+        }
+        let v = 100 + rand(27);
+        if (i % 4 ==0) {
+          v = 127;
+        }
+        if (rhym[i] == 1) {
+          note_on_at(per1, notz[nx], i * pp + offs, dur = dr, vel = v);
+          nx = dincr(nx, 0, len(notz));
+          if (count % 4 == 0) {
+            note_on_at(dx, notz[nx], i * pp + offs, dur = dr, vel = v);
+          }
+        }
+        dr = dr + 10;
+        if (dr > 200) {
+          dr = 40;
+        }
+      }
+    }
+    if (count % 8 == 0) {
+      rhym = mask(rand_array(16, 0, 1), rand_beat());
+    }
+  }
+}
+
+# let oeoh = loop(dloops2/EIGHtobeat.wav);
+let ddblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set oeoh:active 1;
+    if (count % 2 == 0) {
+      mashupToo(rand_beat(), [oeoh, ara, deil]);
+    }
+  }
+}
+
+# p4 < osc 4 "0 0.3" "send(1, deil, %)"

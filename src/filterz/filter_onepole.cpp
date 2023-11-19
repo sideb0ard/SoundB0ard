@@ -8,7 +8,7 @@
 
 void OnePole::Update() {
   Filter::Update();
-  double wd = 2.0 * M_PI * m_fc;
+  double wd = TWO_PI * m_fc;
   double T = 1.0 / SAMPLE_RATE;
   double wa = (2.0 / T) * tan(wd * T / 2.0);
   double g = wa * T / 2.0;
@@ -44,7 +44,4 @@ double OnePole::DoFilter(double xn) {
     return lpf;
   else if (m_filter_type == HPF1)
     return hpf;
-
-  // should never get here
-  return xn;
 }

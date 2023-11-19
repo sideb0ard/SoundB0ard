@@ -29,10 +29,6 @@ void Filter::SetType(unsigned int type) {
   }
 }
 
-void Filter::SetQControl(double val) {
-  // do nothing. Needs override
-}
-
 void Filter::Update() {
   if (global_filter_params) {
     m_aux_control = global_filter_params->aux_control;
@@ -55,8 +51,6 @@ void Filter::Update() {
   if (m_fc > FILTER_FC_MAX) m_fc = FILTER_FC_MAX;
   if (m_fc < FILTER_FC_MIN) m_fc = FILTER_FC_MIN;
 }
-
-void Filter::Reset() {}
 
 void Filter::InitGlobalParameters(GlobalFilterParams *params) {
   global_filter_params = params;

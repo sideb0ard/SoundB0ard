@@ -18,10 +18,11 @@ struct OnePole : public Filter {
   double m_z1{0.0};
   double m_feedback{0.0};
 
-  double DoFilter(double xn);
-  void Update();
+  double DoFilter(double xn) override;
+  void Update() override;
+  void SetQControl(double d) override {}
   void SetFeedback(double fb);
   double GetFeedbackOutput();
-  void Reset();
+  void Reset() override;
   void SetFilterType(unsigned int ftype);  // ENUM in filter.h
 };

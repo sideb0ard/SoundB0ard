@@ -6,16 +6,16 @@
 struct Biquad {
   Biquad() = default;
   ~Biquad() = default;
-  double m_xz_1;
-  double m_xz_2;
-  double m_yz_1;
-  double m_yz_2;
+  double m_xz_1{0};
+  double m_xz_2{0};
+  double m_yz_1{0};
+  double m_yz_2{0};
 
-  double m_a0;
-  double m_a1;
-  double m_a2;
-  double m_b1;
-  double m_b2;
+  double m_a0{0};
+  double m_a1{0};
+  double m_a2{0};
+  double m_b1{0};
+  double m_b2{0};
 
   void FlushDelays();
   double Process(double xn);

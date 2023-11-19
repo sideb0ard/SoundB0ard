@@ -73,7 +73,4 @@ double FilterSem::DoFilter(double xn) {
     return bpf;
   else if (m_filter_type == BSF2)
     return semBSF;
-
-  // shouldn't get here
-  return xn;
 }
