@@ -26,8 +26,8 @@ class ModFilter : public Fx {
   void SetLfoPhase(unsigned int val);
 
  private:
-  biquad m_left_lpf_;
-  biquad m_right_lpf_;
+  Biquad m_left_lpf_;
+  Biquad m_right_lpf_;
 
   WTOscillator m_fc_lfo_;
   WTOscillator m_q_lfo_;

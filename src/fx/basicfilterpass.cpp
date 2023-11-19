@@ -1,11 +1,10 @@
 #include <defjams.h>
-#include <filter_moogladder.h>
 #include <fx/basicfilterpass.h>
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <utils.h>
 
+#include <iostream>
 #include <sstream>
 
 FilterPass ::FilterPass() {
@@ -26,7 +25,7 @@ FilterPass ::FilterPass() {
   m_lfo1_.StartOscillator();
   m_lfo2_.StartOscillator();
 
-  printf("LFO1 freq is %.2f\n", m_lfo1_.m_osc_fo);
+  std::cout << "LFO1 freq is " << m_lfo1_.m_osc_fo << std::endl;
   enabled_ = true;
 }
 
@@ -104,7 +103,7 @@ void FilterPass::SetParam(std::string name, double val) {
 
 void FilterPass::SetLfoType(int lfo_num, unsigned int type) {
   if (type >= MAX_LFO_OSC) {
-    printf("Val out of range - must be < %d\n", MAX_LFO_OSC);
+    std::cout << "Val out of range - must be < " << MAX_LFO_OSC << std::endl;
     return;
   }
   switch (lfo_num) {
@@ -115,7 +114,7 @@ void FilterPass::SetLfoType(int lfo_num, unsigned int type) {
       m_lfo2_.m_waveform = type;
       break;
     default:
-      printf("Only got two LFO's mate - what do you think i am?\n");
+      std::cout << "Only got two LFO's mate - what do you think i am?\n";
   }
 }
 
@@ -128,14 +127,14 @@ void FilterPass::SetLfoActive(int lfo_num, bool b) {
       m_lfo2_active_ = b;
       break;
     default:
-      printf("Only got two LFO's mate - what do you think i am?\n");
+      std::cout << "Only got two LFO's mate - what do you think i am?\n";
   }
 }
 
 void FilterPass::SetLfoRate(int lfo_num, double val) {
   if (val < MIN_LFO_RATE || val > MAX_LFO_RATE) {
-    printf("Val out of range - must be between %f and %f\n", MIN_LFO_RATE,
-           MAX_LFO_RATE);
+    std::cout << "Val out of range - must be between " << MIN_LFO_RATE
+              << " and " << MAX_LFO_RATE << std::endl;
     return;
   }
   switch (lfo_num) {
@@ -146,13 +145,13 @@ void FilterPass::SetLfoRate(int lfo_num, double val) {
       m_lfo2_.m_osc_fo = val;
       break;
     default:
-      printf("Only got two LFO's mate - what do you think i am?\n");
+      std::cout << "Only got two LFO's mate - what do you think i am?\n";
   }
 }
 
 void FilterPass::SetLfoAmp(int lfo_num, double val) {
   if (val < 0. || val > 1.) {
-    printf("Val out of range - must be between 0 and 1\n");
+    std::cout << "Val out of range - must be between 0 and 1" << std::endl;
     return;
   }
   switch (lfo_num) {
@@ -163,6 +162,6 @@ void FilterPass::SetLfoAmp(int lfo_num, double val) {
       m_lfo2_.m_amplitude = val;
       break;
     default:
-      printf("Only got two LFO's mate - what do you think i am?\n");
+      std::cout << "Only got two LFO's mate - what do you think i am?\n";
   }
 }

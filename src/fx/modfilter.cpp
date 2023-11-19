@@ -14,8 +14,8 @@ ModFilter::ModFilter() {
 }
 
 void ModFilter::Init() {
-  biquad_flush_delays(&m_left_lpf_);
-  biquad_flush_delays(&m_right_lpf_);
+  m_left_lpf_.FlushDelays();
+  m_right_lpf_.FlushDelays();
 
   m_min_cutoff_freq_ = 100.;
   m_max_cutoff_freq_ = 5000.;
@@ -128,8 +128,8 @@ StereoVal ModFilter::Process(StereoVal in) {
   else
     CalculateRightLpfCoeffs(fcq, qq);
 
-  out.left = biquad_process(&m_left_lpf_, in.left);
-  out.right = biquad_process(&m_right_lpf_, in.right);
+  out.left = m_left_lpf_.Process(in.left);
+  out.right = m_right_lpf_.Process(in.right);
 
   return out;
 }
