@@ -7,7 +7,7 @@ let mt = sample(mt/hes23mt.aif);
 
 let cp = sample(cp/kNackr.aiff);
 
-# let deil = loop(dloops2/deilla.wav); add_fx(deil, "sidechain", bd); set deil:len 2;
+# let deil = loop(dloops2/deilla.wav); add_fx(deil, "sidechain", bd); set deil:len 2; p1 $ perblah_gen
 
 # let ara = loop(dloops2/aradisbeatiuz.wav); set ara:pitch -2; vol ara 0.6;
 let perblah_gen = gen()
@@ -60,7 +60,7 @@ let perblah_gen = gen()
 }
 
 # dx swuuush
-# load_preset(dx, "swuuush"); add_fx(dx, "sidechain", bd)
+# load_preset(dx, "swuuush"); add_fx(dx, "sidechain", bd) ; p3 $ dxblah_gen; vol dx 0.4
 let dxblah_gen = gen()
 {
   setup()
@@ -69,11 +69,11 @@ let dxblah_gen = gen()
   run()
   {
     if (count % 4 == 0) {
-      note_on_at(dx, 48, 0, dur= 3840 * 2 - 100, vel = 100);
+      note_on_at(dx, 48, 40, dur= 3840 * 2 - 100, vel = 100);
       solo(deil, at=12*pp);
     }
     if (count % 4 == 2) {
-      note_on_at(dx, 43, 0, dur = 1920  - 100 , vel = 90);
+      note_on_at(dx, 43, 40, dur = 1920  - 100 , vel = 90);
       note_on_at(dx, 52, 1920, dur = 1920, vel = 80);
     }
   }

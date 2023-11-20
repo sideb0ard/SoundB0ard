@@ -10,12 +10,14 @@
 FilterPass ::FilterPass() {
   type_ = BASICFILTER;
   // m_filter_ = std::make_unique<MoogLadder>();
-  filter_left_ = std::make_unique<FilterSem>();
+  // filter_left_ = std::make_unique<FilterSem>();
+  filter_left_ = std::make_unique<CKThreeFive>();
   filter_left_->SetFcControl(10000);
-  filter_left_->SetQControl(7);
-  filter_right_ = std::make_unique<FilterSem>();
+  filter_left_->SetQControlGUI(7);
+  // filter_right_ = std::make_unique<FilterSem>();
+  filter_right_ = std::make_unique<CKThreeFive>();
   filter_right_->SetFcControl(10000);
-  filter_right_->SetQControl(7);
+  filter_right_->SetQControlGUI(7);
 
   m_lfo1_.m_waveform = SINE;
   m_lfo1_.m_lfo_mode = LFOSYNC;
@@ -44,7 +46,10 @@ std::string FilterPass::Status() {
   std::stringstream ss;
   ss << "freq:" << filter_left_->m_fc_control;
   ss << " q:" << filter_left_->m_q_control;
+  ss << " k:" << filter_left_->m_k;
   ss << " type:" << k_filter_type_names[filter_left_->m_filter_type];
+  ss << " nlp:" << filter_left_->m_nlp;
+  ss << " sat:" << filter_left_->m_saturation;
   ss << " lfo1_active:" << m_lfo1_active_;
   ss << " lfo1_type:" << m_lfo1_.m_waveform;
   ss << " lfo1_amp:" << m_lfo1_.m_amplitude << "\n";
@@ -86,11 +91,17 @@ void FilterPass::SetParam(std::string name, double val) {
     filter_left_->SetFcControl(val);
     filter_right_->SetFcControl(val);
   } else if (name == "q") {
-    filter_left_->SetQControl(val);
-    filter_right_->SetQControl(val);
+    filter_left_->SetQControlGUI(val);
+    filter_right_->SetQControlGUI(val);
   } else if (name == "type") {
     filter_left_->SetType(val);
     filter_right_->SetType(val);
+  } else if (name == "nlp") {
+    filter_left_->m_nlp = val;
+    filter_right_->m_nlp = val;
+  } else if (name == "sat") {
+    filter_left_->m_saturation = val;
+    filter_right_->m_saturation = val;
   } else if (name == "lfo1_active")
     SetLfoActive(1, val);
   else if (name == "lfo1_type")

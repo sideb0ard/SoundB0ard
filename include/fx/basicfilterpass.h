@@ -1,6 +1,7 @@
 #pragma once
 
 #include <defjams.h>
+#include <filter_ckthreefive.h>
 #include <filter_moogladder.h>
 #include <filter_sem.h>
 #include <fx/fx.h>
@@ -25,8 +26,10 @@ class FilterPass : public Fx {
 
  private:
   // std::unique_ptr<MoogLadder> m_filter_;
-  std::unique_ptr<FilterSem> filter_left_;
-  std::unique_ptr<FilterSem> filter_right_;
+  // std::unique_ptr<FilterSem> filter_left_;
+  // std::unique_ptr<FilterSem> filter_right_;
+  std::unique_ptr<CKThreeFive> filter_left_;
+  std::unique_ptr<CKThreeFive> filter_right_;
 
   LFO m_lfo1_;  // route to freq
   bool m_lfo1_active_{false};

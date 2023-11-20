@@ -44,6 +44,7 @@ class Filter {
 
  public:
   void SetFcMod(double d);
+  void SetQControlGUI(double d);
   virtual void SetQControl(double d) = 0;
   virtual void SetFcControl(double val);
   virtual void Update();

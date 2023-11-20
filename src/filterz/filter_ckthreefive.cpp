@@ -1,12 +1,15 @@
 #include "filter_ckthreefive.h"
 
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
+
+#include <iostream>
 
 #include "defjams.h"
 #include "filter.h"
 #include "filter_onepole.h"
+
+CKThreeFive::CKThreeFive() { m_filter_type = LPF2; }
 
 void CKThreeFive::SetQControl(double qcontrol) {
   m_k = (2.0 - 0.01) * (qcontrol - 1.0) / (10.0 - 1.0) + 0.01;

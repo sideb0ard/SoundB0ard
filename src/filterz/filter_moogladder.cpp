@@ -30,10 +30,7 @@ MoogLadder::MoogLadder() {
 }
 
 void MoogLadder::SetQControl(double qcontrol) {
-  if (qcontrol >= 1 && qcontrol < 10) {
-    m_q_control = qcontrol;
-    m_k = (4.0) * (qcontrol - 1.0) / (10.0 - 1.0);
-  }
+  m_k = (4.0) * (qcontrol - 1.0) / (10.0 - 1.0);
 }
 
 void MoogLadder::Update() {

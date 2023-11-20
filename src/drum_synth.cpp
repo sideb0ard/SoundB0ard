@@ -230,7 +230,7 @@ void DrumSynth::SetParam(std::string name, double val) {
     filter1_->SetFcControl(val);
   } else if (name == "f1_q") {
     settings_.filter1_q = val;
-    filter1_->SetQControl(val);
+    filter1_->SetQControlGUI(val);
   } else if (name == "f1_en") {
     settings_.filter1_enable = val;
   }
