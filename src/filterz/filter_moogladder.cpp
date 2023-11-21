@@ -13,7 +13,6 @@ MoogLadder::MoogLadder() {
   m_LPF1.m_filter_type = LPF1;
   m_LPF2.m_filter_type = LPF1;
   m_LPF3.m_filter_type = LPF1;
-
   m_LPF4.m_filter_type = LPF1;
 
   m_filter_type = LPF4;  // default
@@ -35,7 +34,6 @@ void MoogLadder::SetQControl(double qcontrol) {
 
 void MoogLadder::Update() {
   Filter::Update();
-  m_k = (4.0) * (m_q_control - 1.0) / (10.0 - 1.0);
 
   double wd = 2.0 * M_PI * m_fc;
   static double T = 1.0 / SAMPLE_RATE;

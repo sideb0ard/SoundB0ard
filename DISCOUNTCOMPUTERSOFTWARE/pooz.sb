@@ -9,7 +9,8 @@ let cp = sample(cp/kNackr.aiff);
 
 # let deil = loop(dloops2/deilla.wav); add_fx(deil, "sidechain", bd); set deil:len 2; p1 $ perblah_gen
 
-# let ara = loop(dloops2/aradisbeatiuz.wav); set ara:pitch -2; vol ara 0.6;
+# p2 < osc 8 "300 18000" "set deil:fx1:freq %"
+# let ara = loop(dloops2/aradisbeatiuz.wav); set ara:pitch -2; vol ara 0.5; note_on(ara,1);
 let perblah_gen = gen()
 {
   setup()
@@ -59,7 +60,7 @@ let perblah_gen = gen()
   }
 }
 
-# dx swuuush
+# dx swuuush // hedgehOG
 # load_preset(dx, "swuuush"); add_fx(dx, "sidechain", bd) ; p3 $ dxblah_gen; vol dx 0.4
 let dxblah_gen = gen()
 {
@@ -70,7 +71,7 @@ let dxblah_gen = gen()
   {
     if (count % 4 == 0) {
       note_on_at(dx, 48, 40, dur= 3840 * 2 - 100, vel = 100);
-      solo(deil, at=12*pp);
+      # solo(deil, at=12*pp);
     }
     if (count % 4 == 2) {
       note_on_at(dx, 43, 40, dur = 1920  - 100 , vel = 90);
@@ -79,7 +80,30 @@ let dxblah_gen = gen()
   }
 }
 
-# per1 =
+let dxblah2_gen = gen()
+{
+  setup()
+  {
+    let notz = [48, 43, 52];
+    let beat = combinor(rotate(rand_beat(), 2), notz);
+    let bx = 0;
+    let bxmax = 3;
+  }
+  run()
+  {
+    if (count % 8 == 0) {
+      beat = combinor(rotate(rand_beat(), 2), notz);
+    }
+
+    for (i = 0; i < 16; ++i) {
+      stepper(dx, beat, bx, i, 100);
+      bx = incr(bx, 0, bxmax);
+    }
+    bxmax = incr(bxmax, 3, 16);
+  }
+}
+
+# per1 = // FWUMPE
 # 52 47 40
 let ppblah_gen = gen()
 {
@@ -122,6 +146,39 @@ let ppblah_gen = gen()
   }
 }
 
+let pp2blah_gen = gen()
+{
+  setup()
+  {
+    let notz = [52, 47, 40];
+    let beat = combinor(rotate(rand_beat(), 2), notz);
+    let bx = 0;
+    let bxmax = 3;
+    let dr = 20;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        stepper(per1, beat, bx, i, dr);
+        bx = incr(bx, 0, bxmax);
+        if (count % 4 == 0) {
+          if (beat[i] > 0) {
+            note_on_at(dx, notz[2], i * pp, dur = dr);
+          }
+        }
+      }
+      bxmax = incr(bxmax, 3, 16);
+      dr = dr + 10;
+      if (dr > 200) {
+        dr = 40;
+      }
+    }
+    if (count % 8 == 0) {
+      beat = combinor(rotate(rand_beat(), 2), notz);
+    }
+  }
+}
 # let oeoh = loop(dloops2/EIGHtobeat.wav);
 let ddblah_gen = gen()
 {
@@ -130,10 +187,10 @@ let ddblah_gen = gen()
   }
   run()
   {
-    set oeoh:active 1;
-    if (count % 2 == 0) {
-      mashupToo(rand_beat(), [oeoh, ara, deil]);
-    }
+    set deil:active 1;
+    # if (count % 2 == 0) {
+      #   mashupToo(rand_beat(), [ara, deil]);
+      # }
   }
 }
 

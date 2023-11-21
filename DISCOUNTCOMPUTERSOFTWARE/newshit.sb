@@ -25,15 +25,15 @@ let newblah_gen = gen()
   }
 }
 
-# dx fnc // WHHXc
+# dx fnc // WHHXc // FLOOR
 let mblah_gen = gen()
 {
   setup()
   {
     let key = 14;
-    let notz = notes_in_chord(key);
+    let notz = [45, 41, 55, 50, 53];
     let nx = 0;
-    let mel = riff(key);
+    let mel = riff(notz[nx]);
     let dr = 350;
 
     let mx = 0;
@@ -50,14 +50,35 @@ let mblah_gen = gen()
       mmx = incr(mmx, 3, 16);
       dr = dr + 50;
       if (dr > 770){
-        dr = 40;
+        dr = 240;
       }
     }
 
     if (count % 8 == 0) {
       mel = riff(notz[nx]);
+      #mel = combinor(rand_beat(), notz);
       nx = incr(nx, 0, len(notz));
     }
+  }
+}
+
+# let laz = loop(dloops2/lazr.wav)
+#  let fnk = loop(dloops2/funken.wav); add_fx(fnk, "distort");
+
+let mablah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      set laz:stutter 1;
+    }
+    if (count % 4 == 0) {
+      set fnk:stutter 1;
+    }
+
   }
 }
 

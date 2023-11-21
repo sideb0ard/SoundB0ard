@@ -154,22 +154,23 @@ class DrumSynth : public SoundGenerator {
   double frequency_diff_{0};
 
   std::unique_ptr<QBLimitedOscillator> osc1_;
-  std::unique_ptr<MoogLadder> filter1_;
-  // std::unique_ptr<CKThreeFive> filter1_;
+  // std::unique_ptr<MoogLadder> filter1_;
+  std::unique_ptr<CKThreeFive> filter1_;
 
   std::unique_ptr<QBLimitedOscillator> osc2_;
-  std::unique_ptr<MoogLadder> filter2_;
-  // std::unique_ptr<CKThreeFive> filter2_;
+  // std::unique_ptr<MoogLadder> filter2_;
+  std::unique_ptr<CKThreeFive> filter2_;
 
   std::unique_ptr<QBLimitedOscillator> osc3_;
-  std::unique_ptr<MoogLadder> filter3_;
-  // std::unique_ptr<CKThreeFive> filter3_;
+  // std::unique_ptr<MoogLadder> filter3_;
+  std::unique_ptr<CKThreeFive> filter3_;
 
   EnvelopeGenerator eg_;
   LFO lfo_;
 
   Distortion distortion_;
-  std::unique_ptr<MoogLadder> master_filter_;
+  // std::unique_ptr<MoogLadder> master_filter_;
+  std::unique_ptr<CKThreeFive> master_filter_;
 
   DCA dca_;
 

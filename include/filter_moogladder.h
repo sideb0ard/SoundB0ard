@@ -10,7 +10,7 @@ struct MoogLadder : public Filter {
 
   double m_k{0};
   double m_gamma{0};
-  double m_alpha_0{0};
+  double m_alpha_0{1.0};
 
   double m_a{0};
   double m_b{0};

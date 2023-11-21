@@ -29,10 +29,14 @@ DrumSynth::DrumSynth() {
   osc1_ = std::make_unique<QBLimitedOscillator>();
   osc2_ = std::make_unique<QBLimitedOscillator>();
   osc3_ = std::make_unique<QBLimitedOscillator>();
-  filter1_ = std::make_unique<MoogLadder>();
-  filter2_ = std::make_unique<MoogLadder>();
-  filter3_ = std::make_unique<MoogLadder>();
-  master_filter_ = std::make_unique<MoogLadder>();
+  // filter1_ = std::make_unique<MoogLadder>();
+  // filter2_ = std::make_unique<MoogLadder>();
+  // filter3_ = std::make_unique<MoogLadder>();
+  // master_filter_ = std::make_unique<MoogLadder>();
+  filter1_ = std::make_unique<CKThreeFive>();
+  filter2_ = std::make_unique<CKThreeFive>();
+  filter3_ = std::make_unique<CKThreeFive>();
+  master_filter_ = std::make_unique<CKThreeFive>();
 
   // default
   LoadSettings(DrumSettings());
@@ -77,24 +81,24 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     if (settings_.eg_filter1_freq_enable) {
       filter1_->SetFcMod(eg_out * settings_.pitch_range);
     }
-    if (settings_.eg_filter1_q_enable) {
-      filter1_->m_q_control +=
-          (eg_out * settings_.q_range) - settings_.q_range / 2;
-    }
+    // if (settings_.eg_filter1_q_enable) {
+    //   filter1_->m_q_control +=
+    //       (eg_out * settings_.q_range) - settings_.q_range / 2;
+    // }
     if (settings_.eg_filter2_freq_enable) {
       filter2_->SetFcMod(eg_out * settings_.pitch_range);
     }
-    if (settings_.eg_filter2_q_enable) {
-      filter2_->m_q_control +=
-          (eg_out * settings_.q_range) - settings_.q_range / 2;
-    }
+    // if (settings_.eg_filter2_q_enable) {
+    //   filter2_->m_q_control +=
+    //       (eg_out * settings_.q_range) - settings_.q_range / 2;
+    // }
     if (settings_.eg_master_filter_freq_enable) {
       master_filter_->SetFcMod(eg_out * settings_.pitch_range);
     }
-    if (settings_.eg_master_filter_q_enable) {
-      master_filter_->m_q_control +=
-          (eg_out * settings_.q_range) - settings_.q_range / 2;
-    }
+    // if (settings_.eg_master_filter_q_enable) {
+    //   master_filter_->m_q_control +=
+    //       (eg_out * settings_.q_range) - settings_.q_range / 2;
+    // }
 
     if (settings_.lfo_pw_enable) {
       // --- limits are 2% and 98%
@@ -113,24 +117,24 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     if (settings_.lfo_filter1_freq_enable) {
       filter1_->SetFcMod(lfo_out * settings_.pitch_range);
     }
-    if (settings_.lfo_filter1_q_enable) {
-      filter1_->m_q_control +=
-          (lfo_out * settings_.q_range) - settings_.q_range / 2;
-    }
+    // if (settings_.lfo_filter1_q_enable) {
+    //   filter1_->m_q_control +=
+    //       (lfo_out * settings_.q_range) - settings_.q_range / 2;
+    // }
     if (settings_.lfo_filter2_freq_enable) {
       filter2_->SetFcMod(lfo_out * settings_.pitch_range);
     }
-    if (settings_.lfo_filter2_q_enable) {
-      filter2_->m_q_control +=
-          (lfo_out * settings_.q_range) - settings_.q_range / 2;
-    }
+    // if (settings_.lfo_filter2_q_enable) {
+    //   filter2_->m_q_control +=
+    //       (lfo_out * settings_.q_range) - settings_.q_range / 2;
+    // }
     if (settings_.lfo_master_filter_freq_enable) {
       master_filter_->SetFcMod(lfo_out * settings_.pitch_range);
     }
-    if (settings_.lfo_master_filter_q_enable) {
-      master_filter_->m_q_control +=
-          (lfo_out * settings_.q_range) - settings_.q_range / 2;
-    }
+    // if (settings_.lfo_master_filter_q_enable) {
+    //   master_filter_->m_q_control +=
+    //       (lfo_out * settings_.q_range) - settings_.q_range / 2;
+    // }
 
     filter1_->Update();
     filter2_->Update();
@@ -250,7 +254,7 @@ void DrumSynth::SetParam(std::string name, double val) {
     filter2_->SetFcControl(val);
   } else if (name == "f2_q") {
     settings_.filter2_q = val;
-    filter2_->SetQControl(val);
+    filter2_->SetQControlGUI(val);
   } else if (name == "f2_en") {
     settings_.filter2_enable = val;
   }
@@ -270,7 +274,7 @@ void DrumSynth::SetParam(std::string name, double val) {
     filter3_->SetFcControl(val);
   } else if (name == "f3_q") {
     settings_.filter3_q = val;
-    filter3_->SetQControl(val);
+    filter3_->SetQControlGUI(val);
   } else if (name == "f3_en") {
     settings_.filter3_enable = val;
   }
@@ -635,13 +639,13 @@ void DrumSynth::Update() {
   osc3_->Update();
 
   filter1_->SetFcControl(settings_.filter1_fc);
-  filter1_->SetQControl(settings_.filter1_q);
+  filter1_->SetQControlGUI(settings_.filter1_q);
 
   filter2_->SetFcControl(settings_.filter2_fc);
-  filter2_->SetQControl(settings_.filter2_q);
+  filter2_->SetQControlGUI(settings_.filter2_q);
 
   master_filter_->SetFcControl(settings_.master_filter_fc);
-  master_filter_->SetQControl(settings_.master_filter_q);
+  master_filter_->SetQControlGUI(settings_.master_filter_q);
 
   eg_.SetAttackTimeMsec(settings_.eg_attack_ms);
   eg_.SetDecayTimeMsec(settings_.eg_decay_ms);

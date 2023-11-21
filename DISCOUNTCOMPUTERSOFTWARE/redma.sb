@@ -25,72 +25,40 @@ let rdblah_gen = gen()
   }
 }
 
-# dx = siiiiney // WTOOF
-let dblah_gen = gen()
+# skirissh
+# load_preset(dx, "skirissh"); p2 $ nudxbblah_gen
+
+let nudxbblah_gen = gen()
 {
   setup()
   {
-    # Ab # key 9 with rdm // 11
-    let key = 16;
-    # let base_mel = [0, 15, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 15, 0];
-    let base_mel = gamelody(16, key);
+    let notz = down([59, 57, 55], 24);
     let dr = 200;
-    let bx = 0;
-    let bmx = 3;
-
   }
   run()
   {
-    let mel = base_mel;
-    set rdm:pitch 1;
-    if (count % 8 == 7) {
-      mel = up(base_mel, 12);
-      set rdm:pitch 2;
-    }
-    if (count % 8 == 6) {
-      mel = down(base_mel, 12);
-      set rdm:pitch 0.5;
-    }
-    if (count % 6 < 3) {
+    if (count % 2 == 0) {
+      let beat = rand_beat();
+      let beat2 = rand_beat();
+      if (count % 4 == 0) {
+        beat2 = rotate(beat2, 2);
+      }
       for (i = 0; i < 16; ++i) {
-        let v = 90 + rand(37);
-        if (i % 4 == 2) {
-          v = 127;
+        if (beat[i] == 1) {
+          note_on_at(dx, notz[0], i * pp, dur = dr);
         }
-        if (mel[i] > 0) {
-          note_on_at(dx, mel[i], i*pp, dur = dr, vel = v);
+        if (beat2[i] == 1) {
+          let n = notz[1];
+          if (i > 7) {
+            n = notz[2];
+          }
+          note_on_at(dx, n, 3840 + i * pp, dur = dr);
         }
       }
     }
-    if (count % 6 == 3) {
-      let mmel = gamelody(16, key);
-      for (i = 0; i < 16; ++i) {
-        let v = 90 + rand(37);
-        if (i % 4 == 2) {
-          v = 127;
-        }
-        if (mmel[i] > 0) {
-          note_on_at(dx, mmel[i], i*pp, dur = dr, vel = v);
-          #note_on_at(cb, mmel[i]+36, i*pp, dur = dr, vel = v);
-          dr = dr + 30;
-        }
-      }
-    }
-    if (count % 6 == 4) {
-      for (i = 0; i < 16; ++i) {
-        stepper(dx, mel, bx, i, 100);
-        bx = incr(bx, 0, bmx);
-      }
-      bmx = incr(mbx, 3, 16);
-    }
-
     dr = dr + 50;
-    if (dr > 450) {
-      dr = 150;
-    }
-
-    if (count % 8 == 0) {
-      base_mel = gamelody(16, key);
+    if (dr > 500) {
+      dr = 100;
     }
 
   }
