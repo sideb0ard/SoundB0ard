@@ -1,4 +1,6 @@
 # let hx = loop(dloops2/harshx.wav);
+# let hxar = loop(dloops2/aradisbeatiuz.wav);
+
 let wblah_gen = gen()
 {
   setup()
@@ -11,9 +13,11 @@ let wblah_gen = gen()
     set hx:plooplen lenz[lx];
     if (count % 2 == 0) {
       lx = incr(lx, 0, len(lenz));
+      set hxar:plooplen lenz[lx];
     }
     if (count % 7 == 0) {
       set hx:stutter 1;
+      set hxar:scramble 1;
     }
   }
 }
@@ -95,7 +99,6 @@ let perblah_gen = gen()
         }
       }
     }
-
   }
 }
 

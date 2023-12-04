@@ -7,7 +7,7 @@ let mt = sample(mt/hes23mt.aif);
 
 let cp = sample(cp/kNackr.aiff);
 
-# let deil = loop(dloops2/deilla.wav); add_fx(deil, "sidechain", bd); set deil:len 2; p1 $ perblah_gen
+# let deil = loop(dloops2/deilla.wav); set deil:len 2; p1 $ perblah_gen
 
 # p2 < osc 8 "300 18000" "set deil:fx1:freq %"
 # let ara = loop(dloops2/aradisbeatiuz.wav); set ara:pitch -2; vol ara 0.5; note_on(ara,1);
