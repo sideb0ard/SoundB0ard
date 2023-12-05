@@ -17,6 +17,25 @@ enum LoopMode {
   smudge_mode,
 };
 
+struct FileBuffer {
+  FileBuffer(std::string filename) : filename{filename} {
+    ImportFile(filename);
+  };
+  ~FileBuffer() = default;
+
+  void ImportFile(std::string filename);
+  void SetLoopLen(double bars);
+  void SetAudioBufferReadIdx(size_t position);
+
+  std::string filename;
+  std::vector<double> audio_buffer{};
+  int num_channels{0};
+  int loop_len;
+
+  int size_of_sixteenth{0};
+  int audio_buffer_read_idx{0};
+};
+
 class Granulator : public SoundGenerator {
  public:
   Granulator(std::string filename, unsigned int loop_mode);
@@ -37,9 +56,12 @@ class Granulator : public SoundGenerator {
  public:
   bool started_{false};
 
-  std::string filename_;
-  std::vector<double> audio_buffer_{};
-  int num_channels_{0};
+  std::vector<FileBuffer> file_buffers_{};
+  int cur_file_buffer_idx_{0};
+
+  // std::string filename_;
+  // std::vector<double> audio_buffer_{};
+  // int num_channels_{0};
   int size_of_sixteenth_{0};
   int audio_buffer_read_idx_{0};
 
@@ -110,13 +132,10 @@ class Granulator : public SoundGenerator {
   bool preverse_{false};
 
  public:
-  void ImportFile(std::string filename);
-
   void SetGrainPitch(double pitch);
   void SetIncrSpeed(double speed);
   void SetGrainDuration(int dur);
   void SetGrainDensity(int gps);
-  void SetAudioBufferReadIdx(size_t position);
   void SetGranularSpray(int spray_ms);
   void SetQuasiGrainFudge(int fudgefactor);
   void SetReverseMode(bool b);
