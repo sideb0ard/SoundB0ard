@@ -26,14 +26,42 @@ struct FileBuffer {
   void ImportFile(std::string filename);
   void SetLoopLen(double bars);
   void SetAudioBufferReadIdx(size_t position);
+  void SetPidx(int val);
+  void SetPOffset(int poffset);
+  void SetPlooplen(int plooplen);
+  void SetPinc(int pinc);
+  void SetLoopMode(unsigned int m);
+  void SetScramblePending();
+  void SetStutterPending();
 
-  std::string filename;
+  bool scramble_mode{false};
+  bool scramble_pending{false};
+
+  bool stutter_mode{false};
+  bool stutter_pending{false};
+
+  std::string filename{};
   std::vector<double> audio_buffer{};
-  int num_channels{0};
-  int loop_len;
+  int num_channels{2};
+
+  LoopMode loop_mode{LoopMode::loop_mode};
+  int loop_len{-1};
 
   int size_of_sixteenth{0};
   int audio_buffer_read_idx{0};
+
+  std::array<int, 16> scrambled_pattern{0};
+
+  int cur_sixteenth{0};
+
+  double incr_speed{1};
+  double cur_midi_idx{0};
+
+  double plooplen{16};
+  double poffset{0};
+  int pinc{1};
+  bool pbounce{false};
+  bool preverse{false};
 };
 
 class Granulator : public SoundGenerator {
@@ -62,8 +90,8 @@ class Granulator : public SoundGenerator {
   // std::string filename_;
   // std::vector<double> audio_buffer_{};
   // int num_channels_{0};
-  int size_of_sixteenth_{0};
-  int audio_buffer_read_idx_{0};
+  // int size_of_sixteenth_{0};
+  // int audio_buffer_read_idx_{0};
 
   SoundGrainType grain_type_{SoundGrainType::Sample};
   std::unique_ptr<SoundGrain> grain_a_;
@@ -99,9 +127,9 @@ class Granulator : public SoundGenerator {
 
   EnvelopeGenerator eg_;  // start/stop amp
 
-  LoopMode loop_mode_{LoopMode::loop_mode};
-  double loop_len_{1};  // bars
-  int loop_counter_{-1};
+  // LoopMode loop_mode_{LoopMode::loop_mode};
+  // double loop_len_{1};  // bars
+  // int loop_counter_{-1};
 
   bool stop_count_pending_{false};
   int stop_len_{0};
@@ -114,22 +142,8 @@ class Granulator : public SoundGenerator {
   bool stutter_pending_{false};
 
   bool stop_pending_{false};  // allow eg to stop
-
-  int degrade_by_{0};  // percent change to drop bits
-                       //
-
-  std::array<int, 16> scrambled_pattern_{0};
-
-  int cur_sixteenth_{0};
-
-  double incr_speed_{1};
-  double cur_midi_idx_{0};
-
-  double plooplen_{16};
-  double poffset_{0};
-  int pinc_{1};
-  bool pbounce_{false};
-  bool preverse_{false};
+  int degrade_by_{0};         // percent change to drop bits
+                              //
 
  public:
   void SetGrainPitch(double pitch);
@@ -139,6 +153,7 @@ class Granulator : public SoundGenerator {
   void SetGranularSpray(int spray_ms);
   void SetQuasiGrainFudge(int fudgefactor);
   void SetReverseMode(bool b);
+
   void SetLoopMode(unsigned int m);
   void SetLoopLen(double bars);
   void SetScramblePending();
