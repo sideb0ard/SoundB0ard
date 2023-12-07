@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "PerlinNoise.hpp"
+#include "filebuffer.h"
 #include "midi_device.h"
 #include "midi_freq_table.h"
 
@@ -1508,6 +1509,31 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      std::make_unique<AudioActionItem>(AudioAction::ADD_FX);
                  action->soundgen_num = soundgen->soundgen_id_;
                  action->fx = fx;
+                 audio_queue.push(std::move(action));
+               }
+             }
+           }
+           return evaluator::NULLL;
+         })},
+    {"add_buf",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size >= 2) {
+             std::cout << "YO ADD BUFFER!\n";
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen && mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+               if (args[1]->Type() == "STRING") {
+                 std::cout << args[1]->Inspect() << " " << args[1]->Type()
+                           << std::endl;
+                 auto fb =
+                     std::make_unique<SBAudio::FileBuffer>(args[1]->Inspect());
+                 auto action =
+                     std::make_unique<AudioActionItem>(AudioAction::ADD_BUFFER);
+                 action->soundgen_num = soundgen->soundgen_id_;
+                 action->fb = std::move(fb);
                  audio_queue.push(std::move(action));
                }
              }

@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+#include <memory>
+
 #include "envelope_generator.h"
 #include "fft_processor.h"
 #include "fx/ramp.h"
@@ -10,59 +12,6 @@
 #include "stepper.h"
 
 namespace SBAudio {
-
-enum LoopMode {
-  loop_mode,
-  static_mode,
-  smudge_mode,
-};
-
-struct FileBuffer {
-  FileBuffer(std::string filename) : filename{filename} {
-    ImportFile(filename);
-  };
-  ~FileBuffer() = default;
-
-  void ImportFile(std::string filename);
-  void SetLoopLen(double bars);
-  void SetAudioBufferReadIdx(size_t position);
-  void SetPidx(int val);
-  void SetPOffset(int poffset);
-  void SetPlooplen(int plooplen);
-  void SetPinc(int pinc);
-  void SetLoopMode(unsigned int m);
-  void SetScramblePending();
-  void SetStutterPending();
-
-  bool scramble_mode{false};
-  bool scramble_pending{false};
-
-  bool stutter_mode{false};
-  bool stutter_pending{false};
-
-  std::string filename{};
-  std::vector<double> audio_buffer{};
-  int num_channels{2};
-
-  LoopMode loop_mode{LoopMode::loop_mode};
-  int loop_len{-1};
-
-  int size_of_sixteenth{0};
-  int audio_buffer_read_idx{0};
-
-  std::array<int, 16> scrambled_pattern{0};
-
-  int cur_sixteenth{0};
-
-  double incr_speed{1};
-  double cur_midi_idx{0};
-
-  double plooplen{16};
-  double poffset{0};
-  int pinc{1};
-  bool pbounce{false};
-  bool preverse{false};
-};
 
 class Granulator : public SoundGenerator {
  public:
@@ -79,19 +28,17 @@ class Granulator : public SoundGenerator {
   void NoteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
 
+  void AddBuffer(std::unique_ptr<FileBuffer> fb) override;
+
   void Reset();
 
  public:
   bool started_{false};
 
-  std::vector<FileBuffer> file_buffers_{};
+  std::vector<std::unique_ptr<FileBuffer>> file_buffers_{};
   int cur_file_buffer_idx_{0};
-
-  // std::string filename_;
-  // std::vector<double> audio_buffer_{};
-  // int num_channels_{0};
-  // int size_of_sixteenth_{0};
-  // int audio_buffer_read_idx_{0};
+  // TODO - control matrix for buffer playback
+  int cur_buffer_play_count_{0};
 
   SoundGrainType grain_type_{SoundGrainType::Sample};
   std::unique_ptr<SoundGrain> grain_a_;

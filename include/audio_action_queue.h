@@ -2,7 +2,6 @@
 
 #include <audioutils.h>
 #include <fx/fx.h>
-#include <soundgenerator.h>
 
 #include <interpreter/object.hpp>
 #include <map>
@@ -10,10 +9,13 @@
 #include <vector>
 
 #include "drum_synth.h"
+#include "filebuffer.h"
+#include "soundgenerator.h"
 
 enum AudioAction {
   ADD,
   ADD_FX,
+  ADD_BUFFER,
   BPM,
   INFO,
   HELP,
@@ -51,6 +53,7 @@ struct AudioActionItem {
   ~AudioActionItem() = default;
   AudioAction type;
   std::unique_ptr<SBAudio::SoundGenerator> sg{nullptr};
+  std::unique_ptr<SBAudio::FileBuffer> fb{nullptr};
   int mixer_soundgen_idx{-1};
   bool is_xfader{false};
   std::vector<int> group_of_soundgens{};
