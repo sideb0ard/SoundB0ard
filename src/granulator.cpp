@@ -95,10 +95,7 @@ Granulator::~Granulator() {
 }
 
 void Granulator::AddBuffer(std::unique_ptr<FileBuffer> fb) {
-  std::cout << "YO GRANNN - ADD BUFFA\n";
-  std::cout << "BUFFERS ZSIZ b4:" << file_buffers_.size() << std::endl;
   file_buffers_.push_back(std::move(fb));
-  std::cout << "BUFFERS ZSIZ now:" << file_buffers_.size() << std::endl;
 }
 
 void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
@@ -201,17 +198,17 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
     }
   }
   if (tinfo.is_start_of_loop) {
-    if (scramble_pending_) {
-      scramble_mode_ = true;
-      scramble_pending_ = false;
+    if (buffer->scramble_pending) {
+      buffer->scramble_mode = true;
+      buffer->scramble_pending = false;
     } else
-      scramble_mode_ = false;
+      buffer->scramble_mode = false;
 
-    if (stutter_pending_) {
-      stutter_mode_ = true;
-      stutter_pending_ = false;
+    if (buffer->stutter_pending) {
+      buffer->stutter_mode = true;
+      buffer->stutter_pending = false;
     } else
-      stutter_mode_ = false;
+      buffer->stutter_mode = false;
 
     if (reverse_pending_) {
       reverse_mode_ = true;
@@ -579,7 +576,6 @@ void Granulator::SetParam(std::string name, double val) {
 }
 
 void Granulator::SetSubParam(int id, std::string name, double val) {
-  std::cout << "YO GRAN - SET SUB PARAM\n";
   if (id < file_buffers_.size()) {
     std::unique_ptr<FileBuffer> &buffer = file_buffers_[id];
     buffer->SetParam(name, val);

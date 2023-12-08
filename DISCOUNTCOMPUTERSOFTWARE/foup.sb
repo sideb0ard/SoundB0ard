@@ -1,0 +1,47 @@
+
+let letblah_gen = gen()
+{
+  setup()
+  {
+    let ixz = 1;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set fourp:0:play_for ixz;
+      ixz = incr(ixz, 2, 4);
+    }
+    if (count % 3 == 0) {
+      set fourp:1:play_for ixz;
+      ixz = incr(ixz, 1, 6);
+      set fourp:2:play_for ixz;
+    }
+
+    if (count % 4 == 0) {
+      set fourp:stutter 1;
+      set snap:stutter 1;
+    }
+    if (count % 6 == 0) {
+      set fourp:scramble 1;
+    }
+  }
+}
+
+let mwadblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (i % 4 == 2) {
+        note_on_at(dx, 8, i * pp, dur = 250);
+      }
+      if (i % 8 == 7) {
+        note_on_at(per1, 32, i * pp, dur = 250);
+      }
+    }
+  }
+}
+

@@ -9,14 +9,12 @@ namespace SBAudio {
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 void FileBuffer::ImportFile(std::string filename) {
-  std::cout << "FB IMPORT FILE YO!:" << filename << std::endl;
   AudioBufferDetails deetz = ImportFileContents(audio_buffer, filename);
   num_channels = deetz.num_channels;
   SetLoopLen(1);
 }
 
 void FileBuffer::SetParam(std::string param, double value) {
-  std::cout << "YO IT DAT FILE BUFFER SET PARAM YO\n";
   if (param == "idx") {
     if (value <= 100) {
       double pos = value / 100. * audio_buffer.size();
@@ -84,7 +82,6 @@ void FileBuffer::SetAudioBufferReadIdx(size_t pos) {
     return;
   }
   audio_buffer_read_idx = pos;
-  std::cout << "YO SETTIN READ IDX TO : " << pos << std::endl;
 }
 
 }  // namespace SBAudio

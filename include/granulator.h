@@ -75,19 +75,9 @@ class Granulator : public SoundGenerator {
 
   EnvelopeGenerator eg_;  // start/stop amp
 
-  // LoopMode loop_mode_{LoopMode::loop_mode};
-  // double loop_len_{1};  // bars
-  // int loop_counter_{-1};
-
   bool stop_count_pending_{false};
   int stop_len_{0};
   int stop_countr_{0};
-
-  bool scramble_mode_{false};
-  bool scramble_pending_{false};
-
-  bool stutter_mode_{false};
-  bool stutter_pending_{false};
 
   bool stop_pending_{false};  // allow eg to stop
   int degrade_by_{0};         // percent change to drop bits
