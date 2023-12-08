@@ -36,7 +36,6 @@ class WebsocketServer {
   // Registers a callback for when a client connects
   template <typename CallbackTy>
   void connect(CallbackTy handler) {
-    std::cout << "YO REGISTER ON CONNECT GUYS\n";
     // Make sure we only access the handlers list from the networking thread
     this->eventLoop.post(
         [this, handler]() { this->connectHandlers.push_back(handler); });

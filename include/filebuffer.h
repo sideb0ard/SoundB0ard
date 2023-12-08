@@ -14,6 +14,15 @@ enum LoopMode {
   smudge_mode,
 };
 
+enum NextAction {
+  NoAction,
+  PlayFirst,
+  PlayNext,
+  PlayPrevious,
+  PlayRandom,
+  Stop,
+};
+
 struct FileBuffer {
   FileBuffer() = default;
   FileBuffer(std::string filename) : filename{filename} {
@@ -22,6 +31,8 @@ struct FileBuffer {
   ~FileBuffer() = default;
 
   void ImportFile(std::string filename);
+
+  void SetParam(std::string param, double value);
   void SetLoopLen(double bars);
   void SetAudioBufferReadIdx(size_t position);
   void SetPidx(int val);
@@ -60,6 +71,9 @@ struct FileBuffer {
   int pinc{1};
   bool pbounce{false};
   bool preverse{false};
+
+  int play_for{1};  // loops
+  NextAction next_action{PlayFirst};
 };
 
 }  // namespace SBAudio

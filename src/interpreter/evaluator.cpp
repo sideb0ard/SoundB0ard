@@ -264,8 +264,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     auto target = Eval(set_stmt->target_, env);
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(target);
     if (soundgen) {
+      std::cout << "YO DA EVALUATOR!\n";
       auto action = std::make_unique<AudioActionItem>(AudioAction::UPDATE);
       action->mixer_soundgen_idx = soundgen->soundgen_id_;
+      std::cout << "MIXER SOUNDGENID:" << action->mixer_soundgen_idx
+                << std::endl;
       action->fx_id = set_stmt->fx_num_;
       action->param_name = set_stmt->param_;
       action->delayed_by = delayed_by;

@@ -17,6 +17,9 @@ namespace SBAudio {
 namespace {
 
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
+const std::array<std::string, 6> kNextAction = {
+    "(0)NoAction",     "(1)PlayFirst",  "(3)PlayNext",
+    "(4)PlayPrevious", "(5)PlayRandom", "(6)Stop"};
 
 void ClearPattern(std::array<int, 16> &pattern) {
   for (int i = 0; i < 16; ++i) {
@@ -113,11 +116,34 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
     //             << " sizteen:" << cur_sixteenth_ << " SAMP:" <<
     //             tinfo.cur_sample
     //             << std::endl;
-    cur_buffer_play_count_++;
-    if (cur_buffer_play_count_ % 2 == 0) {
-      cur_file_buffer_idx_ = (cur_file_buffer_idx_ + 1) % file_buffers_.size();
-      cur_buffer_play_count_ = 0;
+    std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+    if (cur_buffer_play_count_ % (buffer->loop_len * buffer->play_for) == 0) {
+      switch (buffer->next_action) {
+        case PlayFirst:
+          cur_file_buffer_idx_ = 0;
+          cur_buffer_play_count_ = 0;
+          break;
+        case PlayNext:
+          cur_file_buffer_idx_ =
+              (cur_file_buffer_idx_ + 1) % file_buffers_.size();
+          cur_buffer_play_count_ = 0;
+          break;
+        case PlayPrevious:
+          cur_file_buffer_idx_ = (cur_file_buffer_idx_ - 1);
+          if (cur_file_buffer_idx_ < 0)
+            cur_file_buffer_idx_ = file_buffers_.size() - 1;
+          cur_buffer_play_count_ = 0;
+          break;
+        case PlayRandom:
+          cur_file_buffer_idx_ = rand() % file_buffers_.size();
+          cur_buffer_play_count_ = 0;
+          break;
+        case NextAction::Stop:
+          Stop();
+          break;
+      }
     }
+    cur_buffer_play_count_++;
   }
 
   std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
@@ -336,7 +362,8 @@ std::string Granulator::Status() {
                 buffer->audio_buffer_read_idx)
        << " mode:" << kLoopModeNames[buffer->loop_mode] << "("
        << buffer->loop_mode << ")"
-       << " len:" << buffer->loop_len << "\n";
+       << " len:" << buffer->loop_len << " play_for:" << buffer->play_for
+       << " next_action:" << kNextAction[buffer->next_action] << "\n";
   }
   ss << ANSI_COLOR_RESET;
   return ss.str();
@@ -477,10 +504,10 @@ void Granulator::SetPidx(int val) {
   buffer->poffset = abs(val - buffer->cur_sixteenth) % 16;
 }
 
-void Granulator::SetPOffset(int poffset) {
-  if (poffset >= 0 && poffset <= 15) {
+void Granulator::SetPOffset(int p) {
+  if (p >= 0 && p <= 15) {
     std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
-    buffer->poffset = poffset;
+    buffer->poffset = p;
   }
 }
 
@@ -548,6 +575,14 @@ void Granulator::SetParam(std::string name, double val) {
     use_fft_ = val;
     fftp_left_chan_.SetPitchSemitones(val);
     fftp_right_chan_.SetPitchSemitones(val);
+  }
+}
+
+void Granulator::SetSubParam(int id, std::string name, double val) {
+  std::cout << "YO GRAN - SET SUB PARAM\n";
+  if (id < file_buffers_.size()) {
+    std::unique_ptr<FileBuffer> &buffer = file_buffers_[id];
+    buffer->SetParam(name, val);
   }
 }
 

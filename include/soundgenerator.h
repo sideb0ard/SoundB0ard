@@ -24,6 +24,7 @@ class SoundGenerator {
   virtual std::string Status() = 0;
 
   virtual void SetParam(std::string name, double val) = 0;
+  virtual void SetSubParam(int id, std::string name, double val){};
 
   virtual void Start();
   virtual void Stop();

@@ -193,7 +193,8 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
     return nullptr;
   }
 
-  if (!ExpectPeek(token::SLANG_IDENT) && !ExpectPeek(token::SLANG_VOLUME)) {
+  if (!ExpectPeek(token::SLANG_IDENT) && !ExpectPeek(token::SLANG_VOLUME) &&
+      !ExpectPeek(token::SLANG_NUMBER)) {
     std::cerr << "NOT GOT PARAM ! Peek token is " << peek_token_ << std::endl;
     return nullptr;
   }
@@ -233,6 +234,15 @@ std::shared_ptr<ast::Statement> Parser::ParseSetStatement() {
       /// std::cerr << "Tried FX - no num!\n";
       return nullptr;
     }
+  } else if (cur_token_.type_ == token::SLANG_NUMBER) {
+    std::cout << "GOT A NUMBER 4 SAMPLER\n";
+    int samp_num = std::stoi(cur_token_.literal_);
+    stmt->fx_num_ = samp_num;
+    if (!ExpectPeek(token::SLANG_COLON)) {
+      std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_ << std::endl;
+      return nullptr;
+    }
+    NextToken();
   }
   stmt->param_ = cur_token_.literal_;
 

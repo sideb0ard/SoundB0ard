@@ -29,6 +29,7 @@ class Granulator : public SoundGenerator {
   void SetParam(std::string name, double val) override;
 
   void AddBuffer(std::unique_ptr<FileBuffer> fb) override;
+  void SetSubParam(int id, std::string name, double val) override;
 
   void Reset();
 
