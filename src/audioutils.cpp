@@ -208,15 +208,19 @@ std::vector<int> GetMidiNotesInChord(unsigned int root_note,
   std::vector<int> notes_in_chord{};
   notes_in_chord.push_back(root_note);
 
-  if (chord_type == MAJOR_CHORD)
-    notes_in_chord.push_back(root_note + 4);
-  else
-    notes_in_chord.push_back(root_note + 3);
-
-  if (chord_type == DIMINISHED_CHORD)
-    notes_in_chord.push_back(root_note + 6);
-  else
+  if (chord_type == POWER_CHORD) {
     notes_in_chord.push_back(root_note + 7);
+    notes_in_chord.push_back(root_note + 12);
+  } else if (chord_type == MAJOR_CHORD) {
+    notes_in_chord.push_back(root_note + 4);
+    notes_in_chord.push_back(root_note + 7);
+  } else if (chord_type == MINOR_CHORD) {
+    notes_in_chord.push_back(root_note + 3);
+    notes_in_chord.push_back(root_note + 7);
+  } else if (chord_type == DIMINISHED_CHORD) {
+    notes_in_chord.push_back(root_note + 3);
+    notes_in_chord.push_back(root_note + 6);
+  }
 
   switch (modification) {
     case (1):  // minor 7th

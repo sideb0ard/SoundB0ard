@@ -1,0 +1,267 @@
+
+# key = B
+#let KEY = 22;
+#let KEY = 24;
+let KEY = 12;
+# // 5 or 17 ?
+# let CHRDZ = [ III, IV, I, V ];
+# let CHRDZ = [ 27, 28, 23, 30];
+let notez = notes_in_key(KEY);
+let CHRDZ = [ notez[2], notez[3], notez[0], notez[4] ];
+let chx = 0;
+let chmax = 2;
+
+# dx = POPpunk
+# p2 < osc 8 "5 23"  "set dx:o1rat %"
+let powwrblah_gen = gen()
+{
+  setup()
+  {
+
+    let beat = rand_beat();
+    let d = 150;
+
+    let swg = 20;
+    let invcount = 0;
+
+    let doubledurcount = 0;
+  }
+  run()
+  {
+    if (count % 4 == 1) {
+      chx = incr(chx, 0, chmax);
+    }
+    let notez = notes_in_chord(CHRDZ[chx], 3);
+    #print("POWERCHORD: ", chx, " ", chmax,  ":", notez);
+    if (count % 4 == 3) {
+      # do inversion before the next chord change
+      #print("INVERSZZIOMN!");
+      if (invcount % 2 == 0) {
+        notez[0] = notez[0] + 12;
+        notez[1] = notez[1] + 12;
+      } else {
+        notez[1] = notez[1] - 12;
+        notez[2] = notez[2] - 12;
+      }
+
+      invcount = incr(invcount, 0, 2);
+
+    }
+    if (count % 8 == 1) {
+      chmax = incr(chmax, 1, 5);
+      #print("YO MAX IS NOW:" , chmax);
+      beat = rand_beat();
+    }
+
+    if (count % 8 < 5) {
+      let nx = 1;
+      for (i = 0; i < 16; ++i) {
+        let v = 100 + rand(27);
+        if (i % 4 == 2) {
+          v = 127;
+        }
+
+        let offs = swg;
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+        if (beat[i] == 1) {
+          if (count % 3 == 0) {
+            let thedur = d;
+            if (doubledurcount % 7 == 0) {
+              thedur = d * 3;
+            }
+            ++doubledurcount;
+            note_on_at(dx, notez[0], i * pp + offs, dur = thedur * 2, vel = v);
+          } else {
+            note_on_at(dx, notez[nx], i * pp + offs, dur = thedur, vel = v);
+          }
+        } else {
+          if (count % 8 < 7) {
+            if (i % 3 == 0) {
+              note_on_at(dx, notez[nx], i * pp + offs, dur = d - 20, vel = v);
+              if (count % 16 < 8 ) {
+                nx = incr(nx, 1, len(notez));
+              } else {
+                nx = rincr(nx, 1, len(notez));
+              }
+            }
+          }
+        }
+      }
+    } else {
+      let nx = 0;
+      for (i = 0; i < 16; ++i) {
+        let offs = swg;
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+        let v = 100 + rand(27);
+        if (i % 4 == 2) {
+          v = 127;
+        }
+        if (beat[i] == 1) {
+          note_on_at(dx, notez[nx], i * pp + offs, dur = d - 20, vel = v);
+          nx = incr(nx, 0, len(notez));
+        }
+      }
+    }
+    d = d + 30;
+    if (d > 500) {
+      d = 70;
+    }
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 2) {
+      set del:stutter 1;
+      set tlc:stutter 1;
+    }
+  }
+}
+
+
+# BASSZZ
+# load_preset(per1, "BASSZZ"); // GHOSTXZ
+let comelgen = gen()
+{
+  setup()
+  {
+    let notez = notes_in_chord(CHRDZ[chx], 3);
+    let rf = chord_riff(notez);
+    let ix = 0;
+    let imax = 3;
+    let dr = 80;
+  }
+  run()
+  {
+    if (count % 8 > 2) {
+      if (count % 4 == 1) {
+        notez = notes_in_chord(CHRDZ[chx], 3);
+        rf = chord_riff(notez);
+      }
+      for (i = 0; i < 16; ++i) {
+        stepper(per1, rf, ix, i, dr);
+        ix = incr(ix, 0, imax);
+      }
+      imax = incr(imax, 4, 16);
+      dr = dr + 30;
+      if (dr > 250) {
+        dr = 50;
+      }
+    }
+
+    if (count % 32 == 0) {
+      rf = riff(KEY);
+    }
+  }
+}
+
+let in = sample(voices/ineed.wav);
+let dj = sample(voices/DJPLZ.wav);
+let yo = sample(voices/THORyo.wav);
+
+let vocblah_gen = gen()
+{
+  setup()
+  {
+    let sampz = [in, dj];
+    let sx = 0;
+    let dr = 100;
+    let bc = 0;
+    let beat = rand_beat();
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          if (bc % 6 < 2) {
+            note_on_at(sampz[sx], 1, i * pp, dur = dr);
+            sx  = incr(sx, 0, len(sampz));
+          }
+          ++bc;
+        }
+      }
+      dr = dr + 300;
+      if (dr >  1000) {
+        dr = 100;
+      }
+    }
+  }
+}
+
+# let slb = loop(dloops2/SOULbeat.wav);
+# let gra = loop(dloops2/grooveARM.wav);
+# let dub = loop(dloops2/dubbegood.wav)
+let db2lah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 2) {
+      set slb:stutter 1;
+      set gra:stutter 1;
+    }
+  }
+}
+
+let powwr2blah_gen = gen() {
+  setup()
+  {
+    let d = 1000;
+    let bjz = [ 2, 3, 4, 5];
+    let bjx = 0;
+    let invcount = 0;
+  }
+  run()
+  {
+    if (count % 4 == 1) {
+      chx = incr(chx, 0, chmax);
+    }
+    if (count % 8 == 1) {
+      chmax = incr(chmax, 1, 5);
+      #print("YO MAX IS NOW:" , chmax);
+    }
+    if (count % 4 == 3) {
+      # do inversion before the next chord change
+      #print("INVERSZZIOMN!");
+      if (invcount % 2 == 0) {
+        notez[0] = notez[0] + 12;
+        notez[1] = notez[1] + 12;
+      } else {
+        notez[1] = notez[1] - 12;
+        notez[2] = notez[2] - 12;
+      }
+      invcount = incr(invcount, 0, 2);
+    }
+
+    let notez = notes_in_chord(CHRDZ[chx], 3);
+    if (count % 2 == 0) {
+      let ct = 1;
+      note_on_at(dx, notez[0], 0, dur = d);
+      d = d + 1000;
+      if (d > 7000) {
+        d = 1000;
+      }
+      let bt = bjork(bjz[bjx], 8);
+      bjx = incr(bjx, 0, len(bjz));
+      let haf = 3840 / 2;
+      for (i = 0; i < 8; ++i) {
+        if (bt[i] == 1) {
+          note_on_at(dx, notez[ct], 3840/2 + i*pp , dur = d / 5);
+          ct = incr(ct, 1, len(notez));
+        }
+      }
+    }
+  }
+}

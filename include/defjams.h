@@ -248,6 +248,7 @@ enum {
   MAJOR_CHORD,
   MINOR_CHORD,
   DIMINISHED_CHORD,
+  POWER_CHORD,
   NUM_CHORD_TYPES,
 };  // chord type
 
