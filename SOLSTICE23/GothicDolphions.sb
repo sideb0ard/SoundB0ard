@@ -1,0 +1,226 @@
+# let del = loop(dloops2/deilla.wav); set del:len 2
+# p1 $ voicblah_gen
+
+#   h h w h h h w h  h  w   h   h   h   w   h
+# 0 1 2 4 5 6 7 9 10 11 13  14  15  16  18  19
+# 0 1 2 3 4 5 6 7 8  9  10  11  12  13  14  15
+# scale_melody
+
+let sclaeblah_fn = fn(root, num)
+{
+  num = num % 15;
+
+  if (num < 3) {
+    return root + num;
+  }
+  if (num < 7) {
+    return root + num + 1;
+  }
+  if (num < 10) {
+    return root + num + 2;
+  }
+  if (num < 14) {
+    return root + num + 3;
+  }
+  return root + num + 4;
+}
+
+# per1 = electrHH
+# per2 = WOMPPP
+let numblah_gen = gen()
+{
+  setup()
+  {
+    let key = 24;
+    # minor
+    let key_type = 1;
+    let num_numz = 0;
+    let num_hitz = 3;
+    let idx1 = 0;
+    let idx2 = 15;
+    let idxz = rand_array(16, 0, 0);
+    let swng = 190;
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      num_hitz = incr(num_hitz, 3, 11);
+    }
+    let dr = 3840 / num_hitz / 3;
+
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        if (i % num_hitz == 0) {
+          let offset = swng;
+          if (i % 2 == 0) {
+            offset = 0;
+          }
+          note_on_at(per2, sclaeblah_fn(key, idxz[i] - 12), i * pp + offset, dur = dr);
+          idxz[i] = incr(idxz[i], 0, 14);idxz[i] + i;
+        } else {
+          if (count % 4 < 2) {
+            note_on_at(per1, sclaeblah_fn(key, idxz[i]), i * pp + offset, dur = dr);
+          }
+        }
+        if (i%2 == 0) {
+          idxz[i] = idxz[i] - 1;
+        }
+      }
+    }
+  }
+}
+  #dx = magicpiano
+let riffblah_gen = gen()
+{
+  setup()
+  {
+    let rf = [0, 24, 22, 0, 0, 0, 31, 0, 0, 0, 29, 0, 32, 0, 24, 0];
+    let rf2 = [0, 0, 24, 0, 0, 31, 31, 0, 0, 0, 0, 0, 32, 0, 24, 0];
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (rf[i] > 0) {
+          note_on_at(dx, rf[i], i * pp);
+        }
+      }
+    }
+  }
+}
+
+let bassblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (i % 2 == 1) {
+          note_on_at(dx, 24, i * pp, dur = 70);
+        }
+      }
+    }
+  }
+}
+
+
+# per1 = GHOSTXZ
+let counterblah_gen = gen()
+{
+  setup()
+  {
+    let rf = [22, 0, 22, 24, 0, 36, 0, 24, 0, 0, 0, 29, 0, 41, 0, 0];
+    let swng = 20;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      for (i = 0; i < 16; ++i) {
+        let offs = swng;
+        if (i % 2 == 1) {
+          offs = 0;
+        }
+        if (rf[i] > 0) {
+          note_on_at(per1, rf[i], i * pp + offs);
+        }
+      }
+    }
+  }
+}
+
+
+let jist = sample(voices/ceecee.wav);
+
+# let whatsup = loop(loops2/whatsup.wav)
+let wwwblah_gen = gen()
+{
+  setup()
+  {
+    vol whatsup 0;
+  }
+  run()
+  {
+    vol whatsup 0;
+
+    if (count % 8 == 7) {
+      vol whatsup 1;
+      set whatsup:stutter 1;
+    }
+    if (count % 4 == 2) {
+      set tlc:stutter 1;
+    }
+  }
+}
+
+let beatblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 8 == 7) {
+      mashup([tlc, del]);
+    }
+    if (count % 16 == 3) {
+      set del:stutter 1;
+    }
+    if (count % 16 == 8) {
+      set tlc:stutter 1;
+      set del:reverse 1;
+    }
+  }
+}
+
+# let tlc = loop(dloops2/TLC.wav)
+# dx = lrrt // elellelele // darth
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    let d = 80;
+    let swng = 20;
+  }
+  run()
+  {
+    if (count % 8 > 4) {
+      for (i = 0; i < 16; ++i) {
+        let offs = swng;
+        if (i % 2 == 1) {
+          if (i % 4 == 1) {
+            offs = 0;
+          }
+          note_on_at(dx, 24, i * pp + offs, dur = d);
+        }
+      }
+      d = d + 10;
+      if (d > 120) {
+        d = 80;
+      }
+    }
+  }
+}
+
+let djpl = sample(voices/DJPLZ.wav);
+let voicblah_gen = gen()
+{
+  setup()
+  {
+    let dr = 800;
+  }
+  run()
+  {
+    if (count % 8 == 7) {
+      note_on_at(jist, 1, 12 * pp, dur = dr);
+      #note_on_at(djpl, 1, 4 * pp, dur = dr);
+    }
+    dr = dr + 100;
+    if (dr > 1600) {
+      dr = 800;
+    }
+  }
+}
+

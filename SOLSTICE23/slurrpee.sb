@@ -1,0 +1,138 @@
+# let hx = loop(dloops2/harshx.wav);
+# let hxar = loop(dloops2/aradisbeatiuz.wav);
+
+let wblah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [ 16, 3, 8, 4, 16];
+    let lx = 0;
+  }
+  run()
+  {
+    set hx:plooplen lenz[lx];
+    if (count % 2 == 0) {
+      lx = incr(lx, 0, len(lenz));
+      set hxar:plooplen lenz[lx];
+    }
+    if (count % 7 == 0) {
+      set hx:stutter 1;
+      set hxar:scramble 1;
+    }
+  }
+}
+
+# fnacccx FLOOR
+# notes c:48 e:52 a:45
+
+let mel = rand_array(16, 0, 0);
+let merblah_gen = gen()
+{
+  setup()
+  {
+    let nomz = 2;
+    let ofs1 = 3;
+    let ofs2 = 2;
+    let ofs3 = 0;
+    let shft = 160;
+    let dr = 650;
+    let bzx = 0;
+  }
+  run()
+  {
+    let section1 = combinor(bjork(ofs1, 8), [48]);
+    let section2 = combinor(bjork(ofs2, 8), [52]);
+    mel = section1 + section2;
+    if (count % 8 == 7) {
+      mel = combinor(rotate(bjork(5, 16), ofs3), [45]);
+    }
+    ofs1 = incr(ofs1, 2, 7);
+    ofs2 = incr(ofs2, 3, 7);
+    if (count % 16 < 14) {
+      if (count % 2 == 0) {
+        for (i = 0; i < 16; ++i) {
+          let offset = shft;
+          if (i % 2 == 0) {
+            offset = 0;
+          }
+          ++bzx;
+          if (mel[i] > 0) {
+            if (bzx % 12 == 0) {
+              note_on_at(dx, mel[i] - 12, i * pp + offset, dur = dr);
+            } else {
+              note_on_at(dx, mel[i], i * pp + offset, dur = dr);
+            }
+          }
+        }
+      }
+    }
+    dr = dr + 50;
+    if (dr > 400) {
+      dr = 100;
+    }
+  }
+}
+
+# GALZIAN // ASCURF
+# 59 * 2 // 55 * 1 // 52 * 1;
+let perblah_gen = gen()
+{
+  setup()
+  {
+    let swng = 160;
+    let dr = 100;
+  }
+  run()
+  {
+    let sec1 = combinor(bjork(3, 8), [59]);
+    let sec2 = combinor(bjork(1, 8), [55]);
+    let sec3 = combinor(bjork(1, 8), [52]);
+    let melmel = mask((sec1 + sec2 + sec3), mel);
+    if (count % 2 == 1) {
+      for (i = 0; i < 16; ++i) {
+        if (mel[i] > 0) {
+          note_on_at(per1, mel[i], i * pp + rand(swng), dur = dr);
+        }
+        dr = dr + 50;
+        if (dr > 270) {
+          dr = 50;
+        }
+      }
+    }
+  }
+}
+
+# let lov = loop(loops/loversrockLoop1bar.aiff); set lov:len 2
+# add_fx(lov, "sidechain", hx);
+# p6 < osc 8 "0 0.7" "send(0, [jam,lov], %)"
+# p7 < osc 7 "0 0.7" "send(1, [jam, lov], %)"
+let jam = sample(voices/jamhot.wav);
+let jamblah_gen = gen()
+{
+  setup()
+  {
+    let dr = 1200;
+  }
+  run()
+  {
+    if (count % 16 < 12) {
+      if (count % 2 == 1) {
+        note_on(jam, 1, dur = dr);
+      }
+    }
+    if (count % 4 == 3) {
+      dr = dr + 100;
+      if (dr > 1500) {
+        dr = 100;
+      }
+    }
+    if (count % 4 == 2) {
+      set lov:stutter 1;
+    }
+    if (count % 8 == 7) {
+      solo(lov, at=12*pp);
+      solo(jam, at=12*pp);
+    }
+  }
+}
+
