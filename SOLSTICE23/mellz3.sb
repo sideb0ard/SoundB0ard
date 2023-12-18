@@ -131,14 +131,14 @@ let dblah_gen = gen()
       set tlc:stutter 1;
     }
     if (count % 4 == 3) {
-      set itgo:stutter 1;
+      set itg:stutter 1;
     }
   }
 }
 
 
 # BASSZZ
-# load_preset(per1, "GHOSTXZ"); p4 $ comelgen;
+# load_preset(per1, "GHOSTXZ"); p4 $ comelgen; p1 $ ""
 let comelgen = gen()
 {
   setup()

@@ -240,7 +240,7 @@ let fffsblah_gen = gen()
       }
       imx = incr(imx, 3, 16);
 
-      if (dr > 750) {
+      ilet beatbb = loop(dub/beatbassloop.aiff); vol hhb 0; vol hiha 0f (dr > 750) {
         dr = 100;
       }
     }
@@ -278,7 +278,7 @@ let newblah_gen = gen()
 # STOP FBLAH and NEWFBLAH AND BRING IN DUB TO END
 # p6 $ "" ; p7 $ ""; vol hiha 0;
 
-# let dubr = loop(dub/dubriffloop.aiff); set dubr:len 0.5;
+# let dubr = loop(dub/dubriffloop.aiff);
 # let beatbb = loop(dub/beatbassloop.aiff); vol hhb 0; vol hiha 0
 
 # vol hiha 1; vol dubr 0;

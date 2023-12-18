@@ -194,3 +194,60 @@ let dablah_gen = gen()
   }
 }
 
+let StepDatMel = fn(num_hits, base_key, direction)
+{
+  let notz = notes_in_chord(base_key, 1, 1);
+  let mel = rand_array(16, 0, 0);
+  let sixtz = sort(rand_sixteenthz(num_hits));
+  let idx = 0;
+  for (i = 0; i < num_hits; ++i) {
+    mel[sixtz[i]] = notz[idx];
+    if (direction > 1) {
+      idx = rincr(idx, 0, len(notz));
+    } else {
+      idx = incr(idx, 0, len(notz));
+    }
+  }
+  return mel;
+}
+
+# let itg = loop(dloops2/itgo.wav)
+# RAVER // wururrrp // hooverARP // quazzz // MWAUR // fnord0
+let melrrblah_gen = gen()
+{
+  setup()
+  {
+    let key = 14;
+    let d = 0;
+    let pat_lenz = [3, 4, 5];
+    let px = 0;
+    let mel = StepDatMel(pat_lenz[px], key, d);
+    let dr = 150;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      d = incr(d, 0, 2);
+      mel = StepDatMel(pat_lenz[px], key, d);
+    }
+    if (count % 3 == 0) {
+      px = incr(px, 0, len(pat_lenz));
+    }
+
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        if (mel[i] > 0) {
+          note_on_at(dx, mel[i], i * pp, dur = dr);
+        }
+      }
+      dr = dr + 50;
+      if (dr > 500) {
+        dr = 50;
+      }
+      if (count % 8 == 6) {
+        set itg:stutter 1;
+      }
+    }
+  }
+}
+

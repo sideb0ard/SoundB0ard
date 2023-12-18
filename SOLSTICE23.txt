@@ -1,5 +1,4 @@
 SOLSTICE23/mellz.sb
-SOLSTICE23/mellz2.sb
 SOLSTICE23/mellz3.sb
 SOLSTICE23/puffDMTsmokeLinux.sb
 SOLSTICE23/scriptkid606.sb
