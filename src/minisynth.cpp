@@ -21,7 +21,6 @@ const char *S_VOICES[] = {"SAW3",    "SQR3",    "SAW2SQR",
 
 MiniSynth::MiniSynth() {
   type = MINISYNTH_TYPE;
-  std::cout << "Added, MiniMoog, yo!\n";
 
   for (int i = 0; i < MAX_VOICES; i++) {
     voices_[i] = std::make_shared<MiniSynthVoice>();

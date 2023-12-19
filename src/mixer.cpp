@@ -724,6 +724,13 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
         }
       }
     }
+  } else if (action->type == AudioAction::ADD_BUFFER) {
+    if (action->soundgen_num && IsValidSoundgenNum(action->soundgen_num)) {
+      auto &sg = sound_generators_[action->soundgen_num];
+      if (sg && sg->type == LOOPER_TYPE) {
+        sg->AddBuffer(std::move(action->fb));
+      }
+    }
   } else if (action->type == AudioAction::BPM) {
     UpdateBpm(action->new_bpm);
   } else if (action->type == AudioAction::VOLUME) {
@@ -827,6 +834,11 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
               f->enabled_ = param_val;
             else
               f->SetParam(action->param_name, param_val);
+          } else {
+            // if is Granulator - which re-uses the fx_id slot.
+            if (sg->type == LOOPER_TYPE) {
+              sg->SetSubParam(fx_num, action->param_name, param_val);
+            }
           }
         } else  // must be a SoundGenerator param
         {

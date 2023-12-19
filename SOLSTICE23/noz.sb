@@ -1,0 +1,201 @@
+# change speed
+# reverse
+# shuffle
+# rhythmic 8 4 2 1
+# rhythmic 7 3 1 2
+# rhythmic 7 3 1 2
+#
+
+# BPM 96
+
+let bd = sample(bd/technotronBD.aiff);
+let sd = sample(sd/weekendSnare.aiff);
+let cp = sample(cp/technotron.aiff);
+
+let prc1 = sample(ht/DR660808CongaHigh.aif);
+vol prc1 0.4;
+let prc2 = sample(oh/2stepOPENhh.aiff);
+vol prc2 0.4;
+let prc3 = sample(aesamples/steeldif07.WAV);
+vol prc3 0.4;
+let prc4 = sample(cp/clipClap.aiff);
+
+let percz = [prc1, prc2, prc3, prc4];
+
+let primez = [11, 7, 5, 3, 2];
+
+let key = 20;
+let ntz = [20, 22, 24, 25, 27, 29, 31, 32];
+# vi-ii-V-I
+let progz = [ [29, 32, 36], [22, 25, 29], [27, 31, 34], [20, 24, 27] ];
+let prgx = 0;
+
+let t = 434344;
+let p = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
+
+#let progblah_gen = gen()
+#{
+#  setup()
+#  {
+#  }
+#  run()
+#  {
+#    ++t;
+#    p = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
+#    if (count % 8 == 0) {
+#      prgx = incr(prgx, 0, len(progz));
+#    }
+#  }
+#}
+
+let dn_fn = fn(x)
+{
+  x = x - 1;
+  if (x == 0) {
+    x = primez[rand(len(primez))];;
+  }
+  return x;
+}
+
+let xblah_gen = gen()
+{
+  setup()
+  {
+    let numz = [7, 5, 11, 3];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 8 > 5)  {
+      play_array(bd, bjork(numz[0], 16));
+    }
+    if (count % 4 == 3) {
+      play_array(percz[px], bjork(numz[0], 16));
+      px = incr(px, 0, len(percz));
+    }
+    if (count % 4 == 2) {
+      play_array(percz[px], bjork(numz[1], 16));
+      px = incr(px, 0, len(percz));
+    }
+    if (count % 4 == 1) {
+      play_array(cp, rotate(bjork(numz[1], 16), 2));
+    }
+    if (count % 2 == 0) {
+      play_array(percz[px], bjork(numz[2], 16));
+      px = incr(px, 0, len(percz));
+    }
+
+    if (count % 3 == 0) {
+      play_array(percz[px], bjork(numz[3], 16));
+      px = incr(px, 0, len(percz));
+    }
+
+    numz = map(numz, dn_fn);
+  }
+}
+
+# let maw2 = loop(TWMAWLoops/maw2.wav);
+let dbblah_gen = gen()
+{
+  setup()
+  {
+    let plenz = [2, 1, 3, 1, 4, 3];
+    let pz = 0;
+  }
+  run()
+  {
+
+    set maw2:plooplen 16;
+    if (count % 8 == 7) {
+      set maw2:plooplen plenz[pz];
+      pz = incr(pz, 0, len(plenz));
+    }
+    if (count % 11 == 7 || count % 13 == 7) {
+      set maw2:scramble 1;
+    }
+    #unsolo();
+    if (count % 8 == 7) {
+      #solo(maw2, at=plenz[pz]*pp);
+    }
+  }
+}
+
+# cb = WURPZ
+let cbxxah_gen = gen()
+{
+  setup()
+  {
+    #let mel = [48, 0, 0, 52, 0, 0, 48, 60, 0, 48, 0, 0, 45, 0, 0, 0];
+    #let mel =  [44, 0, 44, 44, 0, 44, 0, 44, 0, 44, 44, 0, 44, 47, 44, 48];
+    let maxx = 3;
+    let mx = 0;
+
+    let drz = [250, 75, 100, 250, 400, 600];
+    let drzx = 0;
+  }
+  run()
+  {
+    let mel = combinor(p, up(progz[prgx], 12));
+    if (count % 4 < 3) {
+      for (i = 0; i < 16; ++i) {
+        stepper(cb, mel, mx, i, drz[drzx]);
+        mx = incr(mx, 0, maxx);
+      }
+      drzx = incr(drzx, 0, len(drz));
+      maxx = incr(maxx, 2, len(mel));
+    }
+  }
+}
+
+let fxblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    send(0, [bd, cp, sd, prc3, maw2], 0);
+    send(2, [bd, cp, sd, prc3, maw2], 0);
+
+    if (count % 4 == 3) {
+      send(0, [bd, cp, sd, prc3, maw2], 0.5, at=8*pp);
+    }
+    if (count % 8 == 7) {
+      send(2, maw2, 0.1);
+    }
+  }
+}
+
+#cb = DrumZynth - PIPEBLING // MFFF // ZKZZ
+#cl = DrumZynth -  SQWA // BADUM
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let px = 0;
+    let pmax = 3;
+    let drz = [250, 75, 100, 250, 400, 600];
+    let drzx = 0;
+  }
+  run()
+  {
+
+    if (count % 2 == 1 ) {
+      let pat = combinor(p, progz[prgx]);
+
+      for (i = 0; i < 16; ++i) {
+        stepper(cl, pat, px, i, drz[drzx]);
+        px = incr(px, 0, pmax);
+      }
+      pmax = incr(pmax, 4, 16);
+      drzx = incr(drsz, 0, len(drz));
+    }
+
+    if (count % 16 == 0) {
+      p = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
+      ++t;
+    }
+
+  }
+}
+

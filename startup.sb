@@ -884,3 +884,51 @@ let mashupToo = fn(pat, soundgz)
   }
 }
 
+let StepDatPattern = fn(pat, base_key, range_of_melody)
+{
+  let nots = notes_in_key(base_key, 1);
+  let cur_val = 0;
+  for (i = 0; i < len(pat); ++i) {
+    if (pat[i] == 1)  {
+      pat[i] = nots[cur_val % range_of_melody % len(nots)];
+      if (rand(100) > 90) {
+        pat[i] = 0;
+      }
+      if (rand(100) > 95) {
+        if (i > 0) {
+          pat[i - 1] = pat[i];
+          pat[i] = 0;
+        }
+      }
+      cur_val = cur_val + rand(range_of_melody);
+      if (rand(100) > 70) {
+        cur_val = cur_val - rand(4);
+        if (cur_val < 0) {
+          cur_val = base_key;
+        }
+      }
+    }
+  }
+  return pat;
+}
+
+let GenMellerdy = fn(length_of_melody, base_key, range_of_melody)
+{
+  let third_of_melody = length_of_melody / 3;
+  let len_section_one = floor(third_of_melody + rand(third_of_melody));
+  let len_section_two = floor((length_of_melody - len_section_one) / 2);
+  let len_section_three = (length_of_melody - len_section_one) - len_section_two;
+
+  let steps_section_one = 3 + rand(2);
+  let section_one = bjork(steps_section_one, len_section_one);
+
+  section_one = StepDatPattern(section_one, base_key, range_of_melody);
+
+  let section_two_one = bjork(1 + rand(2), len_section_two);
+  section_two_one = StepDatPattern(section_two_one, base_key, range_of_melody);
+  let section_two_two = bjork(1 + rand(3), len_section_three);
+  section_two_two = StepDatPattern(section_two_two, base_key, range_of_melody);
+
+  return section_one + section_two_one + section_two_two;
+
+}

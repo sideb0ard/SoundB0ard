@@ -1,6 +1,5 @@
 #pragma once
 
-#include <defjams.h>
 #include <fx/envelope.h>
 #include <fx/fx.h>
 #include <stdbool.h>
@@ -9,6 +8,9 @@
 #include <atomic>
 #include <iostream>
 #include <map>
+
+#include "defjams.h"
+#include "filebuffer.h"
 
 namespace SBAudio {
 class SoundGenerator {
@@ -22,6 +24,7 @@ class SoundGenerator {
   virtual std::string Status() = 0;
 
   virtual void SetParam(std::string name, double val) = 0;
+  virtual void SetSubParam(int id, std::string name, double val){};
 
   virtual void Start();
   virtual void Stop();
@@ -45,6 +48,8 @@ class SoundGenerator {
   virtual void AllNotesOff(){};
 
   virtual void EventNotify(broadcast_event event, mixer_timing_info tinfo);
+
+  virtual void AddBuffer(std::unique_ptr<FileBuffer> fb){};
 
   void ParseMidiEvent(midi_event ev, mixer_timing_info tinfo);
 

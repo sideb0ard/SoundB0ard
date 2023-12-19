@@ -1,0 +1,62 @@
+
+let dbblah_gen = gen()
+{
+  setup()
+  {
+    let swg = 10;
+    let bdnote = 10;
+  }
+
+  run()
+  {
+    dmbeat(bd, bdnote);
+    cmbeat(sd, 44);
+    # hhbeat(hh);
+  }
+}
+# p3 < osc 12 "800 6000" "set hh:fx0:freq %"
+let oh = sample(oh/hes23ohh0.aif)
+
+let binblah_gen = gen()
+{
+  setup()
+  {
+    let t = 10347;
+    let pat = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
+  }
+  run()
+  {
+    if (count % 1 == 0) {
+      ++t;
+      pat = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
+    }
+    for (i = 0; i < 16; ++i) {
+      if (pat[i] == 1) {
+        note_on_at(oh, 1, i * pp);
+      } else {
+      }
+    }
+
+    if (count % 4 == 3) {
+      set wump:stutter 1;
+    }
+
+  }
+}
+
+# let doo = loop(drones2/doubleOTEE.wav); set doo:len 4
+
+let full = sample(voices/fullfx.wav);
+let pblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      note_on_at(full, 1, 2 * pp, dur = 2600);
+    }
+  }
+}
+

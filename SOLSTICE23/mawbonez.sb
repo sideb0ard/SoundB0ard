@@ -1,0 +1,144 @@
+#  let maw3 = loop(TWMAWLoops/maw3.wav)
+
+let ksht = sample(bombz/BSQ_M504_s.wav);
+#let key = 28;
+#let key = 18;
+# dx wang
+#let key = 24;
+#let key = 17;
+let key = 16;
+# let tcn = loop(JUNALGOGZ/technoBASS.wav);
+
+# dx MWAUR l0renzo4 wururrrp rivletz youshure spurbp wang garage
+let ddblah_gen = gen()
+{
+  setup()
+  {
+    let mel = chord_riff(notes_in_chord(key));
+    let mskz = ["f7f0", "f400", "7f00", "0420"];
+    let mx = 0;
+    let dr = 300;
+  }
+  run()
+  {
+    if (count % 16 < 15) {
+      let themel = mask(mel, mskz[mx]);
+      mx = incr(mx, 0, len(mskz));
+      for (i = 0; i < 16; ++i) {
+        let v = 70 + rand(50);
+        if (i % 4 == 0) {
+          v = 127;
+        }
+        if (themel[i] > 0) {
+          note_on_at(dx, themel[i], i * pp, dur = dr);
+          dr = dr + 50;
+        }
+      }
+      if (dr > 450) {
+        dr = 100;
+      }
+    }
+    if (count % 4 == 0) {
+      set maw3:scramble 1;
+    }
+
+    if (count % 9 == 0) {
+      mashup([maw3, ksht, tcn]);
+      mel = chord_riff(notes_in_chord(key));
+      set maw3:reverse 1;
+      set tcn:stutter 1;
+      for (i = 0; i < 16; ++i) {
+        if (mel[i] > 0) {
+          note_on_at(ksht, 1, i*pp, vel = 70+rand(50));
+        }
+      }
+    }
+  }
+}
+#
+## let beatb = loop(dub/beatbassloop.aiff); p3 $ dubblah_gen
+## let pitchw = loop(glitchedVinyl/pitchsweel.wav); set pitchw:pitch 2;
+# let bbl = loop(aaassembly/bbablyon.wav);
+let dubblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      set beatb:vol 1;
+      set pitchw:vol 0;
+      set bbl:vol 0;
+      set beatb:scramble 1;
+    }
+    if (count % 7 == 0) {
+      set beatb:vol 0;
+      set bbl:vol 1;
+      set pitchw:reverse 1;
+    }
+    if (count % 3 == 0) {
+      set pitchw:vol 0.7;
+      mashup([beatp, pitchw, bbl]);
+      set beatb:reverse 1;
+      set pitchw:stutter 1;
+    }
+  }
+}
+
+## let crnch = loop(Riser77/crnchBeat.wav); set crnch:len 2;
+let crnblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      set crnch:stutter 1;
+    }
+    set crnch:vol 1;
+    if (count % 4 == 0) {
+      let b = rand_beat();
+      for (i = 0; i < 16; ++i) {
+        if (b[i] == 1) {
+          set crnch:vol 1 at=i*pp;
+        } else {
+          set crnch:vol 0 at=i*pp;
+        }
+      }
+    }
+    if (count % 8 == 6) {
+      solo(crnch);
+      set crnch:stutter 1;
+    }
+  }
+}
+
+#let jbs = loop(dloops/jbsscratchbeat.aiff); send(2, jbs)
+let rp = sample(voices/RAPMatrix.wav);
+let jbsblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set jbs:vol 1;
+    if (count % 4 == 0) {
+      set jbs:vol 0;
+    }
+    if (count % 8 == 7) {
+      let b = rand_beat();
+
+      for (i = 0; i < 16; ++i) {
+        set jbs:vol 0 at=i*pp;;
+        if (b[i] == 1) {
+          set jbs:vol 1 at=i*pp;;
+          note_on_at(rp, 1, i * pp, dur = 3000);
+        }
+      }
+    }
+  }
+}
+

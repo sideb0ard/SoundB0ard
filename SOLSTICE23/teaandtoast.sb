@@ -1,0 +1,66 @@
+# IDEAS
+# 3/5
+# different timings
+
+# [30, 41, 39, 42, 34, 30, 35, 37, 30, 42, 39, 34, 37, 0, 32, 30]
+
+let key = 18;
+let mmax = 3;
+
+let teablah_gen = gen()
+{
+  setup()
+  {
+    #let swing = 110;
+    let swing = 150;
+    let mel = gamelody(16, key);
+    let mx = 0;
+    #let mel = [30, 41, 39, 42, 34, 30, 35, 37, 30, 42, 39, 34, 37, 0, 32, 30];
+    let insz = [dx, per1, per2];
+    let isx = 0;
+    let drz = 50;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (mel[i] > 0) {
+        let off = 0;
+        if (i % 2 == 1) {
+          off = swing;
+        }
+        let v = 100 + rand(27);
+        if (i% 4 == 0) {
+          v = 127;
+        }
+        let n = mel[mx];
+        mx = incr(mx, 0, mmax);
+        if (count % 3 == 0) {
+          n = n - 12;
+        }
+        note_on_at(insz[isx], n, i * pp + off, dur = drz, vel = v);
+        drz = drz + 10;
+        if (drz > 500) {
+          drz = 50;
+        }
+      }
+    }
+    mmax = incr(mmax, 3, 16);
+    #isx = incr(0, isx, len(insz));
+    #if (count % 8 == 0) {
+      #   mel = gamelody(16, key);
+      # }
+  }
+}
+
+let xblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    set mabeat:plooplen mmax;
+  }
+}
+
+

@@ -1,0 +1,253 @@
+#let base_key = 13;
+let base_key = 25;
+# bpm 100; load_preset(dx, "fnord0"); p1 $ melblah_gen
+# dx = fnord0 // tigerking // fnc // ETZ // ZILLAx
+# WARSND // FWUMPE // SNDCLNR // WHIRZ
+
+let StepDatPattern = fn(pat, base_key, range_of_melody)
+{
+  let nots = notes_in_chord(base_key);
+  if (count % 4 == 3) {
+    nots = notes_in_chord(base_key + 7);
+  }
+  if (count % 16 == 15) {
+    nots[1] = nots[1] + 12;
+    nots[2] = nots[2] + 12;
+  }
+  let cur_val = 1;
+  for (i = 0; i < len(pat); ++i) {
+    if (pat[i] == 1) {
+      let nt = nots[cur_val];
+      cur_val= incr(cur_val, 1, len(nots));
+      if (i % 4 == 0) {
+        nt = nots[0];
+      }
+      pat[i] = nt;
+    }
+  }
+  return pat;
+}
+
+let chz = [1, 3, 2, 4];
+let GenMellerdy = fn(length_of_melody, base_key, range_of_melody)
+{
+  #let third_of_melody = length_of_melody / 3;
+  #let len_section_one = 2 * third_of_melody;
+  #let len_section_two = (length_of_melody - len_section_one) / 2;
+  #let len_section_three = (length_of_melody - len_section_one) - len_section_two;
+
+  let len_section_one = length_of_melody  / 2;
+  let len_section_two = (length_of_melody - len_section_one) / 2;
+  let len_section_three = (length_of_melody - len_section_one) - len_section_two;
+
+  let steps_section_one = chz[rand(len(chz))];
+  let section_one = bjork(steps_section_one, len_section_one);
+
+  section_one = StepDatPattern(section_one, base_key, range_of_melody);
+
+  let steps_section_two_one = chz[rand(len(chz))];
+  let section_two_one = bjork(steps_section_two_one, len_section_two);
+  section_two_one = StepDatPattern(section_two_one, base_key, range_of_melody);
+  let steps_section_two_two = chz[rand(len(chz))];
+  let section_two_two = bjork(steps_section_two_two, len_section_three);
+  section_two_two = StepDatPattern(section_two_two, base_key, range_of_melody);
+
+  return section_one + section_two_one + section_two_two;
+
+}
+
+let jam = sample(voices/jamhot.wav);
+let melblah_gen = gen()
+{
+  setup()
+  {
+    #let base_key = 13;
+    #let base_key = 14;
+    let num_nots = 1;
+    let mel1 = GenMellerdy(64, base_key, num_nots);
+    let d = 150;
+    let djam = 1350;
+    let swg = 10;
+    let ntct = 0;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      mel1 = GenMellerdy(64, base_key, num_nots);
+      #set deilla:stutter 1;
+
+      num_nots = incr(num_nots, 1, 3);
+    }
+
+    if (count % 8 < 6) {
+      let pp = 3840 / len(mel1);
+      for (i = 0; i < len(mel1); ++i) {
+        let v = 100 + rand(27);
+        let offs = swg;
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+        if (i % 4 == 1) {
+          v = 127;
+        }
+        if (mel1[i] > 0) {
+          note_on_at(dx, mel1[i], i * pp + offs, dur = d, vel = v);
+        }
+      }
+      d = d + 50;
+      if (d > 350) {
+        d = 150;
+      }
+    } else {
+      note_on_at(jam, 1, 12 * pp, dur = djam);
+      djam = djam + 550;
+      if (djam > 3000) {
+        djam = 500;
+      }
+    }
+  }
+}
+
+# bpm 96
+
+# let ara = loop(dloops2/aradisbeatiuz.wav)
+# add_buf(ara, "dloops2/startingwit.wav")
+# set ara:0:play_for 3; set ara:0:next_action 2
+
+let da2blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set ara:scramble 1;
+      solo(ara, at=14*pp);
+    }
+    if (count % 8 == 7) {
+      set ara:stutter 1;
+      solo(ara, at=14*pp);
+    }
+  }
+}
+
+# dx2 -= wurrop // skirissh // rSQer // quazzz // tigerking // timeLLy
+# load_preset(dx2, "MWAUR"); p3 $ CompMel
+let CompMel= gen()
+{
+  setup()
+  {
+    #let beat = rand_beat() * 2;
+    let beat = rotate(rand_beat(), 2);
+    # let mel = StepDatPattern(beat, base_key, 4);
+    let notz = notes_in_chord(base_key, 3);
+    let nx = 1;
+    let d = 140;
+  }
+  run()
+  {
+    # 5
+    if (count % 8 > 5)  {
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          let n = notz[nx];
+          nx = incr(nx, 1, len(notz));
+          if (i % 2 == 4) {
+            n = notz[0];
+          }
+          if (rand(100) > 80) {
+            n = n + 12;
+          }
+          note_on_at(dx2, n, i * pp, dur = d);
+        }
+      }
+      if (count % 8 == 0) {
+        beat = rotate(rand_beat(), 2);
+      }
+    }
+    d = d + 40;
+    if (d > 250) {
+      d = 50;
+    }
+  }
+}
+
+# let crn = loop(dloops2/cruncN.wav); set crn:len 2;
+# let slb = loop(dloops2/SOULbeat.wav); add_fx(slb, "distort");
+
+let dablah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set slb:stutter 1;
+      solo(slb, at=14*pp);
+    }
+    if (count % 8 == 7) {
+      set crn:stutter 1;
+      solo(crn, at=14*pp);
+    }
+  }
+}
+
+let StepDatMel = fn(num_hits, base_key, direction)
+{
+  let notz = notes_in_chord(base_key, 1, 1);
+  let mel = rand_array(16, 0, 0);
+  let sixtz = sort(rand_sixteenthz(num_hits));
+  let idx = 0;
+  for (i = 0; i < num_hits; ++i) {
+    mel[sixtz[i]] = notz[idx];
+    if (direction > 1) {
+      idx = rincr(idx, 0, len(notz));
+    } else {
+      idx = incr(idx, 0, len(notz));
+    }
+  }
+  return mel;
+}
+
+# let itg = loop(dloops2/itgo.wav)
+# RAVER // wururrrp // hooverARP // quazzz // MWAUR // fnord0
+let melrrblah_gen = gen()
+{
+  setup()
+  {
+    let key = 14;
+    let d = 0;
+    let pat_lenz = [3, 4, 5];
+    let px = 0;
+    let mel = StepDatMel(pat_lenz[px], key, d);
+    let dr = 150;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      d = incr(d, 0, 2);
+      mel = StepDatMel(pat_lenz[px], key, d);
+    }
+    if (count % 3 == 0) {
+      px = incr(px, 0, len(pat_lenz));
+    }
+
+    if (count % 8 < 6) {
+      for (i = 0; i < 16; ++i) {
+        if (mel[i] > 0) {
+          note_on_at(dx, mel[i], i * pp, dur = dr);
+        }
+      }
+      dr = dr + 50;
+      if (dr > 500) {
+        dr = 50;
+      }
+      if (count % 8 == 6) {
+        set itg:stutter 1;
+      }
+    }
+  }
+}
+

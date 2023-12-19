@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+#include <memory>
+
 #include "envelope_generator.h"
 #include "fft_processor.h"
 #include "fx/ramp.h"
@@ -10,12 +12,6 @@
 #include "stepper.h"
 
 namespace SBAudio {
-
-enum LoopMode {
-  loop_mode,
-  static_mode,
-  smudge_mode,
-};
 
 class Granulator : public SoundGenerator {
  public:
@@ -32,16 +28,18 @@ class Granulator : public SoundGenerator {
   void NoteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
 
+  void AddBuffer(std::unique_ptr<FileBuffer> fb) override;
+  void SetSubParam(int id, std::string name, double val) override;
+
   void Reset();
 
  public:
   bool started_{false};
 
-  std::string filename_;
-  std::vector<double> audio_buffer_{};
-  int num_channels_{0};
-  int size_of_sixteenth_{0};
-  int audio_buffer_read_idx_{0};
+  std::vector<std::unique_ptr<FileBuffer>> file_buffers_{};
+  int cur_file_buffer_idx_{0};
+  // TODO - control matrix for buffer playback
+  int cur_buffer_play_count_{0};
 
   SoundGrainType grain_type_{SoundGrainType::Sample};
   std::unique_ptr<SoundGrain> grain_a_;
@@ -77,49 +75,23 @@ class Granulator : public SoundGenerator {
 
   EnvelopeGenerator eg_;  // start/stop amp
 
-  LoopMode loop_mode_{LoopMode::loop_mode};
-  double loop_len_{1};  // bars
-  int loop_counter_{-1};
-
   bool stop_count_pending_{false};
   int stop_len_{0};
   int stop_countr_{0};
 
-  bool scramble_mode_{false};
-  bool scramble_pending_{false};
-
-  bool stutter_mode_{false};
-  bool stutter_pending_{false};
-
   bool stop_pending_{false};  // allow eg to stop
-
-  int degrade_by_{0};  // percent change to drop bits
-                       //
-
-  std::array<int, 16> scrambled_pattern_{0};
-
-  int cur_sixteenth_{0};
-
-  double incr_speed_{1};
-  double cur_midi_idx_{0};
-
-  double plooplen_{16};
-  double poffset_{0};
-  int pinc_{1};
-  bool pbounce_{false};
-  bool preverse_{false};
+  int degrade_by_{0};         // percent change to drop bits
+                              //
 
  public:
-  void ImportFile(std::string filename);
-
   void SetGrainPitch(double pitch);
   void SetIncrSpeed(double speed);
   void SetGrainDuration(int dur);
   void SetGrainDensity(int gps);
-  void SetAudioBufferReadIdx(size_t position);
   void SetGranularSpray(int spray_ms);
   void SetQuasiGrainFudge(int fudgefactor);
   void SetReverseMode(bool b);
+
   void SetLoopMode(unsigned int m);
   void SetLoopLen(double bars);
   void SetScramblePending();

@@ -146,34 +146,9 @@ void *websocket_worker(WebsocketServer &server) {
                 << " open connections." << std::endl;
     });
   });
-  // server.message("message", [&mainEventLoop, &server](ClientConnection conn,
-  // const Json::Value &args) {
-  // mainEventLoop.post([conn,
-  // args, &server]() {
-  //   std::clog <<
-  //   "Message
-  //   handlerrr!!" <<
-  //   std::endl;
-  //   std::clog <<
-  //   "Message payload!!"
-  //   << std::endl; for
-  //   (auto key :
-  //   args.getMemberNames())
-  //   {
-  //     std::clog << "\t"
-  //     << key << ": " <<
-  //     args[key].asString()
-  //     << std::endl;
-  //   }
-  //   server.sendMessage(conn,
-  //   "message", args);
-  // });
-  //});
-
   std::thread websocket_server_thread([&server]() { server.run(kPortNumber); });
 
   asio::io_service::work work(mainEventLoop);
-  std::cout << "YO WORK CREATED - ABOUT TO RUN\n";
   mainEventLoop.run();
 
   return nullptr;

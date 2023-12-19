@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "PerlinNoise.hpp"
+#include "filebuffer.h"
 #include "midi_device.h"
 #include "midi_freq_table.h"
 
@@ -683,6 +684,28 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              incr_num++;
              if (incr_num >= max->value_) {
                incr_num = min->value_;
+             }
+             return std::make_shared<object::Number>(incr_num);
+           }
+           return evaluator::NULLL;
+         })},
+    {"rincr",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           if (args.size() != 3)
+             return evaluator::NewError(
+                 "Too many arguments for incr - need three - "
+                 "number to "
+                 "incr, min and max");
+           auto number = std::dynamic_pointer_cast<object::Number>(args[0]);
+           auto min = std::dynamic_pointer_cast<object::Number>(args[1]);
+           auto max = std::dynamic_pointer_cast<object::Number>(args[2]);
+           if (number && min && max) {
+             int incr_num = number->value_;
+             incr_num--;
+             if (incr_num < min->value_) {
+               incr_num = max->value_ - 1;
              }
              return std::make_shared<object::Number>(incr_num);
            }
@@ -1514,6 +1537,31 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            return evaluator::NULLL;
          })},
+    {"add_buf",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size >= 2) {
+             std::cout << "YO ADD BUFFER!\n";
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen && mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+               if (args[1]->Type() == "STRING") {
+                 std::cout << args[1]->Inspect() << " " << args[1]->Type()
+                           << std::endl;
+                 auto fb =
+                     std::make_unique<SBAudio::FileBuffer>(args[1]->Inspect());
+                 auto action =
+                     std::make_unique<AudioActionItem>(AudioAction::ADD_BUFFER);
+                 action->soundgen_num = soundgen->soundgen_id_;
+                 action->fb = std::move(fb);
+                 audio_queue.push(std::move(action));
+               }
+             }
+           }
+           return evaluator::NULLL;
+         })},
     {"monitor", std::make_shared<object::BuiltIn>(
                     [](std::vector<std::shared_ptr<object::Object>> args)
                         -> std::shared_ptr<object::Object> {
@@ -1667,6 +1715,35 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              return std::make_shared<object::Number>(rand_number);
            }
 
+           return evaluator::NULLL;
+         })},
+    {"rand_sixteenthz",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size > 0) {
+             auto nom = std::dynamic_pointer_cast<object::Number>(args[0]);
+             if (nom) {
+               std::vector<int> noms_added;
+               auto return_array = std::make_shared<object::Array>(
+                   std::vector<std::shared_ptr<object::Object>>());
+               while (noms_added.size() < nom->value_) {
+                 int sixt_num = std::rand() % 16;
+                 if (std::find(noms_added.begin(), noms_added.end(),
+                               sixt_num) == noms_added.end()) {
+                   noms_added.push_back(sixt_num);
+                   auto num_obj = std::make_shared<object::Number>(sixt_num);
+                   return_array->elements_.push_back(num_obj);
+                 }
+               }
+               return return_array;
+             }
+           } else {
+             int sixt_num = std::rand() % 16;
+             auto number_obj = std::make_shared<object::Number>(sixt_num);
+             return number_obj;
+           }
            return evaluator::NULLL;
          })},
     {"perlin", std::make_shared<object::BuiltIn>(
@@ -2165,7 +2242,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                root_note_value = root_note->value_;
              }
 
-             // MAJOR (0), MINOR (1), DIMINISHED (2)
+             // MAJOR (0), MINOR (1), DIMINISHED (2), POWER(3);
              int chord_type = 0;
 
              if (args_size > 1) {
