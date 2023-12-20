@@ -176,6 +176,8 @@ let comelgen = gen()
 let in = sample(voices/ineed.wav);
 let dj = sample(voices/DJPLZ.wav);
 
+# p5 $ vocblah_gen
+
 let vocblah_gen = gen()
 {
   setup()

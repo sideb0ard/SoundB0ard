@@ -79,7 +79,7 @@ let melblah_gen = gen()
       num_nots = incr(num_nots, 1, 3);
     }
 
-    if (count % 8 < 6) {
+    if (count % 8 < 5) {
       let pp = 3840 / len(mel1);
       for (i = 0; i < len(mel1); ++i) {
         let v = 100 + rand(27);
@@ -148,7 +148,7 @@ let CompMel= gen()
   run()
   {
     # 5
-    if (count % 8 > 5)  {
+    if (count % 8 > 4)  {
       for (i = 0; i < 16; ++i) {
         if (beat[i] == 1) {
           let n = notz[nx];
@@ -251,3 +251,4 @@ let melrrblah_gen = gen()
   }
 }
 
+# let janl = loop(drones2/doubleOTEE.wav); set janl:len 8

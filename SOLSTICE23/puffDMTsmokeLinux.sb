@@ -10,6 +10,9 @@ let I = notes_in_chord(scale[0]);
 let chordprog = [I, V, V, I, I, IV];
 let cpx = 0;
 
+# bpm 140; p2 $ ""; load_preset(dx, "default");
+# clear p2 - p2 < osc 8 "5 23"  "set dx:o1rat %"
+
 #let into = loop(JUNALGOGZ/discoBEATloopintodanight.wav); send(2, into); p3 $ melblah_gen
 
 let melblah_gen = gen()
