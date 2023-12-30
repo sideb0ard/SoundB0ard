@@ -12,7 +12,9 @@ let tz = sample(aesamples/SHSTR_06lpB.WAV);
 
 let hdsd = sample(sd/hdSD.wav);
 
+# load_preset(per2, "HIGHWR");  p6 $ fblah_gen;
 # let dbrs = loop(dub/dubLOOPsnrsz.aiff); p2 $ bstepblah_gen ; send(2, dbrs);
+# let hhb = loop(JUNALGOGZ/hipbeat.wav); set hhb:len 2; send(2, hhb);
 let bstepblah_gen = gen()
 {
   setup()
@@ -60,10 +62,9 @@ let ther = sample(voices/theerwasaTIME.wav);
 let djp = sample(voices/DJPLZ.wav);
 let gob = sample(voices/goback.aiff);
 
-# let hhb = loop(JUNALGOGZ/hipbeat.wav); set hhb:len 2; send(2, hhb);
+# send(0, its, 0.8); send(2, its, 0.5); p3 $ topblah_gen
 
 let its = sample(aaassembly/itsSuicideVoice.wav);
-# set its:pitch 0.7 ; send(0, its, 0.8); send(2, its, 0.5); p3 $ topblah_gen
 let topblah_gen = gen()
 {
   setup()
@@ -71,7 +72,7 @@ let topblah_gen = gen()
     let sampz = [rock, hhah, inee, ther, djp, gob];
     let bt = rand_array(16, 0, len(sampz) + 5);
     let dr = 10;
-    let vdr = 200;
+    let vdr = 300;
   }
   run()
   {
@@ -93,19 +94,19 @@ let topblah_gen = gen()
         }
       }
     }
-    if (count % 5 == 0) {
+    if (count % 16 == 0) {
       bt = rand_array(16, 0, len(sampz) + 5);
       note_on(its, 1, dur = vdr);
       vdr = vdr + 200;
-      if (vdr > 1500) {
+      if (vdr > 1300) {
         vdr = 200;
       }
     }
   }
 }
 
-# vol hhb 0;  let doad = loop(aaassembly/dodad.wav); vol doad 0; vol dbrs 0;
-# load_preset(per2, "HIGHWR"); p6 $ fblah_gen; vol per2 1; vol hhb 1;
+# vol hhb 0;  let doad = loop(aaassembly/dodad.wav); vol dbrs 0; set doad:vol 0 at=3840;
+# vol per2 1; vol hhb 1; let fsh = loop(dloops2/funkshuffle.wav);
 let fbeats = combinor(bassgen(), [key]);
 let fblah_gen = gen()
 {
@@ -152,7 +153,8 @@ let startstringblah_fn = fn()
   p5 $ strnblah_gen;
 }
 
-# let strn = loop(loops/strongsNHats.aiff); set strn:len 4; p5 $ strnblah_gen
+# p2 $ ""; vol dbrs 0; p6 $ "" ; p5 $ ""; vol doad 1;
+# let strn = loop(loops/strongsNHats.aiff); set strn:len 4; p5 $ strnblah_gen; vol doad 0
 let strnblah_gen = gen()
 {
   setup()
@@ -177,11 +179,11 @@ let strnblah_gen = gen()
   }
 }
 
-# p2 $ ""; vol dbrs 0; p6 $ "" ; p5 $ ""; vol strn 0
-# let rqf = loop(loops/rqfeedback.aiff); set rqf:len 8
+# load_preset(dx2, "tigerking");  p6 $ melfblah_gen; vol dx2 1; p6 $ ""
+# let rqf = loop(loops/rqfeedback.aiff); set rqf:len 8; vol fsh 0; vol hhb 0;
+# p2 $ ""; vol dbrs 0; p5 $ ""; vol strn 0
 
-# load_preset(dx2, "tigerking");  p6 $ melfblah_gen; vol dx2 1
-# let hiha = loop(dloops/hihache.aif); send(2, hiha, 1)
+# let hiha = loop(dloops/hihache.aif); send(2, hiha, 1) ; vol fsh 1; vol hhb 1; vol strn 1;
 
 let melfblah_gen = gen()
 {
@@ -219,7 +221,6 @@ let melfblah_gen = gen()
   }
 }
 
-# vol hhb 0; vol hiha 0;
 let fffsblah_gen = gen()
 {
   setup()
@@ -240,9 +241,6 @@ let fffsblah_gen = gen()
       }
       imx = incr(imx, 3, 16);
 
-      ilet beatbb = loop(dub/beatbassloop.aiff); vol hhb 0; vol hiha 0f (dr > 750) {
-        dr = 100;
-      }
     }
     if (count % 16 == 15) {
       fbeats = combinor(bassgen(), [key - 12]);
@@ -252,7 +250,7 @@ let fffsblah_gen = gen()
 
 
 # p6 $ fffsblah_gen; vol rqf 0; vol hiha 1;
-# vol per2 1; p7 $ newblah_gen; vol rqf 0
+# vol per2 1; p7 $ newblah_gen;
 
 let newblah_gen = gen()
 {
@@ -261,31 +259,30 @@ let newblah_gen = gen()
   }
   run()
   {
-    if (count % 3 == 0) {
+    if (count % 13 == 0) {
       mashup([hiha, dx2, hhb]);
     }
-    if (count % 4 == 0) {
-    }
-    if (count % 5 == 0) {
+    if (count % 15 == 0) {
       set hiha:stutter 1;
     }
-    if (count % 8 == 7) {
+    if (count % 28 == 7) {
       solo(hiha, at=8*pp);
     }
   }
 }
 
 # STOP FBLAH and NEWFBLAH AND BRING IN DUB TO END
-# p6 $ "" ; p7 $ ""; vol hiha 0;
+# p6 $ "" ; p7 $ ""; vol hiha 0; vol fsh 0; vol hhb 0;
 
 # let dubr = loop(dub/dubriffloop.aiff);
-# let beatbb = loop(dub/beatbassloop.aiff); vol hhb 0; vol hiha 0
+# let beatbb = loop(dub/beatbassloop.aiff); vol hhb 0; vol hiha 0; vol strn 0
 
 # vol hiha 1; vol dubr 0;
 # vol beatbb 0;
-# let planz = loop(voices/planzcanfademe.wav); p7 $ dadubblah_gen; p6 $ fblah_gen
+# let planz = loop(voices/planzcanfademe.wav); p7 $ dadubblah_gen; p6 $ fblah_gen; vol strn 1
 
 # p5 $ strnblah_gen; vol strn 1
+# let ab = loop(dloops/autechreBeat.aiff)
 
 let dadubblah_gen = gen()
 {
@@ -308,6 +305,5 @@ let dadubblah_gen = gen()
   }
 }
 
-# vol beatbb 0;
-# switch p6 between melfblah_gen and fblah_gen
+# bpm 80
 

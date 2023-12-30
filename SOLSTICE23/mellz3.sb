@@ -12,8 +12,8 @@ let chx = 0;
 let chmax = 2;
 
 # dx = POPpunk
-# bpm 100; load_preset(dx, "POPpunk"); p1 $ powwrblah_gen
-# p2 < osc 8 "5 23"  "set dx:o1rat %"
+# bpm 100; load_preset(dx, "POPpunk"); p1 $ powwrblah_gen; vol ara 0
+# p3 < osc 8 "5 23"  "set dx:o1rat %"; vol slb 0
 let powwrblah_gen = gen()
 {
   setup()
@@ -117,7 +117,8 @@ let powwrblah_gen = gen()
 }
 
 # let del = loop(dloops2/deilla.wav); set del:len 2; vol slb 0;
-# let tlc = loop(dloops2/TLC.wav); p3 $ dblah_gen
+
+# let tlc = loop(dloops2/TLC.wav); p2 $ dblah_gen;
 
 let dblah_gen = gen()
 {
@@ -138,7 +139,7 @@ let dblah_gen = gen()
 
 
 # BASSZZ
-# load_preset(per1, "GHOSTXZ"); p4 $ comelgen; p1 $ ""
+# load_preset(per1, "GHOSTXZ"); p4 $ comelgen; p1 $ ""; p5 $ vocblah_gen
 let comelgen = gen()
 {
   setup()
@@ -208,9 +209,7 @@ let vocblah_gen = gen()
   }
 }
 
-# let slb = loop(dloops2/SOULbeat.wav);
-# let gra = loop(dloops2/grooveARM.wav);
-# let dub = loop(dloops2/dubbegood.wav)
+# let janl = loop(drones2/doubleOTEE.wav); set janl:len 8; vol itg 0; p3 $ db2lah_gen
 let db2lah_gen = gen()
 {
   setup()
@@ -219,8 +218,7 @@ let db2lah_gen = gen()
   run()
   {
     if (count % 4 == 2) {
-      set slb:stutter 1;
-      set gra:stutter 1;
+      set janl:stutter 1;
     }
   }
 }

@@ -111,8 +111,7 @@ let melblah_gen = gen()
 # bpm 96
 
 # let ara = loop(dloops2/aradisbeatiuz.wav)
-# add_buf(ara, "dloops2/startingwit.wav")
-# set ara:0:play_for 3; set ara:0:next_action 2
+# add_buf(ara, "dloops2/startingwit.wav"); set ara:0:play_for 3; set ara:0:next_action 2
 
 let da2blah_gen = gen()
 {
@@ -173,9 +172,10 @@ let CompMel= gen()
   }
 }
 
-# let crn = loop(dloops2/cruncN.wav); set crn:len 2;
-# let slb = loop(dloops2/SOULbeat.wav); add_fx(slb, "distort");
+# let slb = loop(dloops2/SOULbeat.wav); p2 $ dablah_gen
 
+
+#let crn = loop(dloops2/cruncN.wav); set crn:len 2; vol slb 0
 let dablah_gen = gen()
 {
   setup()
@@ -211,7 +211,7 @@ let StepDatMel = fn(num_hits, base_key, direction)
   return mel;
 }
 
-# let itg = loop(dloops2/itgo.wav)
+# vol slb 1; let itg = loop(dloops2/itgo.wav); p1 $ melrrblah_gen ; vol crn 0
 # RAVER // wururrrp // hooverARP // quazzz // MWAUR // fnord0
 let melrrblah_gen = gen()
 {
@@ -251,4 +251,3 @@ let melrrblah_gen = gen()
   }
 }
 
-# let janl = loop(drones2/doubleOTEE.wav); set janl:len 8

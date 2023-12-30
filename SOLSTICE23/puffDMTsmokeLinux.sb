@@ -212,7 +212,7 @@ let w2blah_gen = gen()
 }
 
 # vol bsb 0; vol ama 0; vol into 0; vol ma 0; p3 $ ""
-#load_preset(per2, "TINPAN"); vol per2 1; send(2, per2); p4 $ wowoblah_gen; vol bsb 1;
+#load_preset(per2, "TINPAN"); vol per2 1;  p4 $ wowoblah_gen; vol bsb 1;
 
 let wowoblah_gen = gen()
 {
