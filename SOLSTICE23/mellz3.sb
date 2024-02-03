@@ -2,7 +2,8 @@
 # key = B
 #let KEY = 22;
 #let KEY = 24;
-let KEY = 12;
+#let KEY = 12;
+let KEY = 15;
 # // 5 or 17 ?
 # let CHRDZ = [ III, IV, I, V ];
 # let CHRDZ = [ 27, 28, 23, 30];
@@ -73,9 +74,9 @@ let powwrblah_gen = gen()
               thedur = d * 3;
             }
             ++doubledurcount;
-            note_on_at(dx, notez[0], i * pp + offs, dur = thedur * 2, vel = v);
+            note_on_at(dx2, notez[0], i * pp + offs, dur = thedur * 2, vel = v);
           } else {
-            note_on_at(dx, notez[nx], i * pp + offs, dur = thedur, vel = v);
+            note_on_at(dx2, notez[nx], i * pp + offs, dur = thedur, vel = v);
           }
         } else {
           if (count % 8 < 7) {

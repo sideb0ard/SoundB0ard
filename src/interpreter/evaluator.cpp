@@ -1055,7 +1055,13 @@ std::shared_ptr<object::Object> EvalMultiplyArrayExpression(
     }
     return std::make_shared<object::Array>(return_vec);
   }
-  return NewError("unknown operator: %s %s %s", left->Type(), op,
+  if (op.compare("!=") == 0) {
+    return TTRUE;
+  }
+  if (op.compare("==") == 0) {
+    return FFALSE;
+  }
+  return NewError("IT ME! unknown operator: %s %s %s", left->Type(), op,
                   right->Type());
 }
 

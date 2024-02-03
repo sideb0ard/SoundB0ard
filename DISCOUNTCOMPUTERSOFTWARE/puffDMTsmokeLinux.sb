@@ -138,8 +138,8 @@ let mashup = fn(sndgenz)
 }
 
 # load_preset(dx2, "UFO"); load_preset(cl, "BLELL"); vol cl 1; send(2, cl);
-#
 # vol ama 0; vol into 0; p4 $ nnblah_gen
+
 let nnblah_gen = gen()
 {
   setup()

@@ -595,6 +595,8 @@ void Mixer::PrintMidiInfo() {
   ss << "5 C:72 C#:73 D:74 D#:75 E:76 F:77 F#:78 G:79 G#:80 A:81 A#:82 "
         "B:83\n";
   ss << "Chord Progressions: I-IV-V, I-V-vi-IV, I-vi-IV-V, vi-ii-V-I\n";
+  ss << "Chord Types: MAJOR (0), MINOR (1), DIMINISHED (2), POWER(3), "
+        "SUS2(4), SUS4(5)\n";
   ss << "Filters: LPF1, HPF1, LPF2, HPF2, BPF2, BSF2, LPF4, HPF4, BPF4\n"
      << ANSI_COLOR_RESET;
 

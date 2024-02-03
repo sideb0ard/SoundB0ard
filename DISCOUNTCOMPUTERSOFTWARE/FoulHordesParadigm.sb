@@ -5,43 +5,41 @@ let key = 25;
 # [29, 31, 33, 34, 36, 38, 40, 41]
 # vi-ii-V-I [38, 41, 45] [31, 34, 38] [36, 40, 43] [29, 33, 36]
 
-# bpm 160; load_preset(dx, "wahaio"); load_preset(per3, "PHRANK");
-# p3 $ dxxxblah_gen; p4 $ melblah_gen
-
-#let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen;
-
-#let sal = loop(dloops/sadLIB.aiff);
+# bpm 120; load_preset(dx, "garage");
+# p3 $ dxxxblah_gen; let sal = loop(dloops/sadLIB.aiff); set sal:vol 0 at=3840*8
 #let krs = loop(dloops/krushSnareRoll.aiff); p5 $ drumblah_gen
 
 let wblah_gen = gen()
 {
   setup() {
-    let ptz = [0.8, 0.7, 1.5, 1.2, 1.5, 1];
-    let px = 0;
   }
   run()
   {
     if (count % 8 == 7) {
       set bx:scramble 1;
     }
-    if (count % 4 == 0) {
-      set bx:pitch ptz[px];
-      px = incr(px, 0, len(ptz));
-    }
+
     if (count % 16 == 15) {
       set bx:reverse 1;
-      solo(bx, at=10*pp);
+      # solo(bx, at=10*pp);
     }
     if (count % 4 == 0) {
       set bx:stutter 1;
+      set ab:scramble 1;
       #mashup([bx, krs, sal]);
     }
   }
 }
 
 
-# let vrv = loop(JUNALGOGZ/VIBErev.wav); set vrv:len 4;
-#let nots = loop(voices/notstayinghome.wav); set nots:len 2; p6 $ vblah_gen; solo(nots);
+# let vrv = loop(JUNALGOGZ/VIBErev.wav); set vrv:len 4; set vrv:vol 0 at=3840;
+# let nots = loop(voices/notstayinghome.wav); set nots:len 2;
+# p6 $ vblah_gen;; set nots:vol 0 at=3840*2 ; p4 $ ""
+
+
+#let bx = loop(dloops/brandyxmen2bar1.aif); set bx:len 2; p2 $ wblah_gen;
+# let ab = loop(dloops2/autechreBeat.wav);
+
 let vblah_gen = gen()
 {
   setup()
@@ -50,7 +48,7 @@ let vblah_gen = gen()
   run()
   {
 
-    unsolo();
+    # unsolo();
     if (count % 2 == 0) {
       set vrv:scramble 1;
       set nots:stutter 1;
@@ -64,14 +62,15 @@ let vblah_gen = gen()
     }
     if (count % 6 == 0) {
       vol vrv 1;
-      vol nots 1;
+      #vol nots 1;
     }
     if (count % 8 == 7) {
-      solo(vrv, at=14*pp);
+      # solo(vrv, at=14*pp);
       vol vrv 0 at = 16*pp;
     }
   }
 }
+# muffin
 #load_preset(dx, "garage"); // halien // bassTFumpoctMin1 // ETZ // wahaio
 let dxxxblah_gen = gen()
 {
@@ -104,9 +103,11 @@ let dxxxblah_gen = gen()
   }
 }
 
+# vol ab 0; vol bx 0;
+
 # let iget = loop(aaassembly/iegtMAD.wav); vol iget 0;
 # let yoyo = loop(aaassembly/yoyoredman.wav); vol yoyo 0;
-# p4 $ kkbelah_gen
+# let psp = loop(dloops2/postspidey.wav) ; p4 $ kkbelah_gen; set psp:vol 0 at=3840*4
 
 let kkbelah_gen = gen()
 {
@@ -138,8 +139,8 @@ let kkbelah_gen = gen()
 }
 
 
-# mo = swqSAW or sandepp Esgr
-let melblah_gen = gen()
+# load_preset(per3, "Scrurhf"); p4 $ per3melblah_gen
+let per3melblah_gen = gen()
 {
   setup()
   {
@@ -222,7 +223,7 @@ let wnah_gen = gen()
     }
     if (count % 8 == 7) {
       set wnk:reverse 1;
-      set wnk:sql 1;
+      set sql:stutter 1;
     }
   }
 }

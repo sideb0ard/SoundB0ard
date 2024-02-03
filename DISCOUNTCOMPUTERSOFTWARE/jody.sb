@@ -1,15 +1,15 @@
 # f
 #let key = 40;
 #let key = 30;
-let key = 30;
+#let key = 30;
+let key = 14;
 
 let jdy = sample(aaassembly/heyJODY.wav);
 
-# bpm 120
-# let intr = loop(legowelt/Synth-InterBellumAtmo.wav); set intr:len 2
+# bpm 110 ; let cr = loop(loops2/crdunk.wav); set cr:len 2 ; set cr:vol 0 at=3840*2;
+# let intr = loop(legowelt/Synth-InterBellumAtmo.wav); set intr:len 2;
 # let rkk = loop(dloops/rockafellayall2bar.aiff); set rkk:len 2;
-# let rks = loop(dloops/rocksteady_vocal.aif);
-# p2 $ jblah_gen
+# let rks = loop(dloops/rocksteady_vocal.aif);  p2 $ jblah_gen
 
 let jblah_gen = gen()
 {
@@ -20,6 +20,8 @@ let jblah_gen = gen()
   }
   run()
   {
+
+    set cr:vol 0;
     if (count % 8 == 0) {
       let b = rand_beat();
       for (i = 0; i < 16; ++i) {
@@ -34,9 +36,11 @@ let jblah_gen = gen()
     }
     if (count % 8 == 7) {
       set rkk:stutter 1;
+      set cr:vol 1 at=pp*8;
     }
     if (count % 8 == 6) {
       set rks:reverse 1;
+      set cr:vol 1 at=pp*4;
     }
     if (count % 3 == 0) {
       set rks:len 1 + rklen;
@@ -50,6 +54,7 @@ let jblah_gen = gen()
     if (count % 12 == 11) {
       set intr:vol 0.7;
       solo(intr, at=8*pp);
+      set cr:vol 1;
     }
   }
 }
@@ -59,8 +64,44 @@ let jblah_gen = gen()
 # let jb = loop(aaassembly/jungleBREAKDOWN.wav); set jb:len 4;
 
 
-# mo = RUBBERduck
+# dx2 ratz // wururrrp
+let keyblah_gen = gen()
+{
+  setup()
+  {
+    let key = 14;
+    let ntz = notes_in_key(key);
+    let chrdz = [ notes_in_chord(ntz[5], 1), notes_in_chord(ntz[1], 1), notes_in_chord(ntz[4]), notes_in_chord(ntz[0])];
+    let chx = 0;
+    let beat = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
+    let rf = combinor(beat, chrdz[chx]);
+    let d = 50;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      chx = incr(chx, 0, len(chrdz));
+      rf = combinor(beat, chrdz[chx]);
+    }
+    if (count % 8 < 8) {
+      for (i = 0; i < 16; ++i) {
+        let v = 100 + rand(27);
+        if (i % 4 == 0) {
+          v = 127;
+        }
+        if (rf[i] > 0) {
+          note_on_at(dx2, rf[i], i * pp, dur = d, vel = v);
+        }
+      }
+    }
+    d = d + 50;
+    if (d > 350) {
+      d = 50;
+    }
+  }
+}
 
+# per1 - GHOSTXZ // per2 TWANrG //
 let bassblah_gen = gen()
 {
   setup()
@@ -80,22 +121,22 @@ let bassblah_gen = gen()
     if (count % 3 == 0) {
       mx = incr(mx, 0, len(melz));
     }
-    if (count % 4 < 2) {
+    if (count % 4 < 3) {
       let mel = melz[mx];
       for (i = 0; i < 16; ++i) {
         if (mel[i] > 0) {
-          note_on_at(mo, mel[i], i * pp, dur = dr);
+          note_on_at(per1, mel[i], i * pp, dur = dr);
         }
       }
     }
-    if (count % 4 == 3) {
-      let mel = melz[mx];
-      for (i = 0; i < 16; ++i) {
-        stepper(per2, mel, midx, i, dr);
-        midx = incr(midx, 0, midxmax);
-      }
-      midxmax = incr(midxmax, 3, 16);
-    }
+    #if (count % 4 == 3) {
+      #  let mel = melz[mx];
+      #  for (i = 0; i < 16; ++i) {
+        #    stepper(per2, mel, midx, i, dr);
+        #    midx = incr(midx, 0, midxmax);
+        #  }
+      #  midxmax = incr(midxmax, 3, 16);
+      #}
     dr = dr + 50;
     if (dr > 400) {
       dr = 100;
@@ -103,12 +144,13 @@ let bassblah_gen = gen()
   }
 }
 
-# dx = wuurpr
+# dx = wuurpr // fnc // l0renzo4 // wuuurodx
 let dxblah_gen = gen()
 {
   setup()
   {
-    let ocz = [ 4, 16];
+    #let ocz = [ 4, 16];
+    let ocz = [ 30, 40];
     let ox = 0;
     let dxmel = gamelody(16, ocz[ox]);
     let sx = 0;
@@ -147,20 +189,24 @@ let dxblah_gen = gen()
   }
 }
 
-# let mk = loop(dloops/markdistort.wav);
-let mkblah_gen = gen()
+let bodylah_gen = gen()
 {
   setup()
   {
   }
   run()
   {
-    if (count % 8 == 7) {
-      set mk:reverse 1;
-    }
     if (count % 4 == 3) {
-      set mk:stutter 1;
+      set ab:stutter 1;
+      set rks:vol 0;
+      set rkk:stutter 1;
     }
+    if (count % 4 == 0) {
+      set ab:scramble 1;
+      set rks:vol 0.7;
+      set rkk:scramble 1;
+    }
+    set rks:stutter 1;
   }
 }
 

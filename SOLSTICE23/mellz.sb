@@ -1,5 +1,6 @@
 #let base_key = 13;
-let base_key = 25;
+# let base_key = 25;
+let base_key = 27;
 # bpm 100; load_preset(dx, "fnord0"); p1 $ melblah_gen
 # dx = fnord0 // tigerking // fnc // ETZ // ZILLAx
 # WARSND // FWUMPE // SNDCLNR // WHIRZ
@@ -63,7 +64,7 @@ let melblah_gen = gen()
   {
     #let base_key = 13;
     #let base_key = 14;
-    let num_nots = 1;
+    let num_nots = 2;
     let mel1 = GenMellerdy(64, base_key, num_nots);
     let d = 150;
     let djam = 1350;
@@ -91,7 +92,7 @@ let melblah_gen = gen()
           v = 127;
         }
         if (mel1[i] > 0) {
-          note_on_at(dx, mel1[i], i * pp + offs, dur = d, vel = v);
+          note_on_at(dx2, mel1[i], i * pp + offs, dur = d, vel = v);
         }
       }
       d = d + 50;
@@ -131,8 +132,9 @@ let da2blah_gen = gen()
   }
 }
 
+# per2 - SAWD // MFFF // TWANrG //
 # dx2 -= wurrop // skirissh // rSQer // quazzz // tigerking // timeLLy
-# load_preset(dx2, "MWAUR"); p3 $ CompMel
+# load_preset(dx2, "MWAUR"); p3 $ CompMel; p2 $ da2blah_gen
 let CompMel= gen()
 {
   setup()
@@ -158,7 +160,7 @@ let CompMel= gen()
           if (rand(100) > 80) {
             n = n + 12;
           }
-          note_on_at(dx2, n, i * pp, dur = d);
+          note_on_at(per2, n, i * pp, dur = d);
         }
       }
       if (count % 8 == 0) {
@@ -237,7 +239,7 @@ let melrrblah_gen = gen()
     if (count % 8 < 6) {
       for (i = 0; i < 16; ++i) {
         if (mel[i] > 0) {
-          note_on_at(dx, mel[i], i * pp, dur = dr);
+          note_on_at(dx2, mel[i], i * pp, dur = dr);
         }
       }
       dr = dr + 50;

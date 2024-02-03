@@ -1,7 +1,7 @@
-#let hh2 = loop(aaassembly/hiphouse2.wav); vol hh2 0;
-#let hhturn = loop(aaassembly/hiphouseTURNIOUT.wav); vol hhturn 0;
+#let hhi = loop(aaassembly/hiphouse2.wav);
+# add_buf(hhi, "aaassembly/hiphouseTURNIOUT.wav"); add_buf(hhi, "aaassembly/hiphouseACID.wav");
+# set hhi:0:next_action 2; set hhi:1:next_action 2; set hhi:2:next_action 2; set hhi:0:play_for 3
 
-#let hh1 = loop(aaassembly/hiphouse1.wav); vol hh1 0;
 #let supa = loop(aaassembly/superhumanBEINGyo.wav); vol supa 0;
 #let rmb = loop(aaassembly/remarcBREAKDOWN.wav); vol rmb 0;
 #let bba = loop(aaassembly/bahbad.wav); vol bba 0;

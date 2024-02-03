@@ -1,5 +1,5 @@
 # bpm 110
-# let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8; set jon:stop_in 16;
+# let jon = loop(JUNALGOGZ/scratcDUBjon.wav); set jon:len 8; set jon:vol 0 at=3840*2
 # p15 < osc 4 "0.2 0.9" "send(0, jon, %)"; p14 < ramp 12 "1 0" "vol jon %";;
 
 # p3 < ramp 8 "1 0" "vol jon %";
@@ -71,18 +71,20 @@ let dooblah_gen = gen()
   }
   run()
   {
-    for (i = 0; i < 16; ++i) {
-      stepper(per3, m, ix, i, dr);
-      ix = incr(ix, 0, imx);
-      dr = dr + 10;
-    }
-    imx = incr(imx, 4, 16);
-    if (dr > 700) {
-      dr = 200;
-    }
+    if (count % 8 > 4) {
+      for (i = 0; i < 16; ++i) {
+        stepper(per3, m, ix, i, dr);
+        ix = incr(ix, 0, imx);
+        dr = dr + 10;
+      }
+      imx = incr(imx, 4, 16);
+      if (dr > 700) {
+        dr = 200;
+      }
 
-    if (count % 8 == 0) {
-      m = gamelody(16, rnote);
+      if (count % 8 == 0) {
+        m = gamelody(16, rnote);
+      }
     }
   }
 }
@@ -138,19 +140,21 @@ let melliblah_gen = gen()
 
   run()
   {
-    for (i = 0; i < 16; ++i) {
-      stepper(per1, mel, ix, i, dr);
-      ix = incr(ix, 0, imx);
-    }
-    imx = incr(imx, 3, 16);
-    dr = dr + 10;
-    if (dr > 450) {
-      dr = 100;
-    }
+    if (count % 8 < 4) {
+      for (i = 0; i < 16; ++i) {
+        stepper(per1, mel, ix, i, dr);
+        ix = incr(ix, 0, imx);
+      }
+      imx = incr(imx, 3, 16);
+      dr = dr + 10;
+      if (dr > 450) {
+        dr = 100;
+      }
 
-    if (count % 8 == 0) {
-      mel = gamelody(16, ntz[nx]);
-      nx = incr(nx, 0, len(ntz));
+      if (count % 8 == 0) {
+        mel = gamelody(16, ntz[nx]);
+        nx = incr(nx, 0, len(ntz));
+      }
     }
   }
 }

@@ -165,7 +165,11 @@ let combinorCh = fn(rhythm, chord)
     }
     else {
       if (rhythm[i] > 0) {
-        return_melody = push(return_melody, chord);
+        if (type(chord) == "ARRAY" && len(chord) > 1 && type(chord[0]) == "ARRAY") {
+          return_melody = push(return_melody, chord[rand(len(chord))]);
+        } else {
+          return_melody = push(return_melody, chord);
+        }
       } else {
         return_melody = push(return_melody, 0);
       }
@@ -597,7 +601,7 @@ let hhbeat = fn(hh)
 }
 let hhmbeat = fn(hh, midi_num)
 {
-  let sw = rand(pp/2);
+  let sw = rand(20);
   if (rand(100) < 95) {
     for (i = 0; i < 16; ++i) {
       if (rand(100) < 95) {
@@ -870,9 +874,9 @@ let mashup = fn(sndgenz)
       px = incr(px, 0, len(poz));
     }
   }
-  if (count % 4 == 3) {
-    solo(sndgenz[rand(len(sndgenz))], at = 14*pp) ;
-  }
+  # if (count % 4 == 3) {
+    #   solo(sndgenz[rand(len(sndgenz))], at = 14*pp) ;
+    # }
 }
 
 let mashupToo = fn(pat, soundgz)

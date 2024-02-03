@@ -249,6 +249,8 @@ enum {
   MINOR_CHORD,
   DIMINISHED_CHORD,
   POWER_CHORD,
+  SUS2_CHORD,
+  SUS4_CHORD,
   NUM_CHORD_TYPES,
 };  // chord type
 

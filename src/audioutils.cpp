@@ -220,6 +220,12 @@ std::vector<int> GetMidiNotesInChord(unsigned int root_note,
   } else if (chord_type == DIMINISHED_CHORD) {
     notes_in_chord.push_back(root_note + 3);
     notes_in_chord.push_back(root_note + 6);
+  } else if (chord_type == SUS2_CHORD) {
+    notes_in_chord.push_back(root_note + 2);
+    notes_in_chord.push_back(root_note + 7);
+  } else if (chord_type == SUS4_CHORD) {
+    notes_in_chord.push_back(root_note + 5);
+    notes_in_chord.push_back(root_note + 7);
   }
 
   switch (modification) {

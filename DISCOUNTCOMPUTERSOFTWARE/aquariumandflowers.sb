@@ -1,3 +1,7 @@
+# bpm 120;
+# let dumb = loop(NewLoopz/getdumb.wav); set dumb:len 2
+# let crch = loop(Riser77/crnchBeat.wav); set crch:len 2
+
 let rand_octave = fn()
 {
   let octz = [0, 12];
@@ -246,12 +250,13 @@ let beatwablah_gen = gen()
 
 # load_preset(per3, "MFFF"); vol per3 0.8; p11 $ mooblah_gen
 
+let root = 22;
 let mooblah_gen = gen()
 {
   setup()
   {
     let ntx = 0;
-    let mel = gamelody(16, ntz[ntx]);
+    let mel = gamelody(16, root);
     let ix = 0;
     let maax = 3;
     let drz = 170;
@@ -261,10 +266,11 @@ let mooblah_gen = gen()
     if (count % 3 == 0) {
       ntx = incr(ntx, 0, len(ntz));
       #mel = gamelody(16, ntz[ntx]-12);
-      mel = gamelody(16, ntz[ntx] + rand_octave());
+      #mel = gamelody(16, ntz[ntx] + rand_octave());
+      mel = gamelody(16, root + rand_octave());
     }
     for (i = 0; i < 16; ++i) {
-      stepper(per3, mel, ix, i, drz);
+      stepper(per2, mel, ix, i, drz);
       ix = incr(ix, 0, maax);
       drz = drz + 10;
       if (drz > 400) {
@@ -277,4 +283,46 @@ let mooblah_gen = gen()
 }
 
 
-# stop modxblah_gen and missy_gen - just have drums and mooblah
+# kwait0 // wahaio // cscrk // wuuurop
+let wwblah_gen = gen()
+{
+  setup()
+  {
+    let beat = rotate(rand_beat(), 4);
+    let cx = 0;
+    let d = 50;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      beat = rotate(rand_beat(), 4);
+    }
+    #if (count % 2 == 0) {
+      #  beat = rotate(beat, 2);
+      #}
+    let chrd = notes_in_chord(root);
+
+    if (count % 3 == 0) {
+      # chrd[len(chrd)-1] = chrd[len(chrd)-1] + 12;
+      cx = incr(cx, 0, len(chrd));
+      chrd[cx] = chrd[cx] + 12;
+    }
+
+    if (count % 9 < 7) {
+      for (i = 0; i < 16; ++i) {
+        let v = 90 + rand(37);
+        if (i % 4 == 2) {
+          v = 127;
+        }
+        if (beat[i] == 1) {
+          note_on_at(dx, chrd, i * pp, dur = d, vel = v);
+        }
+      }
+      d = d + 50;
+      if (d > 250) {
+        d = 50;
+      }
+    }
+  }
+}
+

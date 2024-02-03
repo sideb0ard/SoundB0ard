@@ -2242,7 +2242,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                root_note_value = root_note->value_;
              }
 
-             // MAJOR (0), MINOR (1), DIMINISHED (2), POWER(3);
+             // MAJOR (0), MINOR (1), DIMINISHED (2), POWER(3), SUS2(4),
+             // SUS4(5);
              int chord_type = 0;
 
              if (args_size > 1) {

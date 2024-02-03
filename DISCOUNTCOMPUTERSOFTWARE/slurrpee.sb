@@ -1,6 +1,8 @@
 # let hx = loop(dloops2/harshx.wav);
 # let hxar = loop(dloops2/aradisbeatiuz.wav);
 
+let key = 36;
+
 let wblah_gen = gen()
 {
   setup()
@@ -22,7 +24,9 @@ let wblah_gen = gen()
   }
 }
 
-# fnacccx FLOOR
+# bvvgzz
+# load_preset(dx, "wahaio") ; p1 $ merblah_gen
+# fnacccx FLOOR (narf) // wahaio
 # notes c:48 e:52 a:45
 
 let mel = rand_array(16, 0, 0);
@@ -35,16 +39,20 @@ let merblah_gen = gen()
     let ofs2 = 2;
     let ofs3 = 0;
     let shft = 160;
-    let dr = 650;
+    let dr = 350;
     let bzx = 0;
+    let offx = [0, 3, 4, 5];
+    let ox = 0;
   }
   run()
   {
-    let section1 = combinor(bjork(ofs1, 8), [48]);
-    let section2 = combinor(bjork(ofs2, 8), [52]);
+    let section1 = combinor(bjork(ofs1, 8), [notes_in_key(key)[offx[ox]]]);
+    ox = incr(ox, 0, len(offx));
+    let section2 = combinor(bjork(ofs2, 8), [notes_in_key(key)[offx[ox]]);
     mel = section1 + section2;
+    ox = incr(ox, 0, len(offx));
     if (count % 8 == 7) {
-      mel = combinor(rotate(bjork(5, 16), ofs3), [45]);
+      mel = combinor(rotate(bjork(5, 16), ofs3), [notes_in_key(key)[offx[ox]]]);
     }
     ofs1 = incr(ofs1, 2, 7);
     ofs2 = incr(ofs2, 3, 7);
@@ -55,23 +63,49 @@ let merblah_gen = gen()
           if (i % 2 == 0) {
             offset = 0;
           }
+          let v = 90 + rand(37);
+          if (i % 4 == 2) {
+            v = 127;
+          }
           ++bzx;
           if (mel[i] > 0) {
             if (bzx % 12 == 0) {
-              note_on_at(dx, mel[i] - 12, i * pp + offset, dur = dr);
+              note_on_at(dx, mel[i] - 12, i * pp + offset, dur = dr, vel = v);
             } else {
-              note_on_at(dx, mel[i], i * pp + offset, dur = dr);
+              note_on_at(dx, mel[i], i * pp + offset, dur = dr, vel = v);
             }
           }
         }
       }
     }
-    dr = dr + 50;
-    if (dr > 400) {
-      dr = 100;
+    if (count % 3 == 0) {
+      dr = dr + 50;
+      if (dr > 450) {
+        dr = 70;
+      }
     }
   }
 }
+
+# let grm = loop(dloops2/grooveARM.wav);
+# let  drm = loop(dloops2/drumzzf.wav);
+let dbblah_gen = gen()
+{
+  setup()
+  {
+    let speedz = [2, 1];
+    let sx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      #set grm:speed speedz[sx];
+      # set drm:speed speedz[sx];
+      sx = incr(sx, 0, len(speedz));
+    }
+  }
+}
+
 
 # GALZIAN // ASCURF
 # 59 * 2 // 55 * 1 // 52 * 1;
@@ -81,23 +115,26 @@ let perblah_gen = gen()
   {
     let swng = 160;
     let dr = 100;
+    let modz = [0, 12, 0, -12, 5];
+    let mx = 0;
   }
   run()
   {
-    let sec1 = combinor(bjork(3, 8), [59]);
-    let sec2 = combinor(bjork(1, 8), [55]);
-    let sec3 = combinor(bjork(1, 8), [52]);
-    let melmel = mask((sec1 + sec2 + sec3), mel);
     if (count % 2 == 1) {
       for (i = 0; i < 16; ++i) {
-        if (mel[i] > 0) {
-          note_on_at(per1, mel[i], i * pp + rand(swng), dur = dr);
+        let v = 80 + rand(47);
+        if (i % 4 == 0) {
+          v = 127;
+        }
+        if (mel[i] == 0) {
+          note_on_at(per1, key + modz[mx], i * pp + rand(swng), dur = dr, vel = v);
         }
         dr = dr + 50;
-        if (dr > 270) {
+        if (dr > 240) {
           dr = 50;
         }
       }
+      mx = incr(mx, 0, len(modz));
     }
   }
 }

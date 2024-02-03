@@ -13,8 +13,10 @@ let rdblah_gen = gen()
     set rdm:pinc pz[px];
     px = incr(px, 0, len(pz));
 
+    set rdm:vol 1;
     if (count % 4 == 0) {
       set rdm:stutter 1;
+      #set rdm:vol 0 at=pp*8;
     }
     if (count % 3 == 0) {
       set rdm:scramble 1;
@@ -25,39 +27,47 @@ let rdblah_gen = gen()
   }
 }
 
-# skirissh
+# skirissh // elellelele // muffin // octaGON
 # load_preset(dx, "skirissh"); p2 $ nudxbblah_gen
+# load_preset(dx, "purlp"); p2 $ nudxbblah_gen
 
 let nudxbblah_gen = gen()
 {
   setup()
   {
-    let notz = down([59, 57, 55], 24);
-    let dr = 200;
+    # Ab
+    let key = 20;
+    #let key = 8;
+    let notz = reverse(notes_in_key(key, 1));
+    let dr = 100;
+    let nx = 0;
   }
   run()
   {
-    if (count % 2 == 0) {
+    if (count % 4 < 3) {
       let beat = rand_beat();
       let beat2 = rand_beat();
       if (count % 4 == 0) {
-        beat2 = rotate(beat2, 2);
+        beat2 = rotate(beat2, 3);
+        beat = rotate(beat, 2);
       }
       for (i = 0; i < 16; ++i) {
+        let v = 80 + rand(37);
+        if (i % 4 == 1) {
+          v = 127;
+        }
         if (beat[i] == 1) {
-          note_on_at(dx, notz[0], i * pp, dur = dr);
+          note_on_at(dx, notz[0], i * pp, dur = dr, vel = v);
         }
         if (beat2[i] == 1) {
-          let n = notz[1];
-          if (i > 7) {
-            n = notz[2];
-          }
-          note_on_at(dx, n, 3840 + i * pp, dur = dr);
+          let n = notz[nx];
+          nx = incr(nx, 0, len(notz));
+          note_on_at(dx, n, 3840 + i * pp, dur = dr, vel = v);
         }
       }
     }
-    dr = dr + 50;
-    if (dr > 500) {
+    dr = dr + 40;
+    if (dr > 350) {
       dr = 100;
     }
 
@@ -74,7 +84,7 @@ let bdlah_gen = gen()
   run()
   {
     dbeat(bd);
-    if (count % 4 == 0) {
+    if (count % 8 == 0) {
       mashup([bd, rdm, dx]);
     }
   }
