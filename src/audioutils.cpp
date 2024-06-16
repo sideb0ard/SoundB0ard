@@ -238,6 +238,18 @@ std::vector<int> GetMidiNotesInChord(unsigned int root_note,
     case (3):  // inverted minor 7th
       notes_in_chord.push_back(root_note - 2);
       break;
+    case (4):  // inverted major 7th
+      notes_in_chord.push_back(root_note - 1);
+      break;
+    case (5):  // inverted minor 7th, no root
+      notes_in_chord[0] -= 2;
+      break;
+    case (6):  // inverted major 7th, no root
+      notes_in_chord[0] -= 1;
+      break;
+    case (7):  // augment the bass +Octave
+      notes_in_chord[0] += 12;
+      break;
       // case (3):  // augmentation
       //   notes_in_chord.push_back(root_note + 10);
       //   notes_in_chord.push_back(root_note + 12);

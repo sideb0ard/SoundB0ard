@@ -6,10 +6,10 @@ let key = 14;
 
 let jdy = sample(aaassembly/heyJODY.wav);
 
-# bpm 110 ; let cr = loop(loops2/crdunk.wav); set cr:len 2 ; set cr:vol 0 at=3840*2;
-# let intr = loop(legowelt/Synth-InterBellumAtmo.wav); set intr:len 2;
+# bpm 110 ; let intr = loop(legowelt/Synth-InterBellumAtmo.wav); set intr:len 2;
 # let rkk = loop(dloops/rockafellayall2bar.aiff); set rkk:len 2;
 # let rks = loop(dloops/rocksteady_vocal.aif);  p2 $ jblah_gen
+# let cr = loop(loops2/crdunk.wav); set cr:len 2 ; set cr:vol 0 at=3840*2;
 
 let jblah_gen = gen()
 {
@@ -63,45 +63,8 @@ let jblah_gen = gen()
 
 # let jb = loop(aaassembly/jungleBREAKDOWN.wav); set jb:len 4;
 
-
-# dx2 ratz // wururrrp
-let keyblah_gen = gen()
-{
-  setup()
-  {
-    let key = 14;
-    let ntz = notes_in_key(key);
-    let chrdz = [ notes_in_chord(ntz[5], 1), notes_in_chord(ntz[1], 1), notes_in_chord(ntz[4]), notes_in_chord(ntz[0])];
-    let chx = 0;
-    let beat = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
-    let rf = combinor(beat, chrdz[chx]);
-    let d = 50;
-  }
-  run()
-  {
-    if (count % 4 == 0) {
-      chx = incr(chx, 0, len(chrdz));
-      rf = combinor(beat, chrdz[chx]);
-    }
-    if (count % 8 < 8) {
-      for (i = 0; i < 16; ++i) {
-        let v = 100 + rand(27);
-        if (i % 4 == 0) {
-          v = 127;
-        }
-        if (rf[i] > 0) {
-          note_on_at(dx2, rf[i], i * pp, dur = d, vel = v);
-        }
-      }
-    }
-    d = d + 50;
-    if (d > 350) {
-      d = 50;
-    }
-  }
-}
-
-# per1 - GHOSTXZ // per2 TWANrG //
+# per1 - GHOSTXZ //
+# load_preset(per1, "GHOSTXZ") ;p6 $ bassblah_gen
 let bassblah_gen = gen()
 {
   setup()
@@ -121,7 +84,7 @@ let bassblah_gen = gen()
     if (count % 3 == 0) {
       mx = incr(mx, 0, len(melz));
     }
-    if (count % 4 < 3) {
+    if (count % 4 > 1) {
       let mel = melz[mx];
       for (i = 0; i < 16; ++i) {
         if (mel[i] > 0) {
@@ -129,14 +92,6 @@ let bassblah_gen = gen()
         }
       }
     }
-    #if (count % 4 == 3) {
-      #  let mel = melz[mx];
-      #  for (i = 0; i < 16; ++i) {
-        #    stepper(per2, mel, midx, i, dr);
-        #    midx = incr(midx, 0, midxmax);
-        #  }
-      #  midxmax = incr(midxmax, 3, 16);
-      #}
     dr = dr + 50;
     if (dr > 400) {
       dr = 100;
@@ -189,6 +144,38 @@ let dxblah_gen = gen()
   }
 }
 
+# load_preset(dx, "lowr"); p6 $ GREENgen
+# dx = lowr
+# RAMONES - "Blietzkrieg Pop" B5 – E5 – F#5 // I - IV - V
+# GREEN DAY - "When i come around" G5 D5 Em C5 // I V vi IV
+let GREENgen = gen()
+{
+  setup()
+  {
+    let ntzk = notes_in_key(key);
+    let uppad = 0;
+    let I = notes_in_chord(ntzk[0] + uppad, 3);
+    let V = notes_in_chord(ntzk[4] + uppad, 3);
+    let vi = notes_in_chord(ntzk[5] + uppad, 1);
+    let IV = notes_in_chord(ntzk[3] + uppad, 3);
+
+    let d = 70;
+    let sw = 40;
+  }
+  run()
+  {
+    let mel = combinorCh(bjork(5, 8), I) + combinorCh(bjork(5, 8), V);;
+    if (count % 2 == 1) {
+      mel = combinorCh(bjork(4, 8), [vi, IV]) + combinorCh(bjork(3, 8), IV);;
+    }
+    for (i = 0; i < 16; ++i) {
+      if (mel[i] != 0) {
+        note_on_at(dx, mel[i], i * pp, dur = 200);
+      }
+    }
+  }
+}
+
 let bodylah_gen = gen()
 {
   setup()
@@ -207,6 +194,45 @@ let bodylah_gen = gen()
       set rkk:scramble 1;
     }
     set rks:stutter 1;
+  }
+}
+
+let kd = sample(wavalc/dm02_909_kickdrum_005_clean.wav);
+let hh1 = sample(ch/SNDhat.aiff);
+let hh2 = sample(ch/krushch.wav);
+
+let hhblah_gen = gen()
+{
+  setup()
+  {
+
+    let hhz = rand_array(16, 0, 2);
+  }
+  run()
+  {
+    if (count % 8 < 6) {
+
+      for (i = 0; i < 16; ++i) {
+        if (i % 4 == 0) {
+          note_on_at(kd, 1, i * pp, dur = 100);
+        }
+      }
+    } else {
+      play_array(kd, rand_beat());
+    }
+
+    if (count % 8 == 0) {
+      hhz = rand_array(16, 0, 2);
+    }
+
+    for (i = 0; i < 16; ++i) {
+      if (hhz[i] == 0) {
+        note_on_at(hh1, 1, i * pp, dur = 10);
+      }
+      if (hhz[i] == 1) {
+        note_on_at(hh2, 1, i * pp, dur = 10);
+      }
+    }
   }
 }
 

@@ -5,7 +5,7 @@
 # p3 < ramp 8 "1 0" "vol jon %";
 
 let hh = sample(ch/hh13.aif);
-#let oh = sample(oh/OH_D_808_01.wav);
+let oh = sample(oh/OH_D_808_01.wav);
 #let oh = sample(oh/mawopenhh.aiff);
 # let js = loop(JUNALGOGZ/JSFTYmylove.wav);
 # p6 $ hhblah_gen;
