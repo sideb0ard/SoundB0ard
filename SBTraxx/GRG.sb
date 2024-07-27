@@ -36,7 +36,7 @@ let hhblah_gen = gen()
   run()
   {
     let pp = 3840 / 8;
-    for (i = 0; i < 8; ++i) {
+    for (let i = 0; i < 8; ++i) {
       if (rand(100) < 95) {
         let v = 90 + rand(30);
         if (i % 2 == 0) {
