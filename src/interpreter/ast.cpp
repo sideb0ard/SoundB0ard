@@ -160,10 +160,9 @@ std::string PanStatement::String() const {
 std::string ForStatement::String() const {
   std::stringstream ss;
   ss << TokenLiteral() << "(";
-  if (iterator_) ss << iterator_->String() << " = ";
-  if (iterator_value_) ss << iterator_value_->String();
+  if (initialization_) ss << initialization_->String();
   ss << ";";
-  if (termination_condition_) ss << termination_condition_->String();
+  if (termination_) ss << termination_->String();
   ss << ";";
   if (increment_) ss << increment_->String();
   ss << ")";
@@ -195,6 +194,16 @@ std::string PrefixExpression::String() const {
   ss << "(";
   if (!operator_.empty()) ss << operator_;
   if (right_) ss << right_->String();
+  ss << ")";
+
+  return ss.str();
+}
+
+std::string PostfixExpression::String() const {
+  std::stringstream ss;
+  ss << "(";
+  if (!operator_.empty()) ss << operator_;
+  if (left_) ss << left_->String();
   ss << ")";
 
   return ss.str();

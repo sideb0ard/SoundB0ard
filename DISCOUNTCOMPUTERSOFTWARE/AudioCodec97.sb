@@ -1,0 +1,311 @@
+# https://www.reddit.com/r/Blink182/comments/pe73re/what_are_some_of_tom_and_marks_commonly_used/
+# Most of their songs are usually either in B, C or D Major.
+# The best pop punk progressions are Am F C G and then you can flip it and play F C Am G. Or Em C G D
+# The melody will usually use alot of III, IV and I in the verse then go up to V eventually at some part of the chorus or bridge. If the tonic I is the home note think of V as the destination or journey of the piece. It should be used sparingly.
+
+
+let key = 28;
+let notez = notes_in_key(key);
+
+# E = key 28
+# p1 $ chordblah_gen ; bpm 110;
+# let ab = loop(NewLoopz/autBE2.wav) set ab:len 2; p2 $ melblah_gen;
+# let bm = loop(JUNALGOGZ/blackMARKET.wav); set bm:vol 0; p4 $ bwlah_gen;
+
+let powerI = notes_in_chord(notez[0], 3);
+let powerIII = notes_in_chord(notez[2], 3);
+let powerIV = notes_in_chord(notez[3], 3);
+let powerV = notes_in_chord(notez[4], 3);
+
+let chord = powerIII;
+let chordII = powerIII;
+
+let chordblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      chord = powerIV;
+      chordII = powerIV;
+    }
+    if (count % 4 == 3) {
+      chord = powerIV;
+      chordII = powerI;
+    }
+    if (count % 16 == 15) {
+      chord = powerI;
+      chordII = powerV;
+    }
+  }
+}
+
+# p5 < osc 8 "56 96" "set dx:op2out %"
+
+# dx rrrawr // wahaio // WTOOF
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let beat = rand_beat();
+    let d = 160;
+    let offs = 5;
+  }
+  run()
+  {
+    if (count % 16 == 14) {
+      set ab:stutter 1;
+      set ab:reverse 1;
+    }
+    if (count % 16 == 15) {
+      solo(dx, at=12*pp);
+    }
+    let pphaf = 3840 / 2;
+    let ppq = 3840 / 32;
+    for (i = 0; i < 16; ++i) {
+      let offset = offs;
+      if (i % 2 == 0) {
+        offset = 0;
+      }
+      let v = 90 + rand(37);
+      if (i % 4 == 2) {
+        v = 127;
+      }
+      if (beat[i] == 1) {
+        if (rand(100) > 80) {
+          note_on_at(dx, chordII[0], i * ppq + offset, dur = d, vel = v);
+        } else {
+          note_on_at(dx, chord[0], i * ppq + offset, dur = d, vel = v);
+        }
+        note_on_at(dx, chordII[0], pphaf + i * ppq + offset, dur = d, vel = v);
+      }
+    }
+    d = d + 50;
+    if (d> 320) {
+      beat = rand_beat();
+      d = 50;
+    }
+  }
+}
+
+let come = sample(NewLoopz/comeDELAY.wav);
+
+let bwlah_gen = gen()
+{
+  setup()
+  {
+    let d = 500;
+  }
+  run()
+  {
+    set bm:vol 0;
+    if (count % 8 == 2) {
+      set bm:stutter 1;
+      set ab:stutter 1;
+    }
+    if (count % 4 == 3) {
+      set bm:vol 1;
+      set bm:vol 0 at=12*pp;
+    }
+
+    if (count % 5 == 0) {
+      note_on_at(come, 1, 12 * pp, dur = d);
+      d = d + 1500;
+      if (d > 5000) {
+        d = 500;
+      }
+    }
+    set ab:vol 1;
+    if (count % 8 == 3) {
+      set ab:vol 0 at=8*pp;
+    }
+  }
+}
+
+let fhblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+
+let CUZ = sample(JanetVocz/CUZ.wav);
+let WHEN = sample(JanetVocz/WHENI.wav);
+let ITHINK = sample(JanetVocz/THINKkk.wav);
+let THINKELSE = sample(JanetVocz/THINGELSE.wav);
+let OF = sample(JanetVocz/OF.wav);
+let YOU = sample(JanetVocz/YOU2.wav);
+let baby = sample(JanetVocz/baby.wav);
+let BAY = sample(JanetVocz/BAY.wav);
+let BEE = sample(JanetVocz/BE.wav);
+
+let janblah_gen = gen()
+{
+  setup()
+  {
+    let janz = [CUZ, WHEN, ITHINK, THINKELSE, OF, YOU, baby, BAY, BEE ];
+    let jx = 0;
+    let beat = rand_beat();
+    let d = 2500;
+    let inx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          note_on_at(janz[jx], 1, i * pp, dur = d);
+          ++inx;
+          if (inx % 4 == 0) {
+            jx = incr(jx, 0, len(janz));
+          }
+        }
+      }
+      d = d + 150;
+      if (d > 3000) {
+        d = 150;
+      }
+    }
+
+    if (count % 8 == 0) {
+      beat = rand_beat();
+    }
+  }
+}
+
+let oh1 = sample(ch/CasioMT70ClosedHihat.aif);
+let oh2 = sample(ch/chezHat.aiff);
+let hahblah_gen = gen()
+{
+  setup()
+  {
+    let hhzpat = rand_array(16, 0, 2);
+    let sw = 0;
+    let d = 10;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      let off = sw;
+      if (i % 2 == 0) {
+        off = 0;
+      }
+      let v = 90 + rand(37);
+      if (i % 4 == 2) {
+        v = 127;
+      }
+      if (hhzpat[i] == 1) {
+        note_on_at(oh1, 1, i * pp + off, dur = d, vel = v);
+      }
+      if (hhzpat[i] == 2) {
+        note_on_at(oh2, 1, i * pp + off, dur = d, vel = v);
+      }
+
+    }
+
+    if (count % 8 == 0) {
+      hhzpat = rand_array(16, 0, 2);
+      d = d + 10;
+      if (d > 50) {
+        d = 10;
+      }
+    }
+  }
+}
+
+# F# - 18 E: 16 B: 11
+# p4 $ ""; p3 $ ""; vol ab 0;
+# dx2 - drm // gnarrrrde // rawrr // WUFFbbgf
+# load_preset(dx2, "WUFFbbgf"); p2 $ mooblah_gen; vol ab 1;
+let mooblah_gen = gen()
+{
+  setup()
+  {
+    let cntz = [ 3, 2, 4, 3, 3, 5, 7 ];
+    let cx = 0;
+    let sw = 20;
+
+    #let ntz = [18, 16, 11];
+    #let ntz = [11, 16, 18];
+    #let ntz = [23, 28, 30];
+    #let ntz = [30, 28, 23];
+    let d = 100;
+  }
+  run()
+  {
+    let beat = bjork(cntz[cx], 16);
+    #let nt = ntz[0];
+    let nt = chord[0];
+    if (count % 4 == 2) {
+      nt = chord[1];
+      #nt = ntz[1];
+    }
+    if (count % 3 == 2) {
+      nt = chord[2];
+      #nt = ntz[2];
+    }
+
+    if (count % 16 == 15) {
+      nt = nt + 12;
+    }
+    cx = incr(cx, 0, len(cntz));
+
+    if (count % 16 < 14) {
+      for (i = 0; i < 16; ++i) {
+        let v = 90 + rand(37);
+        if (i % 4 == 2) {
+          v = 127;
+        }
+        if (beat[i] == 1) {
+          note_on_at(dx2, nt, i * pp, dur = d, vel = v);
+          d = d + 40;
+        }
+      }
+      if (d > 450) {
+        d = 100;
+      }
+    }
+  }
+}
+
+# cut out p1 $
+# just ab and dx2 crucnh - then
+# p3 $ janblah_gen;
+# let revme = loop(JUNALGOGZ/REVMEloc.wav);
+# let del = loop(JUNALGOGZ/DELAz.wav); set del:len 2; vol ab 0; p3 $ samblah_gen
+
+# vol revme 0; vol ab 0;
+
+let samblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set del:stutter 1;
+      set ab:stutter 1;
+      set del:vol 0 at=3840;
+      set you:stutter 1;
+    }
+    if (count % 3 == 0) {
+      set del:vol 1;
+    }
+    if (count % 8 == 5) {
+      set hhs:stutter 1;
+      set del:scramble 1;
+    }
+  }
+}
+
+# p2 $ melblah_gen; let hhs = loop(JUNALGOGZ/hiphopSNAR.wav); set hhs:len 2;
+# let you = loop(voices/youdidnthink.wav); set you:len 2
+
+
+

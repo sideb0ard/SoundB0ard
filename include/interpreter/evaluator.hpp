@@ -45,6 +45,9 @@ std::shared_ptr<object::Object> EvalStepSequencerExpression(
 std::shared_ptr<object::Object> EvalPrefixExpression(
     std::string op, std::shared_ptr<object::Object> obj);
 
+std::shared_ptr<object::Object> EvalPostfixExpression(
+    std::string op, std::shared_ptr<object::Object> obj);
+
 std::shared_ptr<object::Object> EvalInfixExpression(
     std::string op, std::shared_ptr<object::Object> left,
     std::shared_ptr<object::Object> right);
@@ -75,10 +78,10 @@ std::shared_ptr<object::Object> EvalMinusPrefixOperatorExpression(
     std::shared_ptr<object::Object> right);
 
 std::shared_ptr<object::Object> EvalDecrementOperatorExpression(
-    std::shared_ptr<object::Object> right);
+    std::shared_ptr<object::Object> val, bool is_prefix);
 
 std::shared_ptr<object::Object> EvalIncrementOperatorExpression(
-    std::shared_ptr<object::Object> right);
+    std::shared_ptr<object::Object> val, bool is_prefix);
 
 std::shared_ptr<object::Boolean> NativeBoolToBooleanObject(bool input);
 bool ObjectToNativeBool(std::shared_ptr<object::Object> obj);

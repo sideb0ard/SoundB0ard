@@ -1,0 +1,49 @@
+# let fsh = loop(dloops2/funkshuffle.wav);
+let sv = sample(loops/stereoLabVOICE.aiff);
+let sn = sample(qebo/QEBO-LOCKDOWNFM-35FMSNARE3.wav);
+
+let sblah_gen = gen()
+{
+  setup()
+  {
+    let svdur = 700;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      note_on(sv, 1, dur = svdur);
+      svdur = svdur + 50;
+      if (svdur > 5000) {
+        svdur = 650;
+      }
+    }
+
+    if (count % 4 == 0) {
+      cbeat(sn);
+    }
+    if (count % 4 == 3) {
+      set fsh:stutter 1;
+    }
+  }
+}
+
+
+let mel = [0, 0, 0, 50, 49, 0, 49, 50, 52, 52, 52, 49, 49, 49, 0, 0];
+let moblah_gen = gen()
+{
+  setup()
+  {
+    let ix = 0;
+    let mx = 3;
+
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      stepper(mo, mel, ix, i, 100);
+      ix = incr(ix, 0, mx);
+    }
+    mx = incr(mx, 3, 16);
+  }
+}
+

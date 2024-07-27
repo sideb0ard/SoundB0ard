@@ -363,28 +363,16 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement() {
   std::shared_ptr<ast::ForStatement> stmt =
       std::make_shared<ast::ForStatement>(cur_token_);
 
-  // Starting condition //////////
-
   if (!ExpectPeek(token::SLANG_LPAREN)) {
     std::cerr << "NO LPAREN! - returning nullptr \n";
     return nullptr;
   }
-
-  if (!ExpectPeek(token::SLANG_IDENT)) {
-    std::cerr << "NO IDENT! - returning nullptr \n";
-    return nullptr;
-  }
-
-  stmt->iterator_ =
-      std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);
-
-  if (!ExpectPeek(token::SLANG_ASSIGN)) {
-    std::cerr << "NO ASSIGN! - returning nullptr \n";
-    return nullptr;
-  }
   NextToken();
 
-  stmt->iterator_value_ = ParseExpression(Precedence::LOWEST);
+  stmt->initialization_ = ParseStatement();
+  NextToken();
+
+  stmt->termination_ = ParseExpression(Precedence::LOWEST);
 
   if (!ExpectPeek(token::SLANG_SEMICOLON)) {
     std::cerr << "NO SEMICOLON! - returning nullptr \n";
@@ -392,13 +380,6 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement() {
   }
   NextToken();
 
-  // Termination Condition /////////////
-  stmt->termination_condition_ = ParseExpression(Precedence::LOWEST);
-
-  NextToken();
-  NextToken();
-
-  // Increment Expression
   stmt->increment_ = ParseExpression(Precedence::LOWEST);
 
   // Body
@@ -499,6 +480,12 @@ static bool IsInfixOperator(token::TokenType type) {
   return false;
 }
 
+static bool IsPostfixOperator(token::TokenType type) {
+  if (type == token::SLANG_INCREMENT || type == token::SLANG_DECREMENT)
+    return true;
+  return false;
+}
+
 //////////////////////////////////////////////////////////////////
 
 std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p) {
@@ -515,12 +502,19 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p) {
         left_expr = ParseCallExpression(left_expr);
       else if (cur_token_.type_ == token::SLANG_LBRACKET)
         left_expr = ParseIndexExpression(left_expr);
-      else  // these are the 'leds' (left denotation)
+      else {  // these are the 'leds' (left denotation)
         left_expr = ParseInfixExpression(left_expr);
+      }
     } else {
       return left_expr;
     }
   }
+
+  if (IsPostfixOperator(peek_token_.type_)) {
+    NextToken();
+    return ParsePostfixExpression(left_expr);
+  }
+
   return left_expr;
 }
 
@@ -1069,6 +1063,16 @@ std::shared_ptr<ast::Expression> Parser::ParsePrefixExpression() {
   NextToken();
 
   expression->right_ = ParseExpression(Precedence::PREFIX);
+
+  return expression;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParsePostfixExpression(
+    std::shared_ptr<ast::Expression> left) {
+  auto expression =
+      std::make_shared<ast::PostfixExpression>(cur_token_, cur_token_.literal_);
+
+  expression->left_ = left;
 
   return expression;
 }

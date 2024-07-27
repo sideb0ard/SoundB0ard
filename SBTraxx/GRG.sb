@@ -1,0 +1,52 @@
+
+let bd = sample(bd/kick2.aif);
+let sd = sample(sd/rvrbSnr.aiff);
+let sd2 = sample(sd/slaveSnare.aiff);
+
+let kickblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    note_on_at(bd, 1, 0 * pp);
+    if (count % 8  < 6) {
+      note_on_at(bd, 1, 8 * pp);
+    }
+
+    note_on_at(sd, 1, 4 * pp);
+    if (count % 16  < 12) {
+      note_on_at(sd, 1, 12 * pp);
+    }
+
+    note_on_at(sd2, 1, 7 * pp, dur = 70, vel = 90);
+    note_on_at(sd2, 1, 9 * pp + 40, dur = 40, vel = 100);
+  }
+}
+
+let ch = sample(ch/timbaHat1.aiff);
+let oh = sample(oh/mawopenhh.aiff);
+
+let hhblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    let pp = 3840 / 8;
+    for (i = 0; i < 8; ++i) {
+      if (rand(100) < 95) {
+        let v = 90 + rand(30);
+        if (i % 2 == 0) {
+          note_on_at(ch, 1, i * pp, vel = v);
+        } else {
+          note_on_at(oh, 1, i * pp, dur= 60, vel = v);
+        }
+      }
+    }
+
+  }
+}
+

@@ -125,6 +125,19 @@ class InfixExpression : public Expression {
   std::shared_ptr<Expression> right_;
 };
 
+class PostfixExpression : public Expression {
+ public:
+  PostfixExpression() {}
+  explicit PostfixExpression(Token token) : Expression{token} {}
+  PostfixExpression(Token token, std::string op)
+      : Expression{token}, operator_{op} {}
+  std::string String() const override;
+
+ public:
+  std::string operator_;
+  std::shared_ptr<Expression> left_;
+};
+
 class IfExpression : public Expression {
  public:
   IfExpression() {}
@@ -462,11 +475,8 @@ class ForStatement : public Statement {
   std::string String() const override;
 
  public:
-  std::shared_ptr<Identifier> iterator_{nullptr};
-  std::shared_ptr<Expression> iterator_value_{nullptr};
-
-  std::shared_ptr<Expression> termination_condition_{nullptr};
-
+  std::shared_ptr<Statement> initialization_{nullptr};
+  std::shared_ptr<Expression> termination_{nullptr};
   std::shared_ptr<Expression> increment_{nullptr};
 
   std::shared_ptr<BlockStatement> body_;

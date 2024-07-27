@@ -91,6 +91,8 @@ class Parser {
   std::shared_ptr<ast::Expression> ParsePrefixExpression();
   std::shared_ptr<ast::Expression> ParseInfixExpression(
       std::shared_ptr<ast::Expression> left);
+  std::shared_ptr<ast::Expression> ParsePostfixExpression(
+      std::shared_ptr<ast::Expression> left);
   std::shared_ptr<ast::Expression> ParseGroupedExpression();
   std::shared_ptr<ast::Expression> ParseIfExpression();
   std::shared_ptr<ast::Expression> ParseEveryExpression();

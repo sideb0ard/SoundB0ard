@@ -136,6 +136,14 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     return EvalPrefixExpression(pe->operator_, right);
   }
 
+  std::shared_ptr<ast::PostfixExpression> pof =
+      std::dynamic_pointer_cast<ast::PostfixExpression>(node);
+  if (pof) {
+    auto left = Eval(pof->left_, env);
+    if (IsError(left)) return left;
+    return EvalPostfixExpression(pof->operator_, left);
+  }
+
   std::shared_ptr<ast::InfixExpression> ie =
       std::dynamic_pointer_cast<ast::InfixExpression>(node);
   if (ie) {
@@ -441,14 +449,13 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   std::shared_ptr<ast::ForStatement> forloop =
       std::dynamic_pointer_cast<ast::ForStatement>(node);
   if (forloop) {
-    auto it = forloop->iterator_;
-    auto iterator_value = forloop->iterator_value_;
-    auto termination_condition = forloop->termination_condition_;
+    auto initialization = forloop->initialization_;
+    auto termination = forloop->termination_;
     auto increment = forloop->increment_;
     auto body = forloop->body_;
     auto new_env = std::make_shared<object::Environment>(env);
     auto forloop_obj = std::make_shared<object::ForLoop>(
-        new_env, it, iterator_value, termination_condition, increment, body);
+        new_env, initialization, termination, increment, body);
 
     return EvalForLoop(forloop_obj);
   }
@@ -833,30 +840,29 @@ std::shared_ptr<object::Object> EvalPrefixExpression(
   else if (op.compare("-") == 0)
     return EvalMinusPrefixOperatorExpression(right);
   else if (op.compare("++") == 0)
-    return EvalIncrementOperatorExpression(right);
+    return EvalIncrementOperatorExpression(right, true);
   else if (op.compare("--") == 0)
-    return EvalDecrementOperatorExpression(right);
+    return EvalDecrementOperatorExpression(right, true);
   else
     return NewError("unknown operator: %s %s ", op, right->Type());
 }
 
+std::shared_ptr<object::Object> EvalPostfixExpression(
+    std::string op, std::shared_ptr<object::Object> left) {
+  if (op.compare("++") == 0)
+    return EvalIncrementOperatorExpression(left, false);
+  else if (op.compare("--") == 0)
+    return EvalDecrementOperatorExpression(left, false);
+  else
+    return NewError("unknown operator: %s %s ", op, left->Type());
+}
+
 std::shared_ptr<object::Object> EvalForLoop(
     std::shared_ptr<object::ForLoop> for_loop) {
-  auto initial_iterator_val = Eval(for_loop->iterator_value_, for_loop->env_);
-  if (IsError(initial_iterator_val)) {
-    std::cerr << "OOPS< ERR!\n";
-    return initial_iterator_val;
-  }
-  auto initial_val =
-      std::dynamic_pointer_cast<object::Number>(initial_iterator_val);
-  if (!initial_val) {
-    std::cerr << "DUH! Need a NUMBER for Iterator value!!\n";
-    return evaluator::NULLL;
-  }
-  for_loop->env_->Set(for_loop->iterator_->value_, initial_val);
+  Eval(for_loop->initialization_, for_loop->env_);
 
   std::shared_ptr<object::Object> result = evaluator::NULLL;
-  while (IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_))) {
+  while (IsTruthy(Eval(for_loop->termination_, for_loop->env_))) {
     result = Eval(for_loop->body_, for_loop->env_);
     if (result->Type() == object::BREAK_OBJ) {
       break;
@@ -864,14 +870,9 @@ std::shared_ptr<object::Object> EvalForLoop(
     if (result->Type() == object::RETURN_VALUE_OBJ) {
       return result;
     }
-    auto new_iterator_val = Eval(for_loop->increment_, for_loop->env_);
-    if (IsError(new_iterator_val)) {
-      std::cerr << "OOPS< ERR!\n";
-      return new_iterator_val;
-    }
-    for_loop->env_->Set(for_loop->iterator_->value_, new_iterator_val);
-  }
 
+    Eval(for_loop->increment_, for_loop->env_);
+  }
   return result;
 }
 
@@ -1107,25 +1108,33 @@ std::shared_ptr<object::Object> EvalMinusPrefixOperatorExpression(
 }
 
 std::shared_ptr<object::Object> EvalIncrementOperatorExpression(
-    std::shared_ptr<object::Object> right) {
+    std::shared_ptr<object::Object> val, bool is_prefix) {
   std::shared_ptr<object::Number> i =
-      std::dynamic_pointer_cast<object::Number>(right);
+      std::dynamic_pointer_cast<object::Number>(val);
   if (!i) {
-    return NewError("unknown operator: ++%s", right->Type());
+    return NewError("unknown operator: ++%s", val->Type());
   }
 
-  return std::make_shared<object::Number>(++(i->value_));
+  if (is_prefix) {
+    return std::make_shared<object::Number>(++(i->value_));
+  } else {
+    return std::make_shared<object::Number>((i->value_)++);
+  }
 }
 
 std::shared_ptr<object::Object> EvalDecrementOperatorExpression(
-    std::shared_ptr<object::Object> right) {
+    std::shared_ptr<object::Object> val, bool is_prefix) {
   std::shared_ptr<object::Number> i =
-      std::dynamic_pointer_cast<object::Number>(right);
+      std::dynamic_pointer_cast<object::Number>(val);
   if (!i) {
-    return NewError("unknown operator: --%s", right->Type());
+    return NewError("unknown operator: --%s", val->Type());
   }
 
-  return std::make_shared<object::Number>(--(i->value_));
+  if (is_prefix) {
+    return std::make_shared<object::Number>(--(i->value_));
+  } else {
+    return std::make_shared<object::Number>((i->value_)--);
+  }
 }
 
 std::shared_ptr<object::Object> EvalProgram(

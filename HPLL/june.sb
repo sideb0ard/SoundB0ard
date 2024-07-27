@@ -1,0 +1,38 @@
+# GGGHz
+# let bb = loop(dloops2/boombapyt.wav)
+# dloops2/kdrttd.wav
+# loops2/gnarlyBASS.wav
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    let ntz = [12, 19, 20];
+    let nx = 0;
+    let blz = [3, 5, 7];
+    let bx = 0;
+    let bllz = [16];
+    let bbx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      let beat = bjork(blz[bx], bllz[bbx]);
+      let ppl = 3840 / len(beat);
+      for (i = 0; i < len(beat); ++i) {
+        if (beat[i] == 1) {
+          note_on_at(dx, ntz[nx], i * ppl);
+          if (rand(100) > 80) {
+            nx = incr(nx, 0, len(ntz));
+          }
+        }
+      }
+      bx = incr(bx, 0, len(blz));
+      bbx = incr(bbx, 0, len(bllz));
+      set BS:vol 0;
+    } else {
+      set BS:vol 1;
+      set krd:stutter 1;
+    }
+  }
+}
+
