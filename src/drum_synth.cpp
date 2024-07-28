@@ -51,7 +51,8 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   if (osc1_->m_note_on) {
     lfo_.Update();
     double lfo_out = lfo_.DoOscillate(0);
-    double eg_out = eg_.DoEnvelope(nullptr);
+    double biased_eg_out = 0;
+    double eg_out = eg_.DoEnvelope(&biased_eg_out);
 
     double dca_mod_val = eg_out;
     if (settings_.lfo_master_amp_enable) dca_mod_val *= lfo_out;
@@ -61,22 +62,24 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 
     ///////////
 
+    double eg_osc_mod = OSC_FO_MOD_RANGE * biased_eg_out;
+    double eg_lfo_mod = OSC_FO_MOD_RANGE * lfo_out;
     double osc1_mod_val = 1;
     double osc2_mod_val = 1;
 
     if (settings_.eg_osc1_pitch_enable && settings_.lfo_osc1_pitch_enable)
-      osc1_mod_val = eg_out * lfo_out;
+      osc1_mod_val = eg_osc_mod + eg_lfo_mod;
     else if (settings_.eg_osc1_pitch_enable)
-      osc1_mod_val = eg_out;
+      osc1_mod_val = eg_osc_mod;
     else if (settings_.lfo_osc1_pitch_enable)
-      osc1_mod_val = lfo_out;
+      osc1_mod_val = eg_lfo_mod;
 
     if (settings_.eg_osc2_pitch_enable && settings_.lfo_osc2_pitch_enable)
-      osc2_mod_val = eg_out * lfo_out;
+      osc2_mod_val = eg_osc_mod + eg_lfo_mod;
     else if (settings_.eg_osc2_pitch_enable)
-      osc2_mod_val = eg_out;
+      osc2_mod_val = eg_osc_mod;
     else if (settings_.lfo_osc2_pitch_enable)
-      osc2_mod_val = lfo_out;
+      osc2_mod_val = eg_lfo_mod;
 
     if (settings_.eg_filter1_freq_enable) {
       filter1_->SetFcMod(eg_out * settings_.pitch_range);
@@ -140,13 +143,13 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     filter2_->Update();
     master_filter_->Update();
 
-    osc1_->SetFoModLin(osc1_mod_val);
+    osc1_->SetFoModExp(osc1_mod_val);
     if (settings_.pitch_bend)
       osc1_->m_osc_fo = base_frequency_ * settings_.osc1_ratio +
                         osc1_mod_val * frequency_diff_;
     osc1_->Update();
 
-    osc2_->SetFoModLin(osc2_mod_val);
+    osc2_->SetFoModExp(osc2_mod_val);
     if (settings_.pitch_bend)
       osc2_->m_osc_fo = base_frequency_ * settings_.osc2_ratio +
                         osc2_mod_val * frequency_diff_;

@@ -39,7 +39,7 @@ project(Sbsh VERSION 3.0
   LANGUAGES CXX)
 
 file (GLOB_RECURSE Sbsh_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
-file (GLOB_RECURSE Sbsh_HEADERS CONFIGURE_DEPENDS "include/*.h")
+file (GLOB_RECURSE Sbsh_HEADERS CONFIGURE_DEPENDS "src/*.h")
 
 set (Sbsh_INCLUDE_DIRS "")
 foreach (_headerFile ${Sbsh_HEADERS})
