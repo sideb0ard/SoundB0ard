@@ -109,7 +109,7 @@ void EnvelopeGenerator::SetSustainLevel(double level) {
   if (m_state != RELEASE) CalculateReleaseTime();
 }
 
-void EnvelopeGenerator::SetRampMode(bool b) { ramp_mode = b; }
+void EnvelopeGenerator::SetRampMode(bool b) { ad_mode = b; }
 
 void EnvelopeGenerator::SetSustainOverride(bool b) {
   m_sustain_override = b;
@@ -218,7 +218,7 @@ double EnvelopeGenerator::DoEnvelope(double *p_biased_output) {
       if (m_envelope_output <= m_sustain_level ||
           m_decay_time_scalar * m_decay_time_msec <= 0.0) {
         m_envelope_output = m_sustain_level;
-        if (ramp_mode) {
+        if (ad_mode) {
           NoteOff();
         } else {
           m_state = SUSTAIN;

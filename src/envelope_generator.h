@@ -49,7 +49,7 @@ class EnvelopeGenerator {
   bool m_legato_mode{false};
   bool m_output_eg{false};  // i.e. this instance is going direct to output,
                             // rather than into an intermediatery
-  bool ramp_mode{false};    // used for no sustain
+  bool ad_mode{false};      // used for no sustain
 
   double hold_time_ms_{0};
   double hold_timer_{0};
