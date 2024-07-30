@@ -4,7 +4,7 @@
 #include "filter.h"
 
 struct OnePole : public Filter {
-  OnePole() = default;
+  OnePole();
   OnePole(unsigned int ftype) : Filter{ftype} {};
   ~OnePole() = default;
 

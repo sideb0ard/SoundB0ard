@@ -5,6 +5,7 @@
 #include <envelope_generator.h>
 #include <filter_ckthreefive.h>
 #include <filter_moogladder.h>
+#include <filter_sem.h>
 #include <lfo.h>
 #include <qblimited_oscillator.h>
 
@@ -37,7 +38,8 @@ struct DrumSettings {
   double noise_eg_attack_ms{1};
   double noise_eg_decay_ms{44};
   int noise_eg_mode{DIGITAL};
-  unsigned int noise_filter_type{6};
+  unsigned int noise_filter_type{LPF2};
+  // unsigned int noise_filter_type{LPF4};
   double noise_filter_fc{5000};
   double noise_filter_q{1};
 
@@ -54,7 +56,8 @@ struct DrumSettings {
   double amp_eg_decay_ms{1000};
   int amp_eg_mode{DIGITAL};
 
-  unsigned int amp_filter_type{6};
+  // unsigned int amp_filter_type{LPF4};
+  unsigned int amp_filter_type{LPF2};
   double amp_filter_fc{10000};
   double amp_filter_q{1};
 
@@ -94,7 +97,8 @@ class DrumSynth : public SoundGenerator {
   // TRANSIENT
   std::unique_ptr<QBLimitedOscillator> noise_;
   EnvelopeGenerator noise_eg_;
-  std::unique_ptr<CKThreeFive> noise_filter_;
+  // std::unique_ptr<CKThreeFive> noise_filter_;
+  std::unique_ptr<FilterSem> noise_filter_;
 
   // PITCH
   std::unique_ptr<QBLimitedOscillator> osc1_;
@@ -104,7 +108,8 @@ class DrumSynth : public SoundGenerator {
 
   // OUTPUT
   EnvelopeGenerator amp_eg_;
-  std::unique_ptr<CKThreeFive> amp_filter_;
+  // std::unique_ptr<CKThreeFive> amp_filter_;
+  std::unique_ptr<FilterSem> amp_filter_;
   Distortion distortion_;
   double velocity_{0.};
   DCA dca_;

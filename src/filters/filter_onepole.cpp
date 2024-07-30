@@ -1,10 +1,16 @@
 #include "filter_onepole.h"
 
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 #include "defjams.h"
+
+OnePole::OnePole() {
+  m_filter_type = LPF1;
+  Reset();
+}
 
 void OnePole::Update() {
   Filter::Update();
@@ -28,7 +34,10 @@ void OnePole::Reset() {
 }
 
 double OnePole::DoFilter(double xn) {
-  if (m_filter_type != LPF1 && m_filter_type != HPF1) return xn;
+  if (m_filter_type != LPF1 && m_filter_type != HPF1) {
+    std::cerr << "OnePole filter - wrong type!\n";
+    return xn;
+  }
 
   xn = xn * m_gamma + m_feedback + m_epsilon * GetFeedbackOutput();
 
@@ -44,4 +53,7 @@ double OnePole::DoFilter(double xn) {
     return lpf;
   else if (m_filter_type == HPF1)
     return hpf;
+
+  std::cerr << "SHOULD NOT REACH\n";
+  return xn;
 }

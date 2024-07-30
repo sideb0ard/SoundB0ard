@@ -28,7 +28,8 @@ DrumSynth::DrumSynth() {
   noise_eg_.SetRampMode(true);
   noise_eg_.m_reset_to_zero = true;
 
-  noise_filter_ = std::make_unique<CKThreeFive>();
+  // noise_filter_ = std::make_unique<CKThreeFive>();
+  noise_filter_ = std::make_unique<FilterSem>();
 
   // PITCH
   osc1_ = std::make_unique<QBLimitedOscillator>();
@@ -40,7 +41,8 @@ DrumSynth::DrumSynth() {
   amp_eg_.SetRampMode(true);
   amp_eg_.m_reset_to_zero = true;
 
-  amp_filter_ = std::make_unique<CKThreeFive>();
+  // amp_filter_ = std::make_unique<CKThreeFive>();
+  amp_filter_ = std::make_unique<FilterSem>();
 
   // default
   LoadSettings(DrumSettings());
