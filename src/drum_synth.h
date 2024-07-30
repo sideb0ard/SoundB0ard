@@ -23,50 +23,40 @@ struct DrumSettings {
   DrumSettings() = default;
   DrumSettings(std::string, std::map<std::string, double>);
 
+  // GLOBAL SETTINGS
   double distortion_threshold{0.5};
-  double amplitude{1};
+  double volume{1};
+  double pan{0};
 
   bool hard_sync{false};
   double detune_cents{0};
   double pulse_width_pct{50};
 
+  // TRANSIENT
+  float noise_amp{0.4};
+  double noise_eg_attack_ms{1};
+  double noise_eg_decay_ms{44};
+  int noise_eg_mode{DIGITAL};
+  unsigned int noise_filter_type{6};
+  double noise_filter_fc{5000};
+  double noise_filter_q{1};
+
   // OSCILLATORS
   int osc1_wav{SINE};
   float osc1_amp{1};
   float osc1_ratio{1};
-  bool filter1_enable{false};
-  unsigned int filter1_type{6};
-  double filter1_fc{20000};
-  double filter1_q{1};
+  double osc_eg_attack_ms{1};
+  double osc_eg_decay_ms{1000};
+  int osc_eg_mode{ANALOG};
 
-  int osc3_wav{NOISE};
-  float osc3_amp{0};
-  float osc3_ratio{1};
-  bool filter3_enable{true};
-  unsigned int filter3_type{6};
-  double filter3_fc{10000};
-  double filter3_q{1};
-
-  // MASTER FILTER -> OUT
-  bool master_filter_enable{false};
-  unsigned int master_filter_type{6};
-  double master_filter_fc{10000};
-  double master_filter_q{1};
-
-  // NOISE ENV //////////////////////////
-  double noise_eg_attack_ms{1};
-  double noise_eg_decay_ms{44};
-  bool noise_eg_ramp_mode{true};
-
-  // OSC ENV //////////////////////////
-  double osc_eg_attack_ms{2};
-  double osc_eg_decay_ms{70};
-  bool osc_eg_ramp_mode{true};
-
-  // AMP ENV //////////////////////////
+  // OUTPUT
   double amp_eg_attack_ms{2};
-  double amp_eg_decay_ms{70};
-  bool amp_eg_ramp_mode{true};
+  double amp_eg_decay_ms{1000};
+  int amp_eg_mode{DIGITAL};
+
+  unsigned int amp_filter_type{6};
+  double amp_filter_fc{10000};
+  double amp_filter_q{1};
 
   // LFO //////////////////////////
   // int lfo_wave{SINE};
@@ -101,20 +91,22 @@ class DrumSynth : public SoundGenerator {
 
   DrumSettings settings_;
 
-  std::unique_ptr<QBLimitedOscillator> osc1_;
-  std::unique_ptr<CKThreeFive> osc1_filter_;
-
+  // TRANSIENT
   std::unique_ptr<QBLimitedOscillator> noise_;
+  EnvelopeGenerator noise_eg_;
   std::unique_ptr<CKThreeFive> noise_filter_;
 
+  // PITCH
+  std::unique_ptr<QBLimitedOscillator> osc1_;
   EnvelopeGenerator osc_eg_;
-  EnvelopeGenerator amp_eg_;
-  EnvelopeGenerator noise_eg_;
+
   // LFO lfo_;
 
+  // OUTPUT
+  EnvelopeGenerator amp_eg_;
+  std::unique_ptr<CKThreeFive> amp_filter_;
   Distortion distortion_;
-  //  std::unique_ptr<CKThreeFive> master_filter_;
-
+  double velocity_{0.};
   DCA dca_;
 
  private:

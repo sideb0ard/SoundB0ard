@@ -31,7 +31,6 @@ void Filter::SetFcMod(double val) { m_fc_mod = val; }
 void Filter::SetType(unsigned int type) {
   if (type < NUM_FILTER_TYPES) {
     m_filter_type = type;
-    std::cout << "type is:" << type << std::endl;
     Update();
   } else {
     std::cout << "Type must be between 0 and " << NUM_FILTER_TYPES - 1

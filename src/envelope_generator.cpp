@@ -123,7 +123,6 @@ void EnvelopeGenerator::StartEg() {
   if (m_legato_mode && m_state != OFFF && m_state != RELEASE) {
     return;
   }
-
   Reset();
   m_state = ATTACK;
 }
