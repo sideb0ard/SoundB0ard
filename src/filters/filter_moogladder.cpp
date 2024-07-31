@@ -25,7 +25,7 @@ MoogLadder::MoogLadder() {
   m_d = 0.0;
   m_e = 0.0;
 
-  m_q_control = 1.0;  // Q is 1 to 10
+  m_q_control = 8.0;  // Q is 1 to 10
 }
 
 void MoogLadder::SetQControl(double qcontrol) {

@@ -28,8 +28,9 @@ DrumSynth::DrumSynth() {
   noise_eg_.SetRampMode(true);
   noise_eg_.m_reset_to_zero = true;
 
-  // noise_filter_ = std::make_unique<CKThreeFive>();
-  noise_filter_ = std::make_unique<FilterSem>();
+  // noise_filter_ = std::make_unique<MoogLadder>();
+  noise_filter_ = std::make_unique<CKThreeFive>();
+  //  noise_filter_ = std::make_unique<FilterSem>();
 
   // PITCH
   osc1_ = std::make_unique<QBLimitedOscillator>();
@@ -41,8 +42,9 @@ DrumSynth::DrumSynth() {
   amp_eg_.SetRampMode(true);
   amp_eg_.m_reset_to_zero = true;
 
-  // amp_filter_ = std::make_unique<CKThreeFive>();
-  amp_filter_ = std::make_unique<FilterSem>();
+  // amp_filter_ = std::make_unique<MoogLadder>();
+  amp_filter_ = std::make_unique<CKThreeFive>();
+  //  amp_filter_ = std::make_unique<FilterSem>();
 
   // default
   LoadSettings(DrumSettings());
@@ -59,6 +61,7 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     noise_->Update();
     double noise_eg_out = noise_eg_.DoEnvelope(nullptr);
     double noise_out = noise_->DoOscillate(nullptr) * noise_eg_out;
+    noise_filter_->Update();
     noise_out = noise_filter_->DoFilter(noise_out);
 
     // OSCILLATORS
@@ -100,6 +103,7 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
     //// OUTPUT //////////////////////////
 
     // FILTER ////////////////////
+    amp_filter_->Update();
     double osc_out = amp_filter_->DoFilter(osc_mix);
 
     double out_left = 0.0;

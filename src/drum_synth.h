@@ -97,8 +97,9 @@ class DrumSynth : public SoundGenerator {
   // TRANSIENT
   std::unique_ptr<QBLimitedOscillator> noise_;
   EnvelopeGenerator noise_eg_;
-  // std::unique_ptr<CKThreeFive> noise_filter_;
-  std::unique_ptr<FilterSem> noise_filter_;
+  // std::unique_ptr<MoogLadder> noise_filter_;
+  std::unique_ptr<CKThreeFive> noise_filter_;
+  //  std::unique_ptr<FilterSem> noise_filter_;
 
   // PITCH
   std::unique_ptr<QBLimitedOscillator> osc1_;
@@ -108,8 +109,9 @@ class DrumSynth : public SoundGenerator {
 
   // OUTPUT
   EnvelopeGenerator amp_eg_;
-  // std::unique_ptr<CKThreeFive> amp_filter_;
-  std::unique_ptr<FilterSem> amp_filter_;
+  // std::unique_ptr<MoogLadder> amp_filter_;
+  std::unique_ptr<CKThreeFive> amp_filter_;
+  //  std::unique_ptr<FilterSem> amp_filter_;
   Distortion distortion_;
   double velocity_{0.};
   DCA dca_;

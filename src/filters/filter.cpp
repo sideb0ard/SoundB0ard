@@ -10,7 +10,7 @@
 void Filter::SetFcControl(double val) {
   if (val >= FILTER_FC_MIN && val <= FILTER_FC_MAX) {
     m_fc_control = val;
-    Update();
+    //  Update();
   } else {
     std::cout << "FC must be between " << FILTER_FC_MIN << " and "
               << FILTER_FC_MAX << std::endl;
@@ -20,7 +20,7 @@ void Filter::SetFcControl(double val) {
 void Filter::SetQControlGUI(double val) {
   if (val >= 1 && val <= 10) {
     m_q_control = val;
-    Update();
+    // Update();
   } else {
     std::cout << "Q must be between " << 1 << " and " << 10 << std::endl;
   }
@@ -31,7 +31,7 @@ void Filter::SetFcMod(double val) { m_fc_mod = val; }
 void Filter::SetType(unsigned int type) {
   if (type < NUM_FILTER_TYPES) {
     m_filter_type = type;
-    Update();
+    // Update();
   } else {
     std::cout << "Type must be between 0 and " << NUM_FILTER_TYPES - 1
               << std::endl;

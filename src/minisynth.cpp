@@ -306,7 +306,7 @@ void MiniSynth::LoadDefaults() {
   m_settings.m_lfo2_pulsewidth_enabled = false;
 
   m_settings.m_fc_control = FILTER_FC_MAX;
-  m_settings.m_q_control = FILTER_Q_DEFAULT;
+  m_settings.m_q_control = 1;
 
   /// EG1 //////////////////////////////////////////
   m_settings.m_eg1_osc_intensity = 0.7;
@@ -1406,10 +1406,10 @@ void MiniSynth::SetFilterFc(double val) {
 }
 
 void MiniSynth::SetFilterFq(double val) {
-  if (val >= 0.5 && val <= 10)
+  if (val >= 1 && val <= 10)
     m_settings.m_q_control = val;
   else
-    printf("val must be between 0.5 and 10\n");
+    printf("val must be between 1 and 10\n");
 }
 
 void MiniSynth::SetFilterType(unsigned int val) {
