@@ -40,7 +40,26 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
 }
 
 void DrumSynth::SetParam(std::string name, double val) {
-  if (name == "volume") settings_.volume = val;
+  if (name == "volume")
+    settings_.volume = val;
+  else if (name == "bd_vol")
+    settings_.bd_vol = val;
+  else if (name == "bd_pan")
+    settings_.bd_pan = val;
+  else if (name == "bd_tone")
+    settings_.bd_tone = val;
+  else if (name == "bd_decay")
+    settings_.bd_decay = val;
+  else if (name == "bd_octave")
+    settings_.bd_octave = val;
+  else if (name == "bd_key")
+    settings_.bd_key = val;
+  else if (name == "bd_detune")
+    settings_.bd_detune_cents = val;
+  else if (name == "bd_hard_sync")
+    settings_.bd_hard_sync = val;
+  else if (name == "bd_dist")
+    settings_.bd_distortion_threshold = val;
   Update();
 }
 
@@ -49,10 +68,17 @@ std::string DrumSynth::Info() {
   if (!active || volume == 0)
     ss << ANSI_COLOR_RESET;
   else
-    ss << COOL_COLOR_YELLOW_MELLOW;
-  ss << "DrumZynth - " << COOL_COLOR_PINK2 << settings_.name
-     << COOL_COLOR_YELLOW_MELLOW << " - vol:" << volume << " pan:" << pan
-     << std::endl;
+    ss << COOL_COLOR_PINK2;
+  ss << "DrumZynth - " << settings_.name << " - vol:" << volume
+     << " pan:" << pan << std::endl;
+  ss << COOL_COLOR_YELLOW_MELLOW "     bd(0): bd_vol:" << settings_.bd_vol
+     << " bd_pan:" << settings_.bd_pan << " bd_tone:" << settings_.bd_tone
+     << " bd_decay:" << settings_.bd_decay << std::endl;
+  ss << "     bd_octave:" << settings_.bd_octave
+     << " bd_key:" << settings_.bd_key
+     << " bd_detune:" << settings_.bd_detune_cents
+     << " bd_hard_sync:" << settings_.bd_hard_sync
+     << " bd_dist:" << settings_.bd_distortion_threshold << std::endl;
 
   return ss.str();
 }
@@ -156,7 +182,16 @@ void DrumSynth::Save(std::string new_preset_name) {
 void DrumSynth::Update() {
   // GLOBALS
   volume = settings_.volume;
-  // distortion_.SetParam("threshold", settings_.distortion_threshold);
+  bd_->dca_.m_amplitude_control = settings_.bd_vol;
+  bd_->dca_.m_pan_control = settings_.bd_pan;
+  bd_->out_filter_->SetFcControl(settings_.bd_tone);
+  bd_->eg_.SetDecayTimeMsec(settings_.bd_decay);
+  bd_->frequency_ =
+      Midi2Freq((settings_.bd_octave + 1) * 12 + (settings_.bd_key % 12));
+  bd_->osc1_->m_cents = settings_.bd_detune_cents;
+  bd_->osc2_->m_cents = -(settings_.bd_detune_cents);
+  bd_->hard_sync_ = settings_.bd_hard_sync;
+  bd_->distortion_.SetParam("threshold", settings_.bd_distortion_threshold);
 
   // //// TRANSIENT
   // noise_->m_amplitude = settings_.noise_amp;

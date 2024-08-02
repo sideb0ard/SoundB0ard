@@ -38,9 +38,7 @@ class BassDrum : public DrumModule {
   void NoteOn(double amp) override;
   StereoVal Generate() override;
 
- private:
   bool hard_sync_{false};
-  double detune_cents_{0};
   double frequency_{kDefaultKickFrequency};
 
   std::unique_ptr<QBLimitedOscillator> noise_;
@@ -57,7 +55,7 @@ class BassDrum : public DrumModule {
 
   std::unique_ptr<CKThreeFive> out_filter_;
 
-  DCA out_;
+  DCA dca_;
 };
 
 class SquareOscillatorBank {

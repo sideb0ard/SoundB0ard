@@ -8,14 +8,14 @@ BassDrum::BassDrum() {
   // TRANSIENT
   noise_ = std::make_unique<QBLimitedOscillator>();
   noise_->m_waveform = NOISE;
-  noise_->m_amplitude = 0.4;
+  noise_->m_amplitude = 0.3;
   noise_->Update();
 
   noise_eg_.SetRampMode(true);
   noise_eg_.m_reset_to_zero = true;
   noise_eg_.SetEgMode(DIGITAL);
   noise_eg_.SetAttackTimeMsec(1);
-  noise_eg_.SetDecayTimeMsec(10);
+  noise_eg_.SetDecayTimeMsec(7);
   noise_eg_.Update();
 
   noise_filter_ = std::make_unique<CKThreeFive>();
@@ -46,6 +46,10 @@ BassDrum::BassDrum() {
 
   distortion_.SetParam("threshold", 0.5);
   out_filter_ = std::make_unique<CKThreeFive>();
+  out_filter_->SetType(LPF2);
+  out_filter_->SetFcControl(10000);
+  out_filter_->SetQControlGUI(1);
+  out_filter_->Update();
 }
 
 void BassDrum::NoteOn(double amp) {
@@ -88,28 +92,10 @@ StereoVal BassDrum::Generate() {
     osc2_->Update();
 
     double osc1_out = osc1_->DoOscillate(nullptr);
+    if (osc1_->just_wrapped) osc2_->StartOscillator();
     double osc2_out = osc2_->DoOscillate(nullptr);
 
     double osc_mix = 0.5 * osc1_out + 0.5 * osc2_out + noise_out;
-    // if (settings_.hard_sync) {
-    //   osc1_->DoOscillate(nullptr);
-    //   if (osc1_->just_wrapped) osc2_->StartOscillator();
-    //   double osc2_out = osc2_->DoOscillate(nullptr) * settings_.osc2_amp;
-    //   if (settings_.filter2_enable) {
-    //     osc2_out = filter2_->DoFilter(osc2_out);
-    //   }
-    //   osc_mix = 0.666 * osc2_out + 0.333 * osc3_out;
-    // } else {
-    //   double osc1_out = osc1_->DoOscillate(nullptr) * settings_.osc1_amp;
-    //   if (settings_.filter1_enable) {
-    //     osc1_out = filter1_->DoFilter(osc1_out);
-    //   }
-    //   double osc2_out = osc2_->DoOscillate(nullptr) * settings_.osc2_amp;
-    //   if (settings_.filter2_enable) {
-    //     osc2_out = filter2_->DoFilter(osc2_out);
-    //   }
-    //   osc_mix = 0.5 * osc1_out + 0.5 * osc2_out;
-    // }
 
     //// OUTPUT //////////////////////////
 
@@ -121,9 +107,9 @@ StereoVal BassDrum::Generate() {
     double out_right = 0.0;
 
     double dca_mod_val = amp_eg_out;
-    out_.SetEgMod(dca_mod_val);
-    out_.Update();
-    out_.DoDCA(osc_out, osc_out, &out_left, &out_right);
+    dca_.SetEgMod(dca_mod_val);
+    dca_.Update();
+    dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
 
     out = {.left = out_left, .right = out_right};
     out = distortion_.Process(out);

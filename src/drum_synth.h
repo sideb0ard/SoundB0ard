@@ -20,13 +20,15 @@ struct DrumSettings {
   double volume{1};
 
   // 0 - BassDrum Settings
+  double bd_vol{1};
+  double bd_pan{0};
+  double bd_tone{10000};
+  double bd_decay{1000};
+  int bd_octave{1};
+  int bd_key{7};
+  double bd_detune_cents{0};
   double bd_distortion_threshold{0.5};
   bool bd_hard_sync{false};
-  double bd_detune_cents{0};
-  int bd_octave{0};
-  int bd_key{0};
-  double bd_tone{0};
-  double bd_decay{0};
 
   // 1 - SnareDum Settings
   double sd_tone{0};
@@ -64,7 +66,7 @@ class DrumSynth : public SoundGenerator {
 
   DrumSettings settings_;
 
-  std::unique_ptr<DrumModule> bd_;
+  std::unique_ptr<BassDrum> bd_;
 
   DCA dca_;
 };

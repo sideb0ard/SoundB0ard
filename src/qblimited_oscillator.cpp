@@ -79,7 +79,7 @@ inline void QBLimitedOscillator::Reset() {
     m_modulo = 0.5;
 }
 void QBLimitedOscillator::StartOscillator() {
-  Oscillator::Reset();
+  Reset();
   m_note_on = true;
 }
 
