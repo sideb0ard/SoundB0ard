@@ -21,10 +21,9 @@ std::string GetOscType(int type) {
 namespace SBAudio {
 
 DrumSynth::DrumSynth() {
-  // default
-  // LoadSettings(DrumSettings());
   bd_ = std::make_unique<BassDrum>();
 
+  LoadSettings(DrumSettings());
   active = true;
 }
 
@@ -48,6 +47,12 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.bd_pan = val;
   else if (name == "bd_tone")
     settings_.bd_tone = val;
+  else if (name == "bd_q")
+    settings_.bd_q = val;
+  else if (name == "bd_ntone")
+    settings_.bd_tone = val;
+  else if (name == "bd_nq")
+    settings_.bd_q = val;
   else if (name == "bd_decay")
     settings_.bd_decay = val;
   else if (name == "bd_octave")
@@ -72,12 +77,13 @@ std::string DrumSynth::Info() {
   ss << "DrumZynth - " << settings_.name << " - vol:" << volume
      << " pan:" << pan << std::endl;
   ss << COOL_COLOR_YELLOW_MELLOW "     bd(0): bd_vol:" << settings_.bd_vol
-     << " bd_pan:" << settings_.bd_pan << " bd_tone:" << settings_.bd_tone
-     << " bd_decay:" << settings_.bd_decay << std::endl;
-  ss << "     bd_octave:" << settings_.bd_octave
-     << " bd_key:" << settings_.bd_key
+     << " bd_pan:" << settings_.bd_pan << " bd_nvol:" << settings_.bd_noise_vol
+     << " bd_octave:" << settings_.bd_octave << " bd_key:" << settings_.bd_key
      << " bd_detune:" << settings_.bd_detune_cents
-     << " bd_hard_sync:" << settings_.bd_hard_sync
+     << " bd_hard_sync:" << settings_.bd_hard_sync << std::endl;
+  ss << "     bd_tone:" << settings_.bd_tone << " bd_q:" << settings_.bd_q
+     << " bd_ntone:" << settings_.bd_ntone << " bd_nq:" << settings_.bd_nq
+     << " bd_decay:" << settings_.bd_decay
      << " bd_dist:" << settings_.bd_distortion_threshold << std::endl;
 
   return ss.str();
@@ -140,39 +146,21 @@ void DrumSynth::Save(std::string new_preset_name) {
   std::ofstream presetzzz;
   const std::string kSEP = "::";
   presetzzz.open(DRUM_PRESET_FILENAME, std::ios::app);
-  //  presetzzz << "name=" << settings_.name << kSEP;
-  //  presetzzz << "volume=" << settings_.volume << kSEP;
-  //  presetzzz << "pan=" << settings_.pan << kSEP;
-  //  presetzzz << "distortion_threshold=" << settings_.distortion_threshold
-  //            << kSEP;
-  //  presetzzz << "hard_sync=" << settings_.hard_sync << kSEP;
-  //  presetzzz << "detune_cents=" << settings_.detune_cents << kSEP;
-  //  presetzzz << "pulse_width_pct=" << settings_.pulse_width_pct << kSEP;
-  //
-  //  presetzzz << "noise_amp=" << settings_.noise_amp << kSEP;
-  //  presetzzz << "noise_eg_attack_ms=" << settings_.noise_eg_attack_ms <<
-  //  kSEP; presetzzz << "noise_eg_decay_ms=" << settings_.noise_eg_decay_ms <<
-  //  kSEP; presetzzz << "noise_eg_mode=" << settings_.noise_eg_mode << kSEP;
-  //  presetzzz << "noise_filter_type=" << settings_.noise_filter_type << kSEP;
-  //  presetzzz << "noise_filter_fc=" << settings_.noise_filter_fc << kSEP;
-  //  presetzzz << "noise_filter_q=" << settings_.noise_filter_q << kSEP;
-  //
-  //  // OSCILLATORS
-  //  presetzzz << "osc1_wav=" << settings_.osc1_wav << kSEP;
-  //  presetzzz << "osc1_amp=" << settings_.osc1_amp << kSEP;
-  //  presetzzz << "osc1_ratio=" << settings_.osc1_ratio << kSEP;
-  //  presetzzz << "osc_eg_attack_ms=" << settings_.osc_eg_attack_ms << kSEP;
-  //  presetzzz << "osc_eg_decay_ms=" << settings_.osc_eg_decay_ms << kSEP;
-  //  presetzzz << "osc_eg_mode=" << settings_.osc_eg_mode << kSEP;
-  //
-  //  // OUTPUT
-  //  presetzzz << "amp_eg_attack_ms=" << settings_.amp_eg_attack_ms << kSEP;
-  //  presetzzz << "amp_eg_decay_ms=" << settings_.amp_eg_decay_ms << kSEP;
-  //  presetzzz << "amp_eg_mode=" << settings_.amp_eg_mode << kSEP;
-  //  presetzzz << "amp_filter_type=" << settings_.amp_filter_type << kSEP;
-  //  presetzzz << "amp_filter_fc=" << settings_.amp_filter_fc << kSEP;
-  //  presetzzz << "amp_filter_q=" << settings_.amp_filter_q << kSEP;
-  //
+  presetzzz << "name=" << settings_.name << kSEP;
+  presetzzz << "volume=" << settings_.volume << kSEP;
+  presetzzz << "bd_vol=" << settings_.bd_vol << kSEP;
+  presetzzz << "bd_pan=" << settings_.bd_pan << kSEP;
+  presetzzz << "bd_nvol=" << settings_.bd_noise_vol << kSEP;
+  presetzzz << "bd_octave=" << settings_.bd_octave << kSEP;
+  presetzzz << "bd_key=" << settings_.bd_key << kSEP;
+  presetzzz << "bd_detune=" << settings_.bd_detune_cents << kSEP;
+  presetzzz << "bd_hard_sync=" << settings_.bd_hard_sync << kSEP;
+  presetzzz << "bd_tone=" << settings_.bd_tone << kSEP;
+  presetzzz << "bd_q=" << settings_.bd_q << kSEP;
+  presetzzz << "bd_ntone=" << settings_.bd_ntone << kSEP;
+  presetzzz << "bd_nq=" << settings_.bd_nq << kSEP;
+  presetzzz << "bd_decay=" << settings_.bd_decay << kSEP;
+  presetzzz << "bd_dist=" << settings_.bd_distortion_threshold << kSEP;
   presetzzz << std::endl;
   presetzzz.close();
 
@@ -180,11 +168,14 @@ void DrumSynth::Save(std::string new_preset_name) {
 }
 
 void DrumSynth::Update() {
-  // GLOBALS
   volume = settings_.volume;
   bd_->dca_.m_amplitude_control = settings_.bd_vol;
   bd_->dca_.m_pan_control = settings_.bd_pan;
+  bd_->noise_->m_amplitude = settings_.bd_noise_vol;
   bd_->out_filter_->SetFcControl(settings_.bd_tone);
+  bd_->out_filter_->SetQControl(settings_.bd_q);
+  bd_->noise_filter_->SetFcControl(settings_.bd_ntone);
+  bd_->noise_filter_->SetQControl(settings_.bd_nq);
   bd_->eg_.SetDecayTimeMsec(settings_.bd_decay);
   bd_->frequency_ =
       Midi2Freq((settings_.bd_octave + 1) * 12 + (settings_.bd_key % 12));
@@ -192,44 +183,6 @@ void DrumSynth::Update() {
   bd_->osc2_->m_cents = -(settings_.bd_detune_cents);
   bd_->hard_sync_ = settings_.bd_hard_sync;
   bd_->distortion_.SetParam("threshold", settings_.bd_distortion_threshold);
-
-  // //// TRANSIENT
-  // noise_->m_amplitude = settings_.noise_amp;
-  // noise_->Update();
-  // noise_filter_->SetType(settings_.noise_filter_type);
-  // noise_filter_->SetFcControl(settings_.noise_filter_fc);
-  // noise_filter_->SetQControlGUI(settings_.noise_filter_q);
-  // noise_filter_->Update();
-  // noise_eg_.SetEgMode(settings_.noise_eg_mode);
-  // noise_eg_.SetAttackTimeMsec(settings_.noise_eg_attack_ms);
-  // noise_eg_.SetDecayTimeMsec(settings_.noise_eg_decay_ms);
-  // noise_eg_.Update();
-
-  // // PITCH
-  // osc1_->m_waveform = settings_.osc1_wav;
-  // osc1_->m_amplitude = settings_.osc1_amp;
-  // osc1_->m_fo_ratio = settings_.osc1_ratio;
-  // osc1_->m_pulse_width_control = settings_.pulse_width_pct;
-  // osc1_->Update();
-  // osc_eg_.SetEgMode(settings_.osc_eg_mode);
-  // osc_eg_.SetAttackTimeMsec(settings_.osc_eg_attack_ms);
-  // osc_eg_.SetDecayTimeMsec(settings_.osc_eg_decay_ms);
-  // osc_eg_.Update();
-
-  // // OUTPUT
-  // amp_filter_->SetType(settings_.amp_filter_type);
-  // amp_filter_->SetFcControl(settings_.amp_filter_fc);
-  // amp_filter_->SetQControlGUI(settings_.amp_filter_q);
-  // amp_filter_->Update();
-  // amp_eg_.SetEgMode(settings_.amp_eg_mode);
-  // amp_eg_.SetAttackTimeMsec(settings_.amp_eg_attack_ms);
-  // amp_eg_.SetDecayTimeMsec(settings_.amp_eg_decay_ms);
-  // amp_eg_.Update();
-
-  // lfo_.m_waveform = settings_.lfo_wave;
-  // lfo_.m_lfo_mode = settings_.lfo_mode;
-  // lfo_.m_fo = settings_.lfo_rate;
-  // lfo_.Update();
 }
 
 void DrumSynth::LoadSettings(DrumSettings settings) {
@@ -256,56 +209,34 @@ DrumSettings Map2DrumSettings(std::string name,
 
   for (auto &[key, dval] : preset_vals) {
     // std::cout << "KEY:" << key << " VAL:" << dval << std::endl;
-    if (key == "volume") preset.volume = dval;
-    // else if (key == "pan")
-    //   preset.pan = dval;
-    // else if (key == "hard_sync")
-    //   preset.hard_sync = dval;
-    // else if (key == "detune_cents")
-    //   preset.detune_cents = dval;
-    // else if (key == "distortion_threshold")
-    //   preset.distortion_threshold = dval;
-
-    // else if (key == "noise_amp")
-    //   preset.noise_amp = dval;
-    // else if (key == "noise_eg_attack_ms")
-    //   preset.noise_eg_attack_ms = dval;
-    // else if (key == "noise_eg_decay_ms")
-    //   preset.noise_eg_decay_ms = dval;
-    // else if (key == "noise_eg_mode")
-    //   preset.noise_eg_mode = dval;
-    // else if (key == "noise_filter_type")
-    //   preset.noise_filter_type = dval;
-    // else if (key == "noise_filter_fc")
-    //   preset.noise_filter_fc = dval;
-    // else if (key == "noise_filter_q")
-    //   preset.noise_filter_q = dval;
-
-    // else if (key == "osc1_wav")
-    //   preset.osc1_wav = dval;
-    // else if (key == "osc1_amp")
-    //   preset.osc1_amp = dval;
-    // else if (key == "osc1_ratio")
-    //   preset.osc1_ratio = dval;
-    // else if (key == "osc_eg_attack_ms")
-    //   preset.osc_eg_attack_ms = dval;
-    // else if (key == "osc_eg_decay_ms")
-    //   preset.osc_eg_decay_ms = dval;
-    // else if (key == "osc_eg_mode")
-    //   preset.osc_eg_mode = dval;
-
-    // else if (key == "amp_eg_attack_ms")
-    //   preset.amp_eg_attack_ms = dval;
-    // else if (key == "amp_eg_decay_ms")
-    //   preset.amp_eg_decay_ms = dval;
-    // else if (key == "amp_eg_mode")
-    //   preset.amp_eg_mode = dval;
-    // else if (key == "amp_filter_type")
-    //   preset.amp_filter_type = dval;
-    // else if (key == "amp_filter_fc")
-    //   preset.amp_filter_fc = dval;
-    // else if (key == "amp_filter_q")
-    //   preset.amp_filter_q = dval;
+    if (key == "volume")
+      preset.volume = dval;
+    else if (key == "bd_vol")
+      preset.bd_vol = dval;
+    else if (key == "bd_pan")
+      preset.bd_pan = dval;
+    else if (key == "bd_nvol")
+      preset.bd_noise_vol = dval;
+    else if (key == "bd_octave")
+      preset.bd_octave = dval;
+    else if (key == "bd_key")
+      preset.bd_key = dval;
+    else if (key == "bd_detune")
+      preset.bd_detune_cents = dval;
+    else if (key == "bd_hard_sync")
+      preset.bd_hard_sync = dval;
+    else if (key == "bd_tone")
+      preset.bd_tone = dval;
+    else if (key == "bd_q")
+      preset.bd_q = dval;
+    else if (key == "bd_ntone")
+      preset.bd_ntone = dval;
+    else if (key == "bd_nq")
+      preset.bd_nq = dval;
+    else if (key == "bd_decay")
+      preset.bd_decay = dval;
+    else if (key == "bd_dist")
+      preset.bd_distortion_threshold = dval;
   }
 
   return preset;

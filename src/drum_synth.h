@@ -23,6 +23,10 @@ struct DrumSettings {
   double bd_vol{1};
   double bd_pan{0};
   double bd_tone{10000};
+  double bd_q{1};
+  double bd_noise_vol{0.3};
+  double bd_ntone{5000};
+  double bd_nq{1};
   double bd_decay{1000};
   int bd_octave{1};
   int bd_key{7};
