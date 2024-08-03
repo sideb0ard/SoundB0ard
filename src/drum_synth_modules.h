@@ -16,12 +16,6 @@
 
 namespace SBAudio {
 
-const int kNumOscillators{6};
-const std::array<float, kNumOscillators> kOscFrequencies{263, 400, 421,
-                                                         474, 587, 845};
-const std::array<bool, kNumOscillators> kDefaultOscConfig{true, true, true,
-                                                          true, true, true};
-
 class DrumModule {
  public:
   virtual void NoteOn(double amp) = 0;
@@ -58,18 +52,45 @@ class BassDrum : public DrumModule {
   DCA dca_;
 };
 
+const int kNumOscillators{6};
+// const std::array<float, kNumOscillators> kOscFrequencies{263, 400, 421,
+//                                                          474, 587, 845};
+const std::array<float, kNumOscillators> kOscFrequencies{80,    120,   166.4,
+                                                         217.2, 271.6, 328.4};
+const std::array<bool, kNumOscillators> kDefaultOscConfig{true, true, true,
+                                                          true, true, true};
+const float kSquareOscAmplitude = 0.4;
+
 class SquareOscillatorBank {
  public:
   SquareOscillatorBank();
   ~SquareOscillatorBank() = default;
 
-  double DoOutput();
+  double DoGenerate();
 
-  void Start();
+  void Start(double amp);
   void Stop();
+
+  bool IsNoteOn();
 
  private:
   std::vector<std::unique_ptr<QBLimitedOscillator>> oscillators_;
+};
+
+class HiHat : public DrumModule {
+ public:
+  HiHat();
+  virtual ~HiHat() = default;
+
+  void NoteOn(double amp) override;
+  StereoVal Generate() override;
+
+  SquareOscillatorBank osc_bank_;
+  double osc_amp_{kSquareOscAmplitude};
+  std::unique_ptr<FilterSem> mid_filter_;
+  std::unique_ptr<FilterSem> high_filter_;
+  EnvelopeGenerator eg_;
+  DCA dca_;
 };
 
 }  // namespace SBAudio

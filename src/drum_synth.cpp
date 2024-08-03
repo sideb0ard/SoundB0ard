@@ -22,6 +22,7 @@ namespace SBAudio {
 
 DrumSynth::DrumSynth() {
   bd_ = std::make_unique<BassDrum>();
+  hh_ = std::make_unique<HiHat>();
 
   LoadSettings(DrumSettings());
   active = true;
@@ -34,6 +35,10 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   auto bd_out = bd_->Generate();
   out.left += bd_out.left;
   out.right += bd_out.right;
+
+  auto hh_out = hh_->Generate();
+  out.left += hh_out.left;
+  out.right += hh_out.right;
 
   return out;
 }
@@ -65,6 +70,22 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.bd_hard_sync = val;
   else if (name == "bd_dist")
     settings_.bd_distortion_threshold = val;
+
+  else if (name == "hh_vol")
+    settings_.hh_vol = val;
+  else if (name == "hh_pan")
+    settings_.hh_pan = val;
+  else if (name == "hh_attack")
+    settings_.hh_attack = val;
+  else if (name == "hh_decay")
+    settings_.hh_decay = val;
+  else if (name == "hh_sqamp")
+    settings_.hh_sqamp = val;
+  else if (name == "hh_midf")
+    settings_.hh_midf = val;
+  else if (name == "hh_hif")
+    settings_.hh_hif = val;
+
   Update();
 }
 
@@ -85,6 +106,11 @@ std::string DrumSynth::Info() {
      << " bd_ntone:" << settings_.bd_ntone << " bd_nq:" << settings_.bd_nq
      << " bd_decay:" << settings_.bd_decay
      << " bd_dist:" << settings_.bd_distortion_threshold << std::endl;
+  ss << COOL_COLOR_ORANGE "     hh(2): hh_vol:" << settings_.bd_vol
+     << " hh_pan:" << settings_.hh_pan << " hh_attack:" << settings_.hh_attack
+     << " hh_decay:" << settings_.hh_decay << " hh_sqamp:" << settings_.hh_sqamp
+     << " hh_midf:" << settings_.hh_midf << " hh_hif:" << settings_.hh_hif
+     << std::endl;
 
   return ss.str();
 }
@@ -124,8 +150,9 @@ void DrumSynth::NoteOn(midi_event ev) {
       // Bass Drum
       bd_->NoteOn(amplitude);
       break;
-    case (1):
-      // Snare Drum
+    case (2):
+      // Hi Hat
+      hh_->NoteOn(amplitude);
       break;
     default:
       std::cerr << "DrumSynth - num not implemented:" << drum_module_num
@@ -183,6 +210,14 @@ void DrumSynth::Update() {
   bd_->osc2_->m_cents = -(settings_.bd_detune_cents);
   bd_->hard_sync_ = settings_.bd_hard_sync;
   bd_->distortion_.SetParam("threshold", settings_.bd_distortion_threshold);
+
+  hh_->dca_.m_amplitude_control = settings_.hh_vol;
+  hh_->dca_.m_pan_control = settings_.hh_pan;
+  hh_->eg_.SetAttackTimeMsec(settings_.hh_decay);
+  hh_->eg_.SetDecayTimeMsec(settings_.hh_decay);
+  hh_->osc_amp_ = settings_.hh_sqamp;
+  hh_->mid_filter_->SetFcControl(settings_.hh_midf);
+  hh_->high_filter_->SetFcControl(settings_.hh_hif);
 }
 
 void DrumSynth::LoadSettings(DrumSettings settings) {

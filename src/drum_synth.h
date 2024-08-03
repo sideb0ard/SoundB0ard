@@ -39,8 +39,15 @@ struct DrumSettings {
   double sd_snappy{0};
 
   // 2 - Open hat Settings
-  double oh_decay;
+  double oh_decay{270};
   // 3 - Closed hat Settings
+  double hh_vol{1};
+  double hh_pan{0};
+  double hh_sqamp{0.5};
+  double hh_attack{1};
+  double hh_decay{27};
+  double hh_midf{10000};
+  double hh_hif{7000};
 };
 
 DrumSettings Map2DrumSettings(std::string name,
@@ -71,6 +78,7 @@ class DrumSynth : public SoundGenerator {
   DrumSettings settings_;
 
   std::unique_ptr<BassDrum> bd_;
+  std::unique_ptr<HiHat> hh_;
 
   DCA dca_;
 };

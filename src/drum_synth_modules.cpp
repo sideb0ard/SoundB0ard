@@ -127,10 +127,7 @@ StereoVal BassDrum::Generate() {
   return out;
 }
 
-const float kSquareOscAmplitude = 0.3;
-
 SquareOscillatorBank::SquareOscillatorBank() {
-  std::cout << "YO SQUARE OSC BANK!\n";
   for (const auto &f : kOscFrequencies) {
     auto osc = std::make_unique<QBLimitedOscillator>();
     osc->m_osc_fo = f;
@@ -140,8 +137,9 @@ SquareOscillatorBank::SquareOscillatorBank() {
   }
 }
 
-void SquareOscillatorBank::Start() {
+void SquareOscillatorBank::Start(double amp) {
   for (const auto &o : oscillators_) {
+    o->m_amplitude = amp;
     o->StartOscillator();
   }
 }
@@ -151,13 +149,76 @@ void SquareOscillatorBank::Stop() {
     o->StopOscillator();
   }
 }
+bool SquareOscillatorBank::IsNoteOn() {
+  assert(oscillators_.size() > 0);
+  return oscillators_[0]->m_note_on;
+}
 
-double SquareOscillatorBank::DoOutput() {
+double SquareOscillatorBank::DoGenerate() {
   double out = 0;
   for (int i = 0; i < kNumOscillators; i++) {
-    if (kDefaultOscConfig[i]) out += oscillators_[i]->DoOscillate(nullptr);
+    if (kDefaultOscConfig[i]) {
+      oscillators_[i]->Update();
+      out += oscillators_[i]->DoOscillate(nullptr);
+    }
   }
   return out;
 }
 
+HiHat::HiHat() {
+  mid_filter_ = std::make_unique<FilterSem>();
+  mid_filter_->SetType(BPF2);
+  mid_filter_->SetFcControl(10000);
+  mid_filter_->SetQControlGUI(1);
+  mid_filter_->Update();
+
+  high_filter_ = std::make_unique<FilterSem>();
+  high_filter_->SetType(HPF2);
+  high_filter_->SetFcControl(7000);
+  high_filter_->SetQControlGUI(1);
+  high_filter_->Update();
+
+  eg_.SetRampMode(true);
+  eg_.m_reset_to_zero = true;
+  eg_.SetEgMode(ANALOG);
+  eg_.SetAttackTimeMsec(1);
+  eg_.SetDecayTimeMsec(27);
+  eg_.Update();
+}
+
+void HiHat::NoteOn(double amp) {
+  osc_bank_.Start(amp);
+  eg_.StartEg();
+}
+
+StereoVal HiHat::Generate() {
+  StereoVal out = {.left = 0, .right = 0};
+  if (osc_bank_.IsNoteOn()) {
+    double square_out = osc_bank_.DoGenerate();
+    mid_filter_->Update();
+    double mid_out = mid_filter_->DoFilter(square_out);
+
+    high_filter_->Update();
+    double hi_out = high_filter_->DoFilter(mid_out);
+
+    double eg_out = eg_.DoEnvelope(nullptr);
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    double dca_mod_val = eg_out;
+    dca_.SetEgMod(dca_mod_val);
+    dca_.Update();
+    dca_.DoDCA(hi_out, hi_out, &out_left, &out_right);
+
+    out = {.left = out_left, .right = out_right};
+  }
+
+  if (eg_.GetState() == OFFF) {
+    osc_bank_.Stop();
+    eg_.StopEg();
+  }
+
+  return out;
+}
 }  // namespace SBAudio
