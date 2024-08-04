@@ -95,6 +95,7 @@ class SquareOscillatorBank {
   void Start();
   void Stop();
 
+  void SetAmplitude(double amp);
   bool IsNoteOn();
 
  private:
@@ -109,8 +110,9 @@ class HiHat : public DrumModule {
   void NoteOn(double vel) override;
   StereoVal Generate() override;
 
+  void SetAmplitude(double val);
+
   SquareOscillatorBank osc_bank_;
-  double osc_amp_{kSquareOscAmplitude};
   std::unique_ptr<FilterSem> mid_filter_;
   std::unique_ptr<FilterSem> high_filter_;
   EnvelopeGenerator eg_;

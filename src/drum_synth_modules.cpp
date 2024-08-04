@@ -251,6 +251,11 @@ bool SquareOscillatorBank::IsNoteOn() {
   assert(oscillators_.size() > 0);
   return oscillators_[0]->m_note_on;
 }
+void SquareOscillatorBank::SetAmplitude(double amp) {
+  for (int i = 0; i < kNumOscillators; i++) {
+    oscillators_[i]->m_amplitude = amp;
+  }
+}
 
 double SquareOscillatorBank::DoGenerate() {
   double out = 0;
@@ -283,6 +288,8 @@ HiHat::HiHat() {
   eg_.SetDecayTimeMsec(27);
   eg_.Update();
 }
+
+void HiHat::SetAmplitude(double val) { osc_bank_.SetAmplitude(val); }
 
 void HiHat::NoteOn(double vel) {
   velocity_ = vel;

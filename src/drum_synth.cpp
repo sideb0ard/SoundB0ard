@@ -256,7 +256,7 @@ void DrumSynth::Update() {
   hh_->dca_.m_pan_control = settings_.hh_pan;
   hh_->eg_.SetAttackTimeMsec(settings_.hh_decay);
   hh_->eg_.SetDecayTimeMsec(settings_.hh_decay);
-  hh_->osc_amp_ = settings_.hh_sqamp;
+  hh_->SetAmpltiude(settings_.hh_sqamp);
   hh_->mid_filter_->SetFcControl(settings_.hh_midf);
   hh_->high_filter_->SetFcControl(settings_.hh_hif);
 }
