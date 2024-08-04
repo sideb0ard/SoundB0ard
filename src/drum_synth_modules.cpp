@@ -127,6 +127,108 @@ StereoVal BassDrum::Generate() {
   return out;
 }
 
+SnareDrum::SnareDrum() {
+  // TRANSIENT
+  noise_ = std::make_unique<QBLimitedOscillator>();
+  noise_->m_waveform = NOISE;
+  noise_->m_amplitude = 0.6;
+  noise_->Update();
+
+  noise_eg_.SetRampMode(true);
+  noise_eg_.m_reset_to_zero = true;
+  noise_eg_.SetEgMode(DIGITAL);
+  noise_eg_.SetAttackTimeMsec(1);
+  noise_eg_.SetDecayTimeMsec(7);
+  noise_eg_.Update();
+
+  noise_filter_ = std::make_unique<CKThreeFive>();
+  noise_filter_->SetType(HPF2);
+  noise_filter_->SetFcControl(1000);
+  noise_filter_->SetQControlGUI(1);
+  noise_filter_->Update();
+
+  // PITCH
+  osc1_ = std::make_unique<QBLimitedOscillator>();
+  osc1_->m_waveform = SINE;
+  osc1_->m_osc_fo = kHighSnareFreq;
+  osc1_->m_amplitude = 1;
+  osc1_->Update();
+
+  osc2_ = std::make_unique<QBLimitedOscillator>();
+  osc1_->m_waveform = SINE;
+  osc1_->m_osc_fo = kLowSnareFreq;
+  osc2_->m_amplitude = 1;
+  osc2_->Update();
+
+  eg_.SetRampMode(true);
+  eg_.m_reset_to_zero = true;
+  eg_.SetEgMode(ANALOG);
+  eg_.SetAttackTimeMsec(1);
+  eg_.SetDecayTimeMsec(100);
+  eg_.Update();
+}
+
+void SnareDrum::NoteOn(double amp) {
+  noise_->StartOscillator();
+  noise_eg_.StartEg();
+
+  osc1_->m_amplitude = amp;
+  osc1_->StartOscillator();
+
+  osc2_->m_amplitude = amp;
+  osc2_->StartOscillator();
+
+  eg_.StartEg();
+}
+
+StereoVal SnareDrum::Generate() {
+  StereoVal out = {.left = 0, .right = 0};
+  if (osc1_->m_note_on) {
+    // Transient
+    noise_->Update();
+    double noise_eg_out = noise_eg_.DoEnvelope(nullptr);
+    double noise_out = noise_->DoOscillate(nullptr) * noise_eg_out;
+    noise_filter_->Update();
+    noise_out = noise_filter_->DoFilter(noise_out);
+
+    // OSCILLATORS
+
+    osc1_->Update();
+    osc2_->Update();
+
+    double osc1_out = osc1_->DoOscillate(nullptr);
+    double osc2_out = osc2_->DoOscillate(nullptr);
+
+    double osc_out = 0.5 * osc1_out + 0.5 * osc2_out + noise_out;
+
+    //// OUTPUT //////////////////////////
+
+    // FILTER ////////////////////
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    double amp_eg_out = eg_.DoEnvelope(nullptr);
+    double dca_mod_val = amp_eg_out;
+    dca_.SetEgMod(dca_mod_val);
+    dca_.Update();
+    dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
+
+    out = {.left = out_left, .right = out_right};
+  }
+
+  if (eg_.GetState() == OFFF) {
+    osc1_->StopOscillator();
+    osc2_->StopOscillator();
+    noise_->StopOscillator();
+
+    eg_.StopEg();
+    noise_eg_.StopEg();
+  }
+
+  return out;
+}
+
 SquareOscillatorBank::SquareOscillatorBank() {
   for (const auto &f : kOscFrequencies) {
     auto osc = std::make_unique<QBLimitedOscillator>();

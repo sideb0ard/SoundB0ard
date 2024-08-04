@@ -22,6 +22,7 @@ namespace SBAudio {
 
 DrumSynth::DrumSynth() {
   bd_ = std::make_unique<BassDrum>();
+  sd_ = std::make_unique<SnareDrum>();
   hh_ = std::make_unique<HiHat>();
 
   LoadSettings(DrumSettings());
@@ -39,6 +40,10 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   auto hh_out = hh_->Generate();
   out.left += hh_out.left;
   out.right += hh_out.right;
+
+  auto snare_out = sd_->Generate();
+  out.left += snare_out.left;
+  out.right += snare_out.right;
 
   return out;
 }
@@ -149,6 +154,10 @@ void DrumSynth::NoteOn(midi_event ev) {
     case (0):
       // Bass Drum
       bd_->NoteOn(amplitude);
+      break;
+    case (1):
+      // Snare Drum
+      sd_->NoteOn(amplitude);
       break;
     case (2):
       // Hi Hat

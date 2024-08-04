@@ -52,6 +52,30 @@ class BassDrum : public DrumModule {
   DCA dca_;
 };
 
+const float kHighSnareFreq = 476;
+const float kLowSnareFreq = 238;
+
+class SnareDrum : public DrumModule {
+ public:
+  SnareDrum();
+  virtual ~SnareDrum() = default;
+
+  void NoteOn(double amp) override;
+  StereoVal Generate() override;
+
+  std::unique_ptr<QBLimitedOscillator> noise_;
+  EnvelopeGenerator noise_eg_;
+  std::unique_ptr<CKThreeFive> noise_filter_;
+
+  std::unique_ptr<QBLimitedOscillator> osc1_;
+  std::unique_ptr<QBLimitedOscillator> osc2_;
+
+  // used for Oscillator pitch and DCA amplitude
+  EnvelopeGenerator eg_;
+
+  DCA dca_;
+};
+
 const int kNumOscillators{6};
 // const std::array<float, kNumOscillators> kOscFrequencies{263, 400, 421,
 //                                                          474, 587, 845};

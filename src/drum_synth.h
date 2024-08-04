@@ -78,6 +78,7 @@ class DrumSynth : public SoundGenerator {
   DrumSettings settings_;
 
   std::unique_ptr<BassDrum> bd_;
+  std::unique_ptr<SnareDrum> sd_;
   std::unique_ptr<HiHat> hh_;
 
   DCA dca_;
