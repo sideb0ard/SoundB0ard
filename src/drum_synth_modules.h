@@ -18,8 +18,9 @@ namespace SBAudio {
 
 class DrumModule {
  public:
-  virtual void NoteOn(double amp) = 0;
+  virtual void NoteOn(double vel) = 0;
   virtual StereoVal Generate() = 0;
+  double velocity_{1};
 };
 
 const double kDefaultKickFrequency = 48.9994;  // G1
@@ -29,7 +30,7 @@ class BassDrum : public DrumModule {
   BassDrum();
   virtual ~BassDrum() = default;
 
-  void NoteOn(double amp) override;
+  void NoteOn(double vel) override;
   StereoVal Generate() override;
 
   bool hard_sync_{false};
@@ -60,7 +61,7 @@ class SnareDrum : public DrumModule {
   SnareDrum();
   virtual ~SnareDrum() = default;
 
-  void NoteOn(double amp) override;
+  void NoteOn(double vel) override;
   StereoVal Generate() override;
 
   std::unique_ptr<QBLimitedOscillator> noise_;
@@ -70,7 +71,6 @@ class SnareDrum : public DrumModule {
   std::unique_ptr<QBLimitedOscillator> osc1_;
   std::unique_ptr<QBLimitedOscillator> osc2_;
 
-  // used for Oscillator pitch and DCA amplitude
   EnvelopeGenerator eg_;
 
   DCA dca_;
@@ -92,7 +92,7 @@ class SquareOscillatorBank {
 
   double DoGenerate();
 
-  void Start(double amp);
+  void Start();
   void Stop();
 
   bool IsNoteOn();
@@ -106,7 +106,7 @@ class HiHat : public DrumModule {
   HiHat();
   virtual ~HiHat() = default;
 
-  void NoteOn(double amp) override;
+  void NoteOn(double vel) override;
   StereoVal Generate() override;
 
   SquareOscillatorBank osc_bank_;

@@ -52,15 +52,14 @@ BassDrum::BassDrum() {
   out_filter_->Update();
 }
 
-void BassDrum::NoteOn(double amp) {
+void BassDrum::NoteOn(double vel) {
+  velocity_ = vel;
   noise_->StartOscillator();
   noise_eg_.StartEg();
 
-  osc1_->m_amplitude = amp;
   osc1_->m_osc_fo = frequency_;
   osc1_->StartOscillator();
 
-  osc2_->m_amplitude = amp;
   osc2_->m_osc_fo = frequency_;
   osc2_->StartOscillator();
 
@@ -111,7 +110,7 @@ StereoVal BassDrum::Generate() {
     dca_.Update();
     dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
 
-    out = {.left = out_left, .right = out_right};
+    out = {.left = out_left * velocity_, .right = out_right * velocity_};
     out = distortion_.Process(out);
   }
 
@@ -138,7 +137,7 @@ SnareDrum::SnareDrum() {
   noise_eg_.m_reset_to_zero = true;
   noise_eg_.SetEgMode(DIGITAL);
   noise_eg_.SetAttackTimeMsec(1);
-  noise_eg_.SetDecayTimeMsec(7);
+  noise_eg_.SetDecayTimeMsec(27);
   noise_eg_.Update();
 
   noise_filter_ = std::make_unique<CKThreeFive>();
@@ -168,14 +167,12 @@ SnareDrum::SnareDrum() {
   eg_.Update();
 }
 
-void SnareDrum::NoteOn(double amp) {
+void SnareDrum::NoteOn(double vel) {
+  velocity_ = vel;
   noise_->StartOscillator();
   noise_eg_.StartEg();
 
-  osc1_->m_amplitude = amp;
   osc1_->StartOscillator();
-
-  osc2_->m_amplitude = amp;
   osc2_->StartOscillator();
 
   eg_.StartEg();
@@ -214,7 +211,7 @@ StereoVal SnareDrum::Generate() {
     dca_.Update();
     dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
 
-    out = {.left = out_left, .right = out_right};
+    out = {.left = out_left * velocity_, .right = out_right * velocity_};
   }
 
   if (eg_.GetState() == OFFF) {
@@ -239,9 +236,8 @@ SquareOscillatorBank::SquareOscillatorBank() {
   }
 }
 
-void SquareOscillatorBank::Start(double amp) {
+void SquareOscillatorBank::Start() {
   for (const auto &o : oscillators_) {
-    o->m_amplitude = amp;
     o->StartOscillator();
   }
 }
@@ -288,8 +284,9 @@ HiHat::HiHat() {
   eg_.Update();
 }
 
-void HiHat::NoteOn(double amp) {
-  osc_bank_.Start(amp);
+void HiHat::NoteOn(double vel) {
+  velocity_ = vel;
+  osc_bank_.Start();
   eg_.StartEg();
 }
 
@@ -313,7 +310,7 @@ StereoVal HiHat::Generate() {
     dca_.Update();
     dca_.DoDCA(hi_out, hi_out, &out_left, &out_right);
 
-    out = {.left = out_left, .right = out_right};
+    out = {.left = out_left * velocity_, .right = out_right * velocity_};
   }
 
   if (eg_.GetState() == OFFF) {

@@ -35,8 +35,14 @@ struct DrumSettings {
   bool bd_hard_sync{false};
 
   // 1 - SnareDum Settings
-  double sd_tone{0};
-  double sd_snappy{0};
+  double sd_vol{1};
+  double sd_pan{0};
+  double sd_noise_vol{0.5};
+  double sd_noise_decay{22};
+  double sd_tone{1000};
+  double sd_decay{50};
+  double sd_osc1_freq{476};
+  double sd_osc2_freq{238};
 
   // 2 - Open hat Settings
   double oh_decay{270};

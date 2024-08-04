@@ -91,6 +91,23 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "hh_hif")
     settings_.hh_hif = val;
 
+  else if (name == "sd_vol")
+    settings_.sd_vol = val;
+  else if (name == "sd_pan")
+    settings_.sd_pan = val;
+  else if (name == "sd_nvol")
+    settings_.sd_noise_vol = val;
+  else if (name == "sd_noise_decay")
+    settings_.sd_noise_decay = val;
+  else if (name == "sd_tone")
+    settings_.sd_tone = val;
+  else if (name == "sd_decay")
+    settings_.sd_decay = val;
+  else if (name == "sd_osc1_freq")
+    settings_.sd_osc1_freq = val;
+  else if (name == "sd_osc2_freq")
+    settings_.sd_osc2_freq = val;
+
   Update();
 }
 
@@ -111,7 +128,14 @@ std::string DrumSynth::Info() {
      << " bd_ntone:" << settings_.bd_ntone << " bd_nq:" << settings_.bd_nq
      << " bd_decay:" << settings_.bd_decay
      << " bd_dist:" << settings_.bd_distortion_threshold << std::endl;
-  ss << COOL_COLOR_ORANGE "     hh(2): hh_vol:" << settings_.bd_vol
+  ss << COOL_COLOR_ORANGE "     sd(1): sd_vol:" << settings_.sd_vol
+     << " sd_pan:" << settings_.sd_pan << " sd_nvol:" << settings_.sd_noise_vol
+     << " sd_noise_decay:" << settings_.sd_noise_decay
+     << " sd_tone:" << settings_.sd_tone << " sd_decay:" << settings_.sd_decay
+     << std::endl;
+  ss << "     sd_osc1_freq:" << settings_.sd_osc1_freq
+     << " sd_osc2_freq:" << settings_.sd_osc2_freq << std::endl;
+  ss << COOL_COLOR_YELLOW_MELLOW "     hh(2): hh_vol:" << settings_.bd_vol
      << " hh_pan:" << settings_.hh_pan << " hh_attack:" << settings_.hh_attack
      << " hh_decay:" << settings_.hh_decay << " hh_sqamp:" << settings_.hh_sqamp
      << " hh_midf:" << settings_.hh_midf << " hh_hif:" << settings_.hh_hif
@@ -146,22 +170,21 @@ void DrumSynth::NoteOff(midi_event ev) {}
 
 void DrumSynth::NoteOn(midi_event ev) {
   unsigned int drum_module_num = ev.data1;
-  unsigned int velocity = ev.data2;
 
-  double amplitude = scaleybum(0, 127, 0, 1, velocity);
+  double velocity = scaleybum(0, 127, 0, 1, ev.data2);
 
   switch (drum_module_num) {
     case (0):
       // Bass Drum
-      bd_->NoteOn(amplitude);
+      bd_->NoteOn(velocity);
       break;
     case (1):
       // Snare Drum
-      sd_->NoteOn(amplitude);
+      sd_->NoteOn(velocity);
       break;
     case (2):
       // Hi Hat
-      hh_->NoteOn(amplitude);
+      hh_->NoteOn(velocity);
       break;
     default:
       std::cerr << "DrumSynth - num not implemented:" << drum_module_num
@@ -219,6 +242,15 @@ void DrumSynth::Update() {
   bd_->osc2_->m_cents = -(settings_.bd_detune_cents);
   bd_->hard_sync_ = settings_.bd_hard_sync;
   bd_->distortion_.SetParam("threshold", settings_.bd_distortion_threshold);
+
+  sd_->dca_.m_amplitude_control = settings_.sd_vol;
+  sd_->dca_.m_pan_control = settings_.sd_pan;
+  sd_->noise_->m_amplitude = settings_.sd_noise_vol;
+  sd_->noise_eg_.SetDecayTimeMsec(settings_.sd_noise_decay);
+  sd_->noise_filter_->SetFcControl(settings_.sd_tone);
+  sd_->eg_.SetDecayTimeMsec(settings_.sd_decay);
+  sd_->osc1_->m_osc_fo = settings_.sd_osc1_freq;
+  sd_->osc2_->m_osc_fo = -(settings_.sd_osc2_freq);
 
   hh_->dca_.m_amplitude_control = settings_.hh_vol;
   hh_->dca_.m_pan_control = settings_.hh_pan;
