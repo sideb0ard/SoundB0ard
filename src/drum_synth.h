@@ -44,16 +44,30 @@ struct DrumSettings {
   double sd_osc1_freq{476};
   double sd_osc2_freq{238};
 
-  // 2 - Open hat Settings
-  double oh_decay{270};
-  // 3 - Closed hat Settings
+  // 2 - Closed hat Settings
   double hh_vol{1};
   double hh_pan{0};
   double hh_sqamp{0.5};
-  double hh_attack{1};
-  double hh_decay{27};
+  double hh_attack{20};
+  double hh_decay{10};
   double hh_midf{10000};
-  double hh_hif{7000};
+  double hh_hif{6000};
+  double hh_hif_q{1};
+
+  // r32 - Clap
+  double cp_vol{1};
+  double cp_pan{0};
+  double cp_nvol{0.6};
+  double cp_nattack{10};
+  double cp_ndecay{207};
+  double cp_tone{1000};
+  double cp_fq{5};
+  double cp_eg_attack{10};
+  double cp_eg_decay{100};
+  double cp_eg_sustain{0.3};
+  double cp_eg_release{100};
+  int cp_lfo_type{usaw};
+  double cp_lfo_rate{5};
 };
 
 DrumSettings Map2DrumSettings(std::string name,
@@ -86,6 +100,7 @@ class DrumSynth : public SoundGenerator {
   std::unique_ptr<BassDrum> bd_;
   std::unique_ptr<SnareDrum> sd_;
   std::unique_ptr<HiHat> hh_;
+  std::unique_ptr<HandClap> cp_;
 
   DCA dca_;
 };

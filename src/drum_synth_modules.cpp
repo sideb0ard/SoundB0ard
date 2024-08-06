@@ -226,6 +226,93 @@ StereoVal SnareDrum::Generate() {
   return out;
 }
 
+///// CLAP /////////////////////////////
+
+HandClap::HandClap() {
+  noise_ = std::make_unique<QBLimitedOscillator>();
+  noise_->m_waveform = NOISE;
+  noise_->m_amplitude = 0.6;
+  noise_->Update();
+
+  noise_eg_.SetRampMode(true);
+  noise_eg_.m_reset_to_zero = true;
+  noise_eg_.SetEgMode(DIGITAL);
+  noise_eg_.SetAttackTimeMsec(10);
+  noise_eg_.SetDecayTimeMsec(207);
+  noise_eg_.Update();
+
+  noise_filter_ = std::make_unique<FilterSem>();
+  noise_filter_->SetType(BPF2);
+  noise_filter_->SetFcControl(1000);
+  noise_filter_->SetQControlGUI(5);
+  noise_filter_->Update();
+
+  eg_.SetRampMode(true);
+  eg_.m_reset_to_zero = true;
+  eg_.SetEgMode(ANALOG);
+  eg_.SetAttackTimeMsec(10);
+  eg_.SetDecayTimeMsec(100);
+  eg_.SetSustainLevel(0.3);
+  eg_.SetReleaseTimeMsec(200);
+  eg_.Update();
+
+  lfo_ = std::make_unique<LFO>();
+  lfo_->m_waveform = usaw;
+  lfo_->m_osc_fo = 7;
+  lfo_->Update();
+}
+
+void HandClap::NoteOn(double vel) {
+  velocity_ = vel;
+  noise_->StartOscillator();
+  lfo_->StartOscillator();
+  noise_eg_.StartEg();
+  eg_.StartEg();
+}
+
+StereoVal HandClap::Generate() {
+  StereoVal out = {.left = 0, .right = 0};
+  if (noise_->m_note_on) {
+    noise_->Update();
+    double noise_eg_out = noise_eg_.DoEnvelope(nullptr);
+    double noise_out = noise_->DoOscillate(nullptr) * noise_eg_out;
+    noise_filter_->Update();
+    double filter_out = noise_filter_->DoFilter(noise_out);
+
+    lfo_->Update();
+    double lfo_out = lfo_->DoOscillate(nullptr) * noise_out;
+
+    //// OUTPUT //////////////////////////
+
+    double osc_out = lfo_out + filter_out;
+    // double osc_out = lfo_out;
+    // double osc_out = filter_out;
+
+    // FILTER ////////////////////
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    double amp_eg_out = eg_.DoEnvelope(nullptr);
+    double dca_mod_val = amp_eg_out;
+    dca_.SetEgMod(dca_mod_val);
+    dca_.Update();
+    dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
+
+    out = {.left = out_left * velocity_, .right = out_right * velocity_};
+  }
+
+  if (eg_.GetState() == OFFF) {
+    noise_->StopOscillator();
+    lfo_->StopOscillator();
+
+    eg_.StopEg();
+    noise_eg_.StopEg();
+  }
+
+  return out;
+}
+
 SquareOscillatorBank::SquareOscillatorBank() {
   for (const auto &f : kOscFrequencies) {
     auto osc = std::make_unique<QBLimitedOscillator>();
@@ -254,6 +341,7 @@ bool SquareOscillatorBank::IsNoteOn() {
 void SquareOscillatorBank::SetAmplitude(double amp) {
   for (int i = 0; i < kNumOscillators; i++) {
     oscillators_[i]->m_amplitude = amp;
+    oscillators_[i]->Update();
   }
 }
 
@@ -269,13 +357,17 @@ double SquareOscillatorBank::DoGenerate() {
 }
 
 HiHat::HiHat() {
-  mid_filter_ = std::make_unique<FilterSem>();
+  // mid_filter_ = std::make_unique<FilterSem>();
+  mid_filter_ = std::make_unique<MoogLadder>();
   mid_filter_->SetType(BPF2);
   mid_filter_->SetFcControl(10000);
   mid_filter_->SetQControlGUI(1);
   mid_filter_->Update();
+  std::cout << "MID FILTER TYPE::" << mid_filter_->m_filter_type
+            << " CUTOFF:" << mid_filter_->m_fc << std::endl;
 
   high_filter_ = std::make_unique<FilterSem>();
+  // ahigh_filter_ = std::make_unique<MoogLadder>();
   high_filter_->SetType(HPF2);
   high_filter_->SetFcControl(7000);
   high_filter_->SetQControlGUI(1);
@@ -284,8 +376,10 @@ HiHat::HiHat() {
   eg_.SetRampMode(true);
   eg_.m_reset_to_zero = true;
   eg_.SetEgMode(ANALOG);
-  eg_.SetAttackTimeMsec(1);
-  eg_.SetDecayTimeMsec(27);
+  eg_.SetAttackTimeMsec(20);
+  eg_.SetDecayTimeMsec(10);
+  eg_.SetSustainLevel(0.3);
+  eg_.SetReleaseTimeMsec(270);
   eg_.Update();
 }
 
@@ -301,22 +395,26 @@ StereoVal HiHat::Generate() {
   StereoVal out = {.left = 0, .right = 0};
   if (osc_bank_.IsNoteOn()) {
     double square_out = osc_bank_.DoGenerate();
+    // std::cout << "SUQOUT:" << square_out << std::endl;
     mid_filter_->Update();
     double mid_out = mid_filter_->DoFilter(square_out);
+    // std::cout << "MIDSUQOUT:" << mid_out << std::endl;
 
     high_filter_->Update();
     double hi_out = high_filter_->DoFilter(mid_out);
+    // std::cout << "HIHGUQOUT:" << hi_out << std::endl;
 
     double eg_out = eg_.DoEnvelope(nullptr);
 
     double out_left = 0.0;
     double out_right = 0.0;
 
-    double dca_mod_val = eg_out;
-    dca_.SetEgMod(dca_mod_val);
+    dca_.SetEgMod(eg_out);
     dca_.Update();
     dca_.DoDCA(hi_out, hi_out, &out_left, &out_right);
+    // dca_.DoDCA(mid_out, mid_out, &out_left, &out_right);
 
+    // std::cout << "OUT:" << out_left << " VEL<OCL:" << velocity_ << std::endl;
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
   }
 

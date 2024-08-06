@@ -8,7 +8,8 @@
 #include "defjams.h"
 
 FilterSem::FilterSem() {
-  m_aux_control = 0.5;
+  // m_aux_control = 0.5;
+  m_aux_control = 1;
   m_filter_type = LPF2;
 
   m_alpha = 1.0;

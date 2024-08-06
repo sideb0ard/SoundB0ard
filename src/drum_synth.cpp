@@ -24,6 +24,7 @@ DrumSynth::DrumSynth() {
   bd_ = std::make_unique<BassDrum>();
   sd_ = std::make_unique<SnareDrum>();
   hh_ = std::make_unique<HiHat>();
+  cp_ = std::make_unique<HandClap>();
 
   LoadSettings(DrumSettings());
   active = true;
@@ -44,6 +45,10 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   auto snare_out = sd_->Generate();
   out.left += snare_out.left;
   out.right += snare_out.right;
+
+  auto clap_out = cp_->Generate();
+  out.left += clap_out.left;
+  out.right += clap_out.right;
 
   return out;
 }
@@ -90,6 +95,8 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.hh_midf = val;
   else if (name == "hh_hif")
     settings_.hh_hif = val;
+  else if (name == "hh_hif_q")
+    settings_.hh_hif_q = val;
 
   else if (name == "sd_vol")
     settings_.sd_vol = val;
@@ -107,6 +114,33 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.sd_osc1_freq = val;
   else if (name == "sd_osc2_freq")
     settings_.sd_osc2_freq = val;
+
+  else if (name == "cp_vol")
+    settings_.cp_vol = val;
+  else if (name == "cp_pan")
+    settings_.cp_pan = val;
+  else if (name == "cp_nvol")
+    settings_.cp_nvol = val;
+  else if (name == " cp_nattack")
+    settings_.cp_nattack = val;
+  else if (name == " cp_ndecay")
+    settings_.cp_ndecay = val;
+  else if (name == "cp_tone")
+    settings_.cp_tone = val;
+  else if (name == "cp_fq")
+    settings_.cp_fq = val;
+  else if (name == "cp_eg_attack")
+    settings_.cp_eg_attack = val;
+  else if (name == "cp_eg_decay")
+    settings_.cp_eg_decay = val;
+  else if (name == "cp_eg_sustain")
+    settings_.cp_eg_sustain = val;
+  else if (name == "cp_eg_release")
+    settings_.cp_eg_release = val;
+  else if (name == "cp_lfo_type")
+    settings_.cp_lfo_type = val;
+  else if (name == "cp_lfo_rate")
+    settings_.cp_lfo_rate = val;
 
   Update();
 }
@@ -137,10 +171,21 @@ std::string DrumSynth::Info() {
      << " sd_osc2_freq:" << settings_.sd_osc2_freq << std::endl;
   ss << COOL_COLOR_YELLOW_MELLOW "     hh(2): hh_vol:" << settings_.bd_vol
      << " hh_pan:" << settings_.hh_pan << " hh_attack:" << settings_.hh_attack
-     << " hh_decay:" << settings_.hh_decay << " hh_sqamp:" << settings_.hh_sqamp
+     << " hh_decay:" << settings_.hh_decay << std::endl;
+  ss << "     hh_sqamp:" << settings_.hh_sqamp
      << " hh_midf:" << settings_.hh_midf << " hh_hif:" << settings_.hh_hif
-     << std::endl;
-
+     << " hh_hif_q:" << settings_.hh_hif_q << std::endl;
+  ss << COOL_COLOR_ORANGE "     cp(3): cp_vol:" << settings_.cp_vol
+     << " cp_pan:" << settings_.cp_pan << " cp_nvol:" << settings_.cp_nvol
+     << " cp_nattack:" << settings_.cp_nattack
+     << " cp_ndecay:" << settings_.cp_ndecay << " cp_tone:" << settings_.cp_tone
+     << " cp_fq:" << settings_.cp_fq << std::endl;
+  ss << "     cp_eg_attack:" << settings_.cp_eg_attack
+     << " cp_eg_decay:" << settings_.cp_eg_decay
+     << " cp_eg_sustain:" << settings_.cp_eg_sustain
+     << " cp_eg_release:" << settings_.cp_eg_release << std::endl;
+  ss << "     cp_lfo_type:" << settings_.cp_lfo_type
+     << " cp_lfo_rate:" << settings_.cp_lfo_rate << std::endl;
   return ss.str();
 }
 
@@ -185,6 +230,10 @@ void DrumSynth::NoteOn(midi_event ev) {
     case (2):
       // Hi Hat
       hh_->NoteOn(velocity);
+      break;
+    case (3):
+      // HandClap
+      cp_->NoteOn(velocity);
       break;
     default:
       std::cerr << "DrumSynth - num not implemented:" << drum_module_num
@@ -256,9 +305,24 @@ void DrumSynth::Update() {
   hh_->dca_.m_pan_control = settings_.hh_pan;
   hh_->eg_.SetAttackTimeMsec(settings_.hh_decay);
   hh_->eg_.SetDecayTimeMsec(settings_.hh_decay);
-  hh_->SetAmpltiude(settings_.hh_sqamp);
+  hh_->SetAmplitude(settings_.hh_sqamp);
   hh_->mid_filter_->SetFcControl(settings_.hh_midf);
   hh_->high_filter_->SetFcControl(settings_.hh_hif);
+  hh_->high_filter_->SetQControl(settings_.hh_hif_q);
+
+  cp_->dca_.m_amplitude_control = settings_.cp_vol;
+  cp_->dca_.m_pan_control = settings_.cp_pan;
+  cp_->noise_->m_amplitude = settings_.cp_nvol;
+  cp_->noise_eg_.SetAttackTimeMsec(settings_.cp_nattack);
+  cp_->noise_eg_.SetDecayTimeMsec(settings_.cp_ndecay);
+  cp_->noise_filter_->SetFcControl(settings_.cp_tone);
+  cp_->noise_filter_->SetQControl(settings_.cp_fq);
+  cp_->eg_.SetAttackTimeMsec(settings_.cp_eg_attack);
+  cp_->eg_.SetDecayTimeMsec(settings_.cp_eg_decay);
+  cp_->eg_.SetSustainLevel(settings_.cp_eg_sustain);
+  cp_->eg_.SetReleaseTimeMsec(settings_.cp_eg_release);
+  cp_->lfo_->m_waveform = settings_.cp_lfo_type;
+  cp_->lfo_->m_osc_fo = settings_.cp_lfo_type;
 }
 
 void DrumSynth::LoadSettings(DrumSettings settings) {
