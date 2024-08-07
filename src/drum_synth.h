@@ -48,8 +48,10 @@ struct DrumSettings {
   double sd_noise_decay{22};
   double sd_tone{1000};
   double sd_decay{50};
-  double sd_osc1_freq{476};
-  double sd_osc2_freq{238};
+  int sd_octave{3};
+  int sd_key{7};
+  int sd_hi_osc_waveform{0};
+  int sd_lo_osc_waveform{0};
   double sd_distortion_threshold{0.5};
   int sd_delay_mode{0};  // 0 - norm, 1 - tap1, 2 - tap2, 3 - pingpong
   double sd_delay_ms{23};
@@ -77,7 +79,7 @@ struct DrumSettings {
   bool hh_delay_sync_tempo{true};
   int hh_delay_sync_len{0};  // 0 none, 1 - 1/4 // 2 - 8th // 3 - 16th
 
-  // r32 - Clap
+  // 3 - Clap
   double cp_vol{1};
   double cp_pan{0};
   double cp_nvol{0.6};

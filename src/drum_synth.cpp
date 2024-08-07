@@ -140,10 +140,14 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.sd_tone = val;
   else if (name == "sd_decay")
     settings_.sd_decay = val;
-  else if (name == "sd_osc1_freq")
-    settings_.sd_osc1_freq = val;
-  else if (name == "sd_osc2_freq")
-    settings_.sd_osc2_freq = val;
+  else if (name == "sd_octave")
+    settings_.sd_octave = val;
+  else if (name == "sd_key")
+    settings_.sd_key = val;
+  else if (name == "sd_lo_osc_wav")
+    settings_.sd_lo_osc_waveform = val;
+  else if (name == "sd_hi_osc_wav")
+    settings_.sd_hi_osc_waveform = val;
   else if (name == "sd_dist")
     settings_.sd_distortion_threshold = val;
   else if (name == "sd_delay_mode")
@@ -236,8 +240,10 @@ std::string DrumSynth::Info() {
      << " sd_noise_decay:" << settings_.sd_noise_decay
      << " sd_tone:" << settings_.sd_tone << " sd_decay:" << settings_.sd_decay
      << std::endl;
-  ss << "     sd_osc1_freq:" << settings_.sd_osc1_freq
-     << " sd_osc2_freq:" << settings_.sd_osc2_freq
+  ss << "     sd_octave:" << settings_.sd_octave
+     << " sd_key:" << settings_.sd_key
+     << " sd_lo_osc_wav:" << settings_.sd_lo_osc_waveform
+     << " sd_hi_osc_wav:" << settings_.sd_hi_osc_waveform
      << " sd_dist:" << settings_.sd_distortion_threshold << std::endl;
   ss << "     sd_delay_mode:" << settings_.sd_delay_mode
      << " sd_delay_ms:" << settings_.sd_delay_ms
@@ -399,8 +405,11 @@ void DrumSynth::Update() {
   sd_->noise_eg_.SetDecayTimeMsec(settings_.sd_noise_decay);
   sd_->noise_filter_->SetFcControl(settings_.sd_tone);
   sd_->eg_.SetDecayTimeMsec(settings_.sd_decay);
-  sd_->osc1_->m_osc_fo = settings_.sd_osc1_freq;
-  sd_->osc2_->m_osc_fo = -(settings_.sd_osc2_freq);
+  sd_->lo_osc_->m_waveform = settings_.sd_lo_osc_waveform;
+  sd_->lo_osc_->m_osc_fo =
+      Midi2Freq((settings_.sd_octave + 1) * 12 + (settings_.sd_key % 12));
+  sd_->hi_osc_->m_waveform = settings_.sd_hi_osc_waveform;
+  sd_->hi_osc_->m_osc_fo = sd_->lo_osc_->m_osc_fo * 2;
   sd_->distortion_.SetParam("threshold", settings_.sd_distortion_threshold);
   sd_->delay_->SetMode(settings_.sd_delay_mode);
   sd_->delay_->SetDelayTimeMs(settings_.sd_delay_ms);

@@ -149,17 +149,17 @@ SnareDrum::SnareDrum() {
   noise_filter_->Update();
 
   // PITCH
-  osc1_ = std::make_unique<QBLimitedOscillator>();
-  osc1_->m_waveform = SINE;
-  osc1_->m_osc_fo = kHighSnareFreq;
-  osc1_->m_amplitude = 1;
-  osc1_->Update();
+  lo_osc_ = std::make_unique<QBLimitedOscillator>();
+  lo_osc_->m_waveform = SINE;
+  lo_osc_->m_osc_fo = low_freq_;
+  lo_osc_->m_amplitude = 1;
+  lo_osc_->Update();
 
-  osc2_ = std::make_unique<QBLimitedOscillator>();
-  osc1_->m_waveform = SINE;
-  osc1_->m_osc_fo = kLowSnareFreq;
-  osc2_->m_amplitude = 1;
-  osc2_->Update();
+  hi_osc_ = std::make_unique<QBLimitedOscillator>();
+  hi_osc_->m_waveform = SINE;
+  hi_osc_->m_osc_fo = high_freq_;
+  hi_osc_->m_amplitude = 1;
+  hi_osc_->Update();
 
   eg_.SetRampMode(true);
   eg_.m_reset_to_zero = true;
@@ -177,15 +177,15 @@ void SnareDrum::NoteOn(double vel) {
   noise_->StartOscillator();
   noise_eg_.StartEg();
 
-  osc1_->StartOscillator();
-  osc2_->StartOscillator();
+  lo_osc_->StartOscillator();
+  hi_osc_->StartOscillator();
 
   eg_.StartEg();
 }
 
 StereoVal SnareDrum::Generate() {
   StereoVal out = {.left = 0, .right = 0};
-  if (osc1_->m_note_on) {
+  if (lo_osc_->m_note_on) {
     // Transient
     noise_->Update();
     double noise_eg_out = noise_eg_.DoEnvelope(nullptr);
@@ -195,13 +195,13 @@ StereoVal SnareDrum::Generate() {
 
     // OSCILLATORS
 
-    osc1_->Update();
-    osc2_->Update();
+    lo_osc_->Update();
+    hi_osc_->Update();
 
-    double osc1_out = osc1_->DoOscillate(nullptr);
-    double osc2_out = osc2_->DoOscillate(nullptr);
+    double lo_osc_out = lo_osc_->DoOscillate(nullptr);
+    double hi_osc_out = hi_osc_->DoOscillate(nullptr);
 
-    double osc_out = 0.5 * osc1_out + 0.5 * osc2_out + noise_out;
+    double osc_out = 0.5 * lo_osc_out + 0.5 * hi_osc_out + noise_out;
 
     //// OUTPUT //////////////////////////
 
@@ -223,8 +223,8 @@ StereoVal SnareDrum::Generate() {
   }
 
   if (eg_.GetState() == OFFF) {
-    osc1_->StopOscillator();
-    osc2_->StopOscillator();
+    lo_osc_->StopOscillator();
+    hi_osc_->StopOscillator();
     noise_->StopOscillator();
 
     eg_.StopEg();

@@ -33,35 +33,52 @@ let beatgen = gen()
   }
 }
 
+# p2 < osc 8 "1 160" "set sbdrum:cp_delay_ms %"
 
 let ppblah_gen = gen()
 {
   setup()
   {
     let hv = 10;
+    let delz = [1, 160, 30, 50];
+    let delzx = 0;
+    let delfb = [10, 70, 50, 30];
+    let dfbx = 0;
   }
   run()
   {
-    for (let i = 0; i < 16; ++i) {
-      if (rand(100) < 90) {
-        if (i == 0 || i == 8) {
-          note_on_at(sbdrum, 0, i* pp);
-          note_on_at(sb2, 0, i* pp);
+    if (count % 16 < 14) {
+      for (let i = 0; i < 16; ++i) {
+        if (rand(100) < 90) {
+          if (i == 0 || i == 8) {
+            note_on_at(sbdrum, 0, i* pp);
+            note_on_at(sb2, 0, i* pp);
+          }
+        }
+        if (i == 10 && count % 2 == 1) {
+          note_on_at(sbdrum, 0, i* pp, vel = 100);
+        }
+        if (i == 4 || i == 12) {
+          #note_on_at(sbdrum, 2, i* pp);
+          note_on_at(sbdrum, 3, i* pp + 30);
         }
       }
-      if (i == 10 && count % 2 == 1) {
-        note_on_at(sbdrum, 0, i* pp, vel = 100);
-      }
-      if (i == 4 || i == 12) {
-        #note_on_at(sbdrum, 2, i* pp);
-        note_on_at(sbdrum, 3, i* pp + 30);
-      }
+    }
+
+    if (count % 2 == 0) {
+      set sbdrum:cp_delay_ms delz[delzx];
+      delzx = incr(delzx, 0, len(delz));
+    }
+    if (count % 3 == 0) {
+      set sbdrum:cp_delay_fb delfb[dfbx];
+      set sbdrum:bd_detune delfb[dfbx];
+      dfbx = incr(dfbx, 0, len(delfb));
     }
 
     #let pp = 3840 / 8;
     if (count % 8 < 6) {
       for (let i = 0; i < 16; ++i) {
-        let offs = 30;
+        let offs = 40;
         if (i % 2 == 0) {
           offs = 0;
         }
@@ -73,7 +90,6 @@ let ppblah_gen = gen()
         hv = 10;
       }
     }
-
   }
 }
 

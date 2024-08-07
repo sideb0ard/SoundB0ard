@@ -60,8 +60,9 @@ let taylorblah_gen = gen()
   setup()
   {
     let t = 10444;
-    let ntz2 = [ [41, 44, 48]];
-    let ntz = [  [51, 55, 58] ];
+    let ntz2 = [ [41, 44, 48], [48, 51, 55]];
+    #let ntz2 = [ [40, 43, 47] ];
+    #let ntz = [  [51, 55, 58] ];
     let nx = 0;
     let d = 200;
   }
@@ -69,6 +70,7 @@ let taylorblah_gen = gen()
   {
     let p = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
     ++t;
+    # nx = incr(nx, 0, len(ntz2));
     if (count % 4 == 1) {
       let nt = ntz2[nx];
       let nti = 0;
@@ -84,21 +86,16 @@ let taylorblah_gen = gen()
       }
     }
 
-    if (count % 8 == 7) {
-      let nt = ntz[nx];
-      let nti = 0;
+    # dx - WHHXc
+    if (count % 4 > 1) {
+      let nt = down(ntz2[nx], 36);
       for (let i = 0; i < 16; ++i) {
         if (p[i] == 1) {
-          note_on_at(dx, nt[nti], i * pp, dur = d);
-          d = d + 5;
-          if (d > 210) {
-            d = 160;
-          }
-          nti = incr(nti, 0, len(nt));
+          note_on_at(dx, nt, i * pp, dur = d);
         }
       }
     }
-    #if (count % 4 == 0) {
+    if (count % 4 == 0) {
       #  p = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
       #  let nt = ntz[nx];
       #  for (let i = 0; i < 16; ++i) {
@@ -106,8 +103,24 @@ let taylorblah_gen = gen()
           #      note_on_at(mo, nt, i * pp + 20, dur = 150);
           #    }
         #  }
-      #  nx = incr(nx, 0, len(ntz));
-      #}
+    }
   }
 }
 
+# p6 < osc 8 "10 80" "set sbdrum:bd_detune %"
+let toneblah_gen = gen()
+{
+  setup()
+  {
+    let bd_oct = 1;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      bd_oct = incr(bd_oct, 0, 3);
+      set sbdrum:bd_octave bd_oct;
+    }
+  }
+}
+
+# let rvb = loop(dloops/rabveBreaskB.aiff)

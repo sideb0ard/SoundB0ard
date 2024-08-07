@@ -95,12 +95,15 @@ class SnareDrum : public DrumModule {
   void NoteOn(double vel) override;
   StereoVal Generate() override;
 
+  float low_freq_{kLowSnareFreq};
+  float high_freq_{kHighSnareFreq};
+
   std::unique_ptr<QBLimitedOscillator> noise_;
   EnvelopeGenerator noise_eg_;
   std::unique_ptr<CKThreeFive> noise_filter_;
 
-  std::unique_ptr<QBLimitedOscillator> osc1_;
-  std::unique_ptr<QBLimitedOscillator> osc2_;
+  std::unique_ptr<QBLimitedOscillator> lo_osc_;
+  std::unique_ptr<QBLimitedOscillator> hi_osc_;
 };
 
 class HandClap : public DrumModule {
