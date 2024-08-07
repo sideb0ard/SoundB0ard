@@ -10,9 +10,11 @@ let kickblah_gen = gen()
   }
   run()
   {
-    note_on_at(bd, 1, 0 * pp);
-    if (count % 8  < 6) {
-      note_on_at(bd, 1, 8 * pp);
+    if (count % 4 == 3) {
+      note_on_at(bd, 1, 0 * pp);
+      if (count % 8  < 6) {
+        note_on_at(bd, 1, 8 * pp);
+      }
     }
 
     note_on_at(sd, 1, 4 * pp);
@@ -35,18 +37,77 @@ let hhblah_gen = gen()
   }
   run()
   {
-    let pp = 3840 / 8;
-    for (let i = 0; i < 8; ++i) {
-      if (rand(100) < 95) {
-        let v = 90 + rand(30);
-        if (i % 2 == 0) {
-          note_on_at(ch, 1, i * pp, vel = v);
-        } else {
-          note_on_at(oh, 1, i * pp, dur= 60, vel = v);
+    if (count % 6 < 3) {
+      let pp = 3840 / 8;
+      for (let i = 0; i < 8; ++i) {
+        if (rand(100) < 95) {
+          let v = 90 + rand(30);
+          if (i % 2 == 0) {
+            note_on_at(ch, 1, i * pp, vel = v, dur = 50);
+          } else {
+            note_on_at(oh, 1, i * pp, dur= 30, vel = v);
+          }
         }
       }
     }
 
+  }
+}
+
+# Taylor Dane - Fm [41, 44, 48] / D# [51, 55, 58] / Cm [48, 51, 55]
+let taylorblah_gen = gen()
+{
+  setup()
+  {
+    let t = 10444;
+    let ntz2 = [ [41, 44, 48]];
+    let ntz = [  [51, 55, 58] ];
+    let nx = 0;
+    let d = 200;
+  }
+  run()
+  {
+    let p = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
+    ++t;
+    if (count % 4 == 1) {
+      let nt = ntz2[nx];
+      let nti = 0;
+      for (let i = 0; i < 16; ++i) {
+        if (p[i] == 1) {
+          note_on_at(mo, nt[nti], i * pp, dur = d);
+          d = d + 5;
+          if (d > 210) {
+            d = 160;
+          }
+          nti = incr(nti, 0, len(nt));
+        }
+      }
+    }
+
+    if (count % 8 == 7) {
+      let nt = ntz[nx];
+      let nti = 0;
+      for (let i = 0; i < 16; ++i) {
+        if (p[i] == 1) {
+          note_on_at(dx, nt[nti], i * pp, dur = d);
+          d = d + 5;
+          if (d > 210) {
+            d = 160;
+          }
+          nti = incr(nti, 0, len(nt));
+        }
+      }
+    }
+    #if (count % 4 == 0) {
+      #  p = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
+      #  let nt = ntz[nx];
+      #  for (let i = 0; i < 16; ++i) {
+        #    if (p[i] == 1) {
+          #      note_on_at(mo, nt, i * pp + 20, dur = 150);
+          #    }
+        #  }
+      #  nx = incr(nx, 0, len(ntz));
+      #}
   }
 }
 
