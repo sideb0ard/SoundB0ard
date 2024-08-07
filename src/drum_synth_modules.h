@@ -11,6 +11,7 @@
 #include "filters/filter_ckthreefive.h"
 #include "filters/filter_moogladder.h"
 #include "filters/filter_sem.h"
+#include "fx/stereodelay.h"
 #include "lfo.h"
 #include "qblimited_oscillator.h"
 
@@ -55,6 +56,7 @@ class DrumModule {
   EnvelopeGenerator eg_;
   DCA dca_;
   Distortion distortion_;
+  std::unique_ptr<StereoDelay> delay_;
 };
 
 const double kDefaultKickFrequency = 48.9994;  // G1

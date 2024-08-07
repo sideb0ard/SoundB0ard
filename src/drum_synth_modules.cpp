@@ -45,6 +45,7 @@ BassDrum::BassDrum() {
   eg_.Update();
 
   distortion_.SetParam("threshold", 0.5);
+  delay_ = std::make_unique<StereoDelay>();
   out_filter_ = std::make_unique<CKThreeFive>();
   out_filter_->SetType(LPF2);
   out_filter_->SetFcControl(10000);
@@ -112,6 +113,7 @@ StereoVal BassDrum::Generate() {
 
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
     out = distortion_.Process(out);
+    out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
@@ -165,6 +167,9 @@ SnareDrum::SnareDrum() {
   eg_.SetAttackTimeMsec(1);
   eg_.SetDecayTimeMsec(100);
   eg_.Update();
+
+  distortion_.SetParam("threshold", 0.5);
+  delay_ = std::make_unique<StereoDelay>();
 }
 
 void SnareDrum::NoteOn(double vel) {
@@ -212,6 +217,9 @@ StereoVal SnareDrum::Generate() {
     dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
 
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
+
+    out = distortion_.Process(out);
+    out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
@@ -260,6 +268,9 @@ HandClap::HandClap() {
   lfo_->m_waveform = usaw;
   lfo_->m_osc_fo = 7;
   lfo_->Update();
+
+  distortion_.SetParam("threshold", 0.5);
+  delay_ = std::make_unique<StereoDelay>();
 }
 
 void HandClap::NoteOn(double vel) {
@@ -300,6 +311,9 @@ StereoVal HandClap::Generate() {
     dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
 
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
+
+    out = distortion_.Process(out);
+    out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
@@ -381,6 +395,9 @@ HiHat::HiHat() {
   eg_.SetSustainLevel(0.3);
   eg_.SetReleaseTimeMsec(270);
   eg_.Update();
+
+  distortion_.SetParam("threshold", 0.5);
+  delay_ = std::make_unique<StereoDelay>();
 }
 
 void HiHat::SetAmplitude(double val) { osc_bank_.SetAmplitude(val); }
@@ -416,6 +433,9 @@ StereoVal HiHat::Generate() {
 
     // std::cout << "OUT:" << out_left << " VEL<OCL:" << velocity_ << std::endl;
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
+
+    out = distortion_.Process(out);
+    out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {

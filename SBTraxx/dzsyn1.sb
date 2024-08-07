@@ -1,0 +1,79 @@
+
+let beatgen = gen()
+{
+  setup()
+  {
+    let pat = rand_array(16, 0, 6);
+    let chrd = [16, 20, 16, 23];
+    let cx = 0;
+    let dxdur = 100;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; ++i) {
+      if (pat[i] < 3) {
+        # note_on_at(sbdrum, pat[i], i * pp , vel = 100 + rand(27));
+        cx = incr(cx, 0, len(chrd));
+      } else {
+        note_on_at(dx2, chrd[cx], i * pp, dur = dxdur);
+        dxdur = dxdur + 100;
+        if (dxdur > 500) {
+          dxdur = 100;
+        }
+      }
+    }
+
+    pat = rotate(pat, 2);
+
+    if (count % 4 == 0) {
+      pat = rand_array(16, 0, 6);
+      cx = incr(cx, 0, len(chrd));
+    }
+
+  }
+}
+
+
+let ppblah_gen = gen()
+{
+  setup()
+  {
+    let hv = 10;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; ++i) {
+      if (rand(100) < 90) {
+        if (i == 0 || i == 8) {
+          note_on_at(sbdrum, 0, i* pp);
+          note_on_at(sb2, 0, i* pp);
+        }
+      }
+      if (i == 10 && count % 2 == 1) {
+        note_on_at(sbdrum, 0, i* pp, vel = 100);
+      }
+      if (i == 4 || i == 12) {
+        #note_on_at(sbdrum, 2, i* pp);
+        note_on_at(sbdrum, 3, i* pp + 30);
+      }
+    }
+
+    #let pp = 3840 / 8;
+    if (count % 8 < 6) {
+      for (let i = 0; i < 16; ++i) {
+        let offs = 30;
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+        #note_on_at(sbdrum, 3, i * pp + offs, vel = hv);
+        note_on_at(sbdrum, 2, i * pp + offs, vel = hv);
+      }
+      hv = hv + 5;
+      if (hv > 60) {
+        hv = 10;
+      }
+    }
+
+  }
+}
+

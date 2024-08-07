@@ -80,6 +80,20 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.bd_hard_sync = val;
   else if (name == "bd_dist")
     settings_.bd_distortion_threshold = val;
+  else if (name == "bd_delay_mode")
+    settings_.bd_delay_mode = val;
+  else if (name == "bd_delay_ms")
+    settings_.bd_delay_ms = val;
+  else if (name == "bd_delay_feedback_pct")
+    settings_.bd_delay_feedback_pct = val;
+  else if (name == "bd_delay_ratio")
+    settings_.bd_distortion_threshold = val;
+  else if (name == "bd_delay_wetmix")
+    settings_.bd_distortion_threshold = val;
+  else if (name == "bd_delay_sync_tempo")
+    settings_.bd_delay_sync_tempo = val;
+  else if (name == "bd_delay_sync_len")
+    settings_.bd_delay_sync_len = val;
 
   else if (name == "hh_vol")
     settings_.hh_vol = val;
@@ -97,6 +111,22 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.hh_hif = val;
   else if (name == "hh_hif_q")
     settings_.hh_hif_q = val;
+  else if (name == "hh_dist")
+    settings_.hh_distortion_threshold = val;
+  else if (name == "hh_delay_mode")
+    settings_.hh_delay_mode = val;
+  else if (name == "hh_delay_ms")
+    settings_.hh_delay_ms = val;
+  else if (name == "hh_delay_feedback_pct")
+    settings_.hh_delay_feedback_pct = val;
+  else if (name == "hh_delay_ratio")
+    settings_.hh_distortion_threshold = val;
+  else if (name == "hh_delay_wetmix")
+    settings_.hh_distortion_threshold = val;
+  else if (name == "hh_delay_sync_tempo")
+    settings_.hh_delay_sync_tempo = val;
+  else if (name == "hh_delay_sync_len")
+    settings_.hh_delay_sync_len = val;
 
   else if (name == "sd_vol")
     settings_.sd_vol = val;
@@ -114,6 +144,22 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.sd_osc1_freq = val;
   else if (name == "sd_osc2_freq")
     settings_.sd_osc2_freq = val;
+  else if (name == "sd_dist")
+    settings_.sd_distortion_threshold = val;
+  else if (name == "sd_delay_mode")
+    settings_.sd_delay_mode = val;
+  else if (name == "sd_delay_ms")
+    settings_.sd_delay_ms = val;
+  else if (name == "sd_delay_feedback_pct")
+    settings_.sd_delay_feedback_pct = val;
+  else if (name == "sd_delay_ratio")
+    settings_.sd_distortion_threshold = val;
+  else if (name == "sd_delay_wetmix")
+    settings_.sd_distortion_threshold = val;
+  else if (name == "sd_delay_sync_tempo")
+    settings_.sd_delay_sync_tempo = val;
+  else if (name == "sd_delay_sync_len")
+    settings_.sd_delay_sync_len = val;
 
   else if (name == "cp_vol")
     settings_.cp_vol = val;
@@ -141,6 +187,22 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.cp_lfo_type = val;
   else if (name == "cp_lfo_rate")
     settings_.cp_lfo_rate = val;
+  else if (name == "cp_dist")
+    settings_.cp_distortion_threshold = val;
+  else if (name == "cp_delay_mode")
+    settings_.cp_delay_mode = val;
+  else if (name == "cp_delay_ms")
+    settings_.cp_delay_ms = val;
+  else if (name == "cp_delay_feedback_pct")
+    settings_.cp_delay_feedback_pct = val;
+  else if (name == "cp_delay_ratio")
+    settings_.cp_distortion_threshold = val;
+  else if (name == "cp_delay_wetmix")
+    settings_.cp_distortion_threshold = val;
+  else if (name == "cp_delay_sync_tempo")
+    settings_.cp_delay_sync_tempo = val;
+  else if (name == "cp_delay_sync_len")
+    settings_.cp_delay_sync_len = val;
 
   Update();
 }
@@ -162,19 +224,42 @@ std::string DrumSynth::Info() {
      << " bd_ntone:" << settings_.bd_ntone << " bd_nq:" << settings_.bd_nq
      << " bd_decay:" << settings_.bd_decay
      << " bd_dist:" << settings_.bd_distortion_threshold << std::endl;
+  ss << "     bd_delay_mode:" << settings_.bd_delay_mode
+     << " bd_delay_ms:" << settings_.bd_delay_ms
+     << " bd_delay_feedback_pct:" << settings_.bd_delay_feedback_pct
+     << " bd_delay_ratio:" << settings_.bd_delay_ratio << std::endl;
+  ss << "     bd_delay_wetmix:" << settings_.bd_delay_wetmix
+     << " bd_delay_sync_tempo:" << settings_.bd_delay_sync_tempo
+     << " bd_delay_sync_len:" << settings_.bd_delay_sync_len << std::endl;
   ss << COOL_COLOR_ORANGE "     sd(1): sd_vol:" << settings_.sd_vol
      << " sd_pan:" << settings_.sd_pan << " sd_nvol:" << settings_.sd_noise_vol
      << " sd_noise_decay:" << settings_.sd_noise_decay
      << " sd_tone:" << settings_.sd_tone << " sd_decay:" << settings_.sd_decay
      << std::endl;
   ss << "     sd_osc1_freq:" << settings_.sd_osc1_freq
-     << " sd_osc2_freq:" << settings_.sd_osc2_freq << std::endl;
+     << " sd_osc2_freq:" << settings_.sd_osc2_freq
+     << " sd_dist:" << settings_.sd_distortion_threshold << std::endl;
+  ss << "     sd_delay_mode:" << settings_.sd_delay_mode
+     << " sd_delay_ms:" << settings_.sd_delay_ms
+     << " sd_delay_feedback_pct:" << settings_.sd_delay_feedback_pct
+     << " sd_delay_ratio:" << settings_.sd_delay_ratio << std::endl;
+  ss << "     sd_delay_wetmix:" << settings_.sd_delay_wetmix
+     << " sd_delay_sync_tempo:" << settings_.sd_delay_sync_tempo
+     << " sd_delay_sync_len:" << settings_.sd_delay_sync_len << std::endl;
   ss << COOL_COLOR_YELLOW_MELLOW "     hh(2): hh_vol:" << settings_.bd_vol
      << " hh_pan:" << settings_.hh_pan << " hh_attack:" << settings_.hh_attack
      << " hh_decay:" << settings_.hh_decay << std::endl;
   ss << "     hh_sqamp:" << settings_.hh_sqamp
      << " hh_midf:" << settings_.hh_midf << " hh_hif:" << settings_.hh_hif
-     << " hh_hif_q:" << settings_.hh_hif_q << std::endl;
+     << " hh_hif_q:" << settings_.hh_hif_q
+     << " hh_dist:" << settings_.hh_distortion_threshold << std::endl;
+  ss << "     hh_delay_mode:" << settings_.hh_delay_mode
+     << " hh_delay_ms:" << settings_.hh_delay_ms
+     << " hh_delay_feedback_pct:" << settings_.hh_delay_feedback_pct
+     << " hh_delay_ratio:" << settings_.hh_delay_ratio << std::endl;
+  ss << "     hh_delay_wetmix:" << settings_.hh_delay_wetmix
+     << " hh_delay_sync_tempo:" << settings_.hh_delay_sync_tempo
+     << " hh_delay_sync_len:" << settings_.hh_delay_sync_len << std::endl;
   ss << COOL_COLOR_ORANGE "     cp(3): cp_vol:" << settings_.cp_vol
      << " cp_pan:" << settings_.cp_pan << " cp_nvol:" << settings_.cp_nvol
      << " cp_nattack:" << settings_.cp_nattack
@@ -185,7 +270,16 @@ std::string DrumSynth::Info() {
      << " cp_eg_sustain:" << settings_.cp_eg_sustain
      << " cp_eg_release:" << settings_.cp_eg_release << std::endl;
   ss << "     cp_lfo_type:" << settings_.cp_lfo_type
-     << " cp_lfo_rate:" << settings_.cp_lfo_rate << std::endl;
+     << " cp_lfo_rate:" << settings_.cp_lfo_rate
+     << " cp_dist:" << settings_.cp_distortion_threshold << std::endl;
+  ss << "     cp_delay_mode:" << settings_.cp_delay_mode
+     << " cp_delay_ms:" << settings_.cp_delay_ms
+     << " cp_delay_feedback_pct:" << settings_.cp_delay_feedback_pct
+     << " cp_delay_ratio:" << settings_.cp_delay_ratio << std::endl;
+  ss << "     cp_delay_wetmix:" << settings_.cp_delay_wetmix
+     << " cp_delay_sync_tempo:" << settings_.cp_delay_sync_tempo
+     << " cp_delay_sync_len:" << settings_.cp_delay_sync_len << std::endl;
+
   return ss.str();
 }
 
@@ -291,6 +385,13 @@ void DrumSynth::Update() {
   bd_->osc2_->m_cents = -(settings_.bd_detune_cents);
   bd_->hard_sync_ = settings_.bd_hard_sync;
   bd_->distortion_.SetParam("threshold", settings_.bd_distortion_threshold);
+  bd_->delay_->SetMode(settings_.bd_delay_mode);
+  bd_->delay_->SetDelayTimeMs(settings_.bd_delay_ms);
+  bd_->delay_->SetFeedbackPercent(settings_.bd_delay_feedback_pct);
+  bd_->delay_->SetDelayRatio(settings_.bd_delay_ratio);
+  bd_->delay_->SetWetMix(settings_.bd_delay_wetmix);
+  bd_->delay_->SetSync(settings_.bd_delay_sync_tempo);
+  bd_->delay_->SetSyncLen(settings_.bd_delay_sync_len);
 
   sd_->dca_.m_amplitude_control = settings_.sd_vol;
   sd_->dca_.m_pan_control = settings_.sd_pan;
@@ -300,6 +401,14 @@ void DrumSynth::Update() {
   sd_->eg_.SetDecayTimeMsec(settings_.sd_decay);
   sd_->osc1_->m_osc_fo = settings_.sd_osc1_freq;
   sd_->osc2_->m_osc_fo = -(settings_.sd_osc2_freq);
+  sd_->distortion_.SetParam("threshold", settings_.sd_distortion_threshold);
+  sd_->delay_->SetMode(settings_.sd_delay_mode);
+  sd_->delay_->SetDelayTimeMs(settings_.sd_delay_ms);
+  sd_->delay_->SetFeedbackPercent(settings_.sd_delay_feedback_pct);
+  sd_->delay_->SetDelayRatio(settings_.sd_delay_ratio);
+  sd_->delay_->SetWetMix(settings_.sd_delay_wetmix);
+  sd_->delay_->SetSync(settings_.sd_delay_sync_tempo);
+  sd_->delay_->SetSyncLen(settings_.sd_delay_sync_len);
 
   hh_->dca_.m_amplitude_control = settings_.hh_vol;
   hh_->dca_.m_pan_control = settings_.hh_pan;
@@ -309,6 +418,14 @@ void DrumSynth::Update() {
   hh_->mid_filter_->SetFcControl(settings_.hh_midf);
   hh_->high_filter_->SetFcControl(settings_.hh_hif);
   hh_->high_filter_->SetQControl(settings_.hh_hif_q);
+  hh_->distortion_.SetParam("threshold", settings_.hh_distortion_threshold);
+  hh_->delay_->SetMode(settings_.hh_delay_mode);
+  hh_->delay_->SetDelayTimeMs(settings_.hh_delay_ms);
+  hh_->delay_->SetFeedbackPercent(settings_.hh_delay_feedback_pct);
+  hh_->delay_->SetDelayRatio(settings_.hh_delay_ratio);
+  hh_->delay_->SetWetMix(settings_.hh_delay_wetmix);
+  hh_->delay_->SetSync(settings_.hh_delay_sync_tempo);
+  hh_->delay_->SetSyncLen(settings_.hh_delay_sync_len);
 
   cp_->dca_.m_amplitude_control = settings_.cp_vol;
   cp_->dca_.m_pan_control = settings_.cp_pan;
@@ -323,6 +440,14 @@ void DrumSynth::Update() {
   cp_->eg_.SetReleaseTimeMsec(settings_.cp_eg_release);
   cp_->lfo_->m_waveform = settings_.cp_lfo_type;
   cp_->lfo_->m_osc_fo = settings_.cp_lfo_type;
+  cp_->distortion_.SetParam("threshold", settings_.cp_distortion_threshold);
+  cp_->delay_->SetMode(settings_.cp_delay_mode);
+  cp_->delay_->SetDelayTimeMs(settings_.cp_delay_ms);
+  cp_->delay_->SetFeedbackPercent(settings_.cp_delay_feedback_pct);
+  cp_->delay_->SetDelayRatio(settings_.cp_delay_ratio);
+  cp_->delay_->SetWetMix(settings_.cp_delay_wetmix);
+  cp_->delay_->SetSync(settings_.cp_delay_sync_tempo);
+  cp_->delay_->SetSyncLen(settings_.cp_delay_sync_len);
 }
 
 void DrumSynth::LoadSettings(DrumSettings settings) {
