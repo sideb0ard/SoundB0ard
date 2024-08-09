@@ -477,7 +477,7 @@ class ForStatement : public Statement {
  public:
   std::shared_ptr<Statement> initialization_{nullptr};
   std::shared_ptr<Expression> termination_{nullptr};
-  std::shared_ptr<Expression> increment_{nullptr};
+  std::shared_ptr<Statement> increment_{nullptr};
 
   std::shared_ptr<BlockStatement> body_;
 };

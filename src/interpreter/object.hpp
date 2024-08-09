@@ -321,7 +321,7 @@ class ForLoop : public Object {
   ForLoop(std::shared_ptr<Environment> env,
           std::shared_ptr<ast::Statement> initialization,
           std::shared_ptr<ast::Expression> termination,
-          std::shared_ptr<ast::Expression> increment,
+          std::shared_ptr<ast::Statement> increment,
           std::shared_ptr<ast::BlockStatement> body)
       : env_{env},
         initialization_{initialization},
@@ -337,7 +337,7 @@ class ForLoop : public Object {
 
   std::shared_ptr<ast::Statement> initialization_{nullptr};
   std::shared_ptr<ast::Expression> termination_{nullptr};
-  std::shared_ptr<ast::Expression> increment_{nullptr};
+  std::shared_ptr<ast::Statement> increment_{nullptr};
 
   std::shared_ptr<ast::BlockStatement> body_;
 };

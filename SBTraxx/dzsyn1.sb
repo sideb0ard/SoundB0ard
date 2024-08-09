@@ -134,5 +134,4 @@ let numzFromBits = fn(bits)
   for (let i = 0; i < 16; i = i + 4) {
     print("i:" + i)
   }
-
 }

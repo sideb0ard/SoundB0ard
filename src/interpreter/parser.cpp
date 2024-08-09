@@ -380,7 +380,7 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement() {
   }
   NextToken();
 
-  stmt->increment_ = ParseExpression(Precedence::LOWEST);
+  stmt->increment_ = ParseStatement();
 
   // Body
   if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
