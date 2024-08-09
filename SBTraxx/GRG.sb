@@ -17,13 +17,15 @@ let kickblah_gen = gen()
       }
     }
 
-    note_on_at(sd, 1, 4 * pp);
-    if (count % 16  < 12) {
-      note_on_at(sd, 1, 12 * pp);
-    }
+    if (count % 3 == 0) {
+      note_on_at(sd, 1, 4 * pp);
+      if (count % 16  < 12) {
+        note_on_at(sd, 1, 12 * pp);
+      }
 
-    note_on_at(sd2, 1, 7 * pp, dur = 70, vel = 90);
-    note_on_at(sd2, 1, 9 * pp + 40, dur = 40, vel = 100);
+      note_on_at(sd2, 1, 7 * pp, dur = 70, vel = 90);
+      note_on_at(sd2, 1, 9 * pp + 40, dur = 40, vel = 100);
+    }
   }
 }
 
@@ -54,58 +56,6 @@ let hhblah_gen = gen()
   }
 }
 
-# Taylor Dane - Fm [41, 44, 48] / D# [51, 55, 58] / Cm [48, 51, 55]
-let taylorblah_gen = gen()
-{
-  setup()
-  {
-    let t = 10444;
-    let ntz2 = [ [41, 44, 48], [48, 51, 55]];
-    #let ntz2 = [ [40, 43, 47] ];
-    #let ntz = [  [51, 55, 58] ];
-    let nx = 0;
-    let d = 200;
-  }
-  run()
-  {
-    let p = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
-    ++t;
-    # nx = incr(nx, 0, len(ntz2));
-    if (count % 4 == 1) {
-      let nt = ntz2[nx];
-      let nti = 0;
-      for (let i = 0; i < 16; ++i) {
-        if (p[i] == 1) {
-          note_on_at(mo, nt[nti], i * pp, dur = d);
-          d = d + 5;
-          if (d > 210) {
-            d = 160;
-          }
-          nti = incr(nti, 0, len(nt));
-        }
-      }
-    }
-
-    # dx - WHHXc
-    if (count % 4 > 1) {
-      let nt = down(ntz2[nx], 36);
-      for (let i = 0; i < 16; ++i) {
-        if (p[i] == 1) {
-          note_on_at(dx, nt, i * pp, dur = d);
-        }
-      }
-    }
-    if (count % 4 == 0) {
-      #  p = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
-      #  let nt = ntz[nx];
-      #  for (let i = 0; i < 16; ++i) {
-        #    if (p[i] == 1) {
-          #      note_on_at(mo, nt, i * pp + 20, dur = 150);
-          #    }
-        #  }
-    }
-  }
-}
 
 # p6 < osc 8 "10 80" "set sbdrum:bd_detune %"
 let toneblah_gen = gen()

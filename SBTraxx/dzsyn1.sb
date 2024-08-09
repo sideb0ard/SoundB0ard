@@ -1,40 +1,4 @@
 
-let beatgen = gen()
-{
-  setup()
-  {
-    let pat = rand_array(16, 0, 6);
-    let chrd = [16, 20, 16, 23];
-    let cx = 0;
-    let dxdur = 100;
-  }
-  run()
-  {
-    for (let i = 0; i < 16; ++i) {
-      if (pat[i] < 3) {
-        # note_on_at(sbdrum, pat[i], i * pp , vel = 100 + rand(27));
-        cx = incr(cx, 0, len(chrd));
-      } else {
-        note_on_at(dx2, chrd[cx], i * pp, dur = dxdur);
-        dxdur = dxdur + 100;
-        if (dxdur > 500) {
-          dxdur = 100;
-        }
-      }
-    }
-
-    pat = rotate(pat, 2);
-
-    if (count % 4 == 0) {
-      pat = rand_array(16, 0, 6);
-      cx = incr(cx, 0, len(chrd));
-    }
-
-  }
-}
-
-# p2 < osc 8 "1 160" "set sbdrum:cp_delay_ms %"
-
 let ppblah_gen = gen()
 {
   setup()
@@ -44,10 +8,17 @@ let ppblah_gen = gen()
     let delzx = 0;
     let delfb = [10, 70, 50, 30];
     let dfbx = 0;
+    set sbdrum:bd_key 4;
+    set sbdrum:sd_key 4;
+    let octz = [1, 2];
+    let ox = 0;
+
+    let algz = [0, 1, 3, 4];
+    let ax = 0;
   }
   run()
   {
-    if (count % 16 < 14) {
+    if (count % 18 < 16) {
       for (let i = 0; i < 16; ++i) {
         if (rand(100) < 90) {
           if (i == 0 || i == 8) {
@@ -68,15 +39,25 @@ let ppblah_gen = gen()
     if (count % 2 == 0) {
       set sbdrum:cp_delay_ms delz[delzx];
       delzx = incr(delzx, 0, len(delz));
+      set dx:algo algz[ax];
+      ax = incr(ax, 0, len(algz));
     }
     if (count % 3 == 0) {
       set sbdrum:cp_delay_fb delfb[dfbx];
       set sbdrum:bd_detune delfb[dfbx];
       dfbx = incr(dfbx, 0, len(delfb));
+      set sbdrum:bd_octave octz[ox];
+      ox = incr(ox, 0, len(octz));
+    }
+    if (count % 5 == 4) {
+      set sbdrum:cp_eg_release 500;
+    } else {
+      set sbdrum:cp_eg_release 100;
     }
 
     #let pp = 3840 / 8;
     if (count % 8 < 6) {
+      set sbdrum:hh_decay delfb[dfbx];
       for (let i = 0; i < 16; ++i) {
         let offs = 40;
         if (i % 2 == 0) {
@@ -89,7 +70,69 @@ let ppblah_gen = gen()
       if (hv > 60) {
         hv = 10;
       }
+    } else {
+      set sbdrum:hh_attack 100;
     }
   }
 }
 
+# Dx - WHHXc
+# Taylor Dane - Fm [41, 44, 48] / D# [51, 55, 58] / Cm [48, 51, 55]
+let taylorblah_gen = gen()
+{
+  setup()
+  {
+    let t = 10444;
+    let ntz2 = [ [41, 44, 48], [51, 55, 41]];
+    #let ntz2 = [ [40, 43, 47] ];
+    #let ntz = [  [51, 55, 58] ];
+    let nx = 0;
+    let d = 200;
+  }
+  run()
+  {
+    let p = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
+    ++t;
+
+    if (count % 16 < 14) {
+      let nt = down(ntz2[nx], 36);
+      for (let i = 0; i < 16; ++i) {
+        if (p[i] == 1) {
+          note_on_at(dx, nt, i * pp, dur = d);
+        }
+      }
+    } else {
+      let nt = ntz2[nx];
+      let nti = 0;
+      for (let i = 0; i < 16; ++i) {
+        if (p[i] == 1) {
+          note_on_at(mo, nt[nti], i * pp, dur = d);
+          d = d + 5;
+          if (d > 210) {
+            d = 160;
+          }
+          nti = incr(nti, 0, len(nt));
+        }
+      }
+    }
+    if (count % 4 == 3) {
+      nx = incr(nx, 0, len(ntz2));
+    }
+  }
+}
+
+
+let numzFromBits = fn(bits)
+{
+  if (len(bits) % 4 != 0) {
+    print("Bits need to be in chunks of 4");
+    return;
+  }
+
+  let returnNumz = [];
+  let curNum = 0;
+  for (let i = 0; i < 16; i = i + 4) {
+    print("i:" + i)
+  }
+
+}
