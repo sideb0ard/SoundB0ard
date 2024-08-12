@@ -2,7 +2,6 @@
 
 #include <array>
 #include <functional>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -102,9 +101,7 @@ class BitOp : public Object {
 
 class Number : public Object {
  public:
-  explicit Number(double val) : value_{val} {
-    std::cout << "YO NEW NUM WITH VAL:" << val << std::endl;
-  };
+  explicit Number(double val) : value_{val} {};
   ObjectType Type() override;
   std::string Inspect() override;
   HashKey HashKey();
@@ -207,9 +204,7 @@ class Environment {
  public:
   Environment() = default;
   explicit Environment(std::shared_ptr<Environment> outer_env)
-      : outer_env_{outer_env} {
-    std::cout << "NEW ENV! num is:" << env_num_++ << std::endl;
-  };
+      : outer_env_{outer_env} {};
   ~Environment() = default;
   std::shared_ptr<Object> Get(std::string key);
   std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val,
@@ -217,8 +212,6 @@ class Environment {
   std::string Debug();
   std::string ListFuncsAndGen();
   std::map<std::string, int> GetSoundGenerators();
-
-  inline static int env_num_ = 0;
 
  private:
   std::unordered_map<std::string, std::shared_ptr<Object>> store_;

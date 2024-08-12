@@ -51,7 +51,7 @@ const std::unordered_map<token::TokenType, Precedence> precedences{
     {token::SLANG_ASTERISK, Precedence::PRODUCT},
     {token::SLANG_LPAREN, Precedence::CALL},
     {token::SLANG_LBRACKET, Precedence::INDEX},
-    {token::SLANG_INCREMENT, Precedence::PREFIX},
+    {token::SLANG_INCREMENT, Precedence::POSTFIX},
     {token::SLANG_DECREMENT, Precedence::POSTFIX},
 };
 

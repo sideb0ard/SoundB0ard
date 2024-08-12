@@ -131,7 +131,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   std::shared_ptr<ast::PrefixExpression> pe =
       std::dynamic_pointer_cast<ast::PrefixExpression>(node);
   if (pe) {
-    std::cout << "YO PREFIX EXP!\n";
     auto right = Eval(pe->right_, env);
     if (IsError(right)) return right;
     return EvalPrefixExpression(pe->operator_, right);
@@ -834,7 +833,6 @@ std::shared_ptr<object::Object> EvalHashIndexExpression(
 
 std::shared_ptr<object::Object> EvalPrefixExpression(
     std::string op, std::shared_ptr<object::Object> right) {
-  std::cout << "EVAL PREFIX EXPRRRR\n";
   if (op.compare("!") == 0)
     return EvalBangOperatorExpression(right);
   else if (op.compare("~") == 0)
@@ -851,7 +849,6 @@ std::shared_ptr<object::Object> EvalPrefixExpression(
 
 std::shared_ptr<object::Object> EvalPostfixExpression(
     std::string op, std::shared_ptr<object::Object> left) {
-  std::cout << "EVAL POSTFIX EXPRRRR\n";
   if (op.compare("++") == 0)
     return EvalIncrementOperatorExpression(left, false);
   else if (op.compare("--") == 0)
@@ -897,7 +894,10 @@ std::shared_ptr<object::Object> EvalInfixExpression(
     std::string op, std::shared_ptr<object::Object> left,
     std::shared_ptr<object::Object> right) {
   if (left->Type() == object::NUMBER_OBJ &&
-      right->Type() == object::NUMBER_OBJ) {
+      (op == token::SLANG_INCREMENT || op == token::SLANG_DECREMENT)) {
+    return EvalPostfixExpression(op, left);
+  } else if (left->Type() == object::NUMBER_OBJ &&
+             right->Type() == object::NUMBER_OBJ) {
     auto leftie = std::dynamic_pointer_cast<object::Number>(left);
     auto rightie = std::dynamic_pointer_cast<object::Number>(right);
     return EvalNumberInfixExpression(op, leftie, rightie);
@@ -1112,7 +1112,6 @@ std::shared_ptr<object::Object> EvalMinusPrefixOperatorExpression(
 
 std::shared_ptr<object::Object> EvalIncrementOperatorExpression(
     std::shared_ptr<object::Object> val, bool is_prefix) {
-  std::cout << "EVEL INCRRR EXPR\n";
   std::shared_ptr<object::Number> i =
       std::dynamic_pointer_cast<object::Number>(val);
   if (!i) {
@@ -1120,7 +1119,6 @@ std::shared_ptr<object::Object> EvalIncrementOperatorExpression(
   }
 
   if (is_prefix) {
-    std::cout << "YEAH< DAMN RIGHT ITS A PREFIX\n";
     return std::make_shared<object::Number>(++(i->value_));
   } else {
     return std::make_shared<object::Number>((i->value_)++);
