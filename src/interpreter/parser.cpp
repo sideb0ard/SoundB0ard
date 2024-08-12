@@ -12,6 +12,27 @@
 
 namespace parser {
 
+namespace {
+// TOOD - remove - hacky for debugging
+std::unordered_map<Precedence, int> precedence_value{
+    {Precedence::_, 0},
+    {Precedence::LOWEST, 1},
+    {Precedence::LOGICALANDOR, 2},
+    {Precedence::BITWISEOR, 3},
+    {Precedence::BITWISEXOR, 4},
+    {Precedence::BITWISEAND, 5},
+    {Precedence::EQUALS, 6},
+    {Precedence::LESSGREATER, 7},
+    {Precedence::BITSHIFT, 8},
+    {Precedence::SUM, 9},
+    {Precedence::PRODUCT, 10},
+    {Precedence::PREFIX, 11},
+    {Precedence::PREFIX, 12},
+    {Precedence::CALL, 13},
+    {Precedence::INDEX, 14},
+};
+}  // namespace
+
 Parser::Parser(std::shared_ptr<lexer::Lexer> lexer) : lexer_{lexer} {
   NextToken();
   NextToken();
@@ -23,12 +44,14 @@ std::shared_ptr<ast::Program> Parser::ParseProgram() {
   while (cur_token_.type_ != token::SLANG_EOFF) {
     std::shared_ptr<ast::Statement> stmt = ParseStatement();
     if (stmt) program->statements_.push_back(stmt);
+    std::cout << "STMT:" << stmt->String() << std::endl;
     NextToken();
   }
   return program;
 }
 
 std::shared_ptr<ast::Statement> Parser::ParseStatement() {
+  std::cout << "PARSZZ STETMENT\n";
   if (cur_token_.type_.compare(token::SLANG_LET) == 0) {
     return ParseLetStatement();
   } else if (cur_token_.type_.compare(token::SLANG_BREAK) == 0)
@@ -476,27 +499,35 @@ static bool IsInfixOperator(token::TokenType type) {
       type == token::SLANG_BITWISE_OR || type == token::SLANG_BITWISE_XOR ||
       type == token::SLANG_BITWISE_LEFTSHIFT ||
       type == token::SLANG_BITWISE_RIGHTSHIFT)
+    //|| type == token::SLANG_INCREMENT || type == token::SLANG_DECREMENT)
     return true;
   return false;
 }
 
-static bool IsPostfixOperator(token::TokenType type) {
-  if (type == token::SLANG_INCREMENT || type == token::SLANG_DECREMENT)
-    return true;
-  return false;
-}
+// static bool IsPostfixOperator(token::TokenType type) {
+//   if (type == token::SLANG_INCREMENT || type == token::SLANG_DECREMENT)
+//     return true;
+//   return false;
+// }
 
 //////////////////////////////////////////////////////////////////
 
 std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p) {
   // these are the 'nuds' (null detontations) in the Vaughan Pratt paper
   // 'top down operator precedence'.
+  std::cout << "AIIGHT - PARSE EXPRESSIOn - Precedence is:"
+            << precedence_value[p] << "\n";
   std::shared_ptr<ast::Expression> left_expr = ParseForPrefixExpression();
 
   if (!left_expr) return nullptr;
 
+  std::cout << "YO NEXT TOKNE Izzzz !:" << peek_token_.type_
+            << " and peek precedence is:" << precedence_value[PeekPrecedence()]
+            << std::endl;
   while (!PeekTokenIs(token::SLANG_SEMICOLON) && p < PeekPrecedence()) {
     if (IsInfixOperator(peek_token_.type_)) {
+      std::cout << "YO NEXT TOKNE IS IN_FFFIIX!:" << peek_token_.type_
+                << std::endl;
       NextToken();
       if (cur_token_.type_ == token::SLANG_LPAREN)
         left_expr = ParseCallExpression(left_expr);
@@ -510,15 +541,16 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p) {
     }
   }
 
-  if (IsPostfixOperator(peek_token_.type_)) {
-    NextToken();
-    return ParsePostfixExpression(left_expr);
-  }
+  // if (IsPostfixOperator(peek_token_.type_)) {
+  //   NextToken();
+  //   return ParsePostfixExpression(left_expr);
+  // }
 
   return left_expr;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
+  std::cout << "YO PARSE 4 PREFIX! with:" << cur_token_ << "\n";
   if (cur_token_.type_ == token::SLANG_IDENT)
     return ParseIdentifier();
   else if (cur_token_.type_ == token::SLANG_AT)
@@ -705,13 +737,16 @@ std::shared_ptr<ast::Expression> Parser::ParseIfExpression() {
 
   expression->consequence_ = ParseBlockStatement();
 
-  if (PeekTokenIs(token::SLANG_ELSE)) {
-    NextToken();
+  // if (PeekTokenIs(token::SLANG_ELSE)) {
+  //   NextToken();
 
-    if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
+  //   if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
 
-    expression->alternative_ = ParseBlockStatement();
-  }
+  //   expression->alternative_ = ParseBlockStatement();
+  // }
+
+  std::cout << "END OF IF PARSE - this token is:" << cur_token_
+            << " Next is:" << peek_token_ << std::endl;
 
   return expression;
 }
@@ -1079,6 +1114,7 @@ std::shared_ptr<ast::Expression> Parser::ParsePostfixExpression(
 
 std::shared_ptr<ast::Expression> Parser::ParseInfixExpression(
     std::shared_ptr<ast::Expression> left) {
+  std::cout << "PARSE INFIX EXPRESSS! - " << left->String() << "\n";
   auto expression = std::make_shared<ast::InfixExpression>(
       cur_token_, cur_token_.literal_, left);
 
@@ -1100,6 +1136,7 @@ Precedence Parser::PeekPrecedence() const {
   auto it = precedences.find(peek_token_.type_);
   if (it != precedences.end()) return it->second;
 
+  std::cerr << "COUDNLT FIND PRECEDENCE - RETURN 0\n";
   return Precedence::LOWEST;
 }
 
@@ -1111,6 +1148,7 @@ Precedence Parser::CurPrecedence() const {
 
 std::shared_ptr<ast::BlockStatement> Parser::ParseBlockStatement() {
   auto block_stmt = std::make_shared<ast::BlockStatement>(cur_token_);
+  std::cout << "PARSE BLOCK STATEMENT!\n";
 
   NextToken();
   while (!CurTokenIs(token::SLANG_RBRACE) && !CurTokenIs(token::SLANG_EOFF)) {
@@ -1118,6 +1156,8 @@ std::shared_ptr<ast::BlockStatement> Parser::ParseBlockStatement() {
     if (stmt) block_stmt->statements_.push_back(stmt);
     NextToken();
   }
+  std::cout << "END OF BLOCK STATMENT- cur_token is:" << cur_token_
+            << " Peek is:" << peek_token_ << std::endl;
   return block_stmt;
 }
 

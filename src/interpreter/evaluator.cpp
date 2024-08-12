@@ -131,6 +131,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   std::shared_ptr<ast::PrefixExpression> pe =
       std::dynamic_pointer_cast<ast::PrefixExpression>(node);
   if (pe) {
+    std::cout << "YO PREFIX EXP!\n";
     auto right = Eval(pe->right_, env);
     if (IsError(right)) return right;
     return EvalPrefixExpression(pe->operator_, right);
@@ -204,8 +205,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   std::shared_ptr<ast::BpmStatement> bpm_stmt =
       std::dynamic_pointer_cast<ast::BpmStatement>(node);
   if (bpm_stmt) {
-    std::shared_ptr<ast::NumberLiteral> bpm =
-        std::dynamic_pointer_cast<ast::NumberLiteral>(bpm_stmt->bpm_val_);
+    auto val = Eval(bpm_stmt->bpm_val_, env);
+    auto bpm = std::dynamic_pointer_cast<object::Number>(val);
     if (bpm) {
       auto action = std::make_unique<AudioActionItem>(AudioAction::BPM);
       action->new_bpm = bpm->value_;
@@ -833,6 +834,7 @@ std::shared_ptr<object::Object> EvalHashIndexExpression(
 
 std::shared_ptr<object::Object> EvalPrefixExpression(
     std::string op, std::shared_ptr<object::Object> right) {
+  std::cout << "EVAL PREFIX EXPRRRR\n";
   if (op.compare("!") == 0)
     return EvalBangOperatorExpression(right);
   else if (op.compare("~") == 0)
@@ -849,6 +851,7 @@ std::shared_ptr<object::Object> EvalPrefixExpression(
 
 std::shared_ptr<object::Object> EvalPostfixExpression(
     std::string op, std::shared_ptr<object::Object> left) {
+  std::cout << "EVAL POSTFIX EXPRRRR\n";
   if (op.compare("++") == 0)
     return EvalIncrementOperatorExpression(left, false);
   else if (op.compare("--") == 0)
@@ -1109,6 +1112,7 @@ std::shared_ptr<object::Object> EvalMinusPrefixOperatorExpression(
 
 std::shared_ptr<object::Object> EvalIncrementOperatorExpression(
     std::shared_ptr<object::Object> val, bool is_prefix) {
+  std::cout << "EVEL INCRRR EXPR\n";
   std::shared_ptr<object::Number> i =
       std::dynamic_pointer_cast<object::Number>(val);
   if (!i) {
@@ -1116,6 +1120,7 @@ std::shared_ptr<object::Object> EvalIncrementOperatorExpression(
   }
 
   if (is_prefix) {
+    std::cout << "YEAH< DAMN RIGHT ITS A PREFIX\n";
     return std::make_shared<object::Number>(++(i->value_));
   } else {
     return std::make_shared<object::Number>((i->value_)++);
@@ -1181,6 +1186,7 @@ bool ObjectToNativeBool(std::shared_ptr<object::Object> obj) {
   if (boolobj) return boolobj->value_;
   auto numobj = std::dynamic_pointer_cast<object::Number>(obj);
   if (numobj) return numobj->value_;
+  return false;
 }
 
 std::shared_ptr<object::Object> EvalIdentifier(

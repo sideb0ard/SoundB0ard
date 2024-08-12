@@ -139,8 +139,8 @@ let xfade_gen = gen()
 }
 
 
-p0 # countr ;
-p1 # xfade_gen ;
+# p0 # countr ;
+# p1 # xfade_gen ;
 
 # i.e. 3840 / 16 == 240 midi Pulses Per 16th
 let pp = 240;
