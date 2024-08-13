@@ -33,7 +33,7 @@ let ppblah_gen = gen()
           note_on_at(sbdrum, 0, i* pp, vel = 100);
         }
         if (i == 4 || i == 12) {
-          #note_on_at(sbdrum, 2, i* pp);
+          note_on_at(sbdrum, 2, i* pp);
           note_on_at(sbdrum, 3, i* pp + 30);
         }
       }
@@ -104,11 +104,11 @@ let taylorblah_gen = gen()
     if (count % 4 == 3) {
       p = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
     }
-
     ++t;
     # t++;
 
     let numz = numzFromBits(p);
+    print("NUMZ:", numz);
     let ppp = 3840 / len(numz);
     for (let i = 0; i < len(numz); i++) {
       if (numz[i] < 4) {
