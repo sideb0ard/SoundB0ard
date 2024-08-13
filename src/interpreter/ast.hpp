@@ -138,19 +138,6 @@ class PostfixExpression : public Expression {
   std::shared_ptr<Expression> left_;
 };
 
-class IfExpression : public Expression {
- public:
-  IfExpression() {}
-  explicit IfExpression(Token token) : Expression{token} {}
-
-  std::string String() const override;
-
- public:
-  std::shared_ptr<Expression> condition_;
-  std::shared_ptr<BlockStatement> consequence_;
-  std::shared_ptr<BlockStatement> alternative_;
-};
-
 class EveryExpression : public Expression {
  public:
   EveryExpression() {}
@@ -480,6 +467,18 @@ class ForStatement : public Statement {
   std::shared_ptr<Statement> increment_{nullptr};
 
   std::shared_ptr<BlockStatement> body_;
+};
+
+class IfStatement : public Statement {
+ public:
+  explicit IfStatement(Token token) : Statement{token} {}
+
+  std::string String() const override;
+
+ public:
+  std::shared_ptr<Expression> condition_;
+  std::shared_ptr<BlockStatement> consequence_;
+  std::shared_ptr<BlockStatement> alternative_;
 };
 
 class SetStatement : public Statement {

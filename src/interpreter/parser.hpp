@@ -69,6 +69,7 @@ class Parser {
   std::shared_ptr<ast::LetStatement> ParseLetStatement();
   std::shared_ptr<ast::ReturnStatement> ParseReturnStatement();
   std::shared_ptr<ast::ForStatement> ParseForStatement();
+  std::shared_ptr<ast::Statement> ParseIfStatement();
   std::shared_ptr<ast::HelpStatement> ParseHelpStatement();
   std::shared_ptr<ast::LsStatement> ParseLsStatement();
   std::shared_ptr<ast::StrategyStatement> ParseStrategyStatement();
@@ -98,7 +99,6 @@ class Parser {
   std::shared_ptr<ast::Expression> ParsePostfixExpression(
       std::shared_ptr<ast::Expression> left);
   std::shared_ptr<ast::Expression> ParseGroupedExpression();
-  std::shared_ptr<ast::Expression> ParseIfExpression();
   std::shared_ptr<ast::Expression> ParseEveryExpression();
   std::shared_ptr<ast::Expression> ParseAtExpression();
   std::shared_ptr<ast::Expression> ParseDurationExpression();

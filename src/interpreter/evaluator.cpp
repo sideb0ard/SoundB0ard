@@ -160,10 +160,10 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     return EvalInfixExpression(ie->operator_, left, right);
   }
 
-  std::shared_ptr<ast::IfExpression> if_expr =
-      std::dynamic_pointer_cast<ast::IfExpression>(node);
-  if (if_expr) {
-    return EvalIfExpression(if_expr, env);
+  std::shared_ptr<ast::IfStatement> if_stmt =
+      std::dynamic_pointer_cast<ast::IfStatement>(node);
+  if (if_stmt) {
+    return EvalIfStatement(if_stmt, env);
   }
 
   std::shared_ptr<ast::LetStatement> let_expr =
@@ -876,8 +876,8 @@ std::shared_ptr<object::Object> EvalForLoop(
   return result;
 }
 
-std::shared_ptr<object::Object> EvalIfExpression(
-    std::shared_ptr<ast::IfExpression> if_expr,
+std::shared_ptr<object::Object> EvalIfStatement(
+    std::shared_ptr<ast::IfStatement> if_expr,
     std::shared_ptr<object::Environment> env) {
   auto condition = Eval(if_expr->condition_, env);
   if (IsError(condition)) return condition;

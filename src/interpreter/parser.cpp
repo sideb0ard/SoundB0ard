@@ -68,6 +68,8 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement() {
     return ParseStrategyStatement();
   else if (cur_token_.type_.compare(token::SLANG_FOR) == 0)
     return ParseForStatement();
+  else if (cur_token_.type_.compare(token::SLANG_IF) == 0)
+    return ParseIfStatement();
   else if (cur_token_.type_.compare(token::SLANG_PAN) == 0)
     return ParsePanStatement();
   else if (cur_token_.type_.compare(token::SLANG_PLAY) == 0)
@@ -523,11 +525,11 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p) {
   while (!PeekTokenIs(token::SLANG_SEMICOLON) && p < PeekPrecedence()) {
     if (IsInfixOperator(peek_token_.type_)) {
       NextToken();
-      if (cur_token_.type_ == token::SLANG_LPAREN)
+      if (cur_token_.type_ == token::SLANG_LPAREN) {
         left_expr = ParseCallExpression(left_expr);
-      else if (cur_token_.type_ == token::SLANG_LBRACKET)
+      } else if (cur_token_.type_ == token::SLANG_LBRACKET) {
         left_expr = ParseIndexExpression(left_expr);
-      else {  // these are the 'leds' (left denotation)
+      } else {  // these are the 'leds' (left denotation)
         left_expr = ParseInfixExpression(left_expr);
       }
     } else {
@@ -567,8 +569,6 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
     return ParseBoolean();
   else if (cur_token_.type_ == token::SLANG_LPAREN)
     return ParseGroupedExpression();
-  else if (cur_token_.type_ == token::SLANG_IF)
-    return ParseIfExpression();
   else if (cur_token_.type_ == token::SLANG_FUNCTION)
     return ParseFunctionLiteral();
   else if (cur_token_.type_ == token::SLANG_PHASOR)
@@ -711,29 +711,35 @@ std::shared_ptr<ast::Expression> Parser::ParseVelocityExpression() {
   return vel;
 }
 
-std::shared_ptr<ast::Expression> Parser::ParseIfExpression() {
-  auto expression = std::make_shared<ast::IfExpression>(cur_token_);
+std::shared_ptr<ast::Statement> Parser::ParseIfStatement() {
+  auto stmt = std::make_shared<ast::IfStatement>(cur_token_);
 
-  if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
+  if (!ExpectPeek(token::SLANG_LPAREN)) {
+    return nullptr;
+  }
 
   NextToken();
-  expression->condition_ = ParseExpression(Precedence::LOWEST);
+  stmt->condition_ = ParseExpression(Precedence::LOWEST);
 
-  if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
+  if (!ExpectPeek(token::SLANG_RPAREN)) {
+    return nullptr;
+  }
 
-  if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
+  if (!ExpectPeek(token::SLANG_LBRACE)) {
+    return nullptr;
+  }
 
-  expression->consequence_ = ParseBlockStatement();
+  stmt->consequence_ = ParseBlockStatement();
 
   if (PeekTokenIs(token::SLANG_ELSE)) {
     NextToken();
 
     if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
 
-    expression->alternative_ = ParseBlockStatement();
+    stmt->alternative_ = ParseBlockStatement();
   }
 
-  return expression;
+  return stmt;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseEveryExpression() {
@@ -1138,7 +1144,9 @@ std::shared_ptr<ast::BlockStatement> Parser::ParseBlockStatement() {
   NextToken();
   while (!CurTokenIs(token::SLANG_RBRACE) && !CurTokenIs(token::SLANG_EOFF)) {
     auto stmt = ParseStatement();
-    if (stmt) block_stmt->statements_.push_back(stmt);
+    if (stmt) {
+      block_stmt->statements_.push_back(stmt);
+    }
     NextToken();
   }
   return block_stmt;

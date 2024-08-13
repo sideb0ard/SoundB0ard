@@ -216,12 +216,12 @@ std::string BlockStatement::String() const {
   return ss.str();
 }
 
-std::string IfExpression::String() const {
+std::string IfStatement::String() const {
   std::stringstream ss;
-  ss << "if ";
+  ss << "if (";
   if (condition_) ss << condition_->String();
-  ss << " ";
-  if (consequence_) ss << consequence_->String();
+  ss << " )";
+  if (consequence_) ss << "{" << consequence_->String() << "}";
   if (alternative_) {
     ss << " else ";
     ss << alternative_->String();
