@@ -1,0 +1,83 @@
+# dx - beleep
+
+let nublah_gen = gen()
+{
+  setup()
+  {
+    let chrds_orig = [ [51, 55, 48], [48, 52, 45], [44, 48, 41] ];
+    #let chrds = [ [51, 55, 48], [48, 52, 45], [44, 48, 41] ];
+    let cx = 0;
+    #let t = rand(104);
+    let t = rand(87878787);
+    #let t = 878787;
+    let durz = [50, 10, 500, 150, 1000, 300, 700];
+    let drx = 0;
+  }
+  run()
+  {
+    let chrds = chrds_orig;
+    if (count % 11 == 0) {
+      chrds = [ up(chrds_orig[0], 12), up(chrds_orig[1], 12), up(chrds_orig[2], 12)];
+      p1 $ "";
+    }
+    if (count % 13 == 0) {
+      chrds = [ down(chrds_orig[0], 12), down(chrds_orig[1], 24), down(chrds_orig[2], 32)];
+      p1 $ play2step;
+    }
+    if (count % 14 == 0) {
+      p3 $ hhblah_gen;
+    }
+    if (count % 17 == 0) {
+      p3 $ "";
+    }
+    if (count % 8 < 7) {
+      let ppq = 3840 / 4;
+      for (let i = 0; i < 4; i++) {
+        let p = bits( 74 * ( t | ( t >> 2 | t >> 16 ) ) );
+        if (count % 4 == 2) {
+          p = bits( ((t/4)>>(t/4))>>(t>>(t/8))|t>>2 );
+        }
+        let numz = numzFromBits(p);
+        #print(numz);
+        t++;
+
+        drx = incr(drx, 0, len(durz));
+
+        for (let j = 0; j < 4; j++) {
+          let time_now = i* ppq + j * pp;
+          if (numz[j] < 8) {
+            set dx:algo numz[j] at=time_now;
+          }
+          if (numz[j] == 9) {
+            note_on_at(dx, chrds[cx], time_now, dur = durz[drx]);
+          }
+          if (numz[j] == 10) {
+            note_on_at(dx, chrds[cx], time_now, dur = durz[drx]);
+            set dre:vol 1 at=time_now;
+          }
+          if (numz[j] == 11) {
+            note_on_at(dx, chrds[cx], time_now, dur = durz[drx]);
+          }
+          if (numz[j] == 12) {
+            note_on_at(dx, chrds[cx][rand(3)], time_now, dur = durz[drx]);
+            cx = incr(cx, 0, len(chrds));
+            set dre:vol 0 at=time_now;
+          }
+          if (numz[j] == 13) {
+            note_on_at(dx, chrds[cx][rand(3)], time_now, dur = durz[drx]);
+            cx = incr(cx, 0, len(chrds));
+
+          }
+          if (numz[j] == 15) {
+            note_on_at(dx, chrds[cx][rand(2)], time_now, dur = durz[drx]);
+            cx = incr(cx, 0, len(chrds));
+            set dre:vol 1 at=time_now;
+            let idxxx = rand(100);
+            set dre:idx idxxx at=time_now;
+          }
+        }
+      }
+    }
+  }
+}
+

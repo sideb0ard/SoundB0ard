@@ -1,0 +1,85 @@
+
+let play2step = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    let beat = gen2stepbeat();
+    for (let i = 0; i < 16; i++) {
+      let v = rand(100);
+      if (i == 0) {
+        v = 127;
+      }
+      if (i % 2 == 1) {
+        v = rand(50);
+      }
+      if (beat[i] == 1) {
+        note_on_at(sbdrum, 0, i * pp, vel = v);
+      }
+
+      if (i % 8 == 4) {
+        if (rand(100) > 10) {
+          note_on_at(sbdrum, 3, i * pp + 30, vel = v);
+          note_on_at(sbdrum, 1, i * pp + 30, vel = v);
+        }
+      }
+    }
+  }
+}
+
+let hhblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      let v = rand(70);
+      let offset = 30;
+      if (i % 2 == 0) {
+        offset = 0;
+      }
+      note_on_at(sbdrum, 2, i * pp + offset, vel = v);
+    }
+  }
+}
+
+let gen2stepbeat = fn()
+{
+  let beat = rand_array(16, 0, 0);
+  if (count % 2 == 0 && rand(100) > 10) {
+    beat[0] = 1;
+  }
+  beat[8] = 1;
+
+  for (let i = 4; i < 16; i = i + 4) {
+    let stepz = gen_sequence();
+    for (let j = 0; j < len(stepz); j++) {
+      beat[i + stepz[j]] = 1);
+    }
+  }
+  beat[9] = 0;
+  return beat;
+}
+
+
+let gen_sequence = fn()
+{
+  let num_steps = rand(2) + 1;
+  let idxz = [];
+  let have_all = false;
+  for (let i = 0; i < num_steps; !have_all  ) {
+    let next_idx = rand(3) + 1;
+    if (!is_val_in_list(idxz, next_idx)) {
+      push(idxz, next_idx);
+      i++;
+    }
+    if (len(idxz) == num_steps) {
+      have_all = true;
+    }
+  }
+  return idxz;
+}

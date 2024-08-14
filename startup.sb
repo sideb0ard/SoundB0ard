@@ -936,3 +936,31 @@ let GenMellerdy = fn(length_of_melody, base_key, range_of_melody)
   return section_one + section_two_one + section_two_two;
 
 }
+
+let numzFromBits = fn(bits)
+{
+  if (len(bits) % 4 != 0) {
+    print("Bits need to be in chunks of 4");
+    return;
+  }
+
+  let returnNumz = [];
+  let curNum = 0;
+  for (let i = 0; i < len(bits); i = i + 4) {
+    let num = 0;
+    if (bits[i] > 0) {
+      num = num + 8;
+    }
+    if (bits[i+1] > 0) {
+      num = num + 4;
+    }
+    if (bits[i +2] > 0) {
+      num = num + 2;
+    }
+    if (bits[i + 3] > 0) {
+      num = num + 1;
+    }
+    push(returnNumz, num);
+  }
+  return returnNumz;
+}
