@@ -1,4 +1,6 @@
 
+# bpm
+# monitor(SBTraxx/newSWING.sb);
 let ppblah_gen = gen()
 {
   setup()
@@ -94,10 +96,11 @@ let taylorblah_gen = gen()
 {
   setup()
   {
-    #let t = 10444;
-    let t = rand(10444);
-    let ntz2 = [ [41, 44, 48], [51, 55, 41],  [48, 51, 55]];
-    #let ntz2 = [ [40, 43, 47] ];
+    let t = 10444;
+    #let t = rand(10444);
+    # let ntz2 = [ [41, 44, 48], [51, 55, 41],  [48, 51, 55]];
+    let ntz2 = [ [41, 44, 48] ];
+    # let ntz2 = [ [40, 43, 47] ];
     #let ntz = [  [51, 55, 58] ];
     let nx = 0;
     let d = 200;
@@ -112,21 +115,19 @@ let taylorblah_gen = gen()
     # t++;
 
     let numz = numzFromBits(p);
-    #print("NUMZ:", numz);
+    print("NUMZ:", numz);
     let ppp = 3840 / len(numz);
     for (let i = 0; i < len(numz); i++) {
-      if (numz[i] < 4) {
-        note_on_at(sbdrum, numz[i], i * ppp);
-        set raga:stutter 1;
-      }
+      # if (numz[i] < 4) {
+        #   note_on_at(sbdrum, numz[i], i * ppp);
+        # }
       if (numz[i] == 10) {
         note_on_at(mo, 41, i * pp, dur = numz[i] * 4, vel = 100 + rand(27));
-        set raga:vol 0;
+        p1 $ "";
       }
       if (numz[i] == 13) {
-        p2 $ ppblah_gen;
+        p1 $ play2step;
         note_on_at(mo, 44, i * pp, dur = numz[i] * 4, vel = 100 + rand(27));
-        set raga:vol 1;
       }
       if (numz[i] == 11) {
         note_on_at(mo, 47, i * pp);
@@ -136,9 +137,6 @@ let taylorblah_gen = gen()
           ++t;
           numz = numzFromBits(p);
           for (let k = 0; k < 16; k++) {
-            if (numz[i] < 4) {
-              note_on_at(sbdrum, numz[i], qpp * j + ppp);
-            }
             if (numz[i] == 7) {
               note_on_at(mo, 29, qpp * j + ppp);
             }

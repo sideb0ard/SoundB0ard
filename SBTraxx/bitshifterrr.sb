@@ -1,0 +1,121 @@
+# (t & ((t%(t>>1&t))|t>>3^t>>4)>>7)-1
+# (t & ((t%(t>>1&t))|t>>13^t>>5)>>7)-1
+# ((t/1000)^(t/1001))*t
+# t/((t%(t>>13&t)))
+#t>>(8/((t/32)%3))
+
+
+# key 17
+# chord progression I-V-vi-IV
+# I - [17, 21, 24]
+# V - [24, 28, 31]
+# vi - [26, 29, 33]
+# IV - [22, 26, 29]
+
+# load_preset(dx, "fnord0"); load_preset(mo, "aciied")
+# load_preset(dx, "skirissh"); load_preset(mo, "aciied"); vol dx 0.7; vol mo 0.4
+# dx - nast0r //  surgefizz2 // lrrt // brashh // fnord0 // sqwaar // M00n // skirissh // wahaio
+# mo ven0m  // aciied
+# sbdrum
+let byte_gen = gen()
+{
+  setup()
+  {
+    let t = 6734;
+    #let t = 673784373;
+
+    let chrdz = [ [17, 21, 24],  [24, 28, 31], [26, 29, 33], [22, 26, 29] ];
+    #let chrdz = [ [17, 24, 29],  [24, 31, 36], [26, 33, 38], [22, 29, 34] ];
+    let cx = 0;
+
+    set sbdrum:bd_key 5;
+    let octz = [0, 1, 1, 1, 0, 2];
+    let ox = 0;
+
+    let lfo_type = 0;
+
+    let bd_detunez = [0, 10, 40, 60, 90];
+    let bdx = 0;
+
+    #let drz = [80, 150, 300, 500, 700, 1200];
+    let drz = [880, 1150, 1300, 500, 700, 1200];
+    let drx = 0;
+
+    let cpdelz = [4, 14, 24, 10, 40, 90];
+    let cpx = 0;
+
+  }
+  run()
+  {
+    let ppq = 3840 / 4;
+    if (count % 16 < 15) {
+      for (let i = 0; i < 4; i++) {
+        #let p = bits( (t & ((t%(t>>1&t))|t>>3^t>>4)>>7)-1 );
+        let p = bits( t>>(8/((t/32)%3)) );
+        #let p = bits ( ((t/1000)^(t/1001))*t );
+        t++;
+        let numz = numzFromBits(p);
+        #print(numz);
+        for (let j = 0; j < len(numz); j++) {
+          #print(i * ppq + j * pp);
+          let time_now = i * ppq + j * pp;
+          if (numz[j] == 2) {
+            note_on_at(sbdrum, 2, time_now);
+          }
+
+          if (numz[j] == 0) {
+            let v = 80 + rand(37);
+            if ( (i * 4 + j ) % 4 == 0) {
+              v = 127;
+            }
+            note_on_at(sbdrum, 0, time_now, vel = v);
+            note_on_at(dx, chrdz[cx][0], time_now, vel = v,  dur = drz[drx]);
+            drx = incr(drx, 0, len(drz));
+          }
+          if (numz[j] == 5) {
+            note_on_at(dx, chrdz[cx][1], time_now, vel = v, dur = drz[drx]);
+            drx = incr(drx, 0, len(drz));
+            note_on_at(sbdrum, 2, time_now, vel = v);
+          }
+          if (numz[j] == 6) {
+            note_on_at(dx, chrdz[cx][2], time_now);
+            set sbdrum:bd_octave octz[ox] at=time_now;
+            ox = incr(ox, 0, len(octz));
+          }
+          if (numz[j] == 7) {
+            note_on_at(dx, chrdz[cx], time_now, dur = drz[drx]);
+            drx = incr(drx, 0, len(drz));
+          }
+          if (numz[j] == 8) {
+            set sbdrum:cp_delay_ms cpdelz[cpx];
+            cpx = incr(cpx, 0, len(cpdelz));
+          }
+
+          if (numz[j] < 6) {
+            set dx:algo numz[j] at=time_now;
+            set sbdrum:bd_detune bd_detunez[bdx] at=time_now;
+            bdx = incr(bdx, 0, len(bd_detunez));
+          }
+        }
+      }
+    } else {
+      note_on(mo, chrdz[cx], dur = 3840);
+    }
+
+    if (count % 4 < 3) {
+      note_on_at(sbdrum, 3, 4 * pp);
+    }
+    if (count % 8 < 6) {
+      note_on_at(sbdrum, 3, 12 * pp);
+      set sbdrum:cp_lfo_type lfo_type;
+      lfo_type = incr(lfo_type, 0, 4);
+    }
+
+    #print(chrdz[cx]);
+    if (count % 4 == 3) {
+      # mo = sliddr
+      cx = incr(cx, 0, len(chrdz));
+    }
+  }
+}
+

@@ -83,7 +83,7 @@ let b2step_gen = gen()
       }
     }
 
-    for (i = 0; i < 16; ++i) {
+    for (let i = 0; i < 16; ++i) {
       hatv = hatv + 20;
 
       if (count % 16 < 13) {
@@ -167,8 +167,9 @@ let mostringz_gen = gen()
   {
     #let notez =  [63, 68];
     #let notez1 =  [51, 56, 51, 56, 58, 49];
-    let notez1 =  [51, 56, 56, 49];
-    let notez2 =  [44, 44, 44, 44];
+    let notez1 =  [51, 55, 41, 48];
+    let notez2 =  [48, 55, 41, 48];
+    let ntz2 = [ [41, 44, 48], [51, 55, 41],  [48, 51, 55]];
     let notez =  notez1;
     let nx = 0;
     #let durz = [2000, 1700, 1500, 1200, 900, 500, 250];
@@ -212,7 +213,7 @@ let mostringz_gen = gen()
     let thbeat = beat;
     if (count % 12 < 10) {
       let nxx = 0;
-      for (i = 0; i < divr; ++i) {
+      for (let i = 0; i < divr; ++i) {
         if (thbeat[i] == 1) {
           #note_on_at(mo, ntz[nxx], i * pp, vel = vz[vzx], dur = durz[drx]);
           note_on_at(mo, ntz, i * pp, vel = vz[vzx], dur = durz[drx]);
@@ -307,7 +308,7 @@ let ccclah_gen = gen()
     if (count % 3 == 0) {
       set chz:scramble 1;
       let b = rand_array(16, 0, 1);
-      for (i = 0; i < 16; ++i) {
+      for (let i = 0; i < 16; ++i) {
         if (b[i] == 1) {
           note_on_at(far, 1, i * pp);
         } else {
@@ -329,7 +330,7 @@ let brandylah_gen = gen()
   run()
   {
     if (count % 8 > 6) {
-      for (i = 0; i < 16; ++i) {
+      for (let i = 0; i < 16; ++i) {
         if (beat[i] < len(branz)) {
           note_on_at(branz[beat[i]], 1, i * pp);
         }
@@ -369,7 +370,7 @@ let mooblah_gen = gen()
     }
 
     if (count % 5 > 3) {
-      for (i = 0; i < 16; ++i) {
+      for (let i = 0; i < 16; ++i) {
         stepper(mo2, mel, px, i, 200);
         px = incr(px, 0, pxlen);
       }

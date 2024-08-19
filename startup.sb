@@ -964,3 +964,40 @@ let numzFromBits = fn(bits)
   }
   return returnNumz;
 }
+
+let gen2stepbeat = fn()
+{
+  let beat = rand_array(16, 0, 0);
+  if (count % 2 == 0 && rand(100) > 10) {
+    beat[0] = 1;
+  }
+  beat[8] = 1;
+
+  for (let i = 4; i < 16; i = i + 4) {
+    let stepz = gen2stepsequence();
+    for (let j = 0; j < len(stepz); j++) {
+      beat[i + stepz[j]] = 1);
+    }
+  }
+  beat[9] = 0;
+  return beat;
+}
+
+
+let gen2stepsequence = fn()
+{
+  let num_steps = rand(2) + 1;
+  let idxz = [];
+  let have_all = false;
+  for (let i = 0; i < num_steps; !have_all  ) {
+    let next_idx = rand(3) + 1;
+    if (!is_val_in_list(idxz, next_idx)) {
+      push(idxz, next_idx);
+      i++;
+    }
+    if (len(idxz) == num_steps) {
+      have_all = true;
+    }
+  }
+  return idxz;
+}

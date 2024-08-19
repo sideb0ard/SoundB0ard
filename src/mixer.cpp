@@ -739,8 +739,8 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
     UpdateBpm(action->new_bpm);
   } else if (action->type == AudioAction::VOLUME) {
     VolChange(action->new_volume);
-  } else if (action->type == AudioAction::MIDI_EVENT_ADD ||
-             action->type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+  } else if (action->type == AudioAction::MIDI_NOTE_ON ||
+             action->type == AudioAction::MIDI_NOTE_ON_DELAYED) {
     if (IsValidSoundgenNum(action->soundgen_num)) {
       auto &sg = sound_generators_[action->soundgen_num];
 
@@ -753,7 +753,7 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
         // used later for MIDI OFF MESSAGE
         int midi_note_on_time = timing_info.midi_tick;
 
-        if (action->type == AudioAction::MIDI_EVENT_ADD_DELAYED) {
+        if (action->type == AudioAction::MIDI_NOTE_ON_DELAYED) {
           midi_note_on_time += action->note_start_time;
           auto ev = DelayedMidiEvent(midi_note_on_time, event_on,
                                      action->soundgen_num);
@@ -761,15 +761,36 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
         } else {
           sg->NoteOn(event_on);
         }
-        int midi_off_tick = midi_note_on_time + action->duration;
+        if (action->duration) {
+          int midi_off_tick = midi_note_on_time + action->duration;
 
-        midi_event event_off =
-            new_midi_event(MIDI_OFF, midinum, action->velocity);
+          midi_event event_off =
+              new_midi_event(MIDI_OFF, midinum, action->velocity);
 
-        auto ev =
-            DelayedMidiEvent(midi_off_tick, event_off, action->soundgen_num);
+          auto ev =
+              DelayedMidiEvent(midi_off_tick, event_off, action->soundgen_num);
 
-        _action_items.push_back(ev);
+          _action_items.push_back(ev);
+        }
+      }
+    }
+  } else if (action->type == AudioAction::MIDI_NOTE_OFF ||
+             action->type == AudioAction::MIDI_NOTE_OFF_DELAYED) {
+    if (IsValidSoundgenNum(action->soundgen_num)) {
+      auto &sg = sound_generators_[action->soundgen_num];
+
+      for (auto midinum : action->notes) {
+        midi_event event_off = new_midi_event(MIDI_OFF, midinum, 0);
+
+        if (action->type == AudioAction::MIDI_NOTE_OFF_DELAYED) {
+          int midi_note_off_time =
+              timing_info.midi_tick + action->note_start_time;
+          auto ev = DelayedMidiEvent(midi_note_off_time, event_off,
+                                     action->soundgen_num);
+          _action_items.push_back(ev);
+        } else {
+          sg->NoteOff(event_off);
+        }
       }
     }
   } else if (action->type == AudioAction::SOLO) {

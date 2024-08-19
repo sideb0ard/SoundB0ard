@@ -1,0 +1,57 @@
+
+let bits_fn = fn()
+{
+  for (let i = 0; i < 16; i++) {
+  }
+
+}
+# key of D - 14
+# two chords = [23, 26, 30],  [16, 19, 23]
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let t = 43492;
+    let chordz = [ [23, 26, 30],  [16, 19, 23] ];
+    let chx = 0;
+  }
+  run()
+  {
+    #let pat = (t >> 3 & (t << 2));
+    #let bitpat = bits(pat);
+    #t++;
+    #for (let i = 0; i < 16; i++) {
+      #  if (bitpat[i] == 1) {
+        #    note_on_at(sbdrum, 0, i * pp);
+        #  }
+      #}
+
+    let ppq = 3840 / 4;
+    for (let i = 0; i < 4; i++) {
+      let pat = (t >> 3 & (t << 2));
+      let bitpat = bits(pat);
+      t++;
+
+      #print(bitpat);
+      let nums = numzFromBits(bitpat);
+      #print(nums);
+      for (let j = 0; j < 4; j++) {
+        let time_now = i * ppq + j * pp;
+        #print("num:", nums[j], "timenow:", time_now);
+
+        if (nums[j] < 4) {
+          note_on_at(sbdrum, nums[j], time_now);
+        }
+        if (nums[j] == 5) {
+          note_on_at(dx, chordz[chx], time_now);
+        }
+        if (nums[j] == 4) {
+          chx = incr(chx, 0, len(chordz));
+        }
+      }
+
+    }
+  }
+}
+

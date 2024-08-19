@@ -9,6 +9,7 @@ let nublah_gen = gen()
     let cx = 0;
     #let t = rand(104);
     let t = rand(87878787);
+    print("T:", t);
     #let t = 878787;
     let durz = [50, 10, 500, 150, 1000, 300, 700];
     let drx = 0;
@@ -57,11 +58,13 @@ let nublah_gen = gen()
           }
           if (numz[j] == 11) {
             note_on_at(dx, chrds[cx], time_now, dur = durz[drx]);
+            load_preset(dx, "beleep");
           }
           if (numz[j] == 12) {
             note_on_at(dx, chrds[cx][rand(3)], time_now, dur = durz[drx]);
             cx = incr(cx, 0, len(chrds));
             set dre:vol 0 at=time_now;
+            load_preset(dx, "default");
           }
           if (numz[j] == 13) {
             note_on_at(dx, chrds[cx][rand(3)], time_now, dur = durz[drx]);

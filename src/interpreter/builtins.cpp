@@ -162,7 +162,7 @@ void SendMidiMapping(int mapped_id, std::string mapped_param) {
 void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
                 int vel, int dur) {
   auto action =
-      std::make_unique<AudioActionItem>(AudioAction::MIDI_EVENT_ADD_DELAYED);
+      std::make_unique<AudioActionItem>(AudioAction::MIDI_NOTE_ON_DELAYED);
   action->soundgen_num = sgid;
   action->notes = midi_nums;
   action->velocity = vel;
@@ -181,11 +181,26 @@ void midi_event_at(int sgid, midi_event ev, int start_time) {
 }
 
 void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur) {
-  auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_EVENT_ADD);
+  auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_NOTE_ON);
   action->soundgen_num = sgid;
   action->notes = midi_nums;
   action->velocity = vel;
   action->duration = dur;
+  audio_queue.push(std::move(action));
+}
+
+void note_off(int sgid, std::vector<int> midi_nums) {
+  auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_NOTE_OFF);
+  action->soundgen_num = sgid;
+  action->notes = midi_nums;
+  audio_queue.push(std::move(action));
+}
+void note_off_at(int sgid, std::vector<int> midi_nums, int note_stop_time) {
+  auto action =
+      std::make_unique<AudioActionItem>(AudioAction::MIDI_NOTE_OFF_DELAYED);
+  action->soundgen_num = sgid;
+  action->notes = midi_nums;
+  action->note_start_time = note_stop_time;
   audio_queue.push(std::move(action));
 }
 
@@ -1477,6 +1492,52 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              note_on_at(sgid, midi_nums, note_start_time, vel, dur);
            }
 
+           return evaluator::NULLL;
+         })},
+    {"note_off", std::make_shared<object::BuiltIn>(
+                     [](std::vector<std::shared_ptr<object::Object>> args)
+                         -> std::shared_ptr<object::Object> {
+                       if (args.size() < 2)
+                         return evaluator::NewError(
+                             "`note_on` requires at least two "
+                             "args - a sound_generator target "
+                             "and a midi_note to stop.");
+
+                       auto soundgen =
+                           std::dynamic_pointer_cast<object::SoundGenerator>(
+                               args[0]);
+                       if (soundgen) {
+                         int sgid = soundgen->soundgen_id_;
+                         std::vector<int> midi_nums = GetMidiNotes(args[1]);
+
+                         note_off(sgid, midi_nums);
+                       }
+                       return evaluator::NULLL;
+                     })},
+    {"note_off_at",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           if (args.size() < 3)
+             return evaluator::NewError(
+                 "`note_off_at` requires at least three args - a "
+                 "sound_generator target, a midi_note to stop and a time "
+                 "in the future specified in midi ticks.");
+
+           auto soundgen =
+               std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+           if (soundgen) {
+             int sgid = soundgen->soundgen_id_;
+             std::vector<int> midi_nums = GetMidiNotes(args[1]);
+
+             auto num_obj = std::dynamic_pointer_cast<object::Number>(args[2]);
+
+             if (!num_obj) return evaluator::NULLL;
+
+             int note_stop_time = num_obj->value_;
+
+             note_off_at(sgid, midi_nums, note_stop_time);
+           }
            return evaluator::NULLL;
          })},
     {"set_pitch",
