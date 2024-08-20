@@ -52,7 +52,11 @@ void SoundGenerator::ParseMidiEvent(midi_event ev, mixer_timing_info tinfo) {
       break;
     }
     case (MIDI_OFF): {  // Hex 0x90
-      NoteOff(ev);
+      if (ev.data1 == 0) {
+        AllNotesOff();
+      } else {
+        NoteOff(ev);
+      }
       break;
     }
     case (MIDI_CONTROL): {  // Hex 0xB0

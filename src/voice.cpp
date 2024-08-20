@@ -297,6 +297,7 @@ void Voice::NoteOn(int midi_note, int midi_velocity, double frequency,
     m_note_on = true;
     m_timestamp = 0;
 
+    std::cout << "YO VOICE IS ON!\n";
     return;  // ESCAPE HATCH, ALL DONE
   }
 

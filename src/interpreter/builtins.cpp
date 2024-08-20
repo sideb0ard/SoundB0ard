@@ -1497,19 +1497,21 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"note_off", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
-                       if (args.size() < 2)
+                       if (args.size() == 0)
                          return evaluator::NewError(
-                             "`note_on` requires at least two "
-                             "args - a sound_generator target "
-                             "and a midi_note to stop.");
+                             "`note_off` requires at least one arg - "
+                             "a sound_generator target "
+                             "to stop.");
 
                        auto soundgen =
                            std::dynamic_pointer_cast<object::SoundGenerator>(
                                args[0]);
                        if (soundgen) {
                          int sgid = soundgen->soundgen_id_;
-                         std::vector<int> midi_nums = GetMidiNotes(args[1]);
-
+                         std::vector<int> midi_nums;
+                         if (args.size() > 1) {
+                           midi_nums = GetMidiNotes(args[1]);
+                         }
                          note_off(sgid, midi_nums);
                        }
                        return evaluator::NULLL;

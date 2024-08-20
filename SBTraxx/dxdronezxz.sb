@@ -1,5 +1,14 @@
 
-# TODO
-# Add note_off event type to
-# src/interpreter/builtins.cpp
-# in order to control note on and off programmtically.
+let noteblah_gen = gen()
+{
+  setup()
+  {
+    let chrds_orig = [ [51, 55, 48], [48, 52, 45], [44, 48, 41] ];
+    let chx = 0;
+  }
+  run()
+  {
+    note_on_at(dx, chrds_orig[0][0], 0, dur = 0);
+  }
+}
+
