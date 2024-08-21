@@ -406,8 +406,6 @@ void MiniSynth::Control(midi_event ev) {
 void MiniSynth::NoteOn(midi_event ev) {
   unsigned int midinote = ev.data1;
   unsigned int velocity = ev.data2;
-  std::cout << "YO MINISYNTH NOTE ON!: note:" << ev.data1 << " VEL:" << ev.data2
-            << "\n";
 
   if (m_settings.m_monophonic) {
     auto msv = voices_[0];
@@ -421,7 +419,6 @@ void MiniSynth::NoteOn(midi_event ev) {
   for (auto v : voices_) {
     if (!v->m_note_on) {
       IncrementVoiceTimestamps();
-      std::cout << "SENDING TO BOIVEE:" << std::endl;
       v->NoteOn(midinote, velocity, Midi2Freq(midinote), m_last_note_frequency);
 
       m_last_note_frequency = Midi2Freq(midinote);

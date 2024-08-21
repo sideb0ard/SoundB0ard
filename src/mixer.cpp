@@ -744,7 +744,6 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
     if (IsValidSoundgenNum(action->soundgen_num)) {
       auto &sg = sound_generators_[action->soundgen_num];
 
-      std::cout << "YO MIDI NOTE ON!\n";
       for (auto midinum : action->notes) {
         midi_event event_on =
             new_midi_event(MIDI_ON, midinum, action->velocity);
@@ -760,7 +759,6 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
                                      action->soundgen_num);
           _action_items.push_back(ev);
         } else {
-          std::cout << "SENDING NOTE ON TO SG\n";
           sg->NoteOn(event_on);
         }
         if (action->duration) {
