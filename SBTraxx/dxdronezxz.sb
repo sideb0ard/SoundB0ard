@@ -1,14 +1,80 @@
 
+# DX whodunit
+let next_event_gen = gen()
+{
+  setup()
+  {
+    let note_durs = [1000, 2000, 500];
+    let ndx = 0;
+    let note_rests = [500, 1000, 500, 2000];
+    let nrx = 0;
+  }
+  run()
+  {
+    let next_event = [note_durs[ndx], note_rests[nrx]];
+    ndx = incr(ndx, 0, len(note_durs));
+    nrx = incr(nrx, 0, len(note_rests));
+    return next_event;
+  }
+}
+
 let noteblah_gen = gen()
 {
   setup()
   {
-    let chrds_orig = [ [51, 55, 48], [48, 52, 45], [44, 48, 41] ];
+    # d# minor 7 = [39, 42, 46, 49]
+    # g# minor 7 = [44, 47, 51, 54]
+    let dsharpchrd = [39, 42, 46, 49];
+    let gsharpchrd = [44, 47, 51, 54];
+    let chrds = [ dsharpchrd, gsharpchrd];
     let chx = 0;
+
+    let event_time_rollover = 0;
   }
   run()
   {
-    note_on_at(dx, chrds_orig[0][0], 0, dur = 0);
+    # todo - create system variable to show current bpm
+    # this assumes bpm of 140
+    let cur_loop_time_ms = 60000 / 140 * 4;
+    #print("CUR LOOP TIME:", cur_loop_time_ms, " ms");
+    #print("TIME ROLLOVER ms:", event_time_rollover);
+
+    if (event_time_rollover > cur_loop_time_ms) {
+      event_time_rollover = event_time_rollover - cur_loop_time_ms;
+      #print("TIME ROLLOVER GREATER THAN LOOP LEN - SKIP ACTIONS");
+      return;
+    }
+
+    let pulses_per_ms = 3840 / cur_loop_time_ms;
+    #print("PULSES PER MS:" , pulses_per_ms);
+    let time_left_in_loop = cur_loop_time_ms - event_time_rollover;
+
+    let cur_event_schedule_time = event_time_rollover;
+
+    let is_over_loop_time = false;
+    for (let i = 0; is_over_loop_time == false; i++) {
+      let next_event = next_event_gen();
+      let note_len_time = next_event[0];
+      let rest_time = next_event[1];
+      let total_event_time = note_len_time + rest_time;
+      #print("NEXT EVENT:", next_event, "NOTE ON AT:", cur_event_schedule_time + " for:", note_len_time, " REST TIME:", rest_time);
+      let note_on_pp = cur_event_schedule_time * pulses_per_ms;
+      let note_off_pp = (cur_event_schedule_time + note_len_time) * pulses_per_ms;
+      #print("NOTE ON AT:", note_on_pp, " NOTE OFF:", note_off_pp);
+      note_on_at(sbdrum, 0, note_on_pp);
+      note_on_at(dx, chrds[chx], note_on_pp, dur = 0);
+      chx = incr(chx, 0, len(chrds));
+      note_off_at(dx, 0, note_off_pp);
+      time_left_in_loop = time_left_in_loop - total_event_time;
+      cur_event_schedule_time = cur_event_schedule_time + total_event_time;
+      #print("TIME LFET IN LOOP:", time_left_in_loop);
+      if (time_left_in_loop < 0) {
+        is_over_loop_time = true;
+        event_time_rollover = abs(time_left_in_loop);
+      }
+    }
+
+
   }
 }
 

@@ -14,7 +14,7 @@
 
 # load_preset(dx, "fnord0"); load_preset(mo, "aciied")
 # load_preset(dx, "skirissh"); load_preset(mo, "aciied"); vol dx 0.7; vol mo 0.4
-# dx - nast0r //  surgefizz2 // lrrt // brashh // fnord0 // sqwaar // M00n // skirissh // wahaio
+# dx - nast0r //  surgefizz2 // lrrt // brashh // fnord0 // sqwaar // M00n // skirissh // wahaio // occeanlap
 # mo ven0m  // aciied
 # sbdrum
 let byte_gen = gen()
@@ -24,7 +24,13 @@ let byte_gen = gen()
     let t = 6734;
     #let t = 673784373;
 
-    let chrdz = [ [17, 21, 24],  [24, 28, 31], [26, 29, 33], [22, 26, 29] ];
+    let presetz = ["fnord0", "skirissh"];
+    let px = 0;
+
+    #let chrdz = [ [17, 21, 24],  [24, 28, 31], [26, 29, 33], [22, 26, 29] ];
+    #let chrdz = [ [39, 42, 46, 37],  [44, 47, 51, 42] ];
+    #let chrdz = [  [15, 18, 22, 13], [20, 23, 27, 18] ];
+    let chrdz = [  [15, 18, 22, 13] ];
     #let chrdz = [ [17, 24, 29],  [24, 31, 36], [26, 33, 38], [22, 29, 34] ];
     let cx = 0;
 
@@ -50,8 +56,8 @@ let byte_gen = gen()
     let ppq = 3840 / 4;
     if (count % 16 < 15) {
       for (let i = 0; i < 4; i++) {
-        #let p = bits( (t & ((t%(t>>1&t))|t>>3^t>>4)>>7)-1 );
-        let p = bits( t>>(8/((t/32)%3)) );
+        let p = bits( (t & ((t%(t>>1&t))|t>>3^t>>4)>>7)-1 );
+        #let p = bits( t>>(8/((t/32)%3)) );
         #let p = bits ( ((t/1000)^(t/1001))*t );
         t++;
         let numz = numzFromBits(p);
@@ -115,6 +121,8 @@ let byte_gen = gen()
     if (count % 4 == 3) {
       # mo = sliddr
       cx = incr(cx, 0, len(chrdz));
+      #load_preset(dx, presetz[px]);
+      #px = incr(px, 0, len(presetz));
     }
   }
 }
