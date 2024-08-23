@@ -1,12 +1,13 @@
 
-# DX whodunit
+# DX whodunit // basss
+# dx2 - fnacccx
 let next_event_gen = gen()
 {
   setup()
   {
-    let note_durs = [1000, 2000, 500];
+    let note_durs = [100, 2000, 1000, 500, 700];
     let ndx = 0;
-    let note_rests = [500, 1000, 500, 2000];
+    let note_rests = [500, 750, 500, 2000];
     let nrx = 0;
   }
   run()
@@ -26,8 +27,9 @@ let noteblah_gen = gen()
     # g# minor 7 = [44, 47, 51, 54]
     let dsharpchrd = [39, 42, 46, 49];
     let gsharpchrd = [44, 47, 51, 54];
-    let chrds = [ dsharpchrd, gsharpchrd];
-    let chx = 0;
+    # let chrds = [ dsharpchrd, gsharpchrd];
+    # let chx = 0;
+    let note_ctr = 0;
 
     let event_time_rollover = 0;
   }
@@ -61,9 +63,30 @@ let noteblah_gen = gen()
       let note_on_pp = cur_event_schedule_time * pulses_per_ms;
       let note_off_pp = (cur_event_schedule_time + note_len_time) * pulses_per_ms;
       #print("NOTE ON AT:", note_on_pp, " NOTE OFF:", note_off_pp);
-      note_on_at(sbdrum, 0, note_on_pp);
-      note_on_at(dx, chrds[chx], note_on_pp, dur = 0);
-      chx = incr(chx, 0, len(chrds));
+      #note_on_at(sbdrum, 0, note_on_pp);
+      let root_note = 39;
+      if (note_ctr % 7 == 3 || note_ctr % 7 == 4) {
+        root_note = 44;
+      }
+
+      # min7
+      let chord_mod = 1;
+      #if (note_ctr % 4 == 0) {
+        #  # InvMin7
+        #  chord_mod = 3;
+        #}
+
+      let chr = notes_in_chord(root_note, 1, chord_mod);
+
+      if (note_ctr % 4 == 0) {
+        #note_on_at(dx2, chr[0]-24, note_on_pp, dur = note_len_time * pulses_per_ms, vel = 80 + rand(20));
+        #   # InvMin7NoRoot
+        #   chord_mod = 5;
+        #   # TODO = play BASS
+      }
+      note_ctr++;
+      note_on_at(dx, chr, note_on_pp, dur = 0);
+
       note_off_at(dx, 0, note_off_pp);
       time_left_in_loop = time_left_in_loop - total_event_time;
       cur_event_schedule_time = cur_event_schedule_time + total_event_time;
