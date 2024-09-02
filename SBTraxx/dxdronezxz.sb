@@ -1,20 +1,25 @@
 
+# load_preset(dx, "basss"); load_preset(dx2, "detruit")
 # DX whodunit // basss
-# dx2 - fnacccx
+# dx2 - detruit
+# 16th is 240 midi ticks
 let next_event_gen = gen()
 {
   setup()
   {
-    let note_durs = [100, 2000, 1000, 500, 700];
+    let note_durs = [960, 3840, 1920, 192, 1200];
     let ndx = 0;
-    let note_rests = [500, 750, 500, 2000];
+    let note_rests = [720, 1200, 1920, 1920];
     let nrx = 0;
+    let velz = [127, 127, 110, 115, 110, 120, 120];
+    let vx = 0;
   }
   run()
   {
-    let next_event = [note_durs[ndx], note_rests[nrx]];
+    let next_event = [note_durs[ndx], note_rests[nrx], velz[vx]];
     ndx = incr(ndx, 0, len(note_durs));
     nrx = incr(nrx, 0, len(note_rests));
+    vx = incr(vx, 0, len(velz));
     return next_event;
   }
 }
@@ -23,34 +28,26 @@ let noteblah_gen = gen()
 {
   setup()
   {
-    # d# minor 7 = [39, 42, 46, 49]
-    # g# minor 7 = [44, 47, 51, 54]
-    let dsharpchrd = [39, 42, 46, 49];
-    let gsharpchrd = [44, 47, 51, 54];
-    # let chrds = [ dsharpchrd, gsharpchrd];
-    # let chx = 0;
     let note_ctr = 0;
-
     let event_time_rollover = 0;
+    #let counter_notes = [20, 75];
+    let counter_notes = [20, 32, 27];
+    let cx = 0;
+
+    let dx2durz = [50, 100, 250, 75, 25];
+    let dxdx = 0;
+
+    let algoz = [1, 1, 1, 1, 5];
+    let ax = 0;
   }
   run()
   {
-    # todo - create system variable to show current bpm
-    # this assumes bpm of 140
-    let cur_loop_time_ms = 60000 / 140 * 4;
-    #print("CUR LOOP TIME:", cur_loop_time_ms, " ms");
-    #print("TIME ROLLOVER ms:", event_time_rollover);
-
-    if (event_time_rollover > cur_loop_time_ms) {
-      event_time_rollover = event_time_rollover - cur_loop_time_ms;
-      #print("TIME ROLLOVER GREATER THAN LOOP LEN - SKIP ACTIONS");
+    if (event_time_rollover >= 3840) {
+      event_time_rollover = event_time_rollover - 3840;
       return;
     }
 
-    let pulses_per_ms = 3840 / cur_loop_time_ms;
-    #print("PULSES PER MS:" , pulses_per_ms);
-    let time_left_in_loop = cur_loop_time_ms - event_time_rollover;
-
+    let ticks_left_in_loop = 3840 - event_time_rollover;
     let cur_event_schedule_time = event_time_rollover;
 
     let is_over_loop_time = false;
@@ -58,46 +55,97 @@ let noteblah_gen = gen()
       let next_event = next_event_gen();
       let note_len_time = next_event[0];
       let rest_time = next_event[1];
+      let v = next_event[2];
       let total_event_time = note_len_time + rest_time;
-      #print("NEXT EVENT:", next_event, "NOTE ON AT:", cur_event_schedule_time + " for:", note_len_time, " REST TIME:", rest_time);
-      let note_on_pp = cur_event_schedule_time * pulses_per_ms;
-      let note_off_pp = (cur_event_schedule_time + note_len_time) * pulses_per_ms;
+      let note_on_pp = cur_event_schedule_time;
+      let note_off_pp = (cur_event_schedule_time + note_len_time);
       #print("NOTE ON AT:", note_on_pp, " NOTE OFF:", note_off_pp);
-      #note_on_at(sbdrum, 0, note_on_pp);
+      # 39 = d# // 44 = g#
       let root_note = 39;
       if (note_ctr % 7 == 3 || note_ctr % 7 == 4) {
         root_note = 44;
       }
 
+      if (note_ctr % 13 == 0) {
+        # 42 f#
+        root_note = 54;
+      }
+      if (note_ctr % 22 == 0) {
+        # 42 f#
+        root_note = 63;
+      }
+
       # min7
       let chord_mod = 1;
-      #if (note_ctr % 4 == 0) {
-        #  # InvMin7
-        #  chord_mod = 3;
-        #}
-
       let chr = notes_in_chord(root_note, 1, chord_mod);
 
-      if (note_ctr % 4 == 0) {
-        #note_on_at(dx2, chr[0]-24, note_on_pp, dur = note_len_time * pulses_per_ms, vel = 80 + rand(20));
-        #   # InvMin7NoRoot
-        #   chord_mod = 5;
-        #   # TODO = play BASS
-      }
       note_ctr++;
-      note_on_at(dx, chr, note_on_pp, dur = 0);
-
+      note_on_at(dx, chr, note_on_pp, dur = 0, vel = v);
       note_off_at(dx, 0, note_off_pp);
-      time_left_in_loop = time_left_in_loop - total_event_time;
+
+      # dx2 = detruit
+      if (count % 2 == 1) {
+        note_on_at(dx2, counter_notes[cx], note_off_pp, dur = dx2durz[dxdx], vel = 100);
+        dxdx = incr(dxdx, 0, len(dx2durz));
+        cx = incr(cx, 0, len(counter_notes));
+      }
+
+      ticks_left_in_loop = ticks_left_in_loop - total_event_time;
       cur_event_schedule_time = cur_event_schedule_time + total_event_time;
-      #print("TIME LFET IN LOOP:", time_left_in_loop);
-      if (time_left_in_loop < 0) {
+      if (ticks_left_in_loop < 0) {
         is_over_loop_time = true;
-        event_time_rollover = abs(time_left_in_loop);
+        event_time_rollover = abs(ticks_left_in_loop);
       }
     }
+  }
+}
+
+let beatlah_gen = gen()
+{
+  setup()
+  {
+    let clapextraCtr = 1;
+    let hvz = [30, 40, 60, 80, 90];
+    let hvx = 0;
+    let delz = [5, 10, 23, 40];
+    let dlx = 0;
+    let delfb = [0, 30, 60, 90];
+    let delx = 0;
+
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      note_on(sbdrum, 0);
+      note_on_at(sbdrum, 3, 3840 / 2 + 30, vel = 90);
+      for (let i = 0; i < 16; i++) {
+        if (i % 8 == 3) {
+          note_on_at(sbdrum, 2, i * pp, vel = hvz[hvx]);
+          set sbdrum:cp_delay_ms delz[dlx] at=i*pp;
+          dlx = incr(dlx, 0, len(delz));
+          set sbdrum:hh_delay_ms delz[dlx] at=i*pp;
+          set sbdrum:hh_delay_feedback_pct delfb[delx] at=i*pp;
+          delx = incr(delx, 0, len(delfb));
+        }
+      }
+      hvx = incr(hvx, 0, len(hvz));
+    }
+
+    if (count % 3 == 0) {
+      note_on_at(sbdrum, 3, clapextraCtr * 240, vel = hvz[hvx]);
+      clapextraCtr = incr(clapextraCtr, 1, 14);
+    }
+  }
+}
 
 
+let noteeblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
   }
 }
 

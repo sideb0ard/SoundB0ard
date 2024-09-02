@@ -1,0 +1,20 @@
+
+# wahaio sometimes
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let mel = [55, 58, 53, 56];
+    let ch_type = [1, 0, 1, 0];
+  }
+  run()
+  {
+    let qn = 3840 / 4;
+    for (let i = 0; i < len(mel); i++) {
+      #print(notes_in_chord(mel[i], ch_type[i]));
+      note_on_at(dx, notes_in_chord(mel[i], ch_type[i]), i * qn, dur = qn);
+    }
+
+  }
+}
+

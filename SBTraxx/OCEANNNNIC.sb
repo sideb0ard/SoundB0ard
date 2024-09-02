@@ -12,7 +12,7 @@ let dbblah_gen = gen()
   {
     let p = bits(t>>(8/((t/32)%3)));
     ++t;
-    for (i = 0; i < 16; ++i) {
+    for (let i = 0; i < 16; ++i) {
       let offs = 0;
       if (i % 2 == 1) {
         offs = rand(30);
@@ -63,7 +63,7 @@ let bitzlah_gen = gen()
     }
     let p = bits(((t/4)>>(t/4))>>(t>>(t/8))|t>>2);
     ++t;
-    for (i = 0; i < 16; ++i) {
+    for (let i = 0; i < 16; ++i) {
       ++llx;
       if (p[i] == 1) {
         note_on_at(fkn, mel[llx % 16], i * pp, vel = 120, dur = drrr);

@@ -24,6 +24,7 @@ DrumSynth::DrumSynth() {
   bd_ = std::make_unique<BassDrum>();
   sd_ = std::make_unique<SnareDrum>();
   hh_ = std::make_unique<HiHat>();
+  hh2_ = std::make_unique<HiHat>();
   cp_ = std::make_unique<HandClap>();
 
   LoadSettings(DrumSettings());
@@ -41,6 +42,10 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   auto hh_out = hh_->Generate();
   out.left += hh_out.left;
   out.right += hh_out.right;
+
+  auto hh2_out = hh2_->Generate();
+  out.left += hh2_out.left;
+  out.right += hh2_out.right;
 
   auto snare_out = sd_->Generate();
   out.left += snare_out.left;
@@ -127,6 +132,39 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.hh_delay_sync_tempo = val;
   else if (name == "hh_delay_sync_len")
     settings_.hh_delay_sync_len = val;
+
+  else if (name == "hh2_vol")
+    settings_.hh2_vol = val;
+  else if (name == "hh2_pan")
+    settings_.hh2_pan = val;
+  else if (name == "hh2_attack")
+    settings_.hh2_attack = val;
+  else if (name == "hh2_decay")
+    settings_.hh2_decay = val;
+  else if (name == "hh2_sqamp")
+    settings_.hh2_sqamp = val;
+  else if (name == "hh2_midf")
+    settings_.hh2_midf = val;
+  else if (name == "hh2_hif")
+    settings_.hh2_hif = val;
+  else if (name == "hh2_hif_q")
+    settings_.hh2_hif_q = val;
+  else if (name == "hh2_dist")
+    settings_.hh2_distortion_threshold = val;
+  else if (name == "hh2_delay_mode")
+    settings_.hh2_delay_mode = val;
+  else if (name == "hh2_delay_ms")
+    settings_.hh2_delay_ms = val;
+  else if (name == "hh2_delay_feedback_pct")
+    settings_.hh2_delay_feedback_pct = val;
+  else if (name == "hh2_delay_ratio")
+    settings_.hh2_distortion_threshold = val;
+  else if (name == "hh2_delay_wetmix")
+    settings_.hh2_distortion_threshold = val;
+  else if (name == "hh2_delay_sync_tempo")
+    settings_.hh2_delay_sync_tempo = val;
+  else if (name == "hh2_delay_sync_len")
+    settings_.hh2_delay_sync_len = val;
 
   else if (name == "sd_vol")
     settings_.sd_vol = val;
@@ -266,7 +304,22 @@ std::string DrumSynth::Info() {
   ss << "     hh_delay_wetmix:" << settings_.hh_delay_wetmix
      << " hh_delay_sync_tempo:" << settings_.hh_delay_sync_tempo
      << " hh_delay_sync_len:" << settings_.hh_delay_sync_len << std::endl;
-  ss << COOL_COLOR_ORANGE "     cp(3): cp_vol:" << settings_.cp_vol
+  ss << COOL_COLOR_ORANGE "     hh2(4): hh2_vol:" << settings_.bd_vol
+     << " hh2_pan:" << settings_.hh2_pan
+     << " hh2_attack:" << settings_.hh2_attack
+     << " hh2_decay:" << settings_.hh2_decay << std::endl;
+  ss << "     hh2_sqamp:" << settings_.hh2_sqamp
+     << " hh2_midf:" << settings_.hh2_midf << " hh2_hif:" << settings_.hh2_hif
+     << " hh2_hif_q:" << settings_.hh2_hif_q
+     << " hh2_dist:" << settings_.hh2_distortion_threshold << std::endl;
+  ss << "     hh2_delay_mode:" << settings_.hh2_delay_mode
+     << " hh2_delay_ms:" << settings_.hh2_delay_ms
+     << " hh2_delay_feedback_pct:" << settings_.hh2_delay_feedback_pct
+     << " hh2_delay_ratio:" << settings_.hh2_delay_ratio << std::endl;
+  ss << "     hh2_delay_wetmix:" << settings_.hh2_delay_wetmix
+     << " hh2_delay_sync_tempo:" << settings_.hh2_delay_sync_tempo
+     << " hh2_delay_sync_len:" << settings_.hh2_delay_sync_len << std::endl;
+  ss << COOL_COLOR_YELLOW_MELLOW "     cp(3): cp_vol:" << settings_.cp_vol
      << " cp_pan:" << settings_.cp_pan << " cp_nvol:" << settings_.cp_nvol
      << " cp_nattack:" << settings_.cp_nattack
      << " cp_ndecay:" << settings_.cp_ndecay << " cp_tone:" << settings_.cp_tone
@@ -334,6 +387,10 @@ void DrumSynth::NoteOn(midi_event ev) {
     case (3):
       // HandClap
       cp_->NoteOn(velocity);
+      break;
+    case (4):
+      // Hi Hat 2 // Open Hat
+      hh2_->NoteOn(velocity);
       break;
     default:
       std::cerr << "DrumSynth - num not implemented:" << drum_module_num
@@ -435,6 +492,23 @@ void DrumSynth::Update() {
   hh_->delay_->SetWetMix(settings_.hh_delay_wetmix);
   hh_->delay_->SetSync(settings_.hh_delay_sync_tempo);
   hh_->delay_->SetSyncLen(settings_.hh_delay_sync_len);
+
+  hh2_->dca_.m_amplitude_control = settings_.hh2_vol;
+  hh2_->dca_.m_pan_control = settings_.hh2_pan;
+  hh2_->eg_.SetAttackTimeMsec(settings_.hh2_decay);
+  hh2_->eg_.SetDecayTimeMsec(settings_.hh2_decay);
+  hh2_->SetAmplitude(settings_.hh2_sqamp);
+  hh2_->mid_filter_->SetFcControl(settings_.hh2_midf);
+  hh2_->high_filter_->SetFcControl(settings_.hh2_hif);
+  hh2_->high_filter_->SetQControl(settings_.hh2_hif_q);
+  hh2_->distortion_.SetParam("threshold", settings_.hh2_distortion_threshold);
+  hh2_->delay_->SetMode(settings_.hh2_delay_mode);
+  hh2_->delay_->SetDelayTimeMs(settings_.hh2_delay_ms);
+  hh2_->delay_->SetFeedbackPercent(settings_.hh2_delay_feedback_pct);
+  hh2_->delay_->SetDelayRatio(settings_.hh2_delay_ratio);
+  hh2_->delay_->SetWetMix(settings_.hh2_delay_wetmix);
+  hh2_->delay_->SetSync(settings_.hh2_delay_sync_tempo);
+  hh2_->delay_->SetSyncLen(settings_.hh2_delay_sync_len);
 
   cp_->dca_.m_amplitude_control = settings_.cp_vol;
   cp_->dca_.m_pan_control = settings_.cp_pan;

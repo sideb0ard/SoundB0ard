@@ -1,0 +1,291 @@
+# key of F minor
+# Dx - WHHXc // octaGON // wablleeed // rrrkan // brokecomputa // POPpunk
+# mo - gurl2
+# Taylor Dane - Fm [41, 44, 48] / D# [51, 55, 58] / Cm [48, 51, 55]
+
+# load_preset(dx, "detbass");  load_preset(dx2, "WUFFbbgf");
+# load_preset(dx, "beleep");  load_preset(dx2, "WUFFbbgf");
+
+# load_preset(dx, "warlyv");  load_preset(dx2, "WURrpOCT3");
+
+let tyblah_gen = gen()
+{
+  setup()
+  {
+    #let ntz = down([41, 51, 48], 24);
+    #let ntz = down([41, 51, 48], 24);
+    let ntz = down([41, 51, 48], 24);
+    #let ntz = [29, 51, 29, 29, 29, 34, 36];
+    #let ntz = [29];
+    let nx = 0;
+    let durz = [3840, 1280, 240, 1960, 480, 960];
+    let drx = 0;
+    let restz = [1920, 960, 840, 960, 1920, 1280, 240];
+    let rx = 0;
+    let velz = [110, 115, 110, 120, 120];
+    let vx = 0;
+  }
+  run()
+  {
+    let next_event = [ntz[nx], durz[drx], restz[rx], velz[vx]];
+    #if (count % 2 == 1) {
+      #  nx = incr(nx, 0, len(ntz));
+      #}
+    drx = incr(drx, 0, len(durz));
+    rx = incr(rx, 0, len(restz));
+    vx = incr(vx, 0, len(velz));
+    return next_event;
+  }
+}
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let event_time_rollover = 0;
+  }
+  run()
+  {
+    if (event_time_rollover >= 3840) {
+      event_time_rollover = event_time_rollover - 3840;
+      return;
+    }
+    let ticks_left_in_loop = 3840 - event_time_rollover;
+    let cur_event_schedule_time = event_time_rollover;
+
+    if (count % 17 < 16) {
+      let is_over_loop_time = false;
+      for (let i = 0; is_over_loop_time == false; i++) {
+        let next_event = tyblah_gen();
+        let root_note = next_event[0];
+        #if (count % 4 == 0) {
+          #  root_note = root_note - 12;
+          #}
+        let note_len_time = next_event[1];
+        let rest_time = next_event[2];
+        let v = next_event[3];
+        let total_event_time = note_len_time + rest_time;
+        let note_on_pp = cur_event_schedule_time;
+        let note_off_pp = (cur_event_schedule_time + note_len_time);
+
+        let chord_mod = 1;
+        let chr = notes_in_chord(root_note, 1, chord_mod);
+
+        #print("ROLLOVER:", event_time_rollover, " nOTE on:", note_on_pp, " NOTE OFF:", note_off_pp);
+        note_on_at(dx, chr, note_on_pp, dur = 0, vel = v);
+        note_off_at(dx, 0, note_off_pp);
+
+        ticks_left_in_loop = ticks_left_in_loop - total_event_time;
+        cur_event_schedule_time = cur_event_schedule_time + total_event_time;
+        if (ticks_left_in_loop < 0) {
+          is_over_loop_time = true;
+          event_time_rollover = abs(ticks_left_in_loop);
+        }
+      }
+    }
+  }
+}
+
+
+# warlyv // WHHXcx
+let stepah_gen = gen()
+{
+  setup()
+  {
+    #let mel =  [41, 0, 49, 43, 53, 53, 0, 49, 53, 0, 0, 53, 0, 43, 53, 53, 0];
+    let prog = [29, 32, 36];
+    let prx = 0;
+    let num_notez = 3;
+    let mel = garmelody(num_notez, notes_in_chord(prog[prx], 1), 16);
+    #let mel = [32, 0, 29, 0, 29, 0, 32, 0, 36, 0, 36, 0, 32, 0, 32, 0];
+    #let mel =  [29, 0, 36, 29, 37, 36, 29, 36, 0, 32, 0, 32, 0, 29, 29, 29];
+    let mx = 0;
+    let mmax = 4;
+    let durz = [50, 150, 70, 300, 100, 500];
+    let drx = 0;
+    let velz = [80, 90, 85, 110, 100, 117];
+    let vx = 0;
+
+    #let patches = ["warlyv", "warlyv", "rrrkan"];
+    let patches = ["TONIC", "TONIC", "TONIC", "rrrkan"];
+    #let patches = ["wuurpr", "TONIC", "rrrkan"];
+    #let patches = ["youshure", "wuurpr", "rrrkan", "rrrsmth"];
+    let ppx = 0;
+    vol dx 0.4;
+  }
+  run()
+  {
+
+    if (count % 4 == 0) {
+      mel = garmelody(num_notez, notes_in_chord(prog[prx], 1), 16);
+      prx = incr(prx, 0, len(prog));
+      if (count % 3 == 0) {
+        num_notez = incr(num_notez, 3, 9);
+      }
+
+    }
+
+    #load_preset(dx, "default");
+    for (let i = 0; i < 16; i++) {
+      stepper(dx, mel, mx, i, durz[drx], velz[vx]);
+      drx = incr(drx, 0, len(durz));
+      mx = incr(mx, 0, mmax);
+      vx = incr(vx, 0, len(velz));
+    }
+    mmax = incr(mmax, 3, len(mel));
+
+  }
+}
+
+# dirtaedub // perzic // WHHXc // purlp // bassr // pointty // ssharp
+# wuurpr // nrth // detbass // wang
+let dxblah_gen = gen()
+{
+  setup()
+  {
+
+    let me1 = [29, 32, 29, 31, 0, 0, 37, 31, 37, 37, 37, 0, 29, 31, 32, 29];
+    let me2 = [0, 29, 43, 0, 0, 41, 32, 0, 0, 29, 32, 0, 32, 29, 32, 29];
+    let melz = [me1, me2];
+    let melx = 0;
+    let mx = 0;
+    let mmax = 4;
+    let durz = [50, 1000, 250, 450, 40, 300, 100];
+    let drx = 0;
+    let velz = [100, 110, 100, 60, 90, 120, 96, 127, 80, 127, 127];
+    let vx = 0;
+    #let ratz = [2.22, 1.4, 3.33, 3.14];
+    let ratz = [2.22, 1.4, 3.14];
+    let rx = 0;
+    let op4fbz = [20, 30, 40, 77, 80];
+    let ox = 0;
+
+    #let op2outz = [45, 15, 95, 55, 45, 45 ,95];
+    let op2outz = [95, 95, 45, 95, 15];
+    let op2x = 0;
+
+    let portaz = [100, 0, 20, 50, 70];
+    let pox = 0;
+  }
+  run()
+  {
+    if (count % 6 < 5) {
+      let mel = me1;
+      if (count % 24 > 16) {
+        mel = me2;
+      }
+      for (let i = 0; i < 16; i++) {
+        stepper(dx, mel, mx, i, durz[drx], velz[vx]);
+        mx = incr(mx, 0, mmax);
+        drx = incr(drx, 0, len(durz));
+        vx = incr(vx, 0, len(velz));
+      }
+      if (count % 4 == 0) {
+        mmax = incr(mmax, 4, len(mel));
+        #set dx:op4out op4fbz[ox] at=i*pp;
+        ox = incr(ox, 0, len(op4fbz));
+      }
+      if (count % 3 == 0) {
+        #set dx:o1rat ratz[rx] at=i*pp;
+        rx = incr(rx, 0, len(ratz));
+      }
+      set dx:porta portaz[pox];
+      pox = incr(pox, 0, len(portaz));
+    } else {
+      # WUFFbbgf
+      for (let i = 0; i < 16; i++) {
+        stepper(dx2, rotate(up(mel, 12), 2), mx, i, durz[drx], velz[vx]);
+        mx = incr(mx, 0, mmax);
+        drx = incr(drx, 0, len(durz));
+        vx = incr(vx, 0, len(velz));
+      }
+      set dx:op2out op2outz[op2x] at=i*pp;
+      op2x = incr(op2x, 0, len(op2outz));
+    }
+  }
+}
+
+let rollblah_gen = gen()
+{
+  setup()
+  {
+    let bd_everyz = [3, 2, 3, 3, 4, 7, 3, 2, 6, 3, 4];
+    let bdex = 0;
+    let bd_rollover = 0;
+    set sbdrum:bd_octave 0;
+    let sbdecz = [50, 100, 1000, 1000, 500, 200, 1000, 1000];
+    let sbdx = 0;
+  }
+  run()
+  {
+    set sbdrum:bd_decay sbdecz[sbdx];
+    sbdx = incr(sbdx, 0, len(sbdecz));
+
+    let bd_every = bd_everyz[bdex];
+
+    for (let i = 0; i < 16; i++) {
+      if (count % 15 < 13) {
+        if (i == bd_rollover) {
+          note_on_at(sbdrum, 0, i * pp);
+          bd_rollover = (bd_rollover + bd_every) % 16;
+        }
+      }
+
+      if (count % 17 < 15) {
+        if (i % 16 == 8) {
+          note_on_at(sbdrum, 3, i * pp + 40);
+        }
+      }
+      if (count % 12 == 0) {
+        bd_rollover = 0;
+        if (i % 16 == 10) {
+          note_on_at(sbdrum, 3, i * pp + 20, vel = 80);
+        }
+      }
+      if (count % 14 < 10) {
+        let off = 20;
+        if (i % 4 == 0) {
+          off = 0;
+        }
+        if (i % 2 == 0) {
+          note_on_at(sbdrum, 2, i * pp + off, vel=40 + count % 16);
+        }
+      }
+    }
+    bdex = incr(bdex, 0, len(bd_everyz));
+  }
+}
+
+
+# dx2 - timeLLy // WURrpOCT3
+let countrrblah_gen = gen()
+{
+  setup()
+  {
+    # Taylor Dane - Fm [41, 44, 48] / D# [51, 55, 58] / Cm [48, 51, 55]
+    let mel =  [41, 44, 48, 0, 41, 0, 55, 0, 51, 0, 55, 55, 0, 46, 0, 41, 0, 41, 0];
+    let mx = 0;
+    let durz = [300, 500, 100, 70, 180, 100];
+    let drx = 0;
+    let algoz = [4, 4, 4, 5, 3, 2, 1, 5, 5];
+    let alx = 0;
+    let velz = [100, 110, 100, 120, 96, 127, 127, 127];
+    let vx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      #print("I", i, "mx:", mx);
+      if (mel[mx] > 0) {
+        note_on_at(dx2, mel[mx], i*pp, vel = velz[vx], dur= durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        vx = incr(vx, 0, len(velz));
+      }
+      mx = incr(mx, 0, len(mel));
+    }
+
+    set dx2:algo algoz[alx];
+    alx = incr(alx, 0, len(algoz));
+  }
+}
+

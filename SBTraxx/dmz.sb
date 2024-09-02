@@ -1,0 +1,62 @@
+
+let playblah_fn = fn(id, pat)
+{
+  for (let i = 0; i < len(pat); i++) {
+    note_on_at(sbdrum, id, pat[i] * pp);
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let bdz = [0, 4, 8, 12];
+    let chz = [0, 1, 4, 8, 19, 12, 14];
+    let ohz = [4];
+    let cp = [8];
+  }
+  run()
+  {
+    if (count % 16 < 15) {
+      playblah_fn(0, bdz);
+    }
+    if (count % 7 < 5) {
+      playblah_fn(1, cp);
+    }
+    if (count % 8 < 6) {
+      playblah_fn(3, cp);
+    }
+
+    playblah_fn(2, chz);
+    playblah_fn(4, ohz);
+
+  }
+}
+
+let db2lah_gen = gen()
+{
+  setup()
+  {
+    let bdz = [0, 2, 6, 8, 10];
+    let chz = [2, 6, 10, 14];
+    let ohz = [10];
+    let cp = [4, 12, 14];
+  }
+  run()
+  {
+    if (count % 16 < 15) {
+      playblah_fn(0, bdz);
+    }
+    if (count % 7 < 5) {
+      playblah_fn(1, cp);
+    }
+    if (count % 8 < 6) {
+      playblah_fn(3, cp);
+    }
+
+    playblah_fn(2, chz);
+    playblah_fn(4, ohz);
+
+  }
+}
+

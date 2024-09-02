@@ -354,17 +354,21 @@ let gen_beat = fn()
   return beat;
 }
 
-let stepper = fn(sg, pat, read_idx, play_idx, d)
+let stepper = fn(sg, pat, read_idx, play_idx, d, v)
 {
   if (type(pat[read_idx]) == "ARRAY") {
     note_on_at(sg, pat[read_idx][0], play_idx * pp);
   } else {
     if (pat[read_idx] > 0) {
-      let v = 100 + rand(27);
+      # let v = 100 + rand(27);
+      # if (play_idx % 4 == 0) {
+        #   v = 127;
+        # }
+      let offset = 60;
       if (play_idx % 2 == 0) {
-        v = 127;
+        offset = 0;
       }
-      note_on_at(sg, pat[read_idx], play_idx * pp, dur = d, vel = v);
+      note_on_at(sg, pat[read_idx], play_idx * pp + offset, dur = d, vel = v);
       return true;
     }
     return false;
@@ -472,7 +476,7 @@ let string_to_mask = fn(string_mask) {
   let lcmask = lowercase(string_mask);
   for (let i = 0; i < len(string_mask); ++i) {
     let hx = string_to_hex(string_mask[i]);
-    for (j = 0; j < 4; ++j) {
+    for (let j = 0; j < 4; ++j) {
       push(ret_mask, hx[j]);
     }
   }
@@ -524,7 +528,7 @@ let perky = fn(beat_pattern, sample_array)
     if (type(beat_pattern[i]) == "ARRAY") {
       let larr = beat_pattern[i];
       let ppp = pp / len(larr);
-      for (j = 0; j < len(larr); ++j) {
+      for (let j = 0; j < len(larr); ++j) {
         if (larr[j] > 0) {
           note_on_at(sample_array[rand(len(sample_array))], 1, i * pp + j * ppp, vel = v);
         }
@@ -790,10 +794,10 @@ let garmelody = fn(num_steps, notez, loop_len)
 }
 
 
-let gamelody = fn(num_steps, root_key)
+let gamelody = fn(num_steps, root_key, chord_type)
 {
   let melody = rand_array(num_steps, 0, 0);
-  let notez = take_random_n(notes_in_key(root_key), 3);
+  let notez = take_random_n(notes_in_key(root_key, chord_type), 4);
 
   for (let i = 0; i < len(melody); ++i) {
     if (rand(100)> 30) {

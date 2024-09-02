@@ -101,6 +101,24 @@ struct DrumSettings {
   double cp_delay_wetmix{0.5};
   bool cp_delay_sync_tempo{true};
   int cp_delay_sync_len{0};  // 0 none, 1 - 1/4 // 2 - 8th // 3 - 16th
+                             //
+  // 4 - Open hat Settings
+  double hh2_vol{1};
+  double hh2_pan{0};
+  double hh2_sqamp{0.5};
+  double hh2_attack{20};
+  double hh2_decay{100};
+  double hh2_midf{10000};
+  double hh2_hif{6000};
+  double hh2_hif_q{1};
+  double hh2_distortion_threshold{0.5};
+  int hh2_delay_mode{0};  // 0 - norm, 1 - tap1, 2 - tap2, 3 - pingpong
+  double hh2_delay_ms{13};
+  double hh2_delay_feedback_pct{0};
+  double hh2_delay_ratio{0};
+  double hh2_delay_wetmix{0.5};
+  bool hh2_delay_sync_tempo{true};
+  int hh2_delay_sync_len{0};  // 0 none, 1 - 1/4 // 2 - 8th // 3 - 16th
 };
 
 DrumSettings Map2DrumSettings(std::string name,
@@ -133,6 +151,7 @@ class DrumSynth : public SoundGenerator {
   std::unique_ptr<BassDrum> bd_;
   std::unique_ptr<SnareDrum> sd_;
   std::unique_ptr<HiHat> hh_;
+  std::unique_ptr<HiHat> hh2_;
   std::unique_ptr<HandClap> cp_;
 
   DCA dca_;

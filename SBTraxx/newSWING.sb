@@ -1,4 +1,5 @@
 
+# p3 $ play2step
 let play2step = gen()
 {
   setup()
@@ -28,7 +29,7 @@ let play2step = gen()
         if (rand(100) > 10) {
           let v = 100 + rand(27);
           note_on_at(sbdrum, 3, i * pp + rand(40), vel = v);
-          note_on_at(sbdrum, 1, i * pp + rand(30), vel = v);
+          #note_on_at(sbdrum, 1, i * pp + rand(30), vel = v);
           set sd_delay_ms (rand(30) + 5) at=i*pp;
         }
       }
