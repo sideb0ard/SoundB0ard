@@ -339,13 +339,13 @@ let gen_beat = fn()
     beat = rand_beat();
   }
 
-  for (i = 4; i < 16; ++i) {
+  for (let i = 4; i < 16; ++i) {
     if (beat[i] == 1 && rand(100) > 60) {
       beat[i] = bjork(rand(3)+3, 8);
     }
   }
 
-  for (i = 8; i < 16; ++i) {
+  for (let i = 8; i < 16; ++i) {
     if (beat[i] == 1 && rand(100) > 80) {
       beat[i] = bjork(rand(4)+2, 8);
     }
@@ -1005,3 +1005,50 @@ let gen2stepsequence = fn()
   }
   return idxz;
 }
+
+let print_notes = fn(notes)
+{
+  print("Notes:", notes);
+  let ans = "";
+  for (let i = 0; i < len(notes); i++) {
+    let num = notes[i] % 12;
+    if (num == 0) {
+      ans = ans + "C ";
+    }
+    if (num == 1) {
+      ans = ans + "C# ";
+    }
+    if (num == 2) {
+      ans = ans + "D ";
+    }
+    if (num == 3) {
+      ans = ans + "D# ";
+    }
+    if (num == 4) {
+      ans = ans + "E ";
+    }
+    if (num == 5) {
+      ans = ans + "F ";
+    }
+    if (num == 6) {
+      ans = ans + "F# ";
+    }
+    if (num == 7) {
+      ans = ans + "G ";
+    }
+    if (num == 8) {
+      ans = ans + "G# ";
+    }
+    if (num == 9) {
+      ans = ans + "A ";
+    }
+    if (num == 10) {
+      ans = ans + "A# ";
+    }
+    if (num == 11) {
+      ans = ans + "B ";
+    }
+  }
+  return ans;
+}
+

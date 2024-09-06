@@ -582,6 +582,8 @@ bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
 void Mixer::PrintMidiInfo() {
   std::stringstream ss;
   ss << ANSI_COLOR_WHITE "Midi Notes:\n";
+  ss << "- C:0  C#:1  D:2  D#:3  E:4  F:5  F#:6  G:7  G#:8  A:9  A#:10 "
+        "B:11\n";
   ss << "0 C:12 C#:13 D:14 D#:15 E:16 F:17 F#:18 G:19 G#:20 A:21 A#:22 "
         "B:23\n";
   ss << "1 C:24 C#:25 D:26 D#:27 E:28 F:29 F#:30 G:31 G#:32 A:33 A#:34 "
@@ -594,12 +596,14 @@ void Mixer::PrintMidiInfo() {
         "B:71\n";
   ss << "5 C:72 C#:73 D:74 D#:75 E:76 F:77 F#:78 G:79 G#:80 A:81 A#:82 "
         "B:83\n";
-  ss << "Chord Progressions: I-IV-V, I-V-vi-IV, I-vi-IV-V, vi-ii-V-I\n";
+  ss << "Chord Progressions: I-IV-V, I-V-vi-IV, I-vi-IV-V, vi-ii-V-I "
+        "vi-IV-I-V\n";
   ss << "Chord Types: MAJOR (0), MINOR (1), DIMINISHED (2), POWER(3), "
         "SUS2(4), SUS4(5)\n";
   ss << "Chord Mod: Min7 (1), Maj7 (2), InvMin7 (3), InvMaj7(4), "
         "InvMin7NoRoot(5), InvMaj7NoRoot(6), AugBass(7)\n";
-  ss << "Filters: LPF1, HPF1, LPF2, HPF2, BPF2, BSF2, LPF4, HPF4, BPF4\n"
+  ss << "Filters: LPF1, HPF1, LPF2, HPF2, BPF2, BSF2, LPF4, HPF4, BPF4\n";
+  ss << "Major Scale: W W H W W W H // Minor Scale: W H W W H W W\n"
      << ANSI_COLOR_RESET;
 
   repl_queue.push(ss.str());

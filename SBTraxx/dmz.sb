@@ -14,9 +14,16 @@ let dblah_gen = gen()
     let chz = [0, 1, 4, 8, 19, 12, 14];
     let ohz = [4];
     let cp = [8];
+
+    set sbdrum:cp_eg_decay 100;
+    set sbdrum:cp_eg_sustain1 1;
+    set sbdrum:cp_eg_release 600;
   }
   run()
   {
+    if (count % 30 < 29) {
+      playblah_fn(2, chz);
+    }
     if (count % 16 < 15) {
       playblah_fn(0, bdz);
     }
@@ -25,11 +32,8 @@ let dblah_gen = gen()
     }
     if (count % 8 < 6) {
       playblah_fn(3, cp);
+      playblah_fn(4, ohz);
     }
-
-    playblah_fn(2, chz);
-    playblah_fn(4, ohz);
-
   }
 }
 
@@ -37,26 +41,164 @@ let db2lah_gen = gen()
 {
   setup()
   {
-    let bdz = [0, 2, 6, 8, 10];
-    let chz = [2, 6, 10, 14];
-    let ohz = [10];
-    let cp = [4, 12, 14];
+    let vlz = [100, 100, 100, 100, 120, 127, 127, 90, 90];
+    let vlx = 0;
+    let sb2delz = [10, 20, 23, 5, 5, 10, 30];
+    let sbx = 0;
+    set sb2:hh_delay_ms sb2delz[sbx];
   }
   run()
   {
-    if (count % 16 < 15) {
-      playblah_fn(0, bdz);
+    if (count % 32 < 15) {
+      if (count % 7 < 5) {
+        for (let i = 0; i < 16; i++) {
+          let off = 30;
+          if (i % 2 == 0) {
+            off = 0;
+          }
+          note_on_at(sb2, 2, i * pp + off, vel = vlz[vlx]);
+          vlx = incr(vlx, 0, len(vlz));
+        }
+      }
+      set sb2:hh_delay_ms sb2delz[sbx];
+      sbx = incr(sbx, 0, len(sb2delz));
     }
-    if (count % 7 < 5) {
-      playblah_fn(1, cp);
+    if (count % 7 == 5) {
+      for (let i = 0; i < 16; i++) {
+        if (i % 2 == 0) {
+          note_on_at(sb2, 2, i * pp + off, vel = vlz[vlx]);
+          vlx = incr(vlx, 0, len(vlz));
+        }
+      }
     }
-    if (count % 8 < 6) {
-      playblah_fn(3, cp);
-    }
+  }
+}
 
-    playblah_fn(2, chz);
-    playblah_fn(4, ohz);
+# notes_in_key(3, 1)
+# dx glassr // WTOOF // youshure // surgefizz2 // WHHXc
+let melblah_gen = gen()
+{
+  setup()
+  {
+    # load_preset(dx, "glassr");
+    vol dx 1;
+    #let ntz = [3, 8, 13, 3, 8, 13, 5];
+    let rf1 = [13, 0, 0, 3, 0, 13, 0, 3, 0, 0, 3, 0, 3, 0, 5, 0];
+    let rf2 = [8, 0, 0, 3, 0, 5, 0, 0, 8, 0, 0, 11, 0, 8, 0, 0];
+    let rf3 =  [8, 0, 0, 0, 0, 3, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0];
+    let rf4 =  [15, 0, 0, 15, 0, 8, 11, 3, 0, 0, 13, 0, 5, 0, 8, 0];
+    let rfz = [rf1, rf2, rf1, rf2, rf1, rf2, rf3, rf4];
+    let rfx = 0;
+    let nx = 0;
+    let nnax = 3;
 
+    let durz = [100, 250, 350, 550, 1000, 300, 1000];
+    let drx = 0;
+
+    let vlz = [100, 100, 100, 120, 127, 127, 120, 127];
+    let vx = 0;
+
+    let op2outz = [94, 50, 94, 60, 94, 98];
+    let op2x = 0;
+  }
+  run()
+  {
+
+    if (count % 4 < 3) {
+      let rf = rfz[rfx];
+
+      if (count % 10 == 9) {
+        rfx = inrc(rfx, 0, len(rfz));
+      }
+      #print("RF", rf, " rfx:", rfx);
+      for (let i = 0; i < 16; i++) {
+        stepper(dx, rf, nx, i, durz[drx], vlz[vx]);
+        nx = incr(nx, 0, nnax);
+        drx = incr(drx, 0, len(durz));
+        vx = incr(vx, 0, len(vlz));
+      }
+      nnax = incr(nnax, 3, 16);
+
+      if (count % 7 == 2) {
+        set dx:op2out op2outz[op2x] at=i*pp;
+        op2x = incr(op2x, 0, len(op2outz));
+      }
+    }
+  }
+}
+
+let arp_fn = fn(chrd, ppp_on, pplen)
+{
+  let cx = 0;
+  let pp = 960 / pplen;
+  for (let i = 0; i < pplen; i++) {
+    note_on_at(dx2, chrd[cx], ppp_on + i * pp, dur = 170);
+    cx = incr(cx, 0, len(chrd));
+  }
+}
+# dx2 RAVER // MWAUR // twnzz // whistley // WTOOF // lorenz0
+# notes_in_key(51, 1)
+# [51, 53, 54, 56, 58, 59, 61, 63]
+let cmelblah_gen = gen()
+{
+  setup()
+  {
+    #let chrdz = [51, 58, 51, 54];
+    #let chrdz = down([51, 58, 51, 54], 12);
+    let chrdz = down([51, 58, 51, 54, 51], 24);
+    let chtype = [1, 1, 1, 0, 1];
+    let cx = 0;
+    let posz = [7, 3, 11];
+    let posx = 0;
+    #let pplenz = [4, 1, 2, 3, 2, 3, 1];
+    let pplenz = [4];
+    let ppx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      let ppq = 3840 / 4;
+      for (let i = 0; i < 4; i++) {
+        arp_fn(notes_in_chord(chrdz[cx], chtype[cx]), i *ppq, pplenz[ppx]);
+        cx = incr(cx, 0, len(chrdz));
+        ppx = incr(ppx, 0, len(pplenz));
+      }
+    }
+  }
+}
+
+let riddimblah_gen = gen()
+{
+  setup()
+  {
+    # A and E
+    # let ntz = [33, 28];
+    let ntz = [45, 40];
+    let nx = 0;
+  }
+  run()
+  {
+    let nt = ntz[nx];
+    note_on_at(mo, nt, 4*pp);
+    note_on_at(mo, nt, 12*pp);
+    nx = incr(nx, 0, len(ntz));
+  }
+}
+
+let playbass_fn = fn(id, pat)
+{
+  for (let i = 0; i < len(pat); i++) {
+    note_on_at(sbdrum, id, pat[i] * pp);
+  }
+}
+
+let bassblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
   }
 }
 

@@ -2262,60 +2262,37 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
-           if (args_size > 0) {
-             float root_note_value = 0;
-             auto root_note =
-                 std::dynamic_pointer_cast<object::Number>(args[0]);
-             if (!root_note) {
-               auto root_note_string =
-                   std::dynamic_pointer_cast<object::String>(args[0]);
-               if (!root_note_string) {
-                 std::cerr << "NAE ROOT NOTE! numpty!\n";
-                 return evaluator::NULLL;
-               }
-               root_note_value = std::stoi(root_note_string->value_);
-             } else {
-               root_note_value = root_note->value_;
-             }
-
-             // MAJOR (0), MINOR (1), DIMINISHED (2), POWER(3), SUS2(4),
-             // SUS4(5);
-             int chord_type = 0;
-
-             if (args_size > 1) {
-               auto chord_type_obj =
-                   std::dynamic_pointer_cast<object::Number>(args[1]);
-               if (!chord_type_obj) {
-                 std::cerr << "NAE CHORD TYPE! numpty!\n";
-                 return evaluator::NULLL;
-               }
-               chord_type = chord_type_obj->value_;
-             }
-
-             auto return_array = std::make_shared<object::Array>(
-                 std::vector<std::shared_ptr<object::Object>>());
-
-             int modification = 0;
-             if (args_size == 3) {
-               auto chord_mod =
-                   std::dynamic_pointer_cast<object::Number>(args[2]);
-               if (!chord_mod) {
-                 std::cerr << "Extra ARG thats not a number?";
-                 return evaluator::NULLL;
-               }
-               modification = chord_mod->value_;
-             }
-
-             std::vector<int> notez =
-                 GetMidiNotesInChord(root_note_value, chord_type, modification);
-
-             for (int i = 0; i < (int)notez.size(); i++) {
-               return_array->elements_.push_back(
-                   std::make_shared<object::Number>(notez[i]));
-             }
-             return return_array;
+           if (args_size < 2) {
+             std::cerr << "Need a root note and key\n";
+             return evaluator::NULLL;
            }
-           return evaluator::NULLL;
+
+           auto root_note = std::dynamic_pointer_cast<object::Number>(args[0]);
+           if (!root_note) {
+             std::cerr << "NAE ROOT NOTE! numpty!\n";
+             return evaluator::NULLL;
+           }
+           int root_note_value = root_note->value_;
+
+           auto key = std::dynamic_pointer_cast<object::Number>(args[1]);
+           if (!key) {
+             std::cerr << "NAE KEY! numpty!\n";
+             return evaluator::NULLL;
+           }
+           int key_value = key->value_;
+
+           auto return_array = std::make_shared<object::Array>(
+               std::vector<std::shared_ptr<object::Object>>());
+
+           std::vector<int> notez = interpreter_sound_cmds::GetNotesInChord(
+               root_note_value, key_value);
+
+           for (int i = 0; i < (int)notez.size(); i++) {
+             return_array->elements_.push_back(
+                 std::make_shared<object::Number>(notez[i]));
+           }
+           return return_array;
+           // return evaluator::NULLL;
          })},
     {"scale_note",
      std::make_shared<object::BuiltIn>(

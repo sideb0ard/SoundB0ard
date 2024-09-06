@@ -202,6 +202,7 @@ int get_chord_type(unsigned int scale_degree) {
     return -1;
 }
 
+// TODO - maybe delete? New version in sound_cmds.cpp
 std::vector<int> GetMidiNotesInChord(unsigned int root_note,
                                      unsigned int chord_type,
                                      unsigned int modification) {

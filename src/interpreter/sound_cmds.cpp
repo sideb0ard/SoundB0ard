@@ -168,4 +168,44 @@ std::vector<int> GetNotesInKey(int root, int scale_type) {
   return notes;
 }
 
+std::vector<int> GetNotesInChord(int chord_root, int key, int scale_type) {
+  std::vector<int> notes_in_chord{};
+  // validate chord root is in key
+  auto is_same_modulo = [&chord_root](int i) {
+    return chord_root % 12 == i % 12;
+  };
+  auto notes_in_key = GetNotesInKey(key % 12, scale_type);
+  bool is_in_key = std::find_if(begin(notes_in_key), end(notes_in_key),
+                                is_same_modulo) != std::end(notes_in_key);
+  if (is_in_key) {
+    int closest_power_of_key = floor(chord_root / 12) * 12 + (key % 12);
+    if (closest_power_of_key > chord_root) closest_power_of_key -= 12;
+    auto first_octave_in_key = GetNotesInKey(closest_power_of_key, scale_type);
+    auto next_octave_in_key =
+        GetNotesInKey(closest_power_of_key + 12, scale_type);
+    std::vector<int> all_keys(first_octave_in_key.size() +
+                              next_octave_in_key.size() - 1);
+    merge(first_octave_in_key.begin(), first_octave_in_key.end(),
+          next_octave_in_key.begin() + 1, next_octave_in_key.end(),
+          all_keys.begin());
+
+    auto el = std::find(all_keys.begin(), all_keys.end(), chord_root);
+    if (el == all_keys.end()) {
+      std::cerr << "Something wrong! chord root not found in key.\n";
+    } else {
+      int idx = el - all_keys.begin();
+      assert(all_keys.size() > idx + 4);
+      notes_in_chord.push_back(all_keys[idx]);
+      notes_in_chord.push_back(all_keys[idx + 2]);
+      notes_in_chord.push_back(all_keys[idx + 4]);
+    }
+
+  } else {
+    std::cerr << "Root:" << chord_root << " is not in the key of " << key
+              << std::endl;
+  }
+
+  return notes_in_chord;
+}
+
 }  // namespace interpreter_sound_cmds
