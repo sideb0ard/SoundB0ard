@@ -1,86 +1,50 @@
-# key - D# Major
-# Notes:[39, 41, 43, 44, 46, 48, 50, 51]
-# I - vi - IV - V
-# 39 48,1 44, 46L
-
-let print_notes = fn(notes)
-{
-  print("Notes:", notes);
-  let ans = "";
-  for (let i = 0; i < len(notes); i++) {
-    let num = notes[i] % 12;
-    if (num == 0) {
-      ans = ans + "C ";
-    }
-    if (num == 1) {
-      ans = ans + "C# ";
-    }
-    if (num == 2) {
-      ans = ans + "D ";
-    }
-    if (num == 3) {
-      ans = ans + "D# ";
-    }
-    if (num == 4) {
-      ans = ans + "E ";
-    }
-    if (num == 5) {
-      ans = ans + "F ";
-    }
-    if (num == 6) {
-      ans = ans + "F# ";
-    }
-    if (num == 7) {
-      ans = ans + "G ";
-    }
-    if (num == 8) {
-      ans = ans + "G# ";
-    }
-    if (num == 9) {
-      ans = ans + "A ";
-    }
-    if (num == 10) {
-      ans = ans + "A# ";
-    }
-    if (num == 11) {
-      ans = ans + "B ";
-    }
-  }
-  return ans;
-}
-
-# dx narf
+# bpm 104 // dx - fnacccx
 let IVblah_gen = gen()
 {
   setup()
   {
-    # f#1gt
+    # F#
     let key = 30;
-    #let prog = [  [48, 52, 55], [55, 59, 62], [57, 60, 64], [53, 57, 60] ];
-    let prog = [  [48, 52, 55], [55, 59, 62], [45, 60, 64], [53, 57, 60] ];
-    let prog = [  [51, 54, 58, 61], [56, 59, 63, 66]];
+    # D#
+    # let key = 13;
+    let notez = notes_in_key(key);
+    # I - vi - IV - V
+    #let prog = [ notez[0], notez[5], notez[3], notez[4] ];
+    # vi - IV - I - V
+    let prog = [ notez[5], notez[3], notez[0], notez[4] ];
+    # I - IV - V
+    #let prog = [ notez[0], notez[0], notez[3], notez[4] ];
     let px = 0;
-    let bjz = [3, 5, 4, 7, 2];
+    let bjz = [3, 5, 9, 4, 7, 2];
     let bx = 0;
     let velz = [100, 90, 90, 100, 110, 127, 127, 127, 110];
     let vx = 0;
-    let drz = [50, 50, 100, 1000, 150, 500, 700, 200, 250, 170, 160, 210];
+    let drz = [50, 500, 100, 1000, 150, 500, 700, 2000, 250, 170, 160, 210];
     #let drz = [5000, 500, 2000, 1000, 150];
     let drx = 0;
   }
   run()
   {
-    let b = bjork(bjz[bx], 16);
-    for (let i = 0; i < 16; i++) {
-      if (b[i] == 1) {
-        note_on_at(mo, down(prog[px], 12), i * pp, vel = velz[vx], dur = drz[drx]);
-        note_on_at(dx, down(prog[px], 24), i * pp, vel = velz[vx], dur = drz[drx]);
-        vx = incr(vx, 0, len(velz));
-        drx = incr(drx, 0, len(drz));
+    if (count % 8 < 7) {
+      let b = bjork(bjz[bx], 16);
+      for (let i = 0; i < 16; i++) {
+        if (b[i] == 1) {
+          note_on_at(dx, notes_in_chord(prog[px], key), i * pp, vel = velz[vx], dur = drz[drx]);
+          vx = incr(vx, 0, len(velz));
+          drx = incr(drx, 0, len(drz));
+        }
+      }
+      px = incr(px, 0, len(prog));
+      bx = incr(bx, 0, len(bjz));
+    } else {
+      let riff = chord_riff(notes_in_chord(prog[px], key));
+      print("riff", riff);
+      for (let i = 0; i < 16; i++) {
+        if (riff[i] > 0) {
+          note_on_at(dx, riff[i], i * pp, vel = velz[vx], dur = drz[drx]);
+        }
       }
     }
-    px = incr(px, 0, len(prog));
-    bx = incr(bx, 0, len(bjz));
   }
 }
 
@@ -91,6 +55,8 @@ let playblah_fn = fn(id, pat)
   }
 }
 
+# p3 < osc 16 "50 5000" "set sbdrum:cp_eg_release %"
+# p4 < osc 7 "0.1 0.6" "set sbdrum:cp_eg_sustain %"
 let dblah_gen = gen()
 {
   setup()
@@ -99,6 +65,9 @@ let dblah_gen = gen()
     let chz = [0, 2, 4, 6, 8, 10, 12];
     let ohz = [14];
     let cp = [4, 12];
+    let cpdz = [23, 3, 5, 8];
+    let cpx = 0;
+    set sbdrum:bd_key 30;
   }
   run()
   {
@@ -112,6 +81,8 @@ let dblah_gen = gen()
       playblah_fn(3, cp);
       playblah_fn(4, ohz);
     }
+    set sbdrum:cp_delay_ms cpdz[cpx];
+    cpx = incr(cpx, 0, len(cpdz));
   }
 }
 

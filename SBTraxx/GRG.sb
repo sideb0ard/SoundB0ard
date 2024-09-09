@@ -10,7 +10,7 @@ let kickblah_gen = gen()
   }
   run()
   {
-    if (count % 4 == 3) {
+    if (count % 4 < 3) {
       note_on_at(bd, 1, 0 * pp);
       if (count % 8  < 6) {
         note_on_at(bd, 1, 8 * pp);

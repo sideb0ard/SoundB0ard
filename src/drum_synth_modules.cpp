@@ -58,6 +58,8 @@ void BassDrum::NoteOn(double vel) {
   noise_->StartOscillator();
   noise_eg_.StartEg();
 
+  click_.Trigger();
+
   osc1_->m_osc_fo = frequency_;
   osc1_->StartOscillator();
 
@@ -95,7 +97,7 @@ StereoVal BassDrum::Generate() {
     if (osc1_->just_wrapped) osc2_->StartOscillator();
     double osc2_out = osc2_->DoOscillate(nullptr);
 
-    double osc_mix = 0.5 * osc1_out + 0.5 * osc2_out + noise_out;
+    double osc_mix = click_.GenNext() + osc1_out + osc2_out + noise_out;
 
     //// OUTPUT //////////////////////////
 
@@ -112,7 +114,7 @@ StereoVal BassDrum::Generate() {
     dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
 
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
-    out = distortion_.Process(out);
+    if (distortion_enabled_) out = distortion_.Process(out);
     out = delay_->Process(out);
   }
 
@@ -441,6 +443,106 @@ StereoVal HiHat::Generate() {
   if (eg_.GetState() == OFFF) {
     osc_bank_.Stop();
     eg_.StopEg();
+  }
+
+  return out;
+}
+
+void PulseTrigger::Trigger() { pulse_counter_ = 0; }
+
+double PulseTrigger::GenNext() {
+  if (pulse_counter_ < pulse_length_) {
+    pulse_counter_++;
+    return 1.0 * amplitude_;
+  }
+  return 0;
+}
+
+///// TOM / CONGA  /////////////////////////////
+
+TomConga::TomConga() {
+  noise_ = std::make_unique<QBLimitedOscillator>();
+  noise_->m_waveform = NOISE;
+  noise_->m_amplitude = 0.6;
+  noise_->Update();
+
+  noise_eg_.SetRampMode(true);
+  noise_eg_.m_reset_to_zero = true;
+  noise_eg_.SetEgMode(DIGITAL);
+  noise_eg_.SetAttackTimeMsec(10);
+  noise_eg_.SetDecayTimeMsec(207);
+  noise_eg_.Update();
+
+  noise_filter_ = std::make_unique<FilterSem>();
+  noise_filter_->SetType(LPF2);
+  noise_filter_->SetFcControl(10000);
+  noise_filter_->SetQControlGUI(5);
+  noise_filter_->Update();
+
+  eg_.SetRampMode(true);
+  eg_.m_reset_to_zero = true;
+  eg_.SetEgMode(DIGITAL);
+  eg_.SetAttackTimeMsec(10);
+  eg_.SetDecayTimeMsec(180);
+  eg_.Update();
+
+  osc1_ = std::make_unique<QBLimitedOscillator>();
+  osc1_->m_waveform = SINE;
+  osc1_->m_osc_fo = 220;
+  osc1_->m_amplitude = 1;
+  osc1_->Update();
+
+  distortion_.SetParam("threshold", 0.5);
+  delay_ = std::make_unique<StereoDelay>();
+}
+
+void TomConga::NoteOn(double vel) {
+  velocity_ = vel;
+  click_.Trigger();
+  noise_->StartOscillator();
+  noise_eg_.StartEg();
+  osc1_->StartOscillator();
+  eg_.StartEg();
+}
+
+StereoVal TomConga::Generate() {
+  StereoVal out = {.left = 0, .right = 0};
+  if (osc1_->m_note_on || noise_->m_note_on) {
+    noise_->Update();
+    double noise_eg_out = noise_eg_.DoEnvelope(nullptr);
+    double noise_out = noise_->DoOscillate(nullptr) * noise_eg_out * 0.2;
+    noise_filter_->Update();
+    noise_out = noise_filter_->DoFilter(noise_out);
+
+    osc1_->Update();
+    double osc1_eg_out = eg_.DoEnvelope(nullptr);
+    double osc1_out = osc1_->DoOscillate(nullptr) * osc1_eg_out;
+
+    //// OUTPUT //////////////////////////
+
+    double osc_out = osc1_out + click_.GenNext();
+    if (is_conga_) osc_out += noise_out;
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    dca_.Update();
+    dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
+
+    out = {.left = out_left * velocity_, .right = out_right * velocity_};
+
+    out = distortion_.Process(out);
+    out = delay_->Process(out);
+  }
+
+  if (eg_.GetState() == OFFF) {
+    osc1_->StopOscillator();
+    eg_.StopEg();
+  }
+
+  if (noise_eg_.GetState() == OFFF) {
+    noise_->StopOscillator();
+    noise_eg_.StopEg();
   }
 
   return out;

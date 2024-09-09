@@ -26,6 +26,9 @@ DrumSynth::DrumSynth() {
   hh_ = std::make_unique<HiHat>();
   hh2_ = std::make_unique<HiHat>();
   cp_ = std::make_unique<HandClap>();
+  lt_ = std::make_unique<TomConga>();
+  mt_ = std::make_unique<TomConga>();
+  ht_ = std::make_unique<TomConga>();
 
   LoadSettings(DrumSettings());
   active = true;
@@ -55,6 +58,18 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   out.left += clap_out.left;
   out.right += clap_out.right;
 
+  auto lt_out = lt_->Generate();
+  out.left += lt_out.left;
+  out.right += lt_out.right;
+
+  auto mt_out = mt_->Generate();
+  out.left += mt_out.left;
+  out.right += mt_out.right;
+
+  auto ht_out = ht_->Generate();
+  out.left += ht_out.left;
+  out.right += ht_out.right;
+
   return out;
 }
 
@@ -77,12 +92,14 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.bd_decay = val;
   else if (name == "bd_octave")
     settings_.bd_octave = val;
-  else if (name == "bd_key")
+  else if (name == "bd_key") {
     settings_.bd_key = val;
-  else if (name == "bd_detune")
+  } else if (name == "bd_detune")
     settings_.bd_detune_cents = val;
   else if (name == "bd_hard_sync")
     settings_.bd_hard_sync = val;
+  else if (name == "bd_dist_en")
+    settings_.bd_distortion_enabled = val;
   else if (name == "bd_dist")
     settings_.bd_distortion_threshold = val;
   else if (name == "bd_delay_mode")
@@ -246,6 +263,33 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "cp_delay_sync_len")
     settings_.cp_delay_sync_len = val;
 
+  else if (name == "lt_vol")
+    settings_.lt_vol = val;
+  else if (name == "lt_pan")
+    settings_.lt_pan = val;
+  else if (name == "lt_tuning")
+    settings_.lt_tuning = val;
+  else if (name == "lt_is_conga")
+    settings_.lt_is_conga = val;
+
+  else if (name == "mt_vol")
+    settings_.mt_vol = val;
+  else if (name == "mt_pan")
+    settings_.mt_pan = val;
+  else if (name == "mt_tuning")
+    settings_.mt_tuning = val;
+  else if (name == "mt_is_conga")
+    settings_.mt_is_conga = val;
+
+  else if (name == "ht_vol")
+    settings_.ht_vol = val;
+  else if (name == "ht_pan")
+    settings_.ht_pan = val;
+  else if (name == "ht_tuning")
+    settings_.ht_tuning = val;
+  else if (name == "ht_is_conga")
+    settings_.ht_is_conga = val;
+
   Update();
 }
 
@@ -265,6 +309,7 @@ std::string DrumSynth::Info() {
   ss << "     bd_tone:" << settings_.bd_tone << " bd_q:" << settings_.bd_q
      << " bd_ntone:" << settings_.bd_ntone << " bd_nq:" << settings_.bd_nq
      << " bd_decay:" << settings_.bd_decay
+     << " bd_dist_en:" << settings_.bd_distortion_enabled
      << " bd_dist:" << settings_.bd_distortion_threshold << std::endl;
   ss << "     bd_delay_mode:" << settings_.bd_delay_mode
      << " bd_delay_ms:" << settings_.bd_delay_ms
@@ -304,7 +349,7 @@ std::string DrumSynth::Info() {
   ss << "     hh_delay_wetmix:" << settings_.hh_delay_wetmix
      << " hh_delay_sync_tempo:" << settings_.hh_delay_sync_tempo
      << " hh_delay_sync_len:" << settings_.hh_delay_sync_len << std::endl;
-  ss << COOL_COLOR_ORANGE "     hh2(4): hh2_vol:" << settings_.bd_vol
+  ss << COOL_COLOR_ORANGE "     hh2(4): hh2_vol:" << settings_.hh2_vol
      << " hh2_pan:" << settings_.hh2_pan
      << " hh2_attack:" << settings_.hh2_attack
      << " hh2_decay:" << settings_.hh2_decay << std::endl;
@@ -338,6 +383,15 @@ std::string DrumSynth::Info() {
   ss << "     cp_delay_wetmix:" << settings_.cp_delay_wetmix
      << " cp_delay_sync_tempo:" << settings_.cp_delay_sync_tempo
      << " cp_delay_sync_len:" << settings_.cp_delay_sync_len << std::endl;
+  ss << COOL_COLOR_ORANGE "     lt(5): lt_vol:" << settings_.lt_vol
+     << " lt_pan:" << settings_.lt_pan << " lt_tuning:" << settings_.lt_tuning
+     << " lt_is_conga:" << settings_.lt_is_conga << std::endl;
+  ss << COOL_COLOR_YELLOW_MELLOW "     mt(6): mt_vol:" << settings_.mt_vol
+     << " mt_pan:" << settings_.mt_pan << " mt_tuning:" << settings_.mt_tuning
+     << " mt_is_conga:" << settings_.mt_is_conga << std::endl;
+  ss << COOL_COLOR_ORANGE "     ht(7): ht_vol:" << settings_.ht_vol
+     << " ht_pan:" << settings_.ht_pan << " ht_tuning:" << settings_.ht_tuning
+     << " ht_is_conga:" << settings_.ht_is_conga << std::endl;
 
   return ss.str();
 }
@@ -391,6 +445,18 @@ void DrumSynth::NoteOn(midi_event ev) {
     case (4):
       // Hi Hat 2 // Open Hat
       hh2_->NoteOn(velocity);
+      break;
+    case (5):
+      // Low Tom / Conga
+      lt_->NoteOn(velocity);
+      break;
+    case (6):
+      // Mid Tom / Conga
+      mt_->NoteOn(velocity);
+      break;
+    case (7):
+      // High Tom / Conga
+      ht_->NoteOn(velocity);
       break;
     default:
       std::cerr << "DrumSynth - num not implemented:" << drum_module_num
@@ -447,6 +513,7 @@ void DrumSynth::Update() {
   bd_->osc1_->m_cents = settings_.bd_detune_cents;
   bd_->osc2_->m_cents = -(settings_.bd_detune_cents);
   bd_->hard_sync_ = settings_.bd_hard_sync;
+  bd_->distortion_enabled_ = settings_.bd_distortion_enabled;
   bd_->distortion_.SetParam("threshold", settings_.bd_distortion_threshold);
   bd_->delay_->SetMode(settings_.bd_delay_mode);
   bd_->delay_->SetDelayTimeMs(settings_.bd_delay_ms);
@@ -531,6 +598,39 @@ void DrumSynth::Update() {
   cp_->delay_->SetWetMix(settings_.cp_delay_wetmix);
   cp_->delay_->SetSync(settings_.cp_delay_sync_tempo);
   cp_->delay_->SetSyncLen(settings_.cp_delay_sync_len);
+
+  lt_->dca_.m_amplitude_control = settings_.lt_vol;
+  lt_->dca_.m_pan_control = settings_.lt_pan;
+  double hi_freq = kLowTomHighFreq;
+  double lo_freq = kLowTomLowFreq;
+  if (settings_.lt_is_conga) {
+    hi_freq = kLowCongaHighFreq;
+    lo_freq = kLowCongaLowFreq;
+  }
+  double lt_freq = (settings_.lt_tuning / 100) * (hi_freq - lo_freq) + lo_freq;
+  lt_->osc1_->m_osc_fo = lt_freq;
+
+  mt_->dca_.m_amplitude_control = settings_.mt_vol;
+  mt_->dca_.m_pan_control = settings_.mt_pan;
+  hi_freq = kMidTomHighFreq;
+  lo_freq = kMidTomLowFreq;
+  if (settings_.mt_is_conga) {
+    hi_freq = kMidCongaHighFreq;
+    lo_freq = kMidCongaLowFreq;
+  }
+  double mt_freq = (settings_.mt_tuning / 100) * (hi_freq - lo_freq) + lo_freq;
+  mt_->osc1_->m_osc_fo = mt_freq;
+
+  ht_->dca_.m_amplitude_control = settings_.ht_vol;
+  ht_->dca_.m_pan_control = settings_.ht_pan;
+  hi_freq = kHighTomHighFreq;
+  lo_freq = kHighTomLowFreq;
+  if (settings_.ht_is_conga) {
+    hi_freq = kHighCongaHighFreq;
+    lo_freq = kHighCongaLowFreq;
+  }
+  double ht_freq = (settings_.ht_tuning / 100) * (hi_freq - lo_freq) + lo_freq;
+  ht_->osc1_->m_osc_fo = ht_freq;
 }
 
 void DrumSynth::LoadSettings(DrumSettings settings) {

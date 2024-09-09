@@ -28,6 +28,9 @@ let noteblah_gen = gen()
 {
   setup()
   {
+    # Key of C#
+    let key = 1;
+
     let note_ctr = 0;
     let event_time_rollover = 0;
     #let counter_notes = [20, 75];
@@ -77,7 +80,7 @@ let noteblah_gen = gen()
 
       # min7
       let chord_mod = 1;
-      let chr = notes_in_chord(root_note, 1, chord_mod);
+      let chr = notes_in_chord(root_note, key, chord_mod);
 
       note_ctr++;
       note_on_at(dx, chr, note_on_pp, dur = 0, vel = v);
@@ -111,6 +114,8 @@ let beatlah_gen = gen()
     let dlx = 0;
     let delfb = [0, 30, 60, 90];
     let delx = 0;
+    let chrd = [1, 5, 8];
+    let chx = 0;
 
   }
   run()
@@ -134,6 +139,9 @@ let beatlah_gen = gen()
     if (count % 3 == 0) {
       note_on_at(sbdrum, 3, clapextraCtr * 240, vel = hvz[hvx]);
       clapextraCtr = incr(clapextraCtr, 1, 14);
+      #print("YO", chx, chrd[chx]);
+      set sbdrum:bd_key chrd[chx];
+      chx = incr(chx, 0, len(chrd));
     }
   }
 }

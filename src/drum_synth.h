@@ -28,9 +28,10 @@ struct DrumSettings {
   double bd_ntone{5000};
   double bd_nq{1};
   double bd_decay{1000};
-  int bd_octave{1};
-  int bd_key{7};
+  int bd_octave{2};
+  int bd_key{40};
   double bd_detune_cents{0};
+  bool bd_distortion_enabled{false};
   double bd_distortion_threshold{0.5};
   bool bd_hard_sync{false};
   int bd_delay_mode{0};  // 0 - norm, 1 - tap1, 2 - tap2, 3 - pingpong
@@ -119,6 +120,22 @@ struct DrumSettings {
   double hh2_delay_wetmix{0.5};
   bool hh2_delay_sync_tempo{true};
   int hh2_delay_sync_len{0};  // 0 none, 1 - 1/4 // 2 - 8th // 3 - 16th
+
+  // 5 - Low Conga / Tom
+  double lt_vol{0.7};
+  double lt_pan{0};
+  double lt_tuning{0};
+  bool lt_is_conga{false};
+  // 6 - Mid Conga / Tom
+  double mt_vol{0.7};
+  double mt_pan{0};
+  double mt_tuning{0};
+  bool mt_is_conga{false};
+  // 7 - High Conga / Tom
+  double ht_vol{0.7};
+  double ht_pan{0};
+  double ht_tuning{0};
+  bool ht_is_conga{false};
 };
 
 DrumSettings Map2DrumSettings(std::string name,
@@ -153,6 +170,9 @@ class DrumSynth : public SoundGenerator {
   std::unique_ptr<HiHat> hh_;
   std::unique_ptr<HiHat> hh2_;
   std::unique_ptr<HandClap> cp_;
+  std::unique_ptr<TomConga> lt_;
+  std::unique_ptr<TomConga> mt_;
+  std::unique_ptr<TomConga> ht_;
 
   DCA dca_;
 };

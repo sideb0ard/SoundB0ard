@@ -18,6 +18,6 @@ void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
                      const std::string &preset_name,
                      const std::map<std::string, double> &preset);
 std::vector<int> GetNotesInKey(int root, int scale_type = 0);
-std::vector<int> GetNotesInChord(int root, int key, int scale_type = 0);
+std::vector<int> GetNotesInChord(int root, int key, int modifier = 0);
 
 }  // namespace interpreter_sound_cmds

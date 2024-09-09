@@ -1,4 +1,4 @@
-
+# load_preset(dx, "dirtaedub");  load_preset(mo, "melodiuy")
 let playblah_fn = fn(id, pat)
 {
   for (let i = 0; i < len(pat); i++) {
@@ -74,99 +74,9 @@ let db2lah_gen = gen()
   }
 }
 
-# notes_in_key(3, 1)
-# dx glassr // WTOOF // youshure // surgefizz2 // WHHXc
-let melblah_gen = gen()
-{
-  setup()
-  {
-    # load_preset(dx, "glassr");
-    vol dx 1;
-    #let ntz = [3, 8, 13, 3, 8, 13, 5];
-    let rf1 = [13, 0, 0, 3, 0, 13, 0, 3, 0, 0, 3, 0, 3, 0, 5, 0];
-    let rf2 = [8, 0, 0, 3, 0, 5, 0, 0, 8, 0, 0, 11, 0, 8, 0, 0];
-    let rf3 =  [8, 0, 0, 0, 0, 3, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0];
-    let rf4 =  [15, 0, 0, 15, 0, 8, 11, 3, 0, 0, 13, 0, 5, 0, 8, 0];
-    let rfz = [rf1, rf2, rf1, rf2, rf1, rf2, rf3, rf4];
-    let rfx = 0;
-    let nx = 0;
-    let nnax = 3;
 
-    let durz = [100, 250, 350, 550, 1000, 300, 1000];
-    let drx = 0;
-
-    let vlz = [100, 100, 100, 120, 127, 127, 120, 127];
-    let vx = 0;
-
-    let op2outz = [94, 50, 94, 60, 94, 98];
-    let op2x = 0;
-  }
-  run()
-  {
-
-    if (count % 4 < 3) {
-      let rf = rfz[rfx];
-
-      if (count % 10 == 9) {
-        rfx = inrc(rfx, 0, len(rfz));
-      }
-      #print("RF", rf, " rfx:", rfx);
-      for (let i = 0; i < 16; i++) {
-        stepper(dx, rf, nx, i, durz[drx], vlz[vx]);
-        nx = incr(nx, 0, nnax);
-        drx = incr(drx, 0, len(durz));
-        vx = incr(vx, 0, len(vlz));
-      }
-      nnax = incr(nnax, 3, 16);
-
-      if (count % 7 == 2) {
-        set dx:op2out op2outz[op2x] at=i*pp;
-        op2x = incr(op2x, 0, len(op2outz));
-      }
-    }
-  }
-}
-
-let arp_fn = fn(chrd, ppp_on, pplen)
-{
-  let cx = 0;
-  let pp = 960 / pplen;
-  for (let i = 0; i < pplen; i++) {
-    note_on_at(dx2, chrd[cx], ppp_on + i * pp, dur = 170);
-    cx = incr(cx, 0, len(chrd));
-  }
-}
-# dx2 RAVER // MWAUR // twnzz // whistley // WTOOF // lorenz0
-# notes_in_key(51, 1)
-# [51, 53, 54, 56, 58, 59, 61, 63]
-let cmelblah_gen = gen()
-{
-  setup()
-  {
-    #let chrdz = [51, 58, 51, 54];
-    #let chrdz = down([51, 58, 51, 54], 12);
-    let chrdz = down([51, 58, 51, 54, 51], 24);
-    let chtype = [1, 1, 1, 0, 1];
-    let cx = 0;
-    let posz = [7, 3, 11];
-    let posx = 0;
-    #let pplenz = [4, 1, 2, 3, 2, 3, 1];
-    let pplenz = [4];
-    let ppx = 0;
-  }
-  run()
-  {
-    if (count % 4 == 3) {
-      let ppq = 3840 / 4;
-      for (let i = 0; i < 4; i++) {
-        arp_fn(notes_in_chord(chrdz[cx], chtype[cx]), i *ppq, pplenz[ppx]);
-        cx = incr(cx, 0, len(chrdz));
-        ppx = incr(ppx, 0, len(pplenz));
-      }
-    }
-  }
-}
-
+# androidDreams // 4tet // rexian // SQuinrrr3G // squarey
+# flexxy0c // gnurly // melodiuy //
 let riddimblah_gen = gen()
 {
   setup()
@@ -175,30 +85,92 @@ let riddimblah_gen = gen()
     # let ntz = [33, 28];
     let ntz = [45, 40];
     let nx = 0;
+    let velz = [100, 100, 127, 100, 127, 100, 90];
+    let vx = 0;
+    let durx = [650, 800, 500, 750, 350, 600, 550, 700];
+    let drx = 0;
   }
   run()
   {
-    let nt = ntz[nx];
-    note_on_at(mo, nt, 4*pp);
+    let nt = notes_in_chord(ntz[nx], 0);
+    note_on_at(mo, nt, 4*pp, dur = durx[drx], vel = velz[vx]);
     note_on_at(mo, nt, 12*pp);
     nx = incr(nx, 0, len(ntz));
+    drx = incr(drx, 0, len(durx));
+    vx = incr(vx, 0, len(velz));
   }
 }
 
-let playbass_fn = fn(id, pat)
+let playbass_fn = fn(note, pat, durz)
 {
   for (let i = 0; i < len(pat); i++) {
-    note_on_at(sbdrum, id, pat[i] * pp);
+    note_on_at(dx, note, pat[i] * pp, dur = durz[i]);
   }
 }
 
+# dx dirtaedub
 let bassblah_gen = gen()
 {
   setup()
   {
+    # A and E chords
+    # A - [9, 12, 16] // A C E
+    # E - [4, 7, 11] // E G B
+    let az = [4, 8, 10];
+    let az_durz = [480, 240, 240];
+
+    let ez = [12];
+    let ez_durz = [240];
+
+    let ez2 = [0, 4];
+    let ez2_durz = [480, 480];
+
+    let cz = [14];
+    let cz_durz = [240];
+
+    let bz = [8];
+    let bz_durz = [650];
+
+    #let dxratz = [4.71, 4.71, 4.71, 4.71, 6];
+    #let dxx = 0;
   }
   run()
   {
+    #set dx:o1rat dxratz[dxx];
+    #dxx = incr(dxx, 0, len(dxratz));
+
+    if (count % 17 < 13) {
+      if (count % 2 == 0) {
+        playbass_fn(9, az, az_durz);
+        playbass_fn(12, cz, cz_durz);
+        playbass_fn(16, ez, ez_durz);
+      }
+    }
+
+    if (count % 2 == 1) {
+      playbass_fn(16, ez2, ez2_durz);
+      playbass_fn(11, bz, bz_durz);
+    }
+  }
+}
+
+# dx2
+# rrrawr // ralllffr0 // klonk
+let dx2blah_gen = gen()
+{
+  setup()
+  {
+    let mel = [0, 23, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 21, 0, 45, 0];
+    let mel2 = [40, 0, 21, 0, 0, 40, 0, 0, 0, 0, 0, 0, 21, 40, 45, 0];
+    let mel3 = [0, 47, 23, 0, 0, 19, 0, 0, 0, 0, 0, 0, 21, 40, 45, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (mel3[i] > 0) {
+        note_on_at(dx2, notes_in_chord(mel[i], 0), i * pp);
+      }
+    }
   }
 }
 

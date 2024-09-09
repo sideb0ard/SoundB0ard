@@ -168,21 +168,20 @@ std::vector<int> GetNotesInKey(int root, int scale_type) {
   return notes;
 }
 
-std::vector<int> GetNotesInChord(int chord_root, int key, int scale_type) {
+std::vector<int> GetNotesInChord(int chord_root, int key, int modifier) {
   std::vector<int> notes_in_chord{};
   // validate chord root is in key
   auto is_same_modulo = [&chord_root](int i) {
     return chord_root % 12 == i % 12;
   };
-  auto notes_in_key = GetNotesInKey(key % 12, scale_type);
+  auto notes_in_key = GetNotesInKey(key % 12, 0);
   bool is_in_key = std::find_if(begin(notes_in_key), end(notes_in_key),
                                 is_same_modulo) != std::end(notes_in_key);
   if (is_in_key) {
     int closest_power_of_key = floor(chord_root / 12) * 12 + (key % 12);
     if (closest_power_of_key > chord_root) closest_power_of_key -= 12;
-    auto first_octave_in_key = GetNotesInKey(closest_power_of_key, scale_type);
-    auto next_octave_in_key =
-        GetNotesInKey(closest_power_of_key + 12, scale_type);
+    auto first_octave_in_key = GetNotesInKey(closest_power_of_key, 0);
+    auto next_octave_in_key = GetNotesInKey(closest_power_of_key + 12, 0);
     std::vector<int> all_keys(first_octave_in_key.size() +
                               next_octave_in_key.size() - 1);
     merge(first_octave_in_key.begin(), first_octave_in_key.end(),
@@ -198,6 +197,8 @@ std::vector<int> GetNotesInChord(int chord_root, int key, int scale_type) {
       notes_in_chord.push_back(all_keys[idx]);
       notes_in_chord.push_back(all_keys[idx + 2]);
       notes_in_chord.push_back(all_keys[idx + 4]);
+      if (modifier == 1)  // seventh
+        notes_in_chord.push_back(all_keys[idx + 6]);
     }
 
   } else {

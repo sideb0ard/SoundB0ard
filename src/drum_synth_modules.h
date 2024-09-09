@@ -25,6 +25,20 @@ const std::array<float, kNumOscillators> kOscFrequencies{263, 400, 421,
 // const std::array<float, kNumOscillators> kOscFrequencies{80,    120,   166.4,
 //                                                          217.2, 271.6,
 //                                                          328.4};
+//
+class PulseTrigger {
+ public:
+  PulseTrigger() = default;
+  ~PulseTrigger() = default;
+
+  void Trigger();
+  double GenNext();
+
+  double amplitude_{0.3};
+  int pulse_counter_{0};
+  int pulse_length_{44};  // samples
+};
+
 const std::array<bool, kNumOscillators> kDefaultOscConfig{true, true, true,
                                                           true, true, true};
 const float kSquareOscAmplitude = 0.4;
@@ -69,9 +83,11 @@ class BassDrum : public DrumModule {
   void NoteOn(double vel) override;
   StereoVal Generate() override;
 
+  bool distortion_enabled_{false};
   bool hard_sync_{false};
   double frequency_{kDefaultKickFrequency};
 
+  PulseTrigger click_;
   std::unique_ptr<QBLimitedOscillator> noise_;
   EnvelopeGenerator noise_eg_;
   std::unique_ptr<CKThreeFive> noise_filter_;
@@ -136,6 +152,56 @@ class HiHat : public DrumModule {
   std::unique_ptr<MoogLadder> mid_filter_;
   std::unique_ptr<FilterSem> high_filter_;
   // std::unique_ptr<MoogLadder> high_filter_;
+};
+
+const double kLowCongaHighFreq = 220;
+const double kLowCongaLowFreq = 165;
+const double kLowCongaOscDecay = 180;
+const double kLowCongaNoiseDecay = 200;
+
+const double kMidCongaHighFreq = 310;
+const double kMidCongaLowFreq = 250;
+const double kMidCongaOscDecay = 100;
+const double kMidCongaNoiseDecay = 155;
+
+const double kHighCongaHighFreq = 455;
+const double kHighCongaLowFreq = 370;
+const double kHighCongaOscDecay = 180;
+const double kHighCongaNoiseDecay = 125;
+
+const double kLowTomHighFreq = 100;
+const double kLowTomLowFreq = 80;
+const double kLowTomOscDecay = 200;
+const double kLowTomNoiseDecay = 200;
+
+const double kMidTomHighFreq = 160;
+const double kMidTomLowFreq = 120;
+const double kMidTomOscDecay = 130;
+const double kMidTomNoiseDecay = 155;
+
+const double kHighTomHighFreq = 220;
+const double kHighTomLowFreq = 165;
+const double kHighTomOscDecay = 200;
+const double kHighTomNoiseDecay = 125;
+
+class TomConga : public DrumModule {
+ public:
+  TomConga();
+  virtual ~TomConga() = default;
+
+  void NoteOn(double vel) override;
+  StereoVal Generate() override;
+
+  PulseTrigger click_;
+
+  std::unique_ptr<QBLimitedOscillator> noise_;
+  EnvelopeGenerator noise_eg_;
+  std::unique_ptr<FilterSem> noise_filter_;
+
+  std::unique_ptr<QBLimitedOscillator> osc1_;
+  EnvelopeGenerator eg_;
+
+  bool is_conga_{false};
 };
 
 }  // namespace SBAudio
