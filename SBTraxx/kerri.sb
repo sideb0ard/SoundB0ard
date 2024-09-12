@@ -1,28 +1,219 @@
-# let watchme = loop(voices/watchmeerase.wav); set watchme:len 2; add_fx(watchme, "delay");
-# p9 $ basslah_gen;
-let basslah_gen = gen()
+# Key of E
+let key = 4;
+#let modz = [1, 1, 2, 2, 1, 1, 3, 0];
+let modz = [1, 1, 3, 1, 1, 1, 0, 1, 1, 2];
+let mx = 0;
+
+let velz = [100, 100, 110, 120, 127, 127, 127];
+let vlx = 0;
+
+# dx forkjy // glassr // sawrr // basss // muffin // scarlet
+# mo swqSAW // sbarkey ( with long durations)M // pacman // flexxy0c
+# load_preset(mo, "dolpd"); load_preset(dx, "garage");
+let playsynth = fn(note, on_at, dr) {
+  note_on_at(mo, notes_in_chord(note, key, modz[mx]), on_at, dur = dr, vel = velz[lvx]);
+  vlx = incr(vlx, 0, len(velz));
+}
+
+
+let sblah_gen = gen()
 {
   setup()
   {
-    #let nt = [45, 40];
-    let nt = [45, 40];
-    #let nt = [33, 28];
-    #let nt = [51, 59];
-    let ntx = 0;
-    let dr = 100;
+    # D# and G#
+    let rootz = [51, 56];
+    #let rootz = [39, 44];
+    #let rootz = [27, 32];
+
+    #let durz = [200, 300, 150, 250, 500, 700, 300];
+    let durz = [1200, 800, 950, 750, 900, 700, 300];
+    #let durz = [300];
+    let drx = 0;
+
+    let portaz = [30, 90, 60, 0, 0];
+    let prx = 0;
+
+    let lforz = [1, 13, 18, 4, 8, 2, 2, 7];
+    let lx = 0;
+
+    let detz = [0, 23 ,75, 0, 0, 65, 47];
+    let dex = 0;
+
   }
   run()
   {
+    if (count % 8 < 7) {
+      let ppq = 3840 / 4;
+      if (count % 16 < 14) {
+        let on_at = 0;
+        playsynth(rootz[0], on_at, durz[drx]);
+        drx = incr(drx, 0, len(durz));
 
+        #set mo:porta portaz[prx];
+        #prx = incr(prx, 0, len(portaz));
+
+        #set mo:detune detz[dex];
+        #dex = incr(dex, 0, len(detz));
+      }
+      if (count % 16 < 12) {
+
+        let on_at = pp * 3;
+        playsynth(rootz[0], on_at, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        #set mo:l1rate lforz[lx];
+        #lx = incr(lx, 0, len(lforz));
+      }
+
+      if (count % 8 < 5) {
+        let on_at = ppq + pp * 3;
+        playsynth(rootz[1], on_at, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        on_at = ppq * 2 + pp * 2;
+        playsynth(rootz[1], on_at, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+      if (count % 8 > 5) {
+        let on_at = ppq + pp * 2;
+        playsynth(rootz[1], on_at, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        on_at = ppq * 2 + pp * 3;
+        playsynth(rootz[1], on_at, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+
+      if (count % 19 < 15) {
+        let on_at = ppq * 3;
+        playsynth(rootz[0], on_at, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+
+      if (count % 17 < 12) {
+        let on_at = ppq * 3 + 2 * pp;
+        playsynth(rootz[0], on_at, durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+      mx = incr(mx, 0, len(modz));
+    }
+  }
+}
+
+# p3 $ play2step
+let play2step = gen()
+{
+  setup()
+  {
+    let durz = [500, 100, 300, 500];
+    let drx = 0;
+    let ntz = [27, 31, 24];
+    let nx = 0;
+    set sbdrum:sd_key 4;
+  }
+  run()
+  {
+    let beat = gen2stepbeat();
+
+    for (let i = 0; i < 16; i++) {
+      let v = rand(100);
+      if (i == 0) {
+        v = 127;
+      }
+      if (i % 2 == 1) {
+        v = rand(50);
+      }
+      if (beat[i] == 1) {
+        note_on_at(sbdrum, 0, i * pp, vel = v);
+      }
+
+      if (i % 8 == 4) {
+        if (count % 8 < 6) {
+          let v = 100 + rand(27);
+          note_on_at(sbdrum, 3, i * pp + rand(40), vel = v);
+          #note_on_at(sbdrum, 1, i * pp + rand(30), vel = v);
+          set sd_delay_ms (rand(30) + 5) at=i*pp;
+        }
+      }
+    }
+  }
+}
+
+# bpm 96
+# mo c3llo // SQRz // pacman
+# dx muffin
+let bsslah_gen = gen()
+{
+  setup()
+  {
+    let pz = [3, 3, 4, 5, 1, 7, 2];
+    let px = 0;
+    # let ntz =notes_in_key(key + 12);
+    let ntz = [28, 16, 20, 23, 23];
+    let nx = 0;
+    let durz = [600, 150, 250, 500, 700];
+    let drx = 0;
+    let vlz = [120, 100, 120, 127, 127, 120, 110];
+    let vx = 0;
+  }
+  run()
+  {
+    let ppq = 3840 / 4;
+    let pp = ppq / 16;
+    let pat = bjork(pz[px], 16);
+    px = incr(px, 0, len(pz));
+    let pat2 = bjork(pz[px], 16);
+    for (let i = 0; i < 16; i++) {
+      if (pat[i] == 1) {
+        note_on_at(dx, ntz[nx], ppq + pp * i, vel = vlz[vx], dur = durz[drx]);
+      }
+      if (pat2[i] == 1) {
+        note_on_at(dx, ntz[nx], ppq *3 + pp * i, vel = vlz[vx], dur = durz[drx]);
+      }
+      vx = incr(vx, 0, len(vlz));
+      drx = incr(drx, 0, len(durz));
+    }
+    if (count % 2 == 0) {
+      nx = incr(nx, 0, len(ntz));
+    }
     if (count % 3 == 0) {
-      set watchme:on 1;
-      set watchme:stutter 1;
+      nx = incr(nx, 0, len(ntz));
     }
-    if (count % 4 == 0) {
-      #set watchme:on 1;
-      set watchme:scramble 1;
-      play_array(watchme, rand_beat());
+  }
+}
+
+let playblah_fn = fn(pat)
+{
+  for (let i = 0; i < 16; i++) {
+    if (pat[i] == 0) {
+      note_on_at(sbdrum, 5, i * pp);
     }
+    if (pat[i] == 1) {
+      note_on_at(sbdrum, 6, i * pp);
+    }
+    if (pat[i] == 2) {
+      note_on_at(sbdrum, 7, i * pp);
+    }
+  }
+}
+
+let tomblah_gen = gen()
+{
+  setup()
+  {
+    let pat1 =  [2, 3, 2, 1, 0, 3, 7, 5, 5, 6, 5, 8, 4, 0, 5, 7];
+    let pat2 = [6, 6, 8, 6, 2, 0, 7, 1, 3, 2, 8, 1, 8, 1, 0, 2];
+    let pat3 = [7, 0, 7, 2, 8, 5, 7, 4, 7, 7, 5, 3, 6, 4, 7, 2];
+    let px = 0;
+    let pmax = 4;
+  }
+  run()
+  {
+    let pat = pat1;
+    if (count % 3 == 0) {
+      pat = pat3;
+    }
+    if (count % 7 == 0) {
+      pat = pat7;
+    }
+
   }
 }
 

@@ -481,17 +481,133 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "volume=" << settings_.volume << kSEP;
   presetzzz << "bd_vol=" << settings_.bd_vol << kSEP;
   presetzzz << "bd_pan=" << settings_.bd_pan << kSEP;
-  presetzzz << "bd_nvol=" << settings_.bd_noise_vol << kSEP;
-  presetzzz << "bd_octave=" << settings_.bd_octave << kSEP;
-  presetzzz << "bd_key=" << settings_.bd_key << kSEP;
-  presetzzz << "bd_detune=" << settings_.bd_detune_cents << kSEP;
-  presetzzz << "bd_hard_sync=" << settings_.bd_hard_sync << kSEP;
   presetzzz << "bd_tone=" << settings_.bd_tone << kSEP;
   presetzzz << "bd_q=" << settings_.bd_q << kSEP;
+  presetzzz << "bd_noise_vol=" << settings_.bd_noise_vol << kSEP;
   presetzzz << "bd_ntone=" << settings_.bd_ntone << kSEP;
   presetzzz << "bd_nq=" << settings_.bd_nq << kSEP;
   presetzzz << "bd_decay=" << settings_.bd_decay << kSEP;
-  presetzzz << "bd_dist=" << settings_.bd_distortion_threshold << kSEP;
+  presetzzz << "bd_octave=" << settings_.bd_octave << kSEP;
+  presetzzz << "bd_key=" << settings_.bd_key << kSEP;
+  presetzzz << "bd_detune_cents=" << settings_.bd_detune_cents << kSEP;
+  presetzzz << "bd_distortion_enabled=" << settings_.bd_distortion_enabled
+            << kSEP;
+  presetzzz << "bd_distortion_threshold=" << settings_.bd_distortion_threshold
+            << kSEP;
+  presetzzz << "bd_hard_sync=" << settings_.bd_hard_sync << kSEP;
+  presetzzz << "bd_delay_mode=" << settings_.bd_delay_mode << kSEP;
+  presetzzz << "bd_delay_ms=" << settings_.bd_delay_ms << kSEP;
+  presetzzz << "bd_delay_feedback_pct=" << settings_.bd_delay_feedback_pct
+            << kSEP;
+  presetzzz << "bd_delay_ratio=" << settings_.bd_delay_ratio << kSEP;
+  presetzzz << "bd_delay_wetmix=" << settings_.bd_delay_wetmix << kSEP;
+  presetzzz << "bd_delay_sync_tempo=" << settings_.bd_delay_sync_tempo << kSEP;
+  presetzzz << "bd_delay_sync_len=" << settings_.bd_delay_sync_len << kSEP;
+
+  // 1 - SnareDum Settings
+  presetzzz << "sd_vol=" << settings_.sd_vol << kSEP;
+  presetzzz << "sd_pan=" << settings_.sd_pan << kSEP;
+  presetzzz << "sd_noise_vol=" << settings_.sd_noise_vol << kSEP;
+  presetzzz << "sd_noise_decay=" << settings_.sd_noise_decay << kSEP;
+  presetzzz << "sd_tone=" << settings_.sd_tone << kSEP;
+  presetzzz << "sd_decay=" << settings_.sd_decay << kSEP;
+  presetzzz << "sd_octave=" << settings_.sd_octave << kSEP;
+  presetzzz << "sd_key=" << settings_.sd_key << kSEP;
+  presetzzz << "sd_hi_osc_waveform=" << settings_.sd_hi_osc_waveform << kSEP;
+  presetzzz << "sd_lo_osc_waveform=" << settings_.sd_lo_osc_waveform << kSEP;
+  presetzzz << "sd_distortion_threshold=" << settings_.sd_distortion_threshold
+            << kSEP;
+  presetzzz << "sd_delay_mode=" << settings_.sd_delay_mode << kSEP;
+  presetzzz << "sd_delay_ms=" << settings_.sd_delay_ms << kSEP;
+  presetzzz << "sd_delay_feedback_pct=" << settings_.sd_delay_feedback_pct
+            << kSEP;
+  presetzzz << "sd_delay_ratio=" << settings_.sd_delay_ratio << kSEP;
+  presetzzz << "sd_delay_wetmix=" << settings_.sd_delay_wetmix << kSEP;
+  presetzzz << "sd_delay_sync_tempo=" << settings_.sd_delay_sync_tempo << kSEP;
+  presetzzz << "sd_delay_sync_len=" << settings_.sd_delay_sync_len << kSEP;
+
+  // 2 - Closed hat Settings
+  presetzzz << "hh_vol=" << settings_.hh_vol << kSEP;
+  presetzzz << "hh_pan=" << settings_.hh_pan << kSEP;
+  presetzzz << "hh_sqamp=" << settings_.hh_sqamp << kSEP;
+  presetzzz << "hh_attack=" << settings_.hh_attack << kSEP;
+  presetzzz << "hh_decay=" << settings_.hh_decay << kSEP;
+  presetzzz << "hh_midf=" << settings_.hh_midf << kSEP;
+  presetzzz << "hh_hif=" << settings_.hh_hif << kSEP;
+  presetzzz << "hh_hif_q=" << settings_.hh_hif_q << kSEP;
+  presetzzz << "hh_distortion_threshold=" << settings_.hh_distortion_threshold
+            << kSEP;
+  presetzzz << "hh_delay_mode=" << settings_.hh_delay_mode << kSEP;
+  presetzzz << "hh_delay_ms=" << settings_.hh_delay_ms << kSEP;
+  presetzzz << "hh_delay_feedback_pct=" << settings_.hh_delay_feedback_pct
+            << kSEP;
+  presetzzz << "hh_delay_ratio=" << settings_.hh_delay_ratio << kSEP;
+  presetzzz << "hh_delay_wetmix=" << settings_.hh_delay_wetmix << kSEP;
+  presetzzz << "hh_delay_sync_tempo=" << settings_.hh_delay_sync_tempo << kSEP;
+  presetzzz << "hh_delay_sync_len=" << settings_.hh_delay_sync_len << kSEP;
+
+  // 3 - Clap
+  presetzzz << "cp_vol=" << settings_.cp_vol << kSEP;
+  presetzzz << "cp_pan=" << settings_.cp_pan << kSEP;
+  presetzzz << "cp_nvol=" << settings_.cp_nvol << kSEP;
+  presetzzz << "cp_nattack=" << settings_.cp_nattack << kSEP;
+  presetzzz << "cp_ndecay=" << settings_.cp_ndecay << kSEP;
+  presetzzz << "cp_tone=" << settings_.cp_tone << kSEP;
+  presetzzz << "cp_fq=" << settings_.cp_fq << kSEP;
+  presetzzz << "cp_eg_attack=" << settings_.cp_eg_attack << kSEP;
+  presetzzz << "cp_eg_decay=" << settings_.cp_eg_decay << kSEP;
+  presetzzz << "cp_eg_sustain=" << settings_.cp_eg_sustain << kSEP;
+  presetzzz << "cp_eg_release=" << settings_.cp_eg_release << kSEP;
+  presetzzz << "cp_lfo_type=" << settings_.cp_lfo_type << kSEP;
+  presetzzz << "cp_lfo_rate=" << settings_.cp_lfo_rate << kSEP;
+  presetzzz << "cp_distortion_threshold=" << settings_.cp_distortion_threshold
+            << kSEP;
+  presetzzz << "cp_delay_mode=" << settings_.cp_delay_mode << kSEP;
+  presetzzz << "cp_delay_ms=" << settings_.cp_delay_ms << kSEP;
+  presetzzz << "cp_delay_feedback_pct=" << settings_.cp_delay_feedback_pct
+            << kSEP;
+  presetzzz << "cp_delay_ratio=" << settings_.cp_delay_ratio << kSEP;
+  presetzzz << "cp_delay_wetmix=" << settings_.cp_delay_wetmix << kSEP;
+  presetzzz << "cp_delay_sync_tempo=" << settings_.cp_delay_sync_tempo << kSEP;
+  presetzzz << "cp_delay_sync_len=" << settings_.cp_delay_sync_len << kSEP;
+
+  // 4 - Open hat Settings
+  presetzzz << "hh2_vol=" << settings_.hh2_vol << kSEP;
+  presetzzz << "hh2_pan=" << settings_.hh2_pan << kSEP;
+  presetzzz << "hh2_sqamp=" << settings_.hh2_sqamp << kSEP;
+  presetzzz << "hh2_attack=" << settings_.hh2_attack << kSEP;
+  presetzzz << "hh2_decay=" << settings_.hh2_decay << kSEP;
+  presetzzz << "hh2_midf=" << settings_.hh2_midf << kSEP;
+  presetzzz << "hh2_hif=" << settings_.hh2_hif << kSEP;
+  presetzzz << "hh2_hif_q=" << settings_.hh2_hif_q << kSEP;
+  presetzzz << "hh2_distortion_threshold=" << settings_.hh2_distortion_threshold
+            << kSEP;
+  presetzzz << "hh2_delay_mode=" << settings_.hh2_delay_mode << kSEP;
+  presetzzz << "hh2_delay_ms=" << settings_.hh2_delay_ms << kSEP;
+  presetzzz << "hh2_delay_feedback_pct=" << settings_.hh2_delay_feedback_pct
+            << kSEP;
+  presetzzz << "hh2_delay_ratio=" << settings_.hh2_delay_ratio << kSEP;
+  presetzzz << "hh2_delay_wetmix=" << settings_.hh2_delay_wetmix << kSEP;
+  presetzzz << "hh2_delay_sync_tempo=" << settings_.hh2_delay_sync_tempo
+            << kSEP;
+  presetzzz << "hh2_delay_sync_len=" << settings_.hh2_delay_sync_len << kSEP;
+
+  // 5 - Low Conga / Tom
+  presetzzz << "lt_vol=" << settings_.lt_vol << kSEP;
+  presetzzz << "lt_pan=" << settings_.lt_pan << kSEP;
+  presetzzz << "lt_tuning=" << settings_.lt_tuning << kSEP;
+  presetzzz << "lt_is_conga=" << settings_.lt_is_conga << kSEP;
+  // 6 - Mid Conga / Tom
+  presetzzz << "mt_vol=" << settings_.mt_vol << kSEP;
+  presetzzz << "mt_pan=" << settings_.mt_pan << kSEP;
+  presetzzz << "mt_tuning=" << settings_.mt_tuning << kSEP;
+  presetzzz << "mt_is_conga=" << settings_.mt_is_conga << kSEP;
+  // 7 - High Conga / Tom
+  presetzzz << "ht_vol=" << settings_.ht_vol << kSEP;
+  presetzzz << "ht_pan=" << settings_.ht_pan << kSEP;
+  presetzzz << "ht_tuning=" << settings_.ht_tuning << kSEP;
+  presetzzz << "ht_is_conga=" << settings_.ht_is_conga << kSEP;
+
   presetzzz << std::endl;
   presetzzz.close();
 
@@ -663,28 +779,222 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.bd_vol = dval;
     else if (key == "bd_pan")
       preset.bd_pan = dval;
-    else if (key == "bd_nvol")
-      preset.bd_noise_vol = dval;
-    else if (key == "bd_octave")
-      preset.bd_octave = dval;
-    else if (key == "bd_key")
-      preset.bd_key = dval;
-    else if (key == "bd_detune")
-      preset.bd_detune_cents = dval;
-    else if (key == "bd_hard_sync")
-      preset.bd_hard_sync = dval;
     else if (key == "bd_tone")
       preset.bd_tone = dval;
     else if (key == "bd_q")
       preset.bd_q = dval;
+    else if (key == "bd_noise_vol")
+      preset.bd_noise_vol = dval;
     else if (key == "bd_ntone")
       preset.bd_ntone = dval;
     else if (key == "bd_nq")
       preset.bd_nq = dval;
     else if (key == "bd_decay")
       preset.bd_decay = dval;
-    else if (key == "bd_dist")
+    else if (key == "bd_octave")
+      preset.bd_octave = dval;
+    else if (key == "bd_key")
+      preset.bd_key = dval;
+    else if (key == "bd_detune_cents")
+      preset.bd_detune_cents = dval;
+    else if (key == "bd_distortion_enabled")
+      preset.bd_distortion_enabled = dval;
+    else if (key == "bd_distortion_threshold")
       preset.bd_distortion_threshold = dval;
+    else if (key == "bd_hard_sync")
+      preset.bd_hard_sync = dval;
+    else if (key == "bd_delay_mode")
+      preset.bd_delay_mode = dval;
+    else if (key == "bd_delay_ms")
+      preset.bd_delay_ms = dval;
+    else if (key == "bd_delay_feedback_pct")
+      preset.bd_delay_feedback_pct = dval;
+    else if (key == "bd_delay_ratio")
+      preset.bd_delay_ratio = dval;
+    else if (key == "bd_delay_wetmix")
+      preset.bd_delay_wetmix = dval;
+    else if (key == "bd_delay_sync_tempo")
+      preset.bd_delay_sync_tempo = dval;
+    else if (key == "bd_delay_sync_len")
+      preset.bd_delay_sync_len = dval;
+
+    // // 1 - SnareDum Settings
+    else if (key == "sd_vol")
+      preset.sd_vol = dval;
+    else if (key == "sd_pan")
+      preset.sd_pan = dval;
+    else if (key == "sd_noise_vol")
+      preset.sd_noise_vol = dval;
+    else if (key == "sd_noise_decay")
+      preset.sd_noise_decay = dval;
+    else if (key == "sd_tone")
+      preset.sd_tone = dval;
+    else if (key == "sd_decay")
+      preset.sd_decay = dval;
+    else if (key == "sd_octave")
+      preset.sd_octave = dval;
+    else if (key == "sd_key")
+      preset.sd_key = dval;
+    else if (key == "sd_hi_osc_waveform")
+      preset.sd_hi_osc_waveform = dval;
+    else if (key == "sd_lo_osc_waveform")
+      preset.sd_lo_osc_waveform = dval;
+    else if (key == "sd_distortion_threshold")
+      preset.sd_distortion_threshold = dval;
+    else if (key == "sd_delay_mode")
+      preset.sd_delay_mode = dval;
+    else if (key == "sd_delay_ms")
+      preset.sd_delay_ms = dval;
+    else if (key == "sd_delay_feedback_pct")
+      preset.sd_delay_feedback_pct = dval;
+    else if (key == "sd_delay_ratio")
+      preset.sd_delay_ratio = dval;
+    else if (key == "sd_delay_wetmix")
+      preset.sd_delay_wetmix = dval;
+    else if (key == "sd_delay_sync_tempo")
+      preset.sd_delay_sync_tempo = dval;
+    else if (key == "sd_delay_sync_len")
+      preset.sd_delay_sync_len = dval;
+
+    // // 2 - Closed hat Settings
+    else if (key == "hh_vol")
+      preset.hh_vol = dval;
+    else if (key == "hh_pan")
+      preset.hh_pan = dval;
+    else if (key == "hh_sqamp")
+      preset.hh_sqamp = dval;
+    else if (key == "hh_attack")
+      preset.hh_attack = dval;
+    else if (key == "hh_decay")
+      preset.hh_decay = dval;
+    else if (key == "hh_midf")
+      preset.hh_midf = dval;
+    else if (key == "hh_hif")
+      preset.hh_hif = dval;
+    else if (key == "hh_hif_q")
+      preset.hh_hif_q = dval;
+    else if (key == "hh_distortion_threshold")
+      preset.hh_distortion_threshold = dval;
+    else if (key == "hh_delay_mode")
+      preset.hh_delay_mode = dval;
+    else if (key == "hh_delay_ms")
+      preset.hh_delay_ms = dval;
+    else if (key == "hh_delay_feedback_pct")
+      preset.hh_delay_feedback_pct = dval;
+    else if (key == "hh_delay_ratio")
+      preset.hh_delay_ratio = dval;
+    else if (key == "hh_delay_wetmix")
+      preset.hh_delay_wetmix = dval;
+    else if (key == "hh_delay_sync_tempo")
+      preset.hh_delay_sync_tempo = dval;
+    else if (key == "hh_delay_sync_len")
+      preset.hh_delay_sync_len = dval;
+
+    // // 3 - Clap
+    else if (key == "cp_vol")
+      preset.cp_vol = dval;
+    else if (key == "cp_pan")
+      preset.cp_pan = dval;
+    else if (key == "cp_nvol")
+      preset.cp_nvol = dval;
+    else if (key == "cp_nattack")
+      preset.cp_nattack = dval;
+    else if (key == "cp_ndecay")
+      preset.cp_ndecay = dval;
+    else if (key == "cp_tone")
+      preset.cp_tone = dval;
+    else if (key == "cp_fq")
+      preset.cp_fq = dval;
+    else if (key == "cp_eg_attack")
+      preset.cp_eg_attack = dval;
+    else if (key == "cp_eg_decay")
+      preset.cp_eg_decay = dval;
+    else if (key == "cp_eg_sustain")
+      preset.cp_eg_sustain = dval;
+    else if (key == "cp_eg_release")
+      preset.cp_eg_release = dval;
+    else if (key == "cp_lfo_type")
+      preset.cp_lfo_type = dval;
+    else if (key == "cp_lfo_rate")
+      preset.cp_lfo_rate = dval;
+    else if (key == "cp_distortion_threshold")
+      preset.cp_distortion_threshold = dval;
+    else if (key == "cp_delay_mode")
+      preset.cp_delay_mode = dval;
+    else if (key == "cp_delay_ms")
+      preset.cp_delay_ms = dval;
+    else if (key == "cp_delay_feedback_pct")
+      preset.cp_delay_feedback_pct = dval;
+    else if (key == "cp_delay_ratio")
+      preset.cp_delay_ratio = dval;
+    else if (key == "cp_delay_wetmix")
+      preset.cp_delay_wetmix = dval;
+    else if (key == "cp_delay_sync_tempo")
+      preset.cp_delay_sync_tempo = dval;
+    else if (key == "cp_delay_sync_len")
+      preset.cp_delay_sync_len = dval;
+
+    // // 4 - Open hat Settings
+    else if (key == "hh2_vol")
+      preset.hh2_vol = dval;
+    else if (key == "hh2_pan")
+      preset.hh2_pan = dval;
+    else if (key == "hh2_sqamp")
+      preset.hh2_sqamp = dval;
+    else if (key == "hh2_attack")
+      preset.hh2_attack = dval;
+    else if (key == "hh2_decay")
+      preset.hh2_decay = dval;
+    else if (key == "hh2_midf")
+      preset.hh2_midf = dval;
+    else if (key == "hh2_hif")
+      preset.hh2_hif = dval;
+    else if (key == "hh2_hif_q")
+      preset.hh2_hif_q = dval;
+    else if (key == "hh2_distortion_threshold")
+      preset.hh2_distortion_threshold = dval;
+    else if (key == "hh2_delay_mode")
+      preset.hh2_delay_mode = dval;
+    else if (key == "hh2_delay_ms")
+      preset.hh2_delay_ms = dval;
+    else if (key == "hh2_delay_feedback_pct")
+      preset.hh2_delay_feedback_pct = dval;
+    else if (key == "hh2_delay_ratio")
+      preset.hh2_delay_ratio = dval;
+    else if (key == "hh2_delay_wetmix")
+      preset.hh2_delay_wetmix = dval;
+    else if (key == "hh2_delay_sync_tempo")
+      preset.hh2_delay_sync_tempo = dval;
+    else if (key == "hh2_delay_sync_len")
+      preset.hh2_delay_sync_len = dval;
+
+    // 5 - Low Conga / Tom
+    else if (key == "lt_vol")
+      preset.lt_vol = dval;
+    else if (key == "lt_pan")
+      preset.lt_pan = dval;
+    else if (key == "lt_tuning")
+      preset.lt_tuning = dval;
+    else if (key == "lt_is_conga")
+      preset.lt_is_conga = dval;
+    // 6 - Mid Conga / Tom
+    else if (key == "mt_vol")
+      preset.mt_vol = dval;
+    else if (key == "mt_pan")
+      preset.mt_pan = dval;
+    else if (key == "mt_tuning")
+      preset.mt_tuning = dval;
+    else if (key == "mt_is_conga")
+      preset.mt_is_conga = dval;
+    // 7 - High Conga / Tom
+    else if (key == "ht_vol")
+      preset.ht_vol = dval;
+    else if (key == "ht_pan")
+      preset.ht_pan = dval;
+    else if (key == "ht_tuning")
+      preset.ht_tuning = dval;
+    else if (key == "ht_is_conga")
+      preset.ht_is_conga = dval;
   }
 
   return preset;

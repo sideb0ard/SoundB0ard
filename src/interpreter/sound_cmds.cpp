@@ -199,6 +199,12 @@ std::vector<int> GetNotesInChord(int chord_root, int key, int modifier) {
       notes_in_chord.push_back(all_keys[idx + 4]);
       if (modifier == 1)  // seventh
         notes_in_chord.push_back(all_keys[idx + 6]);
+      if (modifier == 2)  // seventh inversion
+        notes_in_chord.push_back(all_keys[idx + 6] - 12);
+      if (modifier == 3)  // root inversion
+        notes_in_chord[0] = all_keys[idx] - 12;
+      if (modifier == 4)  // power
+        notes_in_chord[1] = all_keys[idx] + 12;
     }
 
   } else {

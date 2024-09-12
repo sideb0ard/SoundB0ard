@@ -96,6 +96,10 @@ let noteblah_gen = gen()
       ticks_left_in_loop = ticks_left_in_loop - total_event_time;
       cur_event_schedule_time = cur_event_schedule_time + total_event_time;
       if (ticks_left_in_loop < 0) {
+        if (count % 16 < 8) {
+          set dx:algo 5 at=3840;
+          set dx:algo 1 at=3840*3;
+        }
         is_over_loop_time = true;
         event_time_rollover = abs(ticks_left_in_loop);
       }
@@ -140,20 +144,44 @@ let beatlah_gen = gen()
       note_on_at(sbdrum, 3, clapextraCtr * 240, vel = hvz[hvx]);
       clapextraCtr = incr(clapextraCtr, 1, 14);
       #print("YO", chx, chrd[chx]);
-      set sbdrum:bd_key chrd[chx];
+      set sbdrum:bd_key chrd[chx] at=clapextraCtr*240;
       chx = incr(chx, 0, len(chrd));
     }
   }
 }
 
 
+# mo - racer5 // default // phiola // sandepp
 let noteeblah_gen = gen()
 {
   setup()
   {
+    # Key C#
+    let notes = notes_in_key(37);
+    let nx = 0;
+    let steps = 8;
+    let durz = [100, 200, 250, 500];
+    let dux = 0;
+    let velz = [100, 100, 110, 110, 120, 120, 120, 120];
+    let vx = 0;
   }
   run()
   {
+    let pat = bjork(3,steps);
+    let ppq = 3840 / 4 / steps;
+    let ppoff =  3840 / 4 * 3;
+    for (let i = 0; i < len(pat); i++) {
+      note_on_at(mo, notes_in_chord(notes[nx], 1, 1), ppoff + ppq * i, dur = durz[dux], vel = velz[vx]);
+      dux = incr(dux, 0, len(durz));
+      vx = incr(vx, 0, len(velz));
+    }
+
+    if (count % 8 == 0) {
+      nx = 0;
+    }
+    if (count % 3 == 0) {
+      nx = incr(nx, 0, len(notes));
+    }
   }
 }
 
