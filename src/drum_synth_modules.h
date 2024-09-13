@@ -69,11 +69,13 @@ class DrumModule {
 
   EnvelopeGenerator eg_;
   DCA dca_;
+  bool use_distortion_{false};
   Distortion distortion_;
+  bool use_delay_{false};
   std::unique_ptr<StereoDelay> delay_;
 };
 
-const double kDefaultKickFrequency = 48.9994;  // G1
+const double kDefaultKickFrequency = 80;
 
 class BassDrum : public DrumModule {
  public:
@@ -83,14 +85,16 @@ class BassDrum : public DrumModule {
   void NoteOn(double vel) override;
   StereoVal Generate() override;
 
-  bool distortion_enabled_{false};
   bool hard_sync_{false};
   double frequency_{kDefaultKickFrequency};
 
   PulseTrigger click_;
+
+  bool noise_enabled_{false};
   std::unique_ptr<QBLimitedOscillator> noise_;
   EnvelopeGenerator noise_eg_;
-  std::unique_ptr<CKThreeFive> noise_filter_;
+  // std::unique_ptr<CKThreeFive> noise_filter_;
+  std::unique_ptr<FilterSem> noise_filter_;
 
   std::unique_ptr<QBLimitedOscillator> osc1_;
   std::unique_ptr<QBLimitedOscillator> osc2_;
@@ -196,6 +200,7 @@ class TomConga : public DrumModule {
 
   std::unique_ptr<QBLimitedOscillator> noise_;
   EnvelopeGenerator noise_eg_;
+  // std::unique_ptr<FilterSem> noise_filter_;
   std::unique_ptr<FilterSem> noise_filter_;
 
   std::unique_ptr<QBLimitedOscillator> osc1_;

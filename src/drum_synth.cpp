@@ -99,9 +99,11 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "bd_hard_sync")
     settings_.bd_hard_sync = val;
   else if (name == "bd_dist_en")
-    settings_.bd_distortion_enabled = val;
+    settings_.bd_use_distortion = val;
   else if (name == "bd_dist")
     settings_.bd_distortion_threshold = val;
+  else if (name == "bd_delay_en")
+    settings_.bd_use_delay = val;
   else if (name == "bd_delay_mode")
     settings_.bd_delay_mode = val;
   else if (name == "bd_delay_ms")
@@ -309,9 +311,10 @@ std::string DrumSynth::Info() {
   ss << "     bd_tone:" << settings_.bd_tone << " bd_q:" << settings_.bd_q
      << " bd_ntone:" << settings_.bd_ntone << " bd_nq:" << settings_.bd_nq
      << " bd_decay:" << settings_.bd_decay
-     << " bd_dist_en:" << settings_.bd_distortion_enabled
+     << " bd_dist_en:" << settings_.bd_use_distortion
      << " bd_dist:" << settings_.bd_distortion_threshold << std::endl;
   ss << "     bd_delay_mode:" << settings_.bd_delay_mode
+     << " bd_delay_en:" << settings_.bd_use_delay
      << " bd_delay_ms:" << settings_.bd_delay_ms
      << " bd_delay_feedback_pct:" << settings_.bd_delay_feedback_pct
      << " bd_delay_ratio:" << settings_.bd_delay_ratio << std::endl;
@@ -490,11 +493,11 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "bd_octave=" << settings_.bd_octave << kSEP;
   presetzzz << "bd_key=" << settings_.bd_key << kSEP;
   presetzzz << "bd_detune_cents=" << settings_.bd_detune_cents << kSEP;
-  presetzzz << "bd_distortion_enabled=" << settings_.bd_distortion_enabled
-            << kSEP;
+  presetzzz << "bd_use_distortion=" << settings_.bd_use_distortion << kSEP;
   presetzzz << "bd_distortion_threshold=" << settings_.bd_distortion_threshold
             << kSEP;
   presetzzz << "bd_hard_sync=" << settings_.bd_hard_sync << kSEP;
+  presetzzz << "bd_use_delay=" << settings_.bd_use_delay << kSEP;
   presetzzz << "bd_delay_mode=" << settings_.bd_delay_mode << kSEP;
   presetzzz << "bd_delay_ms=" << settings_.bd_delay_ms << kSEP;
   presetzzz << "bd_delay_feedback_pct=" << settings_.bd_delay_feedback_pct
@@ -619,6 +622,7 @@ void DrumSynth::Update() {
   bd_->dca_.m_amplitude_control = settings_.bd_vol;
   bd_->dca_.m_pan_control = settings_.bd_pan;
   bd_->noise_->m_amplitude = settings_.bd_noise_vol;
+  bd_->noise_enabled_ = settings_.bd_noise_enabled;
   bd_->out_filter_->SetFcControl(settings_.bd_tone);
   bd_->out_filter_->SetQControl(settings_.bd_q);
   bd_->noise_filter_->SetFcControl(settings_.bd_ntone);
@@ -629,8 +633,9 @@ void DrumSynth::Update() {
   bd_->osc1_->m_cents = settings_.bd_detune_cents;
   bd_->osc2_->m_cents = -(settings_.bd_detune_cents);
   bd_->hard_sync_ = settings_.bd_hard_sync;
-  bd_->distortion_enabled_ = settings_.bd_distortion_enabled;
+  bd_->use_distortion_ = settings_.bd_use_distortion;
   bd_->distortion_.SetParam("threshold", settings_.bd_distortion_threshold);
+  bd_->use_delay_ = settings_.bd_use_delay;
   bd_->delay_->SetMode(settings_.bd_delay_mode);
   bd_->delay_->SetDelayTimeMs(settings_.bd_delay_ms);
   bd_->delay_->SetFeedbackPercent(settings_.bd_delay_feedback_pct);
@@ -797,12 +802,14 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.bd_key = dval;
     else if (key == "bd_detune_cents")
       preset.bd_detune_cents = dval;
-    else if (key == "bd_distortion_enabled")
-      preset.bd_distortion_enabled = dval;
+    else if (key == "bd_use_distortion")
+      preset.bd_use_distortion = dval;
     else if (key == "bd_distortion_threshold")
       preset.bd_distortion_threshold = dval;
     else if (key == "bd_hard_sync")
       preset.bd_hard_sync = dval;
+    else if (key == "bd_use_delay")
+      preset.bd_use_delay = dval;
     else if (key == "bd_delay_mode")
       preset.bd_delay_mode = dval;
     else if (key == "bd_delay_ms")

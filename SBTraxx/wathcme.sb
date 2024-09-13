@@ -1,0 +1,28 @@
+# let watchme = loop(voices/watchmeerase.wav); set watchme:len 2; add_fx(watchme, "delay");
+# p9 $ basslah_gen;
+let basslah_gen = gen()
+{
+  setup()
+  {
+    #let nt = [45, 40];
+    let nt = [45, 40];
+    #let nt = [33, 28];
+    #let nt = [51, 59];
+    let ntx = 0;
+    let dr = 100;
+  }
+  run()
+  {
+
+    if (count % 3 == 0) {
+      set watchme:on 1;
+      set watchme:stutter 1;
+    }
+    if (count % 4 == 0) {
+      #set watchme:on 1;
+      set watchme:scramble 1;
+      play_array(watchme, rand_beat());
+    }
+  }
+}
+

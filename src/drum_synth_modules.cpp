@@ -8,44 +8,48 @@ BassDrum::BassDrum() {
   // TRANSIENT
   noise_ = std::make_unique<QBLimitedOscillator>();
   noise_->m_waveform = NOISE;
-  noise_->m_amplitude = 0.3;
+  noise_->m_amplitude = 0.6;
   noise_->Update();
 
   noise_eg_.SetRampMode(true);
   noise_eg_.m_reset_to_zero = true;
   noise_eg_.SetEgMode(DIGITAL);
-  noise_eg_.SetAttackTimeMsec(1);
-  noise_eg_.SetDecayTimeMsec(7);
+  noise_eg_.SetAttackTimeMsec(10);
+  noise_eg_.SetDecayTimeMsec(207);
   noise_eg_.Update();
 
-  noise_filter_ = std::make_unique<CKThreeFive>();
+  // noise_filter_ = std::make_unique<CKThreeFive>();
+  noise_filter_ = std::make_unique<FilterSem>();
   noise_filter_->SetType(LPF2);
-  noise_filter_->SetFcControl(5000);
-  noise_filter_->SetQControlGUI(1);
+  noise_filter_->SetFcControl(10000);
+  noise_filter_->SetQControlGUI(5);
   noise_filter_->Update();
 
   // PITCH
   osc1_ = std::make_unique<QBLimitedOscillator>();
   osc1_->m_waveform = SINE;
   osc1_->m_osc_fo = frequency_;
+  osc1_->m_osc_fo = 220;
   osc1_->m_amplitude = 1;
   osc1_->Update();
 
   osc2_ = std::make_unique<QBLimitedOscillator>();
-  osc1_->m_waveform = SINE;
-  osc1_->m_osc_fo = frequency_;
+  osc2_->m_waveform = SINE;
+  osc2_->m_osc_fo = frequency_;
+  osc2_->m_osc_fo = 220;
   osc2_->m_amplitude = 1;
   osc2_->Update();
 
   eg_.SetRampMode(true);
   eg_.m_reset_to_zero = true;
-  eg_.SetEgMode(ANALOG);
-  eg_.SetAttackTimeMsec(1);
-  eg_.SetDecayTimeMsec(1000);
+  eg_.SetEgMode(DIGITAL);
+  eg_.SetAttackTimeMsec(10);
+  eg_.SetDecayTimeMsec(180);
   eg_.Update();
 
   distortion_.SetParam("threshold", 0.5);
   delay_ = std::make_unique<StereoDelay>();
+
   out_filter_ = std::make_unique<CKThreeFive>();
   out_filter_->SetType(LPF2);
   out_filter_->SetFcControl(10000);
@@ -55,10 +59,11 @@ BassDrum::BassDrum() {
 
 void BassDrum::NoteOn(double vel) {
   velocity_ = vel;
-  noise_->StartOscillator();
-  noise_eg_.StartEg();
 
   click_.Trigger();
+
+  noise_->StartOscillator();
+  noise_eg_.StartEg();
 
   osc1_->m_osc_fo = frequency_;
   osc1_->StartOscillator();
@@ -71,11 +76,11 @@ void BassDrum::NoteOn(double vel) {
 
 StereoVal BassDrum::Generate() {
   StereoVal out = {.left = 0, .right = 0};
-  if (osc1_->m_note_on) {
+  if (osc1_->m_note_on || noise_->m_note_on) {
     // Transient
     noise_->Update();
     double noise_eg_out = noise_eg_.DoEnvelope(nullptr);
-    double noise_out = noise_->DoOscillate(nullptr) * noise_eg_out;
+    double noise_out = noise_->DoOscillate(nullptr) * noise_eg_out * 0.2;
     noise_filter_->Update();
     noise_out = noise_filter_->DoFilter(noise_out);
 
@@ -85,19 +90,18 @@ StereoVal BassDrum::Generate() {
     double amp_eg_out = eg_.DoEnvelope(&biased_eg_out);
 
     double eg_osc_mod = OSC_FO_MOD_RANGE * biased_eg_out;
-    double osc_mod_val = eg_osc_mod;
-
-    osc1_->SetFoModExp(osc_mod_val);
+    osc1_->SetFoModExp(eg_osc_mod);
     osc1_->Update();
 
-    osc2_->SetFoModExp(osc_mod_val);
+    osc2_->SetFoModExp(eg_osc_mod);
     osc2_->Update();
 
-    double osc1_out = osc1_->DoOscillate(nullptr);
+    double osc1_out = osc1_->DoOscillate(nullptr) * amp_eg_out;
     if (osc1_->just_wrapped) osc2_->StartOscillator();
-    double osc2_out = osc2_->DoOscillate(nullptr);
+    double osc2_out = osc2_->DoOscillate(nullptr) * amp_eg_out;
 
-    double osc_mix = click_.GenNext() + osc1_out + osc2_out + noise_out;
+    double osc_mix = click_.GenNext() + osc1_out + osc2_out;
+    if (noise_enabled_) osc_mix += noise_out;
 
     //// OUTPUT //////////////////////////
 
@@ -108,22 +112,22 @@ StereoVal BassDrum::Generate() {
     double out_left = 0.0;
     double out_right = 0.0;
 
-    double dca_mod_val = amp_eg_out;
-    dca_.SetEgMod(dca_mod_val);
     dca_.Update();
     dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
 
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
-    if (distortion_enabled_) out = distortion_.Process(out);
-    out = delay_->Process(out);
+    if (use_distortion_) out = distortion_.Process(out);
+    if (use_delay_) out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
     osc1_->StopOscillator();
     osc2_->StopOscillator();
-    noise_->StopOscillator();
-
     eg_.StopEg();
+  }
+
+  if (noise_eg_.GetState() == OFFF) {
+    noise_->StopOscillator();
     noise_eg_.StopEg();
   }
 
@@ -498,9 +502,12 @@ TomConga::TomConga() {
 
 void TomConga::NoteOn(double vel) {
   velocity_ = vel;
+
   click_.Trigger();
+
   noise_->StartOscillator();
   noise_eg_.StartEg();
+
   osc1_->StartOscillator();
   eg_.StartEg();
 }

@@ -1,0 +1,51 @@
+# Key of B
+#let key = 11;
+let key = 23;
+
+# landroiD key 11
+let poblah_gen = gen()
+{
+  setup()
+  {
+    # I - vi - V - IV
+    let prog = [0, 5, 4, 3];
+    let px = 0;
+    let t = 4355;
+    let durz = [600, 300, 100, 100, 100, 400, 150, 500];
+    let drx = 0;
+  }
+  run()
+  {
+    let p = bits(74 * ( t | ( t >> 2 | t >> 16 ) ));
+    if (count % 8 == 0) {
+      t++;
+    }
+    if (count % 4 == 0) {
+      px = incr(px, 0, len(prog));
+    }
+    #print("BIUTS:", p);
+    for (let i = 0; i < 16; i++) {
+      if (p[i] == 1) {
+        #print(notes_in_chord(notes_in_key(key)[0], key, 4));
+        note_on_at(dx, notes_in_chord(notes_in_key(key)[prog[px]], key, 4), i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    note_on_at(sbdrum, 0, 0);
+    if (count % 4 == 2) {
+      note_on_at(sbdrum, 3, 12 * pp);
+    }
+  }
+}
+

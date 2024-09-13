@@ -24,16 +24,18 @@ struct DrumSettings {
   double bd_pan{0};
   double bd_tone{10000};
   double bd_q{1};
+  double bd_noise_enabled{false};
   double bd_noise_vol{0.3};
-  double bd_ntone{5000};
+  double bd_ntone{10000};
   double bd_nq{1};
-  double bd_decay{1000};
+  double bd_decay{180};
   int bd_octave{2};
   int bd_key{40};
   double bd_detune_cents{0};
-  bool bd_distortion_enabled{false};
+  bool bd_use_distortion{false};
   double bd_distortion_threshold{0.5};
   bool bd_hard_sync{false};
+  bool bd_use_delay{false};
   int bd_delay_mode{0};  // 0 - norm, 1 - tap1, 2 - tap2, 3 - pingpong
   double bd_delay_ms{23};
   double bd_delay_feedback_pct{0};
