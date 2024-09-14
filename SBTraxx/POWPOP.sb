@@ -1,6 +1,6 @@
 # Key of B
-#let key = 11;
-let key = 23;
+let key = 11;
+#let key = 23;
 
 # landroiD key 11
 let poblah_gen = gen()

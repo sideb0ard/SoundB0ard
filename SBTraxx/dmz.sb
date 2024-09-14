@@ -1,3 +1,6 @@
+# Key of C
+let key = 0;
+
 # load_preset(dx, "dirtaedub");  load_preset(mo, "melodiuy")
 let playblah_fn = fn(id, pat)
 {
@@ -92,7 +95,7 @@ let riddimblah_gen = gen()
   }
   run()
   {
-    let nt = notes_in_chord(ntz[nx], 0);
+    let nt = notes_in_chord(ntz[nx], key);
     note_on_at(mo, nt, 4*pp, dur = durx[drx], vel = velz[vx]);
     note_on_at(mo, nt, 12*pp);
     nx = incr(nx, 0, len(ntz));
@@ -113,6 +116,7 @@ let bassblah_gen = gen()
 {
   setup()
   {
+    # Key of C
     # A and E chords
     # A - [9, 12, 16] // A C E
     # E - [4, 7, 11] // E G B
@@ -140,6 +144,7 @@ let bassblah_gen = gen()
     #dxx = incr(dxx, 0, len(dxratz));
 
     if (count % 17 < 13) {
+      # A
       if (count % 2 == 0) {
         playbass_fn(9, az, az_durz);
         playbass_fn(12, cz, cz_durz);
@@ -147,6 +152,7 @@ let bassblah_gen = gen()
       }
     }
 
+    # E
     if (count % 2 == 1) {
       playbass_fn(16, ez2, ez2_durz);
       playbass_fn(11, bz, bz_durz);
@@ -155,21 +161,41 @@ let bassblah_gen = gen()
 }
 
 # dx2
-# rrrawr // ralllffr0 // klonk
+# rrrawr // ralllffr0 // klonk // squig
 let dx2blah_gen = gen()
 {
   setup()
   {
-    let mel = [0, 23, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 21, 0, 45, 0];
-    let mel2 = [40, 0, 21, 0, 0, 40, 0, 0, 0, 0, 0, 0, 21, 40, 45, 0];
-    let mel3 = [0, 47, 23, 0, 0, 19, 0, 0, 0, 0, 0, 0, 21, 40, 45, 0];
+    # gen from chord_riff(notes_in_chord(21, key));
+    # and chord_riff(notes_in_chord(28, key));
+
+    let Ezmel1 =  [0, 31, 0, 35, 0, 0, 35, 0, 0, 31, 0, 35, 0, 0, 31, 0];
+    let Azmel1 =  [0, 28, 0, 0, 21, 0, 0, 28, 0, 0, 21, 0, 0, 0, 28, 0];
+    let omodz = [0, 12, -12];
+    let ox = 0;
+    let vlz = [120, 120, 100, 90, 127, 100, 127, 90, 80];
+    let vx = 0;
+    let drz = [400, 400, 400, 300, 200, 1000, 600];
+    let drx = 0;
+
   }
   run()
   {
-    for (let i = 0; i < 16; i++) {
-      if (mel3[i] > 0) {
-        note_on_at(dx2, notes_in_chord(mel[i], 0), i * pp);
+    if (count % 16 > 0) {
+      let mel = Ezmel1;
+      if (count % 2 == 1) {
+        mel = Azmel1;
       }
+      for (let i = 0; i < 16; i++) {
+        if (mel[i] > 0) {
+          note_on_at(dx2, mel[i] + omodz[ox], i * pp, dur = drz[drx], vel = vlz[vx]);
+          drx = incr(drx, 0, len(drz));
+          vx = incr(vx, 0, len(vlz));
+        }
+      }
+    }
+    if (count % 4 == 0) {
+      ox = incr(ox, 0, len(omodz));
     }
   }
 }

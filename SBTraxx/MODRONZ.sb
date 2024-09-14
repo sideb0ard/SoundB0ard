@@ -1,81 +1,208 @@
+# load_preset(mo, "mufflyz"); load_preset(dx, "surgefizz"); vol dx 0.3
+# load_preset(sbdrum, "MODrr"); load_preset(dx2, "covid1111");
 
-# mo gurl2 // mufflyz // MODRONZ
 # bpm 110
+# key of D#
+#let key = 51;
+let key = 39;
+# I - vi
+let prog = [0, 5, 0, 5, 0, 5, 0, 3];
+#let prog = [5, 1, 4, 0];
+let px = 0;
+
+let modz = [1, 1, 2, 3, 0, 4];
+#let modz = [4];
+let mx = 0;
+
 let blah_gen = gen()
 {
   setup()
   {
-    # key of D#
-    #let key = 51;
-    let key = 39;
-    # I - vi
-    let prog = [0, 5, 0, 5, 0, 5, 0, 3];
-    let px = 0;
 
     let lfoz = [2, 12, 15, 7, 3];
     let lfx = 0;
+
+    let velz = [120, 127, 90, 110, 120, 107, 107, 107];
+    let vx = 0;
+
+    #let drz = [30, 50, 80, 80, 100, 110];
+    let drz = [130, 150, 280, 80, 100, 110, 500, 600, 400];
+    let drx = 0;
+
+    let dx_lfo_on = 1;
+
+    let upz = [0, 12, 12, 0, 0, 12];
+    let ux = 0;
 
   }
   run()
   {
 
     let nts = notes_in_key(key);
-    let chrd = notes_in_chord(nts[prog[px]], key, 1);
+    #let chrd = notes_in_chord(nts[prog[px]], key, 1);
+    let chrd = notes_in_chord(nts[prog[px]], key, modz[mx]);
     if (count % 7 == 0) {
       up(chrd, 12);
     }
     if (count % 13 == 0) {
       up(chrd, 24);
+      set dx:l1_dest1 dx_lfo_on;
+      dx_lfo_on = 1 - dx_lfo_on;
     }
 
     if (count % 3 == 0) {
       set mo:l1rate lfoz[lfx];
       lfx = incr(lfx, 0, len(lfoz));
+      set dx:l1_rate lfoz[lfx];
     }
 
     if (count % 4 == 0) {
       px = incr(px, 0, len(prog));
       note_off_at(mo, 0, 0);
-      note_on_at(mo, chrd, 0, dur = 0);
+      if (count % 16 == 0) {
+        let rf = chord_riff(chrd);
+        for (let i = 0; i < 16; i++) {
+          if (rf[i] > 0) {
+            note_on_at(mo, rf[i] + 24, i * pp, dur = 600);
+          }
+        }
+
+      } else {
+        note_on_at(mo, chrd, 0, dur = 0);
+      }
     }
-    #print(chrd);
-    # note_on_at(dx, down(chrd,24), 4 * pp, dur = 500);
-    # note_on_at(dx, down(chrd, 24), 12 * pp, dur = 600);
+
+    if (count % 8 == 7) {
+      note_off_at(mo, 0, 0);
+    }
+
+    if (count % 4 == 3) {
+      let up_by = upz[ux];
+      ux = incr(ux, 0, len(upz));
+      let chrd = notes_in_chord(nts[prog[px]], key, 1);
+      let mel = chord_riff(up(chrd, up_by));
+      for (let i = 0; i < 16; i++) {
+        if (mel[i] > 0) {
+          note_on_at(dx, mel[i], i * pp, dur = drz[drx], vel = velz[vx]);
+          vx = incr(vx, 0, len(velz));
+          drx = incr(drx, 0, len(drz));
+        }
+      }
+    }
   }
 }
 
-let dblah_gen = gen()
+let blahcomp_gen = gen()
 {
   setup()
   {
-    let hhdz = [0, 1, 10, 23, 4];
+    let velz = [120, 100, 127, 110, 120, 127, 100, 127];
+    let vx = 0;
+
+    let drz = [30, 50, 80, 200, 150, 80, 100, 110, 450];
+    let drx = 0;
+
+    let upz = [0, 0, 12];
+    let ux = 0;
+
+  }
+  run()
+  {
+    let should_play = false;
+    if (count % 32 < 16) {
+      if (count % 2 == 1) {
+        should_play = true;
+      }
+    } else {
+      should_play = true;
+    }
+    if (should_play) {
+      let ntz = notes_in_chord(notes_in_key(key)[prog[px]], key, modz[mx]);
+      #let ntz = notes_in_key(key);
+      mx = incr(mx, 0, len(modz));
+      let mel = chord_riff(ntz);
+      for (let i = 0; i < 16; i++) {
+        if (mel[i] > 0) {
+          note_on_at(dx2, up(ntz, upz[ux]), i * pp, dur = drz[drx], vel = velz[vx]);
+          vx = incr(vx, 0, len(velz));
+          drx = incr(drx, 0, len(drz));
+        }
+      }
+      ux = incr(ux, 0, len(upz));
+    }
+  }
+}
+
+let playablah_fn = fn(nt, whenz, should_delay)
+{
+  for (let i = 0; i < len(whenz); i++) {
+    let offset = 0;
+    if (should_delay) {
+      offset = rand(30);
+    }
+    note_on_at(sbdrum, nt, whenz[i] * pp + offset);
+  }
+}
+
+
+let drumplayah_gen = gen()
+{
+  setup()
+  {
+    let bd1 = [0, 2, 10, 13, 14];
+    let bd2 = [0, 2, 3, 5, 7, 11, 13, 15];
+    let bd3 = [2, 9, 11, 13, 14];
+    let bd4 = [0, 2];
+    let bd5 = [0, 8, 12];
+    let bdz = [bd1, bd3, bd2, bd3, bd4, bd5];
+    let sd1 = [4, 7, 8, 9, 12, 15];
+    let sd2 = [4, 9, 14];
+    let sd3 = [4, 12];
+    let sd4 = [];
+    let sdz = [sd1, sd3, sd3, sd2, sd3, sd4];
+
+    let vlz = [100, 90, 95, 100, 105, 90, 90];
+    let vx = 0;
+
+    let hhdz = [0, 1, 10, 23, 4, 77];
     let hx = 0;
   }
   run()
   {
-    for (let i = 0; i < 16; i++) {
-      if (count % 8 < 7) {
-        if (i % 8 == 0) {
-          note_on_at(sbd2, 5, i * pp);
-        }
-        if (i % 4 == 0) {
-          note_on_at(sbdrum, 5, i * pp);
-        }
-      }
-      if (count % 13 < 12) {
-        if (i % 4 == 2) {
-          note_on_at(sbdrum, 2, i * pp);
-        }
-      }
+    let bx = count % (len(bdz));
+    let sx = count % (len(sdz));
+    let bd = bdz[bx];
+    let sd = sdz[sx];
 
-      set sbdrum:hh_delay_ms hhdz[hx];
-      hx = incr(hx, 0, len(hhdz));
-
-      if (count % 8 == 0) {
-        note_on_at(sbdrum, 3, 10 * pp);
-        note_on_at(sbdrum, 4, 14 * pp);
+    playablah_fn(0, bd, false);
+    playablah_fn(3, sd, true);
+    if (count % 8 < 6) {
+      for (let i = 0; i < 16; i++) {
+        if (i % 2 == 0) {
+          note_on_at(sbdrum, 2, i * pp, vel = vlz[vx]);
+          vx = incr(vx, 0, len(vlz));
+        }
       }
     }
+    if (count % 8 == 6) {
+      for (let i = 0; i < 16; i++) {
+        if (i % 4 == 2) {
+          note_on_at(sbdrum, 2, i * pp, vel = vlz[vx]);
+          vx = incr(vx, 0, len(vlz));
+        }
+      }
+    }
+
+    set sbdrum:hh_delay_ms hhdz[hx];
+    set sbdrum:cp_delay_ms hhdz[hx];
+    hx = incr(hx, 0, len(hhdz));
+
+
+    if (count % 8 == 7) {
+      note_on_at(sbdrum, 4, 13 * pp);
+      note_on_at(sbdrum, 4, 15 * pp);
+    }
+
   }
 }
 
