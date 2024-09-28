@@ -579,6 +579,19 @@ bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
   return false;
 }
 
+void Mixer::PrintDxAlgos() {
+  std::stringstream ss;
+  ss << ANSI_COLOR_WHITE "DX Algos:\n";
+  ss << "  0.    1.    2.      3.    4.     5.        6.        7.\n\n";
+  ss << "  4     3 4   3       4\n";
+  ss << "  |     \\ |   |       |\n";
+  ss << "  2-3     2   2 4   2 3   2  4      4            4\n";
+  ss << "  |       |   |/    |/    |  |    / | \\          |\n";
+  ss << "  1       1   1     1     1__3   1__2__3   1__2__3   1__2__3__4\n";
+  ss << ANSI_COLOR_RESET;
+  repl_queue.push(ss.str());
+}
+
 void Mixer::PrintMidiInfo() {
   std::stringstream ss;
   ss << ANSI_COLOR_WHITE "Midi Notes:\n";

@@ -151,13 +151,17 @@ let beatlah_gen = gen()
 }
 
 
+# load_preset(mo, "sandepp"); vol mo 0.4;
 # mo - racer5 // default // phiola // sandepp
 let noteeblah_gen = gen()
 {
   setup()
   {
     # Key C#
-    let notes = notes_in_key(37);
+    let keyz = [25, 25, 25, 37];
+    let kx = 0;
+    #let notes = notes_in_key(37);
+    #let notes = notes_in_key(25);
     let nx = 0;
     let steps = 8;
     let durz = [100, 200, 250, 500];
@@ -167,6 +171,8 @@ let noteeblah_gen = gen()
   }
   run()
   {
+    let notes = notes_in_key(keyz[kx]);
+    kx = incr(kx, 0, len(keyz));
     let pat = bjork(3,steps);
     let ppq = 3840 / 4 / steps;
     let ppoff =  3840 / 4 * 3;

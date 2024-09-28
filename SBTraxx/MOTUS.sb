@@ -1,0 +1,156 @@
+# Key of F#
+let key = 6;
+
+# I - IV - V
+
+# dx - raggalo400sus // mo sandepp // daisyz // reece/mo
+# load_preset(dx, "detbass"); load_preset(dx2, "otherwurld");
+# load_preset(mo, "smrrr"); load_preset(sbdrum, "MOTUS");
+
+let I = [30, 34, 37];
+let IV = [34, 37, 41];
+let V = [37, 41, 44];
+let vi = [39, 42, 46];
+
+let cprog1 = [I, IV, I, IV, vi, IV, V, V];
+let cprog2 = [vi, I, vi, I, V, vi, IV, I];
+let cprogz = [cprog1, cprog2];
+let cpx = 0;
+let cx = 0;
+
+
+
+
+let stepz = [0, 1, 3, 2, 0, 1, 4, 5];
+let sx = 0;
+
+let riff_fn = fn(chrd)
+{
+  let arr = rand_array(8, 0, 0);
+  let stx = stepz[sx];
+  sx = incr(sx, 0, len(stepz));
+  let chx = 0;
+  for (let i = 0; stx < 8;  i++) {
+    arr[stx] = chrd[chx];
+    stx = stx + stepz[sx];
+    sx = incr(sx, 0, len(stepz));
+    chx = incr(chx, 0, len(chrd));
+  }
+  return arr;
+}
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [0, 37, 0, 0, 34, 0, 34, 0, 0, 30, 0, 30, 41, 0, 0, 0];
+    let mel2 = [30, 30, 0, 0, 37, 0, 44, 0, 44, 30, 0, 30, 41, 0, 0, 0];
+    let mel3 = [0, 0, 37, 0, 0, 0, 34, 0, 0, 0, 37, 0, 0, 41, 44, 0];
+    let melz = [mel1, mel1, mel2, mel1, mel3];
+    let mx = 0;
+    let velz = [100, 120, 100, 120, 90, 127, 90, 127];
+    let vx = 0;
+    let drz = [50, 100, 100, 50, 100, 100, 50, 450];
+    let drx = 0;
+    let upz = [0, 0, 12, 24, -12, 0, -24, 12];
+    let ux = 0;
+
+    let durz = [1820, 1900, 1400, 1606, 1280];
+    let durx = 0;
+    let vlz = [110, 100, 127, 100, 127, 90, 80];
+    let vlx = 0;
+
+    let stx = 0;
+    let stmax = 5;
+  }
+  run()
+  {
+    let cprog = cprogz[cpx];
+    if (count % 8 == 0) {
+      cpx = incr(cpx, 0, len(cprogz));
+      cx = 0;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (i % 8 == 0) {
+        if (count % 2 == 1) {
+          #let mp = riff_fn(up(cprog[cx], upz[ux]));
+          let mp = riff_fn(cprog[cx]);
+          let spp = i * pp;
+          let pp = 3840 / 2 / 8;
+          for (let j = 0; j < 8; j++) {
+            if (mp[j] > 0) {
+              let on_at = spp + j * pp;
+              note_on_at(mo, mp[j], on_at, dur = drz[drx] * 2);
+            }
+          }
+        }
+        if (count % 4 == 0) {
+          let chrdd = cprog[cx];
+          if (count % 4 == 3) {
+            chrdd = down(chrdd, upz[ux]);
+          }
+          note_on_at(dx2, chrdd, i * pp, dur = durz[durx], vel = vlz[vlx]);
+        }
+        cx = incr(cx, 0, len(cprog));
+        durx = incr(durx, 0, len(durz));
+        vlx = incr(vlx, 0, len(vlz));
+      }
+    }
+    if (count % 2 == 0) {
+      ux = incr(ux, 0, len(upz));
+      let mel = melz[mx];
+      mx = incr(mx, 0, len(melz));
+      for (let i = 0; i < 16; i++) {
+        stepper(dx, mel, stx, i, drz[drx], velz[vx]);
+        stx = incr(stx, 0, stmax);
+        vx = incr(vx, 0, len(velz));
+        drx = incr(drx, 0, len(drz));
+      }
+      stmax = incr(stmax, 3, len(mel));
+    }
+
+
+  }
+}
+
+let playblah_fn = fn(target, notes)
+{
+  for (let i = 0; i < len(notes); i++) {
+    note_on_at(sbdrum, target, notes[i] * pp);
+  }
+
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let b1 = [0, 3, 7, 10];
+    let b2 = [0];
+    let b3 = [0, 11];
+    let b4 = [8, 10];
+    let b5 = [0, 4, 8, 12];
+    let bz = [b1, b1, b5, b1, b2, b5, b5, b4, b3];
+    let bx = 0;
+    let s1 = [4, 12];
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      playblah_fn(0, bz[bx]);
+      bx = incr(bx, 0, len(bz));
+    }
+    if (count % 9 < 6) {
+      playblah_fn(1, s1);
+    }
+
+    if (count % 4 == 3) {
+      for (let i = 0; i < 16; i++) {
+        if (i % 4 == 2) {
+          note_on_at(sbdrum, 2, i * pp);
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,67 @@
+# Key of E
+let key = 40;
+let mel = [40, 0, 47, 0, 40, 44, 47, 0, 0, 51, 0, 0, 0, 0, 45, 0];
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let melx = 0;
+    let melxmax = 4;
+
+    let melx2 = 3;
+    let melxmax2 = 5;
+
+    let durz = [160, 170, 80, 100, 110];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 4 < 2) {
+      for (let i = 0; i < 16; i++) {
+        if (mel[i] > 0) {
+          note_on_at(dx, mel[i], i * pp, dur = durz[drx]);
+        }
+      }
+    }
+    if (count % 4 == 2) {
+      for (let i = 0; i < 16; i++) {
+        stepper(dx, down(mel, 12), melx, i, durz[drx], 110);
+        melx = incr(melx, 0, melxmax);
+      }
+      melxmax = incr(melxmax, 3, 16);
+    }
+    if (count % 4 == 3) {
+      for (let i = 0; i < 16; i++) {
+        stepper(dx, down(mel, 24), melx2, i, durz[drx], 110);
+        melx2 = incr(melx2, 0, melxmax2);
+      }
+      melxmax2 = incr(melxmax2, 4, 16);
+    }
+    drx = incr(drx, 0, len(durz));
+  }
+}
+
+let dbblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 == 0) {
+        note_on_at(sbdrum, 0, i * pp);
+      }
+      note_on_at(sbdrum, 2, i * pp);
+
+      if (i % 8 == 2) {
+        note_on_at(sbdrum, 3, i * pp);
+      }
+      if (i % 4 == 2) {
+        note_on_at(sbdrum, 4, i * pp);
+      }
+    }
+  }
+}
+

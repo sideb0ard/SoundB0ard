@@ -535,6 +535,32 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NewError("argument to `len` not supported, got %s",
                                       input[0]->Type());
          })},
+    {"keys", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> input)
+                     -> std::shared_ptr<object::Object> {
+                   if (input.size() != 1)
+                     return evaluator::NewError(
+                         "Too many arguments for keys - can only accept "
+                         "one");
+
+                   std::shared_ptr<object::Hash> map_obj =
+                       std::dynamic_pointer_cast<object::Hash>(input[0]);
+
+                   if (map_obj) {
+                     auto return_array = std::make_shared<object::Array>(
+                         std::vector<std::shared_ptr<object::Object>>());
+
+                     for (const auto &pair : map_obj->pairs_) {
+                       return_array->elements_.push_back(pair.second.key_);
+                     }
+
+                     return return_array;
+                   }
+
+                   return evaluator::NewError(
+                       "argument to `keys` not supported, got %s",
+                       input[0]->Type());
+                 })},
     {"head", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> input)
                      -> std::shared_ptr<object::Object> {
@@ -893,6 +919,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        mixr->PrintMidiInfo();
                        return evaluator::NULLL;
                      })},
+    {"algoz", std::make_shared<object::BuiltIn>(
+                  [](std::vector<std::shared_ptr<object::Object>> args)
+                      -> std::shared_ptr<object::Object> {
+                    (void)args;
+                    mixr->PrintDxAlgos();
+                    return evaluator::NULLL;
+                  })},
     {"push", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> input)
                      -> std::shared_ptr<object::Object> {

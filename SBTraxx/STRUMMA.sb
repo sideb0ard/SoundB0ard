@@ -1,0 +1,94 @@
+# mo = smrrr / morphy /  thunderzz
+# dx2 youshure // garage // UND
+# Key of E
+let key = 28;
+
+let strm_pp_diff = 500;
+let note_stagger = 50;
+
+# 0. up
+# 1. down
+let strm_fn = fn(chrd, when, is_doubled,  direction, dura, velo)
+{
+  let first_stroke = chrd;
+  if (direction == 0) {
+    first_stroke = reverse(chrd);
+  }
+  let second_stroke = reverse(first_stroke);
+
+  #strm_pp_diff = strm_pp_diff + 70;
+  #if (strm_pp_diff > 1000) {
+    #  strm_pp_diff = 500;
+    #}
+
+  #note_stagger = note_stagger + 50;
+  #if (note_stagger > 400) {
+    #  note_stagger = 50;
+    #}
+
+  for (let i = 0; i < len(chrd); i++) {
+    note_on_at(dx2, first_stroke[i], when + i * note_stagger, dur = dura, vel = velo);
+    if (is_doubled) {
+      note_on_at(dx2, second_stroke[i], strm_pp_diff + when + i * note_stagger, dur = dura, vel = velo);
+    }
+  }
+
+}
+
+let stublah_gen = gen()
+{
+  setup()
+  {
+    let prog = [28, 33, 35];
+    let px = 0;
+    let durz = [100, 180, 100, 300, 500, 290, 120, 110, 500];
+    let drx = 0;
+    let velz = [127, 127, 110, 127, 90, 127, 100, 127];
+    let vx = 0;
+  }
+  run()
+  {
+    let thrd = 3840 / 3;
+    strm_fn(notes_in_chord(prog[px], key, 1), 0, false, 1, durz[drx], velz[vx]);
+    #drx = incr(drx, 0, len(durz));
+    #vx = incr(vx, 0, len(velz));
+    strm_fn(notes_in_chord(prog[px], key, 1), 1 * thrd, true, 1, durz[drx], velz[vx]);
+    #drx = incr(drx, 0, len(durz));
+    #vx = incr(vx, 0, len(velz));
+    strm_fn(notes_in_chord(prog[px], key, 1), 2 * thrd, true, 0, durz[drx], velz[vx]);
+    #drx = incr(drx, 0, len(durz));
+    #vx = incr(vx, 0, len(velz));
+
+    if (count % 2 == 1) {
+      px = incr(px, 0, len(prog));
+    }
+  }
+}
+
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    let mel = up([0, 28, 0, 40, 40, 0, 39, 0, 0, 33, 0, 30, 0, 0, 0, 0], 12);
+    let mel2 = up([0, 0, 0, 32, 0, 0, 32, 0, 0, 33, 0, 35, 0, 0, 37, 0], 12);
+  }
+  run()
+  {
+    let m = mel;
+    if (count % 4 < 2) {
+      m = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (m[i] > 0) {
+        note_on_at(dx, m[i], i * pp, dur = 50);
+      }
+      if (count % 4 == 3) {
+        if (m[i] == 0) {
+          strm_fn(notes_in_chord(key, key), i*pp, false, 1, 100, 100);
+        }
+      }
+    }
+
+  }
+}
+

@@ -132,6 +132,7 @@ struct Mixer {
   void PreviewAudio(std::unique_ptr<AudioActionItem> action);
 
   void PrintTimingInfo();
+  void PrintDxAlgos();
   void PrintMidiInfo();
   void PrintFuncAndGenInfo();
 
