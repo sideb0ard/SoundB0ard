@@ -29,6 +29,7 @@ DrumSynth::DrumSynth() {
   lt_ = std::make_unique<TomConga>();
   mt_ = std::make_unique<TomConga>();
   ht_ = std::make_unique<TomConga>();
+  lz_ = std::make_unique<Lazer>();
 
   LoadSettings(DrumSettings());
   active = true;
@@ -69,6 +70,10 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   auto ht_out = ht_->Generate();
   out.left += ht_out.left;
   out.right += ht_out.right;
+
+  auto lz_out = lz_->Generate();
+  out.left += lz_out.left;
+  out.right += lz_out.right;
 
   return out;
 }
@@ -292,6 +297,16 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "ht_is_conga")
     settings_.ht_is_conga = val;
 
+  else if (name == "lz_vol")
+    settings_.lz_vol = val;
+  else if (name == "lz_pan")
+    settings_.lz_pan = val;
+  else if (name == "lz_freq")
+    settings_.lz_freq = val;
+  else if (name == "lz_attack")
+    settings_.lz_attack = val;
+  else if (name == "lz_decay")
+    settings_.lz_decay = val;
   Update();
 }
 
@@ -395,6 +410,10 @@ std::string DrumSynth::Info() {
   ss << COOL_COLOR_ORANGE "     ht(7): ht_vol:" << settings_.ht_vol
      << " ht_pan:" << settings_.ht_pan << " ht_tuning:" << settings_.ht_tuning
      << " ht_is_conga:" << settings_.ht_is_conga << std::endl;
+  ss << COOL_COLOR_YELLOW_MELLOW "     lz(8): lz_vol:" << settings_.lz_vol
+     << " lz_pan:" << settings_.lz_pan << " lz_freq:" << settings_.lz_freq
+     << " lz_attack:" << settings_.lz_attack
+     << " lz_decay:" << settings_.lz_decay << std::endl;
 
   return ss.str();
 }
@@ -460,6 +479,10 @@ void DrumSynth::NoteOn(midi_event ev) {
     case (7):
       // High Tom / Conga
       ht_->NoteOn(velocity);
+      break;
+    case (8):
+      // Lazer
+      lz_->NoteOn(velocity);
       break;
     default:
       std::cerr << "DrumSynth - num not implemented:" << drum_module_num
@@ -610,6 +633,12 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "ht_pan=" << settings_.ht_pan << kSEP;
   presetzzz << "ht_tuning=" << settings_.ht_tuning << kSEP;
   presetzzz << "ht_is_conga=" << settings_.ht_is_conga << kSEP;
+  // 8 - Lazer
+  presetzzz << "lz_vol=" << settings_.lz_vol << kSEP;
+  presetzzz << "lz_pan=" << settings_.lz_pan << kSEP;
+  presetzzz << "lz_freq=" << settings_.lz_freq << kSEP;
+  presetzzz << "lz_attack=" << settings_.lz_attack << kSEP;
+  presetzzz << "lz_decay=" << settings_.lz_decay << kSEP;
 
   presetzzz << std::endl;
   presetzzz.close();
@@ -752,6 +781,12 @@ void DrumSynth::Update() {
   }
   double ht_freq = (settings_.ht_tuning / 100) * (hi_freq - lo_freq) + lo_freq;
   ht_->osc1_->m_osc_fo = ht_freq;
+
+  lz_->dca_.m_amplitude_control = settings_.lz_vol;
+  lz_->dca_.m_pan_control = settings_.lz_pan;
+  lz_->osc1_->m_osc_fo = settings_.lz_freq;
+  lz_->eg_.SetAttackTimeMsec(settings_.lz_attack);
+  lz_->eg_.SetDecayTimeMsec(settings_.lz_decay);
 }
 
 void DrumSynth::LoadSettings(DrumSettings settings) {
@@ -1002,6 +1037,18 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.ht_tuning = dval;
     else if (key == "ht_is_conga")
       preset.ht_is_conga = dval;
+
+    // 8 - Lazer
+    else if (key == "lz_vol")
+      preset.lz_vol = dval;
+    else if (key == "lz_pan")
+      preset.lz_pan = dval;
+    else if (key == "lz_freq")
+      preset.lz_freq = dval;
+    else if (key == "lz_attack")
+      preset.lz_attack = dval;
+    else if (key == "lz_decay")
+      preset.lz_decay = dval;
   }
 
   return preset;

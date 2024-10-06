@@ -554,4 +554,59 @@ StereoVal TomConga::Generate() {
 
   return out;
 }
+
+///// LAZER  /////////////////////////////
+
+Lazer::Lazer() {
+  eg_.SetRampMode(true);
+  eg_.m_reset_to_zero = true;
+  eg_.SetEgMode(DIGITAL);
+  eg_.SetAttackTimeMsec(10);
+  eg_.SetDecayTimeMsec(180);
+  eg_.Update();
+
+  osc1_ = std::make_unique<QBLimitedOscillator>();
+  osc1_->m_waveform = SINE;
+  osc1_->m_osc_fo = 220;
+  osc1_->m_amplitude = 1;
+  osc1_->Update();
+}
+
+void Lazer::NoteOn(double vel) {
+  velocity_ = vel;
+
+  osc1_->StartOscillator();
+  eg_.StartEg();
+}
+
+StereoVal Lazer::Generate() {
+  StereoVal out = {.left = 0, .right = 0};
+  if (osc1_->m_note_on) {
+    double biased_eg_out = 0;
+    double amp_eg_out = eg_.DoEnvelope(&biased_eg_out);
+
+    double eg_osc_mod = 47 * biased_eg_out;
+    osc1_->SetFoModExp(eg_osc_mod);
+    osc1_->Update();
+
+    double osc_out = osc1_->DoOscillate(nullptr) * amp_eg_out;
+
+    //// OUTPUT //////////////////////////
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    dca_.Update();
+    dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
+
+    out = {.left = out_left * velocity_, .right = out_right * velocity_};
+  }
+
+  if (eg_.GetState() == OFFF) {
+    osc1_->StopOscillator();
+    eg_.StopEg();
+  }
+
+  return out;
+}
 }  // namespace SBAudio

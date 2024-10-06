@@ -1,0 +1,193 @@
+# Key of C Major
+let key = 24;
+let notes = notes_in_key(key);
+let I = notes_in_chord(notes[0], key);
+let ii = notes_in_chord(notes[1], key);
+let iii = notes_in_chord(notes[2], key);
+let IV = notes_in_chord(notes[3], key);
+let V = notes_in_chord(notes[4], key);
+let vi = notes_in_chord(notes[5], key);
+let vii = notes_in_chord(notes[6], key);
+
+# dx2 wururrrp
+
+let chorus_gen = gen()
+{
+  setup()
+  {
+    let prog = [vi, IV, I, V];
+    let px = len(prog);
+    let prog_px = 8;
+    let rhm1 =  [1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0];
+    let rhm2 = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0];
+    let rhmz = [rhm1, rhm1, rhm2];
+    let rx = 0;
+    let drz = [70, 110, 400, 300, 100];
+    let drzx = 0;
+    let vlz = [127, 120, 127, 110, 90, 80];
+    let vx = 0;
+  }
+  run()
+  {
+    let rhm = rhmz[rx];
+    rx = incr(rx, 0, len(rhmz));
+    for (let i = 0; i < 16; i++) {
+      if (i % prog_px == 0) {
+        px = incr(px, 0, len(prog));
+      }
+      if (rhm[i] == 1) {
+        note_on_at(dx, prog[px], i * pp, dur = drz[drzx], vel = vlz[vx]);
+        drzx = incr(drzx, 0, len(drz));
+      }
+    }
+  }
+}
+
+let playdrum_fn = fn(play_map)
+{
+  let pkeys = keys(play_map);
+  for (let i = 0; i < len(pkeys); i++) {
+    let hitz = play_map[pkeys[i]];
+    for (let j = 0; j < 16; j++) {
+      if (hitz[j] == 1) {
+        note_on_at(sbdrum, pkeys[i], j * pp);
+      }
+    }
+  }
+}
+
+let chorus_beatlah_gen = gen()
+{
+  setup()
+  {
+    let bd = [1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0];
+    let sd = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0];
+    let ch = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0];
+    let play_map = {0:bd, 3:sd, 2:ch};
+  }
+  run()
+  {
+    playdrum_fn(play_map);
+  }
+}
+
+let verse_beatlah_gen = gen()
+{
+  setup()
+  {
+    let bd = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let sd = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0];
+    let ch = [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0];
+    let play_map = {0:bd, 3:sd, 2:ch};
+  }
+  run()
+  {
+    playdrum_fn(play_map);
+  }
+}
+
+let verse_gen = gen()
+{
+  setup()
+  {
+    let prog = [ii, ii, IV, ii];
+    let px = len(prog);
+    let rhm = [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
+  }
+  run()
+  {
+    px = incr(px, 0, len(prog));
+    for (let i = 0; i < 16; i++) {
+      if (rhm[i] == 1) {
+        note_on_at(dx2, prog[px], i * pp, dur = 70)
+      }
+    }
+  }
+}
+
+let bridge_gen = gen()
+{
+  setup()
+  {
+    let prog = [vii];
+    let px = len(prog);
+    let rhm = [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1];
+  }
+  run()
+  {
+    px = incr(px, 0, len(prog));
+    for (let i = 0; i < 16; i++) {
+      if (rhm[i] == 1) {
+        note_on_at(dx, prog[px], i * pp, dur = 70)
+      }
+    }
+  }
+}
+
+let song_runrrr = gen()
+{
+  setup()
+  {
+    let chorus_times = 4;
+    let chorus_cntr = 0;
+    let verse_times = 4;
+    let verse_cntr = 0;
+    let bridge_times = 4;
+    let bridge_cntr = 0;
+    let play_order = [1, 0, 1, 0, 2, 0];
+    let px = 0;
+  }
+  run()
+  {
+    if (play_order[px] == 0) {
+      chorus_gen();
+      chorus_cntr = incr(chorus_cntr, 0, chorus_times);
+      if (chorus_cntr == 0) {
+        px = incr(px, 0, len(play_order));
+      }
+      chorus_beatlah_gen();
+    }
+
+    if (play_order[px] == 1) {
+      verse_gen();
+      verse_cntr = incr(verse_cntr, 0, verse_times);
+      if (verse_cntr == 0) {
+        px = incr(px, 0, len(play_order));
+      }
+      verse_beatlah_gen();
+    }
+
+    if (play_order[px] == 2) {
+      bridge_gen();
+      bridge_cntr = incr(bridge_cntr, 0, bridge_times);
+      if (bridge_cntr == 0) {
+        px = incr(px, 0, len(play_order));
+      }
+      verse_beatlah_gen();
+    }
+  }
+}
+
+let moblah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [0, 36, 0, 36, 0, 0, 40, 0, 41, 0, 0, 47, 0, 0, 38, 0];
+    let mel2 = [0, 45, 41, 0, 0, 26, 0, 0, 0, 47, 0, 0, 31, 24, 0, 0];
+    let melz = [mel1, mel2, mel1];
+    let mx = 0;
+  }
+  run()
+  {
+    if (count % 3 < 2) {
+      let mel = melz[mx];
+      mx = incr(mx, 0, len(melz));
+      for (let i = 0; i < 16; i++) {
+        if (mel[i] > 0) {
+          note_on_at(mo, mel[i], i * pp, dur = 80);
+        }
+      }
+    }
+  }
+}
+

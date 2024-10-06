@@ -138,6 +138,13 @@ struct DrumSettings {
   double ht_pan{0};
   double ht_tuning{0};
   bool ht_is_conga{false};
+
+  // 8 - Lazer
+  double lz_vol{0.7};
+  double lz_pan{0};
+  double lz_freq{220};
+  double lz_attack{10};
+  double lz_decay{180};
 };
 
 DrumSettings Map2DrumSettings(std::string name,
@@ -175,6 +182,7 @@ class DrumSynth : public SoundGenerator {
   std::unique_ptr<TomConga> lt_;
   std::unique_ptr<TomConga> mt_;
   std::unique_ptr<TomConga> ht_;
+  std::unique_ptr<Lazer> lz_;
 
   DCA dca_;
 };

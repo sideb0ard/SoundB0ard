@@ -101,7 +101,7 @@ class BassDrum : public DrumModule {
 
   std::unique_ptr<CKThreeFive> out_filter_;
 
-  DCA dca_;
+  // DCA dca_;
 };
 
 const float kHighSnareFreq = 476;
@@ -207,6 +207,18 @@ class TomConga : public DrumModule {
   EnvelopeGenerator eg_;
 
   bool is_conga_{false};
+};
+
+class Lazer : public DrumModule {
+ public:
+  Lazer();
+  virtual ~Lazer() = default;
+
+  void NoteOn(double vel) override;
+  StereoVal Generate() override;
+
+  std::unique_ptr<QBLimitedOscillator> osc1_;
+  EnvelopeGenerator eg_;
 };
 
 }  // namespace SBAudio

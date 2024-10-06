@@ -1,4 +1,216 @@
 
+#load_preset(dx, "szyataa");  load_preset(dx2, "yrrztup");
+
+# Key of E
+let key = 40;
+
 let playblah_fn = fn(playmap)
 {
+  let kys = keys(playmap);
+  for (let i = 0; i < len(kys); i++) {
+    let pat = playmap[kys[i]];
+    for (let j = 0; j < 16; j++) {
+      if (pat[j] == 1) {
+        note_on_at(sbdrum, kys[i], j * pp);
+      }
+    }
+  }
 }
+
+let dx1_reset = false;
+let dx2_reset = false;
+
+let resetter = gen()
+{
+  setup()
+  {
+    let dx1_reset_at = 26;
+    let dx2_reset_at = 7;
+    let cntr = 0;
+  }
+  run()
+  {
+    if (cntr % dx1_reset_at == 0) {
+      dx1_reset = true;
+    }
+    if (cntr % dx2_reset_at == 0) {
+      dx2_reset = true;
+    }
+    cntr++;
+  }
+}
+
+
+
+let playblah_gen = gen()
+{
+  setup()
+  {
+    let bd1 = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0];
+    let sd1 = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0];
+    let ch1 = [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
+    #let reg1 = {0:bd1, 3:sd1, 2:ch1};
+    let reg1 = {3:sd1, 2:ch1};
+
+    let bd2 = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
+    let sd2 = [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
+    let ch2 = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
+    #let reg2 = {0:bd2, 3:sd2, 2:ch2};
+    let reg2 = {3:sd2, 2:ch2};
+
+    let bd3 = [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0];
+    let sd3 = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0];
+    let ch3 = [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0];
+    #let reg3 = {0:bd3, 3:sd3, 2:ch3};
+    let reg3 = {3:sd3, 2:ch3};
+  }
+  run()
+  {
+    let r = reg1;
+    if (count % 4 == 3) {
+      r = reg2;
+    }
+    if (count % 8 == 7) {
+      r = reg3;
+    }
+    playblah_fn(r);
+  }
+}
+
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    #let mel1 = [0, 0, 44, 0, 40, 47, 0, 51, 0, 49, 0, 0, 0, 45,0 , 0];
+    #let mel2 = [40, 51, 0, 0, 44, 47, 0, 51, 0, 47, 0, 0, 44, 45, 44, 45];
+    let mel1 = [0, 0, 44, 0, 0, 47, 0, 51, 0, 49, 0, 33, 0, 45, 28 , 0];
+    let mel2 = [40, 51, 0, 0, 44, 47, 35, 51, 0, 47, 0, 0, 0, 45, 44, 40];
+    let mlx = 0;
+
+    let melz = [mel1, mel2, mel1];
+    let mx = 0;
+
+    let durz = [100, 60, 60, 100, 80, 120, 180];
+    let drx = 0;
+    let vlz = [100, 110, 120, 127, 127, 127, 120];
+    let vx = 0;
+  }
+  run()
+  {
+    let mel = melz[mx];
+    mx = incr(mx, 0, len(melz));
+
+    for (let i = 0; i < 16; i++) {
+      if (mel[mlx] > 0) {
+        note_on_at(mo, mel[mlx], i * pp, dur = durz[drx], vel = velz[vx]);
+        vx = incr(vx, 0, len(vlz));
+        drx = incr(drx, 0, len(durz));
+      }
+      #print(i, " ", mlx);
+      mlx = incr(mlx, 0, 16);
+
+      resetter();
+      if (dx1_reset == true) {
+        print("DX1 reset!");
+        mlx = 0;
+        dx1_reset = false;
+      }
+    }
+  }
+}
+
+let dxblah2_gen = gen()
+{
+  setup()
+  {
+    #let mel1 = [0, 0, 44, 0, 40, 47, 0, 51, 0, 49, 0, 0, 0, 45,0 , 0];
+    #let mel2 = [40, 51, 0, 0, 44, 47, 0, 51, 0, 47, 0, 0, 44, 45, 44, 45];
+    #let mel1 = [52, 57, 0, 0, 59, 0, 0, 59, 0, 0, 63, 0, 0, 0, 52, 0];
+    #let mel2 = [0, 57, 0, 57, 0, 52, 0, 59, 0, 0, 57, 0, 0, 52, 0, 0];
+    let mel1 = [40, 45, 0, 0, 57, 0, 0, 47, 0, 0, 51, 0, 0, 59, 52, 0];
+    let mel2 =  [0, 45, 0, 45, 0, 40, 0, 57, 0, 0, 45, 0, 40, 59, 0, 57];
+
+    let melz = [mel1, mel2, mel2];
+    let mx = 0;
+
+    let durz = [60, 60, 90, 300, 110, 400];
+    let drx = 0;
+
+    let velz = [100, 120, 127, 120, 123, 100, 90];
+    let vx = 0;
+  }
+  run()
+  {
+    let mel = melz[mx];
+    mx = incr(mx, 0, len(melz));
+
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(mo, mel[i], i * pp, dur = durz[drx], vel = velz[vx]);
+        vx = incr(vx, 0, len(velz));
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+let dxprocz = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 8 < 4) {
+      dxblah_gen()
+    } else {
+      dxblah2_gen()
+    }
+  }
+}
+
+let riddim_gen = gen()
+{
+  setup()
+  {
+    let E = notes_in_chord(28, key, 1);
+    let A = notes_in_chord(33, key, 1);
+    let B = notes_in_chord(35, key, 1);
+    let riddim = [A, E, A, E, B, E];
+    let rx = 0;
+    let drz = [100, 700, 500, 600, 100, 70, 120];
+    let drx = 0;
+    let vlz = [100, 120, 100, 127, 100, 90];
+    let vlx = 0;
+  }
+
+  run()
+  {
+    note_on_at(dx2, riddim[rx], 4 * pp, dur = drz[drx], vel = velz[vlx]);
+    drx = incr(drx, 0, len(drz));
+    vlx = incr(vlx, 0, len(vlz));
+
+    note_on_at(dx2, riddim[rx], 12 * pp, dur = drz[drx], vel = velz[vlx]);
+    vlx = incr(vlx, 0, len(vlz));
+
+    rx = incr(rx, 0, len(riddim));
+  }
+}
+
+let drblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 == 0) {
+        note_on_at(sbdrum, 0, i * pp);
+      }
+      note_on_at(sbdrum, 2, i * pp);
+    }
+
+  }
+}
+
