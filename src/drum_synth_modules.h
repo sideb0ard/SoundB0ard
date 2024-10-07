@@ -209,6 +209,8 @@ class TomConga : public DrumModule {
   bool is_conga_{false};
 };
 
+const double kDefaultPitchOscRange = 47;
+
 class Lazer : public DrumModule {
  public:
   Lazer();
@@ -219,6 +221,8 @@ class Lazer : public DrumModule {
 
   std::unique_ptr<QBLimitedOscillator> osc1_;
   EnvelopeGenerator eg_;
+
+  double pitch_osc_range_{kDefaultPitchOscRange};
 };
 
 }  // namespace SBAudio

@@ -585,7 +585,7 @@ StereoVal Lazer::Generate() {
     double biased_eg_out = 0;
     double amp_eg_out = eg_.DoEnvelope(&biased_eg_out);
 
-    double eg_osc_mod = 47 * biased_eg_out;
+    double eg_osc_mod = pitch_osc_range_ * biased_eg_out;
     osc1_->SetFoModExp(eg_osc_mod);
     osc1_->Update();
 

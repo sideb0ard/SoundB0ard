@@ -307,6 +307,8 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.lz_attack = val;
   else if (name == "lz_decay")
     settings_.lz_decay = val;
+  else if (name == "lz_range")
+    settings_.lz_osc_range = val;
   Update();
 }
 
@@ -413,7 +415,8 @@ std::string DrumSynth::Info() {
   ss << COOL_COLOR_YELLOW_MELLOW "     lz(8): lz_vol:" << settings_.lz_vol
      << " lz_pan:" << settings_.lz_pan << " lz_freq:" << settings_.lz_freq
      << " lz_attack:" << settings_.lz_attack
-     << " lz_decay:" << settings_.lz_decay << std::endl;
+     << " lz_decay:" << settings_.lz_decay
+     << " lz_range:" << settings_.lz_osc_range << std::endl;
 
   return ss.str();
 }
@@ -639,6 +642,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "lz_freq=" << settings_.lz_freq << kSEP;
   presetzzz << "lz_attack=" << settings_.lz_attack << kSEP;
   presetzzz << "lz_decay=" << settings_.lz_decay << kSEP;
+  presetzzz << "lz_osc_range=" << settings_.lz_decay << kSEP;
 
   presetzzz << std::endl;
   presetzzz.close();
@@ -785,6 +789,7 @@ void DrumSynth::Update() {
   lz_->dca_.m_amplitude_control = settings_.lz_vol;
   lz_->dca_.m_pan_control = settings_.lz_pan;
   lz_->osc1_->m_osc_fo = settings_.lz_freq;
+  lz_->pitch_osc_range_ = settings_.lz_osc_range;
   lz_->eg_.SetAttackTimeMsec(settings_.lz_attack);
   lz_->eg_.SetDecayTimeMsec(settings_.lz_decay);
 }
@@ -1049,6 +1054,8 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.lz_attack = dval;
     else if (key == "lz_decay")
       preset.lz_decay = dval;
+    else if (key == "lz_osc_range")
+      preset.lz_osc_range = dval;
   }
 
   return preset;

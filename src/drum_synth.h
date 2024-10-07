@@ -145,6 +145,7 @@ struct DrumSettings {
   double lz_freq{220};
   double lz_attack{10};
   double lz_decay{180};
+  double lz_osc_range{47};
 };
 
 DrumSettings Map2DrumSettings(std::string name,
