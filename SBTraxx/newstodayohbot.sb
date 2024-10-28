@@ -1,0 +1,124 @@
+# load_preset(dx, "ONESZ"); load_preset(sbdrum, "TRUNK");
+# let sbd2 = drum(); set sbd2:bd_key 3; load_preset(dx2, "waaaat")
+
+let resetOn = fn(resetOn) {
+  fn(counter) {
+    if (counter % resetOn == 0) {
+      return true;
+    }
+    return false;
+  }
+}
+
+let counter_blah_gen = gen()
+{
+  setup()
+  {
+    let resetOnX = resetOn(7);
+    let mycntr = 0;
+    let kickr_every = 6;
+    let kick_cntr = 0;
+  }
+
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      let should_reset_kick = resetOnX(mycntr);
+      mycntr++;
+      if (should_reset_kick == true) {
+        #print("RESRTKCK!");
+        kick_cntr = 0;
+      }
+      if (kick_cntr % kickr_every == 0) {
+        note_on_at(sbdrum, 0, i * pp, dur = 10);
+        #print("KICK:", i);
+      }
+      kick_cntr++;
+    }
+    #note_on_at(sbdrum, 1, 4 * pp);
+    #note_on_at(sbdrum, 1, 12 * pp);
+  }
+}
+
+# key of D#
+let key = 3;
+let decrr_gen = gen()
+{
+  setup()
+  {
+    let divz = [4, 4, 3, 3, 4, 2, 5, 4, 7, 11];
+    let dvx = 0;
+    let ratz = [2.7, 5.4, 8.3];
+    let rx = 0;
+    #let ntz = [29];
+    let ntz = [24, 20, 24, 20, 20, 20, 39, 39, 39, 39];
+    let ntx = 0;
+
+    let durz = [100, 150, 200, 400, 500];
+    let drx = 0;
+
+    let bdo = [2, 1, 0, 1, 2, 2, 4, 3];
+    let bx = 0;
+  }
+  run()
+  {
+    let tot = 3840;
+    let now = 0;
+    let div = divz[dvx];
+    dvx = incr(dvx, 0, len(divz));
+
+    set dx:o3rat ratz[rx];
+
+    for (let i = 0; i < 12; i++) {
+      if (i % divz[dvx] == 0) {
+        note_on_at(sbdrum, 0, now);
+      }
+
+      if (i % divz[dvx] == 0) {
+        note_on_at(dx, notes_in_chord(ntz[ntx], key, 1), now, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        note_on_at(sbdrum, 2, now);
+      }
+
+      let ldiv = tot / div;
+      tot = tot - ldiv;
+      now = now + ldiv;
+    }
+
+
+    if (count % 2 == 0) {
+      ntx = incr(ntx, 0, len(ntz));
+      rx = incr(rx, 0, len(ratz));
+      set sbdrum:bd_octave bdo[bx];
+      bx = incr(bx, 0, len(bdo));
+    }
+
+    note_on_at(sbd2, 0, 0);
+    if (count % 4 < 3) {
+      note_on_at(sbdrum, 3, 4 * pp + 150);
+      note_on_at(sbdrum, 3, 12 * pp + 250);
+    }
+  }
+}
+
+
+# notes in key 51
+#  [51, 53, 55, 56, 58, 60, 62, 63]
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let mel = down([55, 0, 58, 0, 51, 56, 0, 0, 0, 53, 0, 0, 51, 0, 0, 0], 12);
+    let mx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (mel[mx] > 0) {
+        note_on_at(dx2, mel[mx], i * pp, dur = 50);
+      }
+    }
+    mx = incr(mx, 0, 16);
+  }
+}
+

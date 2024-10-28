@@ -1,7 +1,7 @@
 # Key of E
 let key = 4;
 #let modz = [1, 1, 2, 2, 1, 1, 3, 0];
-let modz = [1, 1, 3, 1, 1, 1, 0, 1, 1, 2];
+let modz = [1, 1, 0, 0, 0, 1, 1];
 let mx = 0;
 
 let velz = [100, 100, 110, 120, 127, 127, 127];
@@ -26,7 +26,7 @@ let sblah_gen = gen()
     #let rootz = [27, 32];
 
     #let durz = [200, 300, 150, 250, 500, 700, 300];
-    let durz = [1200, 800, 950, 750, 900, 700, 300];
+    let durz = [1200, 800, 950, 1750, 900, 700, 1300];
     #let durz = [300];
     let drx = 0;
 
@@ -191,29 +191,6 @@ let playblah_fn = fn(pat)
     if (pat[i] == 2) {
       note_on_at(sbdrum, 7, i * pp);
     }
-  }
-}
-
-let tomblah_gen = gen()
-{
-  setup()
-  {
-    let pat1 =  [2, 3, 2, 1, 0, 3, 7, 5, 5, 6, 5, 8, 4, 0, 5, 7];
-    let pat2 = [6, 6, 8, 6, 2, 0, 7, 1, 3, 2, 8, 1, 8, 1, 0, 2];
-    let pat3 = [7, 0, 7, 2, 8, 5, 7, 4, 7, 7, 5, 3, 6, 4, 7, 2];
-    let px = 0;
-    let pmax = 4;
-  }
-  run()
-  {
-    let pat = pat1;
-    if (count % 3 == 0) {
-      pat = pat3;
-    }
-    if (count % 7 == 0) {
-      pat = pat7;
-    }
-
   }
 }
 

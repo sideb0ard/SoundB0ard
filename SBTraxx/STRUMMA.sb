@@ -3,8 +3,8 @@
 # Key of E
 let key = 28;
 
-let strm_pp_diff = 500;
-let note_stagger = 50;
+let strm_pp_diff = 2250;
+let note_stagger = 10;
 
 # 0. up
 # 1. down
@@ -16,15 +16,15 @@ let strm_fn = fn(chrd, when, is_doubled,  direction, dura, velo)
   }
   let second_stroke = reverse(first_stroke);
 
-  #strm_pp_diff = strm_pp_diff + 70;
-  #if (strm_pp_diff > 1000) {
-    #  strm_pp_diff = 500;
-    #}
+  strm_pp_diff = strm_pp_diff + 10;
+  if (strm_pp_diff > 5000) {
+    strm_pp_diff = 500;
+  }
 
-  #note_stagger = note_stagger + 50;
-  #if (note_stagger > 400) {
-    #  note_stagger = 50;
-    #}
+  note_stagger = note_stagger + 1;
+  if (note_stagger > 400) {
+    note_stagger = 10;
+  }
 
   for (let i = 0; i < len(chrd); i++) {
     note_on_at(dx2, first_stroke[i], when + i * note_stagger, dur = dura, vel = velo);
@@ -50,14 +50,14 @@ let stublah_gen = gen()
   {
     let thrd = 3840 / 3;
     strm_fn(notes_in_chord(prog[px], key, 1), 0, false, 1, durz[drx], velz[vx]);
-    #drx = incr(drx, 0, len(durz));
-    #vx = incr(vx, 0, len(velz));
-    strm_fn(notes_in_chord(prog[px], key, 1), 1 * thrd, true, 1, durz[drx], velz[vx]);
-    #drx = incr(drx, 0, len(durz));
-    #vx = incr(vx, 0, len(velz));
-    strm_fn(notes_in_chord(prog[px], key, 1), 2 * thrd, true, 0, durz[drx], velz[vx]);
-    #drx = incr(drx, 0, len(durz));
-    #vx = incr(vx, 0, len(velz));
+    drx = incr(drx, 0, len(durz));
+    vx = incr(vx, 0, len(velz));
+    strm_fn(notes_in_chord(prog[px], key, 3), 1 * thrd, true, 1, durz[drx], velz[vx]);
+    drx = incr(drx, 0, len(durz));
+    vx = incr(vx, 0, len(velz));
+    strm_fn(notes_in_chord(prog[px], key, 2), 2 * thrd, true, 0, durz[drx], velz[vx]);
+    drx = incr(drx, 0, len(durz));
+    vx = incr(vx, 0, len(velz));
 
     if (count % 2 == 1) {
       px = incr(px, 0, len(prog));
