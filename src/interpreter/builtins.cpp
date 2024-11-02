@@ -926,6 +926,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     mixr->PrintDxAlgos();
                     return evaluator::NULLL;
                   })},
+    {"ratioz", std::make_shared<object::BuiltIn>(
+                   [](std::vector<std::shared_ptr<object::Object>> args)
+                       -> std::shared_ptr<object::Object> {
+                     (void)args;
+                     mixr->PrintDxRatioz();
+                     return evaluator::NULLL;
+                   })},
     {"push", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> input)
                      -> std::shared_ptr<object::Object> {

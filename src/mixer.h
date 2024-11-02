@@ -133,6 +133,7 @@ struct Mixer {
 
   void PrintTimingInfo();
   void PrintDxAlgos();
+  void PrintDxRatioz();
   void PrintMidiInfo();
   void PrintFuncAndGenInfo();
 

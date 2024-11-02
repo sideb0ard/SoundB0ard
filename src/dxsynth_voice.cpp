@@ -187,25 +187,25 @@ bool DXSynthVoice::CanNoteOff() {
   if (!m_note_on)
     return ret;
   else {
-    switch (m_voice_mode + 1) {
+    switch (m_voice_mode) {
+      case 0:
       case 1:
       case 2:
-      case 3:
-      case 4: {
+      case 3: {
         if (m_eg1.CanNoteOff()) ret = true;
         break;
       }
-      case 5: {
+      case 4: {
         if (m_eg1.CanNoteOff() && m_eg2.CanNoteOff()) ret = true;
         break;
       }
-      case 6:
-      case 7: {
+      case 5:
+      case 6: {
         if (m_eg1.CanNoteOff() && m_eg2.CanNoteOff() && m_eg3.CanNoteOff())
           ret = true;
         break;
       }
-      case 8: {
+      case 7: {
         if (m_eg1.CanNoteOff() && m_eg2.CanNoteOff() && m_eg3.CanNoteOff() &&
             m_eg4.CanNoteOff())
           ret = true;
@@ -218,26 +218,26 @@ bool DXSynthVoice::CanNoteOff() {
 
 bool DXSynthVoice::IsVoiceDone() {
   bool ret = false;
-  switch (m_voice_mode + 1) {
+  switch (m_voice_mode) {
+    case 0:
     case 1:
     case 2:
-    case 3:
-    case 4: {
+    case 3: {
       if (m_eg1.GetState() == OFFF) ret = true;
       break;
     }
-    case 5: {
+    case 4: {
       if (m_eg1.GetState() == OFFF && m_eg2.GetState() == OFFF) ret = true;
       break;
     }
-    case 6:
-    case 7: {
+    case 5:
+    case 6: {
       if (m_eg1.GetState() == OFFF && m_eg2.GetState() == OFFF &&
           m_eg3.GetState() == OFFF)
         ret = true;
       break;
     }
-    case 8: {
+    case 7: {
       if (m_eg1.GetState() == OFFF && m_eg2.GetState() == OFFF &&
           m_eg3.GetState() == OFFF && m_eg4.GetState() == OFFF)
         ret = true;
@@ -253,27 +253,27 @@ void DXSynthVoice::SetOutputEGs() {
   m_eg3.m_output_eg = false;
   m_eg4.m_output_eg = false;
 
-  switch (m_voice_mode + 1) {
+  switch (m_voice_mode) {
+    case 0:
     case 1:
     case 2:
-    case 3:
-    case 4: {
+    case 3: {
       m_eg1.m_output_eg = true;
       break;
     }
-    case 5: {
+    case 4: {
       m_eg1.m_output_eg = true;
       m_eg2.m_output_eg = true;
       break;
     }
-    case 6:
-    case 7: {
+    case 5:
+    case 6: {
       m_eg1.m_output_eg = true;
       m_eg2.m_output_eg = true;
       m_eg3.m_output_eg = true;
       break;
     }
-    case 8: {
+    case 7: {
       m_eg1.m_output_eg = true;
       m_eg2.m_output_eg = true;
       m_eg3.m_output_eg = true;
@@ -350,8 +350,8 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
   m_dca.Update();
 
-  switch (m_voice_mode + 1) {
-    case (1): {
+  switch (m_voice_mode) {
+    case (0): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
       m_op4.SetPhaseMod(out4 * m_op4_feedback);
@@ -376,7 +376,7 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
       break;
     }
-    case (2): {
+    case (1): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
       m_op4.SetPhaseMod(out4 * m_op4_feedback);
       m_op4.Update();
@@ -397,7 +397,7 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
       break;
     }
-    case (3): {
+    case (2): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
       m_op4.SetPhaseMod(out4 * m_op4_feedback);
       m_op4.Update();
@@ -418,7 +418,7 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
       break;
     }
-    case (4): {
+    case (3): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
       m_op4.SetPhaseMod(out4 * m_op4_feedback);
@@ -440,7 +440,7 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
       break;
     }
-    case (5): {
+    case (4): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
       m_op4.SetPhaseMod(out4 * m_op4_feedback);
@@ -458,11 +458,11 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
       out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
-      out = out1;
+      out = 0.5 * out1 + 0.5 * out2;
 
       break;
     }
-    case (6): {
+    case (5): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
       m_op4.SetPhaseMod(out4 * m_op4_feedback);
@@ -487,7 +487,7 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
       break;
     }
-    case (7): {
+    case (6): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
       m_op4.SetPhaseMod(out4 * m_op4_feedback);
       m_op4.Update();
@@ -505,7 +505,7 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
 
       break;
     }
-    case (8): {
+    case (7): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
 
       m_op4.SetPhaseMod(out4 * m_op4_feedback);

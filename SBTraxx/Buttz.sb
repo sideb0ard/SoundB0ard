@@ -1,5 +1,6 @@
 # load_preset(dx, "SNURLP2"); add_fx(dx, "delay"); vol dx 0.6;
 # load_preset(dx2, "phatz"); load_preset(sbdrum, "buttz");
+# load_preset(mo, "kerriz"); add_fx(mo, "delay");
 
 # Key of E // 40
 let key = 36;
@@ -165,10 +166,10 @@ let skank_gen = gen()
     #let rootz = [64, 69];
     let rx = 0;
 
-    let delz = [0, 23, 423, 4, 23, 100, 300, 500];
+    let delz = [0, 23, 423, 4, 23, 100, 300];
     let dlx = 0;
 
-    let dfb = [23, 4, 70, 90, 30];
+    let dfb = [23, 4, 60, 54, 30];
     let dfx = 0;
 
     let delay_on = 1;
@@ -196,12 +197,12 @@ let skank_gen = gen()
           set dx:fx0:ms delz[dlx] at=i*pp;
           dlx = incr(dlx, 0, len(delz));
         }
-        if (count % 3 == 0) {
-          set dx:fx0:fb dfb[dfx] at=i*pp;
-          dfx = incr(dfx, 0, len(dfb));
-          set dx:algo algoz[ax] at = i * pp;
-          ax = incr(ax, 0, len(algoz));
-        }
+        #if (count % 3 == 0) {
+          #  set dx:fx0:fb dfb[dfx] at=i*pp;
+          #  dfx = incr(dfx, 0, len(dfb));
+          #  set dx:algo algoz[ax] at = i * pp;
+          #  ax = incr(ax, 0, len(algoz));
+          #}
       }
     }
     set dx:o1wav wavz[wx];
@@ -303,15 +304,15 @@ let bassblah_gen = gen()
     }
 
 
-    if (count % 7 == 0) {
-      set dx2:algo algz[ax];
-      ax = incr(ax, 0, len(algz));
-    }
+    #if (count % 7 == 0) {
+      #  set dx2:algo algz[ax];
+      #  ax = incr(ax, 0, len(algz));
+      #}
 
-    if (count % 3 == 0) {
-      set dx2:o1rat ratz[rx];
-      rx = incr(rx, 0, len(ratz));
-    }
+    #if (count % 3 == 0) {
+      #  set dx2:o1rat ratz[rx];
+      #  rx = incr(rx, 0, len(ratz));
+      #}
   }
 }
 
@@ -379,11 +380,11 @@ let reggaeblah_gen = gen()
         drx = incr(drx, 0, len(durz));
         vx = incr(vx, 0, len(velz));
 
-        set dx2:op2out o2outz[o2x] at=now;
-        o2x = incr(o2x, 0, len(o2outz));
+        #set dx2:op2out o2outz[o2x] at=now;
+        #o2x = incr(o2x, 0, len(o2outz));
 
-        set dx2:e2att attz[atx] at=now;
-        atx = incr(atx, 0, len(attz));
+        #set dx2:e2att attz[atx] at=now;
+        #atx = incr(atx, 0, len(attz));
       }
     }
   }
@@ -393,15 +394,27 @@ let play_song = gen()
 {
   setup()
   {
+    let presetz = ["ptnchnn", "wahaio", "UFO"];
+    let px = 0;
   }
   run()
   {
-    if (count % 32 < 16) {
-      reggaeblah_gen();
+    if (count % 8 < 4) {
       regpattern1();
     } else {
+      if (count % 8 < 6) {
+        regpattern2();
+      }
+    }
+    if (count % 8 < 4) {
       bassblah_gen();
-      regpattern2();
+    } else {
+      reggaeblah_gen();
+    }
+
+    if (count % 7 == 0) {
+      load_preset(dx2, presetz[px]);
+      px = incr(px, 0, len(presetz));
     }
 
     if (count % 6 < 4) {
@@ -428,6 +441,47 @@ let lzblah_gen = gen()
       note_on_at(sbdrum, 8, now + rand(100), vel = 80 + rand(27));
 
     }
+  }
+}
+
+# mo // kerriz
+# load_preset(mo, "kerriz"); add_fx(mo, "delay");
+let momelblah_gen = gen()
+{
+  setup()
+  {
+    let chrdz = [52, 57];
+    let chx = 0;
+
+    let sncz = [1, 2, 3];
+    let sx = 0;
+
+    let detz = [0, 10, 7, 13, 20, 23];
+    let dtx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      let fifthz = 3840 * 2 / 5;
+      let twofifz = fifthz * 2;
+      let twofifz_div_three = twofifz / 3;
+      let twofifz_div_four = twofifz /4;
+      for (let i = 0; i < 3; i++) {
+        let now = i * twofifz_div_three;
+        note_on_at(mo, notes_in_chord(chrdz[chx], key), now, dur = 220 / (i + 1), vel = 127 - (10 * i));
+      }
+      for (let i = 0; i < 4; i++) {
+        let now = twofifz + i * twofifz_div_four;
+        note_on_at(mo, notes_in_chord(chrdz[chx], key), now, dur = 180 / (i + 1), vel = 127 - (10 * i));
+      }
+
+      chx = incr(chx, 0, len(chrdz));
+      set mo:fx0:sync_len sncz[sx];
+      sx = incr(sx, 0, len(sncz));
+      set mo:detune detz[dtx];
+      dtx = incr(dtx, 0, len(detz));
+    }
+
   }
 }
 
