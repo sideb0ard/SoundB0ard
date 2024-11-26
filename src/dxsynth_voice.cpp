@@ -442,23 +442,22 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
     }
     case (4): {
       out4 = IMAX * eg4 * m_op4.DoOscillate(NULL);
-
       m_op4.SetPhaseMod(out4 * m_op4_feedback);
       m_op4.Update();
 
-      out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
-
-      m_op2.SetPhaseMod(out4);
-      m_op2.Update();
-
       out2 = IMAX * eg2 * m_op2.DoOscillate(NULL);
 
-      m_op1.SetPhaseMod(out3);
+      m_op3.SetPhaseMod(out4);
+      m_op3.Update();
+
+      out3 = IMAX * eg3 * m_op3.DoOscillate(NULL);
+
+      m_op1.SetPhaseMod(out2);
       m_op1.Update();
 
       out1 = IMAX * eg1 * m_op1.DoOscillate(NULL);
 
-      out = 0.5 * out1 + 0.5 * out2;
+      out = 0.5 * out1 + 0.5 * out3;
 
       break;
     }
