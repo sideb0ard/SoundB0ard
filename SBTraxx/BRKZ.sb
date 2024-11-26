@@ -1,0 +1,54 @@
+
+# let blah_fn = fn(val)
+# {
+#   print("VAL:", val);
+# }
+
+let testblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run(val)
+  {
+    #print("VAL WAS:", val);
+  }
+}
+
+let key = 44;
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    note_on_at(dx, notes_in_chord(49, key, 2), 0, dur = 1500);
+    for (let i = 1; i < 4; i++) {
+      note_on_at(dx, notes_in_chord(55, key, 2), 1500 + i * pp, dur = 250);
+    }
+
+    for (let i = 0; i < 3; i++) {
+      note_on_at(dx, notes_in_chord(48, key, 2), 2000 + i * pp, dur = 50);
+    }
+  }
+}
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let m = [44, 0, 46, 49,   0, 0, 53, 0,   0, 44, 0, 49,   0, 0, 0, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (m[i] > 0) {
+        note_on_at(dx, m[i], i * pp);
+      }
+    }
+
+  }
+}
+

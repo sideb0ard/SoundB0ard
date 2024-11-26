@@ -1,0 +1,30 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let pat = [0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0];
+    let dpx = 0;
+    let dlooplen = 5760;
+    let dlpp = dlooplen / 16;
+
+    let epx = 0;
+    let elooplen = 3840;
+    let elpp = elooplen / 16;
+  }
+  run()
+  {
+    for (let i = 0; i < 3840; i++) {
+      if (i % dlpp == 0) {
+        note_on_at(sbdrum, 0, i);
+        note_on_at(dx, 33, i, dur = 440);
+        dpx = incr(dpx, 0, 16);
+      }
+      if (i % elpp == 0) {
+        note_on_at(sbdrum, 2, i);
+        epx = incr(epx, 0, 16);
+      }
+    }
+  }
+}
+

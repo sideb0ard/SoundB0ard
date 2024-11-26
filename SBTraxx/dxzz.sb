@@ -1,0 +1,26 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [33, 0, 0, 33, 0, 0, 36, 0, 33, 0, 0, 28, 0, 0, 28, 0];
+    let mel2 = [29, 0, 0, 29, 0, 0, 0, 0, 28, 0, 0, 0, 28, 0, 0, 0];
+    let melz = [mel1, mel2];
+    let mx = 0;
+  }
+  run()
+  {
+    let mel = up(melz[mx], 24);
+    mx = incr(mx, 0, len(melz));
+    for (let i = 0; i < 16; i++) {
+      let d = 100;
+      if (i % 4 == 0) {
+        d = 500;
+      }
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp, dur = d);
+      }
+    }
+  }
+}
+

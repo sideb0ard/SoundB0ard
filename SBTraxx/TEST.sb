@@ -1,0 +1,16 @@
+
+# let blah_fn = fn(val)
+# {
+#   print("VAL:", val);
+# }
+
+let testblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run(val)
+  {
+    print("VAL WAS:", val);
+  }
+}

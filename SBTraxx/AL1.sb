@@ -1,0 +1,27 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let notz = [33, 33, 36, 33, 28, 28, 29, 29, 28, 28];
+    let nx = 0;
+  }
+  run()
+  {
+    let remaindr = 3840;
+    for (let i = 0; i ; i++) {
+      let quart = remaindr / 4;
+      let on_at = remaindr - quart;
+      let the_dur = quart / 2;
+      #print("Q:", quart, " ON AT:", on_at, " DUR:", the_dur, " NOTE:", notz[nx]);
+      note_on_at(dx, notz[nx], on_at, dur = the_dur);
+      nx = incr(nx, 0, len(notz));
+      remaindr = remaindr - quart;
+      if (on_at < 1) {
+        break;
+      }
+    }
+  }
+
+}
+
