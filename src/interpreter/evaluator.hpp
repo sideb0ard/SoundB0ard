@@ -139,13 +139,14 @@ std::shared_ptr<object::Object> ApplyFunction(
     std::vector<std::shared_ptr<object::Object>> args);
 
 std::shared_ptr<object::Object> ApplyGeneratorRun(
-    std::shared_ptr<object::Object> callable);
+    std::shared_ptr<object::Object> callable,
+    std::vector<std::shared_ptr<object::Object>> args);
 
 std::shared_ptr<object::Object> ApplyGeneratorSignalGenerator(
     std::shared_ptr<object::Object> callable);
 
-std::shared_ptr<object::Environment> ExtendFunctionEnv(
-    std::shared_ptr<object::Function> fun,
+std::shared_ptr<object::Environment> ExtendEnv(
+    std::shared_ptr<object::CallableWithEnv> obj,
     std::vector<std::shared_ptr<object::Object>> const &args);
 
 std::shared_ptr<object::Object> UnwrapReturnValue(

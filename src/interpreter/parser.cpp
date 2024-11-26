@@ -749,20 +749,6 @@ std::shared_ptr<ast::Expression> Parser::ParseEveryExpression() {
   return expression;
 }
 
-std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral() {
-  auto lit = std::make_shared<ast::FunctionLiteral>(cur_token_);
-
-  if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
-
-  lit->parameters_ = ParseFunctionParameters();
-
-  if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
-
-  lit->body_ = ParseBlockStatement();
-
-  return lit;
-}
-
 std::shared_ptr<ast::Expression> Parser::ParsePhasorLiteral() {
   std::cout << "PARSLEY PHASOR\n";
   auto lit = std::make_shared<ast::PhasorLiteral>(cur_token_);
@@ -771,13 +757,25 @@ std::shared_ptr<ast::Expression> Parser::ParsePhasorLiteral() {
   return lit;
 }
 
+std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral() {
+  auto lit = std::make_shared<ast::FunctionLiteral>(cur_token_);
+
+  if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
+
+  lit->parameters_ = ParseCallParameters();
+
+  if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
+
+  lit->body_ = ParseBlockStatement();
+
+  return lit;
+}
+
 std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral() {
   auto lit = std::make_shared<ast::GeneratorLiteral>(cur_token_);
 
   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
-
-  // (currently) unused parens
-  lit->parameters_ = ParseFunctionParameters();
+  if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
 
   if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
 
@@ -794,20 +792,21 @@ std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral() {
 
   // Discard (currently) unused parens
   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
-  if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
+  lit->parameters_ = ParseCallParameters();
+  // if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
   if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
 
   lit->run_ = ParseBlockStatement();
 
-  if (PeekTokenIs(token::SLANG_GENERATOR_SIGNAL_GENERATOR)) {
-    std::cout << "WUFF< GOT A SIGNAL GEN!\n";
-    NextToken();
-    if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
-    if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
-    if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
+  // if (PeekTokenIs(token::SLANG_GENERATOR_SIGNAL_GENERATOR)) {
+  //   std::cout << "WUFF< GOT A SIGNAL GEN!\n";
+  //   NextToken();
+  //   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
+  //   if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
+  //   if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
 
-    lit->signal_generator_ = ParseBlockStatement();
-  }
+  //   lit->signal_generator_ = ParseBlockStatement();
+  // }
 
   return lit;
 }
@@ -1152,8 +1151,7 @@ std::shared_ptr<ast::BlockStatement> Parser::ParseBlockStatement() {
   return block_stmt;
 }
 
-std::vector<std::shared_ptr<ast::Identifier>>
-Parser::ParseFunctionParameters() {
+std::vector<std::shared_ptr<ast::Identifier>> Parser::ParseCallParameters() {
   std::vector<std::shared_ptr<ast::Identifier>> identifiers;
 
   if (PeekTokenIs(token::SLANG_RPAREN)) {

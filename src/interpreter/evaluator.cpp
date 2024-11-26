@@ -446,20 +446,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     return std::make_shared<object::Function>(params, env, body);
   }
 
-  std::shared_ptr<ast::ForStatement> forloop =
-      std::dynamic_pointer_cast<ast::ForStatement>(node);
-  if (forloop) {
-    auto initialization = forloop->initialization_;
-    auto termination = forloop->termination_;
-    auto increment = forloop->increment_;
-    auto body = forloop->body_;
-    auto new_env = std::make_shared<object::Environment>(env);
-    auto forloop_obj = std::make_shared<object::ForLoop>(
-        new_env, initialization, termination, increment, body);
-
-    return EvalForLoop(forloop_obj);
-  }
-
   std::shared_ptr<ast::GeneratorLiteral> gn =
       std::dynamic_pointer_cast<ast::GeneratorLiteral>(node);
   if (gn) {
@@ -472,6 +458,20 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                                    signal_generator);
     Eval(gen->setup_, gen->env_);
     return gen;
+  }
+
+  std::shared_ptr<ast::ForStatement> forloop =
+      std::dynamic_pointer_cast<ast::ForStatement>(node);
+  if (forloop) {
+    auto initialization = forloop->initialization_;
+    auto termination = forloop->termination_;
+    auto increment = forloop->increment_;
+    auto body = forloop->body_;
+    auto new_env = std::make_shared<object::Environment>(env);
+    auto forloop_obj = std::make_shared<object::ForLoop>(
+        new_env, initialization, termination, increment, body);
+
+    return EvalForLoop(forloop_obj);
   }
 
   std::shared_ptr<ast::CallExpression> call_expr =
@@ -488,7 +488,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     if (func_obj) return ApplyFunction(func_obj, args);
 
     auto gen_obj = std::dynamic_pointer_cast<object::Generator>(fun);
-    if (gen_obj) return ApplyGeneratorRun(gen_obj);
+    if (gen_obj) return ApplyGeneratorRun(gen_obj, args);
 
     auto builtin_func = std::dynamic_pointer_cast<object::BuiltIn>(fun);
     if (builtin_func) {
@@ -1238,28 +1238,14 @@ std::vector<std::shared_ptr<object::Object>> EvalExpressions(
 }
 
 std::shared_ptr<object::Object> ApplyGeneratorRun(
-    std::shared_ptr<object::Object> callable) {
+    std::shared_ptr<object::Object> callable,
+    std::vector<std::shared_ptr<object::Object>> args) {
   std::shared_ptr<object::Generator> gen =
       std::dynamic_pointer_cast<object::Generator>(callable);
   if (gen) {
-    // func->env_ = ExtendFunctionEnv(func, args);
-    auto evaluated = Eval(gen->run_, gen->env_);
+    auto extended_env = ExtendEnv(gen, args);
+    auto evaluated = Eval(gen->run_, extended_env);
     return UnwrapReturnValue(evaluated);
-  }
-
-  return NewError("Something stinky wit yer GENERaTOR , mate!");
-}
-
-std::shared_ptr<object::Object> ApplyGeneratorSignalGenerator(
-    std::shared_ptr<object::Object> callable) {
-  std::shared_ptr<object::Generator> gen =
-      std::dynamic_pointer_cast<object::Generator>(callable);
-  if (gen) {
-    // func->env_ = ExtendFunctionEnv(func, args);
-    if (gen->signal_generator_) {
-      auto evaluated = Eval(gen->signal_generator_, gen->env_);
-      return UnwrapReturnValue(evaluated);
-    }
   }
 
   return NewError("Something stinky wit yer GENERaTOR , mate!");
@@ -1271,7 +1257,7 @@ std::shared_ptr<object::Object> ApplyFunction(
   std::shared_ptr<object::Function> func =
       std::dynamic_pointer_cast<object::Function>(callable);
   if (func) {
-    auto extended_env = ExtendFunctionEnv(func, args);
+    auto extended_env = ExtendEnv(func, args);
     auto evaluated = Eval(func->body_, extended_env);
     return UnwrapReturnValue(evaluated);
   }
@@ -1285,12 +1271,13 @@ std::shared_ptr<object::Object> ApplyFunction(
   return NewError("Something stinky wit yer functions, mate!");
 }
 
-std::shared_ptr<object::Environment> ExtendFunctionEnv(
-    std::shared_ptr<object::Function> fun,
+std::shared_ptr<object::Environment> ExtendEnv(
+    std::shared_ptr<object::CallableWithEnv> obj,
     std::vector<std::shared_ptr<object::Object>> const &args) {
-  std::shared_ptr<object::Environment> new_env =
-      std::make_shared<object::Environment>(fun->env_);
-  if (fun->parameters_.size() != args.size()) {
+  std::shared_ptr<object::Environment> new_env;
+
+  new_env = std::make_shared<object::Environment>(obj->env_);
+  if (obj->parameters_.size() != args.size()) {
     std::cerr << "Function Eval - args and params not same size, ya "
                  "numpty!\n";
     return new_env;
@@ -1298,10 +1285,25 @@ std::shared_ptr<object::Environment> ExtendFunctionEnv(
 
   int args_len = args.size();
   for (int i = 0; i < args_len; i++) {
-    auto param = fun->parameters_[i];
+    auto param = obj->parameters_[i];
     new_env->Set(param->value_, args[i]);
   }
   return new_env;
+}
+
+// TODO - this is unused - get rid of it!
+std::shared_ptr<object::Object> ApplyGeneratorSignalGenerator(
+    std::shared_ptr<object::Object> callable) {
+  std::shared_ptr<object::Generator> gen =
+      std::dynamic_pointer_cast<object::Generator>(callable);
+  if (gen) {
+    if (gen->signal_generator_) {
+      auto evaluated = Eval(gen->signal_generator_, gen->env_);
+      return UnwrapReturnValue(evaluated);
+    }
+  }
+
+  return NewError("Something stinky wit yer GENERaTOR , mate!");
 }
 
 std::shared_ptr<object::Object> UnwrapReturnValue(

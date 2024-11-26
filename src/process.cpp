@@ -127,7 +127,8 @@ void Process::EventNotify(mixer_timing_info tinfo) {
             }
           }
           if (tinfo.is_start_of_loop) {
-            auto pattern_obj = evaluator::ApplyGeneratorRun(gen_obj);
+            auto pattern_obj = evaluator::ApplyGeneratorRun(
+                gen_obj, std::vector<std::shared_ptr<object::Object>>());
             auto pattern_string =
                 std::dynamic_pointer_cast<object::String>(pattern_obj);
             if (pattern_string) {

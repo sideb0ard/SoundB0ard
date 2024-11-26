@@ -236,20 +236,50 @@ class Phasor : public Object {
   double Generate();
 };
 
-class Function : public Object {
+class CallableWithEnv : public Object {
+ public:
+  CallableWithEnv(std::vector<std::shared_ptr<ast::Identifier>> parameters,
+                  std::shared_ptr<Environment> env)
+      : parameters_{parameters}, env_{env} {};
+
+ public:
+  std::vector<std::shared_ptr<ast::Identifier>> parameters_;
+  std::shared_ptr<Environment> env_;
+};
+
+class Function : public CallableWithEnv {
  public:
   Function(std::vector<std::shared_ptr<ast::Identifier>> parameters,
            std::shared_ptr<Environment> env,
            std::shared_ptr<ast::BlockStatement> body)
-      : parameters_{parameters}, env_{env}, body_{body} {};
+      : CallableWithEnv(parameters, env), body_{body} {};
   ~Function() = default;
   ObjectType Type() override;
   std::string Inspect() override;
 
  public:
-  std::vector<std::shared_ptr<ast::Identifier>> parameters_;
-  std::shared_ptr<Environment> env_;
   std::shared_ptr<ast::BlockStatement> body_;
+};
+
+class Generator : public CallableWithEnv {
+ public:
+  Generator(std::vector<std::shared_ptr<ast::Identifier>> parameters,
+            std::shared_ptr<Environment> env,
+            std::shared_ptr<ast::BlockStatement> setup,
+            std::shared_ptr<ast::BlockStatement> run,
+            std::shared_ptr<ast::BlockStatement> signal_generator = nullptr)
+      : CallableWithEnv(parameters, env),
+        setup_{setup},
+        run_{run},
+        signal_generator_{signal_generator} {};
+  ~Generator() = default;
+  ObjectType Type() override;
+  std::string Inspect() override;
+
+ public:
+  std::shared_ptr<ast::BlockStatement> setup_;
+  std::shared_ptr<ast::BlockStatement> run_;
+  std::shared_ptr<ast::BlockStatement> signal_generator_;
 };
 
 class MidiArray : public Object {
@@ -289,31 +319,6 @@ class Pattern : public Object {
 
   void EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
                    int target_start, int target_end);
-};
-
-// TODO - rename to ProcessGenerator
-class Generator : public Object {
- public:
-  Generator(std::vector<std::shared_ptr<ast::Identifier>> parameters,
-            std::shared_ptr<Environment> env,
-            std::shared_ptr<ast::BlockStatement> setup,
-            std::shared_ptr<ast::BlockStatement> run,
-            std::shared_ptr<ast::BlockStatement> signal_generator = nullptr)
-      : parameters_{parameters},
-        env_{env},
-        setup_{setup},
-        run_{run},
-        signal_generator_{signal_generator} {};
-  ~Generator() = default;
-  ObjectType Type() override;
-  std::string Inspect() override;
-
- public:
-  std::vector<std::shared_ptr<ast::Identifier>> parameters_;
-  std::shared_ptr<Environment> env_;
-  std::shared_ptr<ast::BlockStatement> setup_;
-  std::shared_ptr<ast::BlockStatement> run_;
-  std::shared_ptr<ast::BlockStatement> signal_generator_;
 };
 
 class ForLoop : public Object {
