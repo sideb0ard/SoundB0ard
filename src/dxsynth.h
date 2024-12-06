@@ -108,7 +108,7 @@ class DXSynth : public SoundGenerator {
   void Save(std::string preset_name) override;
 
  public:
-  std::array<std::shared_ptr<DXSynthVoice>, MAX_VOICES> voices_;
+  std::array<std::shared_ptr<DXSynthVoice>, MAX_DX_VOICES> voices_;
 
   // global modmatrix, core is shared by all voices
   ModulationMatrix modmatrix;  // routing structure for sound generation

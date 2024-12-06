@@ -57,6 +57,7 @@ static const char DRUM_PRESET_FILENAME[] = "settings/drumpresets.dat";
 #define NUM_PROGRESSIONS 4
 
 #define MAX_NUM_MIDI_LOOPS 64
+#define MAX_DX_VOICES 10
 #define MAX_VOICES 4
 #define DEFAULT_LEGATO_MODE 0
 #define DEFAULT_RESET_TO_ZERO 0

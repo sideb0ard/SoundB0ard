@@ -29,6 +29,7 @@ extern Mixer *mixr;
 extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
+extern Tsqueue<int> audio_reply_queue;
 extern siv::PerlinNoise perlinGenerator;
 
 const std::vector<std::string> FILES_TO_IGNORE = {".DS_Store"};
@@ -919,6 +920,17 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        mixr->PrintMidiInfo();
                        return evaluator::NULLL;
                      })},
+    {"now", std::make_shared<object::BuiltIn>(
+                [](std::vector<std::shared_ptr<object::Object>> args)
+                    -> std::shared_ptr<object::Object> {
+                  auto action =
+                      std::make_unique<AudioActionItem>(AudioAction::NOW);
+                  audio_queue.push(std::move(action));
+                  int val = -1;
+                  auto current_tick = audio_reply_queue.pop();
+                  if (current_tick) val = current_tick.value();
+                  return std::make_shared<object::Number>(val);
+                })},
     {"algoz", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {

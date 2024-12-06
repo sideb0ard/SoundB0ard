@@ -238,6 +238,8 @@ void Mixer::Ps(bool all) {
   repl_queue.push(ss.str());
 }
 
+void Mixer::Now() { audio_reply_queue.push(timing_info.midi_tick); }
+
 void Mixer::Help() {
   std::string reply;
   if (rand() % 100 > 90) {
@@ -771,6 +773,8 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
     }
   } else if (action->type == AudioAction::BPM) {
     UpdateBpm(action->new_bpm);
+  } else if (action->type == AudioAction::NOW) {
+    Now();
   } else if (action->type == AudioAction::VOLUME) {
     VolChange(action->new_volume);
   } else if (action->type == AudioAction::MIDI_NOTE_ON ||

@@ -38,6 +38,7 @@ enum AudioAction {
   MIXER_XFADE_CLEAR,
   MONITOR,
   NO_ACTION,
+  NOW,
   PREVIEW,
   RAND,
   SAVE_PRESET,

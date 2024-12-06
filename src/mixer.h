@@ -152,6 +152,7 @@ struct Mixer {
   bool IsValidSoundgenNum(int soundgen_num);
   bool IsValidFx(int soundgen_num, int fx_num);
 
+  void Now();  // time now in midi ticks
   double GetHzPerBar();
   double GetHzPerTimingUnit(unsigned int timing_unit);
   int GetTicksPerCycleUnit(unsigned int event_type);

@@ -36,7 +36,7 @@ DXSynth::DXSynth() {
 
   Reset();
 
-  for (int i = 0; i < MAX_VOICES; i++) {
+  for (int i = 0; i < MAX_DX_VOICES; i++) {
     voices_[i] = std::make_shared<DXSynthVoice>();
     voices_[i]->InitGlobalParameters(&global_synth_params);
   }
@@ -237,6 +237,7 @@ void DXSynth::SetOpFreq(unsigned int op, float val) {
 
 void DXSynth::NoteOn(midi_event ev) {
   bool steal_note = true;
+  int voicecount = 0;
   for (auto v : voices_) {
     if (!v->m_note_on) {
       IncrementVoiceTimestamps();
@@ -282,7 +283,7 @@ void DXSynth::PitchBend(midi_event ev) {
         // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
         scaleybum(0, 16383, -600, 600, m_settings.m_actual_pitch_bent_val);
     printf("Cents to bend - %f\n", scaley_val);
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_DX_VOICES; i++) {
       std::cout << i << ": osc1" << std::endl;
       m_settings.m_op1_detune_cents = scaley_val;
       std::cout << i << ": osc2" << std::endl;
@@ -296,7 +297,7 @@ void DXSynth::PitchBend(midi_event ev) {
           normalized_pitch_bent_val;
     }
   } else {
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_DX_VOICES; i++) {
       voices_[i]->m_osc1->m_cents = 0;
       voices_[i]->m_osc2->m_cents = 2.5;
       voices_[i]->m_osc3->m_cents = 0;
