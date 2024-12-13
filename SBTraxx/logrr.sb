@@ -1,0 +1,126 @@
+
+# note_off(dx2, 0); note_on(dx2, notes_in_chord(44, 44, 2), dur = 0)
+# let key = 44;
+# voices/youdidnthink.wav
+let blah_gen = gen()
+{
+  setup()
+  {
+    let max_num_hits = 40;
+    let divr = 1.1;
+  }
+  run()
+  {
+    let onsets = [];
+    let rem = 3840;
+
+    let cur_pos = 0;
+    for (let i = 0; i < max_num_hits; i++) {
+      rem = rem / divr;
+      note_on_at(dx, 32, cur_pos, dur = rem / 2);
+      cur_pos = cur_pos + rem;
+      rem = 3840 - cur_pos;
+
+      if (rem < 20) {
+        break;
+      }
+    }
+    divr = divr + 0.4;
+    if (divr > 2.5) {
+      divr = 1.1;
+    }
+
+
+  }
+}
+
+# let sb2 = drum();
+# LOGRe2 // add_fx(dx2, "sidechain", sb2);
+let dblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 < 3) {
+      let beat = gen2stepbeat();
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(sb2, 0, i * pp);
+        }
+      }
+    }
+  }
+}
+
+# LOGRe
+let bblah_gen = gen()
+{
+  setup()
+  {
+    let hatz = rand_array(16, 0, 1);
+    let decz = [1, 5, 10, 20, 50];
+    let dcx = 0;
+    let delfbz = [0, 50, 80, 90, 20];
+    let dfx = 0;
+
+  }
+  run()
+  {
+
+    if (count % 8 < 7) {
+      for (let i = 0; i < 16; i++) {
+        if (hatz[i] == 1) {
+          let offset = 80;
+          if (i % 2 == 0) {
+            offset = 0;
+          }
+          let v = 100 + rand(27);
+          note_on_at(sbdrum, 2, i * pp + offset, vel = v);
+          set sbdrum:hh_decay decz[dcx] at = i;
+          dcx = incr(dcx, 0, len(decz));
+          set sbdrum:hh_delay_ms decz[dcx] * 2 at = i;
+        }
+      }
+    }
+
+
+    if (count % 7 < 4) {
+      cmbeat(sbdrum, 3);
+      sched(0, 5, 200, 200, "set sbdrum:cp_delay_ms %");
+      sched(0, 0, 50, 200, "set sbdrum:cp_delay_feedback_pct %");
+    } else {
+      cmbeat(sbdrum, 1);
+      sched(0, 5, 200, 200, "set sbdrum:sd_delay_ms %");
+      sched(0, 0, 50, 200, "set sbdrum:sd_delay_feedback_pct %");
+    }
+
+    if (count % 8 == 7) {
+      hatz = rand_array(16, 0, 1);
+      sched(0, 10, 95, 3840 * 2, "set mixer:delay:fb %");
+      sched(3840 * 2, 64, 65, 1, "set mixer:delay:fb %");
+    }
+  }
+}
+
+let dx2blah_gen = gen()
+{
+  setup()
+  {
+    let chrdz = [0, 0, 0, 0, 4, 3];
+    let chrx = 0;
+  }
+  run()
+  {
+    if (count % 8 == 0) {
+      note_off(dx2, 0);
+      note_on(dx2, notes_in_chord(notes_in_key(key)[chrdz[chrx]], key, 2), dur = 0);
+      chrx = incr(chrx, 0, len(chrdz));
+    }
+    if (count % 19 == 0) {
+      note_off(dx2, 0);
+    }
+  }
+}
+

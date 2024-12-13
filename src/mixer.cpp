@@ -72,6 +72,43 @@ extern Tsqueue<std::string> eval_command_queue;
 
 const auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
 
+Action::Action(double start_val, double end_val, int time_taken_ticks,
+               std::string action_to_take)
+    : start_val_{start_val},
+      end_val_{end_val},
+      cur_val_{start_val},
+      time_taken_ticks_{time_taken_ticks},
+      action_to_take_{action_to_take} {
+  if (time_taken_ticks_ == 0) {
+    incr_ = 1;
+  } else {
+    double diff = std::abs(start_val_ - end_val_);
+    incr_ = diff / time_taken_ticks_;
+  }
+  if (start_val_ > end_val_) {
+    dir_ = 0;  // downward
+    incr_ *= -1;
+  }
+  if (incr_ == 0) {
+    std::cout << "Nah mate, nae zeros allowed!\n";
+  } else {
+    active_ = true;
+  }
+}
+
+void Action::Run() {
+  if (active_) {
+    cur_val_ += incr_;
+    if ((dir_ && (cur_val_ >= end_val_)) || (!dir_ && (cur_val_ <= end_val_))) {
+      cur_val_ = end_val_;
+      active_ = false;
+    }
+    std::string new_cmd =
+        ReplaceString(action_to_take_, "%", std::to_string(cur_val_));
+    eval_command_queue.try_push(new_cmd);
+  }
+}
+
 Mixer::Mixer(WebsocketServer &server) : websocket_server_{server} {
   volume = 0.7;
   UpdateBpm(DEFAULT_BPM);
@@ -461,6 +498,8 @@ void Mixer::MidiTick() {
   EmitEvent((broadcast_event){.type = TIME_MIDI_TICK});
   // lo_send(processing_addr, "/bpm", NULL);
   CheckForDelayedEvents();
+
+  RunScheduledActions();
 }
 
 // The number of microseconds that elapse between samples
@@ -655,6 +694,35 @@ void Mixer::PrintTimingInfo() {
   printf("Has_started:%d\n", info->has_started);
   printf("Start of loop:%d\n", info->is_start_of_loop);
   printf("Is midi_tick:%d\n", info->is_midi_tick);
+}
+
+// called from Process or Repl thread
+void Mixer::ScheduleAction(int when, Action item) {
+  std::lock_guard<std::mutex> lock(scheduled_actions_mutex_);
+  int future_now = timing_info.midi_tick + when;
+  scheduled_actions_.insert(std::make_pair(timing_info.midi_tick + when, item));
+}
+
+void Mixer::RunScheduledActions() {
+  int now = timing_info.midi_tick;
+  if (scheduled_actions_mutex_.try_lock()) {
+    for (auto it = scheduled_actions_.begin();
+         it != scheduled_actions_.end();) {
+      if (now >= it->first) {
+        running_actions_.push_back(it->second);
+        scheduled_actions_.erase(it++);
+      } else {
+        ++it;
+      }
+    }
+    scheduled_actions_mutex_.unlock();
+  }
+
+  for (auto &a : running_actions_) {
+    a.Run();
+  }
+
+  std::erase_if(running_actions_, [](Action a) { return !a.IsActive(); });
 }
 
 double Mixer::GetHzPerBar() {
@@ -958,7 +1026,7 @@ void Mixer::HandleMidiControlMessage(int data1, int data2) {
     auto val = scaleybum(0, 127, lo, hi, data2);
     std::stringstream ss;
     ss << "set " << param << " " << val;
-    eval_command_queue.push(ss.str());
+    eval_command_queue.try_push(ss.str());
   }
 }
 

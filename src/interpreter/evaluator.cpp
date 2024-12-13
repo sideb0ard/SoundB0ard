@@ -247,7 +247,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   if (set_stmt) {
     auto eval_val = Eval(set_stmt->value_, env);
     if (eval_val->Type() == "ERROR") {
-      std::cerr << "COuldn't EVAL your statement value!!\n";
+      std::cerr << "COuldn't EVAL your SET statement value!!\n";
       return NULLL;
     }
     auto val = eval_val->Inspect();
@@ -1468,7 +1468,7 @@ std::shared_ptr<object::Object> EvalProcessStatement(
 
   auto eval_val = Eval(proc->loop_len_, env);
   if (eval_val->Type() == "ERROR") {
-    std::cerr << "COuldn't EVAL your statement value!!\n";
+    std::cerr << "COuldn't EVAL your PROCESS statement value!!\n";
     return NULLL;
   }
   auto loop_len = std::dynamic_pointer_cast<object::Number>(eval_val);
@@ -1508,7 +1508,7 @@ std::shared_ptr<object::Object> EvalProcessSetStatement(
 
   auto eval_val = Eval(proc_set->value_, env);
   if (eval_val->Type() == "ERROR") {
-    std::cerr << "COuldn't EVAL your statement value!!\n";
+    std::cerr << "COuldn't EVAL your PROCESS SET statement value!!\n";
     return NULLL;
   }
   auto num = std::dynamic_pointer_cast<object::Number>(eval_val);

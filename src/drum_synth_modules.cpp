@@ -117,7 +117,6 @@ StereoVal BassDrum::Generate() {
 
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
     if (use_distortion_) out = distortion_.Process(out);
-    if (use_delay_) out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
@@ -131,6 +130,7 @@ StereoVal BassDrum::Generate() {
     noise_eg_.StopEg();
   }
 
+  if (use_delay_) out = delay_->Process(out);
   return out;
 }
 
@@ -225,7 +225,6 @@ StereoVal SnareDrum::Generate() {
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
 
     out = distortion_.Process(out);
-    out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
@@ -237,6 +236,7 @@ StereoVal SnareDrum::Generate() {
     noise_eg_.StopEg();
   }
 
+  out = delay_->Process(out);
   return out;
 }
 
@@ -319,7 +319,6 @@ StereoVal HandClap::Generate() {
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
 
     out = distortion_.Process(out);
-    out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
@@ -330,6 +329,7 @@ StereoVal HandClap::Generate() {
     noise_eg_.StopEg();
   }
 
+  out = delay_->Process(out);
   return out;
 }
 
@@ -441,7 +441,6 @@ StereoVal HiHat::Generate() {
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
 
     out = distortion_.Process(out);
-    out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
@@ -449,6 +448,7 @@ StereoVal HiHat::Generate() {
     eg_.StopEg();
   }
 
+  out = delay_->Process(out);
   return out;
 }
 
@@ -539,7 +539,6 @@ StereoVal TomConga::Generate() {
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
 
     out = distortion_.Process(out);
-    out = delay_->Process(out);
   }
 
   if (eg_.GetState() == OFFF) {
@@ -552,6 +551,7 @@ StereoVal TomConga::Generate() {
     noise_eg_.StopEg();
   }
 
+  out = delay_->Process(out);
   return out;
 }
 

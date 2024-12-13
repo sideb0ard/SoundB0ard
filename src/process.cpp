@@ -22,20 +22,6 @@ extern Mixer *mixr;
 extern Tsqueue<std::string> eval_command_queue;
 extern std::shared_ptr<object::Environment> global_env;
 
-namespace {
-
-std::string ReplaceString(std::string subject, const std::string &search,
-                          const std::string &replace) {
-  size_t pos = 0;
-  while ((pos = subject.find(search, pos)) != std::string::npos) {
-    subject.replace(pos, search.length(), replace);
-    pos += replace.length();
-  }
-  return subject;
-}
-
-}  // namespace
-
 constexpr char const *s_proc_timer_types[] = {"UNDEFINED", "every", "osc",
                                               "over", "ramp"};
 

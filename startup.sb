@@ -554,9 +554,9 @@ let cmbeat = fn(cp, midi_num)
       if (i > 12) {
         v = 72;
       }
-      let offset = 0;
-      if (i > 0) {
-        offset = rand(45);
+      let offset = rand(45);
+      if (rand(100) > 80) {
+        offset = offset * -1;
       }
       note_on_at(cp, midi_num, i * pp - offset, vel = v);
     }

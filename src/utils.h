@@ -95,3 +95,6 @@ bool FileExists(std::string filename);
 std::vector<std::string> GetSynthPresets(unsigned int synthtype);
 void PrintMultiMidi(MultiEventMidiPattern &pattern);
 std::string MultiMidiString(MultiEventMidiPattern &pattern);
+
+std::string ReplaceString(std::string subject, const std::string &search,
+                          const std::string &replace);

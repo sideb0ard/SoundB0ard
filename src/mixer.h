@@ -48,6 +48,25 @@ struct DelayedMidiEvent {
   int sg_idx{-1};
 };
 
+struct Action {
+  Action(double start_val, double end_val, int time_taken_ticks,
+         std::string action_to_take);
+  ~Action() = default;
+
+  void Run();
+  bool IsActive() { return active_; }
+
+  double start_val_{0};
+  double end_val_{0};
+  double cur_val_{0};
+  double incr_{0};
+  int dir_{1};  // 1 going forward, 0, going downard
+  int time_taken_ticks_{0};
+  bool has_started_{false};
+  bool active_{false};
+  std::string action_to_take_{""};
+};
+
 struct Mixer {
  public:
   Mixer(WebsocketServer &server);
@@ -73,6 +92,10 @@ struct Mixer {
 
   XFader xfader_;
 
+  std::mutex scheduled_actions_mutex_;
+  std::vector<Action> running_actions_{};
+  std::multimap<int, Action> scheduled_actions_{};
+
   std::vector<int> soloed_sound_generator_idz{};
 
   bool debug_mode{false};
@@ -85,7 +108,7 @@ struct Mixer {
   mixer_timing_info timing_info = {};
   std::chrono::microseconds mTimeAtLastClick{0};
 
-  double volume{0.7};
+  double volume{1};
 
   PortMidiStream *midi_stream;
   bool have_midi_controller;
@@ -110,6 +133,9 @@ struct Mixer {
 
   void CheckForDelayedEvents();
   void CheckForExternalMidiEvents();
+
+  void ScheduleAction(int when, Action item);
+  void RunScheduledActions();
 
   void Help();
   void Ps(bool all);

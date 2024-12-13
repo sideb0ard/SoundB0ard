@@ -596,6 +596,19 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                   })},
+    {"log", std::make_shared<object::BuiltIn>(
+                [](std::vector<std::shared_ptr<object::Object>> args)
+                    -> std::shared_ptr<object::Object> {
+                  if (args.size() != 1)
+                    return evaluator::NewError("Need WAN arg for log!");
+                  auto number =
+                      std::dynamic_pointer_cast<object::Number>(args[0]);
+                  if (number) {
+                    int log_2_num = std::log2(number->value_);
+                    return std::make_shared<object::Number>(log_2_num);
+                  }
+                  return evaluator::NULLL;
+                })},
     {"take_n",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
@@ -683,6 +696,29 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                     return evaluator::NULLL;
                   })},
+    {"sched",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           if (args.size() != 5)
+             return evaluator::NewError(
+                 "`sched` requires 5 arg - when, start_val, end_val, "
+                 "time_to_take and action_to_take(string).");
+
+           auto when = std::dynamic_pointer_cast<object::Number>(args[0]);
+           auto start_val = std::dynamic_pointer_cast<object::Number>(args[1]);
+           auto end_val = std::dynamic_pointer_cast<object::Number>(args[2]);
+           auto time_taken = std::dynamic_pointer_cast<object::Number>(args[3]);
+           auto action_to_take =
+               std::dynamic_pointer_cast<object::String>(args[4]);
+
+           if (when && start_val && end_val && time_taken && action_to_take) {
+             Action action = Action(start_val->value_, end_val->value_,
+                                    time_taken->value_, action_to_take->value_);
+             mixr->ScheduleAction(when->value_, action);
+           }
+           return evaluator::NULLL;
+         })},
     {"is_in",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
@@ -2158,26 +2194,29 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
        return evaluator::NULLL;
      })},
-    {"kit", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
-                    -> std::shared_ptr<object::Object> {
-                  (void)args;
-                  std::string cmd =
-                      "let sbdrum = drum(); load_preset(sbdrum,\"default\");";
-                  eval_command_queue.push(cmd);
+    {"kit",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+           std::string cmd =
+               "let sbdrum = drum(); load_preset(sbdrum,\"buttz\");";
+           eval_command_queue.push(cmd);
 
-                  cmd = "let dx = fm(); vol dx 0.8;";
-                  eval_command_queue.push(cmd);
+           cmd = "let sb2 = drum(); load_preset(sb2,\"THUG\");";
+           eval_command_queue.push(cmd);
 
-                  cmd =
-                      "let dx2 = fm(); vol dx2 0.7; load_preset(dx2, \"fnc\");";
-                  eval_command_queue.push(cmd);
+           cmd = "let dx = fm(); vol dx 0.8; load_preset(dx,\"mo_jazz\");";
+           eval_command_queue.push(cmd);
 
-                  cmd = "let mo = moog();";
-                  eval_command_queue.push(cmd);
+           cmd = "let dx2 = fm(); vol dx2 0.7; load_preset(dx2, \"MAW2\");";
+           eval_command_queue.push(cmd);
 
-                  return evaluator::NULLL;
-                })},
+           cmd = "let mo = moog();";
+           eval_command_queue.push(cmd);
+
+           return evaluator::NULLL;
+         })},
     {"load_dir", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {

@@ -1,0 +1,26 @@
+
+let key = 20;
+
+# dx2 WUBBBWUB
+let bsslah_gen = gen()
+{
+  setup()
+  {
+    let ntz = notes_in_key(key);
+    let root = ntz[0];
+    let thrd = ntz[2];
+    let ffth = ntz[4];
+    let mel = [root, 0, 0, 0,  root, 0, root, 0,   thrd, 0, 0, 0,   ffth, 0, 0, 0];
+    let durz = [960, 0, 0, 0,  480, 0, 480, 0,   960, 0, 0, 0,   960, 0, 0, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp, dur = durz[i]);
+      }
+    }
+
+  }
+}
+
