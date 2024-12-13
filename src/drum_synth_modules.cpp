@@ -383,8 +383,6 @@ HiHat::HiHat() {
   mid_filter_->SetFcControl(10000);
   mid_filter_->SetQControlGUI(1);
   mid_filter_->Update();
-  std::cout << "MID FILTER TYPE::" << mid_filter_->m_filter_type
-            << " CUTOFF:" << mid_filter_->m_fc << std::endl;
 
   high_filter_ = std::make_unique<FilterSem>();
   // ahigh_filter_ = std::make_unique<MoogLadder>();

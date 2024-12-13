@@ -6,6 +6,7 @@
 #include <fx/dynamics_processor.h>
 #include <fx/fx.h>
 #include <fx/genz.h>
+#include <fx/granulate.h>
 #include <fx/modfilter.h>
 #include <fx/modular_delay.h>
 #include <fx/reverb.h>
@@ -69,6 +70,9 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
           fx.push_back(std::make_shared<ModFilter>());
         } else if (str_obj->value_ == "waveshape") {
           fx.push_back(std::make_shared<WaveShaper>());
+        } else if (str_obj->value_ == "granulate" ||
+                   str_obj->value_ == "gran") {
+          fx.push_back(std::make_shared<Granulate>());
         }
       }
     }

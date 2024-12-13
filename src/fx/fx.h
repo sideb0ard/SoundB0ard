@@ -20,7 +20,8 @@ typedef enum {
   REVERB,
   QUADFLANGER,
   ENVELOPEFOLLOWER,
-  WAVESHAPER
+  WAVESHAPER,
+  GRANULATE,
 } fx_type;
 
 class Fx {
