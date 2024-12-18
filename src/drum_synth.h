@@ -124,34 +124,34 @@ struct DrumSettings {
   int hh2_delay_sync_len{0};  // 0 none, 1 - 1/4 // 2 - 8th // 3 - 16th
 
   // 5 - FM1
-  double fm1_vol{0.7};
-  double fm1_pan{0};
-  double fm1_carrier_freq{24};
-  double fm1_carrier_eg_attack{140};
-  double fm1_carrier_eg_decay{80};
-  double fm1_carrier_eg_sustain{0.7};
-  double fm1_carrier_eg_release{200};
-  double fm1_modulator_freq_ratio{8};
-  double fm1_modulator_eg_attack{50};
-  double fm1_modulator_eg_decay{70};
+  double fm1_vol{0.4};
+  double fm1_pan{-0.1};
+  double fm1_carrier_freq{43};
+  double fm1_carrier_eg_attack{10};
+  double fm1_carrier_eg_decay{1};
+  double fm1_carrier_eg_sustain{0.2};
+  double fm1_carrier_eg_release{10};
+  double fm1_modulator_freq_ratio{13};
+  double fm1_modulator_eg_attack{15};
+  double fm1_modulator_eg_decay{15};
   double fm1_modulator_eg_sustain{0.5};
   double fm1_modulator_eg_release{150};
   // 6 - FM2
-  double fm2_vol{0.7};
-  double fm2_pan{0};
-  double fm2_carrier_freq{65.4};
-  double fm2_carrier_eg_attack{120};
-  double fm2_carrier_eg_decay{100};
+  double fm2_vol{0.4};
+  double fm2_pan{0.2};
+  double fm2_carrier_freq{66};
+  double fm2_carrier_eg_attack{3};
+  double fm2_carrier_eg_decay{20};
   double fm2_carrier_eg_sustain{0.5};
-  double fm2_carrier_eg_release{350};
-  double fm2_modulator_freq_ratio{1.65};
+  double fm2_carrier_eg_release{100};
+  double fm2_modulator_freq_ratio{7.03};
   double fm2_modulator_eg_attack{10};
   double fm2_modulator_eg_decay{70};
   double fm2_modulator_eg_sustain{0.5};
   double fm2_modulator_eg_release{80};
   // 7 - FM3
-  double fm3_vol{0.7};
-  double fm3_pan{0};
+  double fm3_vol{0.4};
+  double fm3_pan{0.1};
   double fm3_carrier_freq{65.4};
   double fm3_carrier_eg_attack{19};
   double fm3_carrier_eg_decay{90};
