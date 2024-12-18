@@ -123,21 +123,45 @@ struct DrumSettings {
   bool hh2_delay_sync_tempo{true};
   int hh2_delay_sync_len{0};  // 0 none, 1 - 1/4 // 2 - 8th // 3 - 16th
 
-  // 5 - Low Conga / Tom
-  double lt_vol{0.7};
-  double lt_pan{0};
-  double lt_tuning{0};
-  bool lt_is_conga{false};
-  // 6 - Mid Conga / Tom
-  double mt_vol{0.7};
-  double mt_pan{0};
-  double mt_tuning{0};
-  bool mt_is_conga{false};
-  // 7 - High Conga / Tom
-  double ht_vol{0.7};
-  double ht_pan{0};
-  double ht_tuning{0};
-  bool ht_is_conga{false};
+  // 5 - FM1
+  double fm1_vol{0.7};
+  double fm1_pan{0};
+  double fm1_carrier_freq{24};
+  double fm1_carrier_eg_attack{140};
+  double fm1_carrier_eg_decay{80};
+  double fm1_carrier_eg_sustain{0.7};
+  double fm1_carrier_eg_release{200};
+  double fm1_modulator_freq_ratio{8};
+  double fm1_modulator_eg_attack{50};
+  double fm1_modulator_eg_decay{70};
+  double fm1_modulator_eg_sustain{0.5};
+  double fm1_modulator_eg_release{150};
+  // 6 - FM2
+  double fm2_vol{0.7};
+  double fm2_pan{0};
+  double fm2_carrier_freq{65.4};
+  double fm2_carrier_eg_attack{120};
+  double fm2_carrier_eg_decay{100};
+  double fm2_carrier_eg_sustain{0.5};
+  double fm2_carrier_eg_release{350};
+  double fm2_modulator_freq_ratio{1.65};
+  double fm2_modulator_eg_attack{10};
+  double fm2_modulator_eg_decay{70};
+  double fm2_modulator_eg_sustain{0.5};
+  double fm2_modulator_eg_release{80};
+  // 7 - FM3
+  double fm3_vol{0.7};
+  double fm3_pan{0};
+  double fm3_carrier_freq{65.4};
+  double fm3_carrier_eg_attack{19};
+  double fm3_carrier_eg_decay{90};
+  double fm3_carrier_eg_sustain{0.2};
+  double fm3_carrier_eg_release{90};
+  double fm3_modulator_freq_ratio{3.4};
+  double fm3_modulator_eg_attack{10};
+  double fm3_modulator_eg_decay{10};
+  double fm3_modulator_eg_sustain{0.5};
+  double fm3_modulator_eg_release{180};
 
   // 8 - Lazer
   double lz_vol{0.7};
@@ -180,9 +204,9 @@ class DrumSynth : public SoundGenerator {
   std::unique_ptr<HiHat> hh_;
   std::unique_ptr<HiHat> hh2_;
   std::unique_ptr<HandClap> cp_;
-  std::unique_ptr<TomConga> lt_;
-  std::unique_ptr<TomConga> mt_;
-  std::unique_ptr<TomConga> ht_;
+  std::unique_ptr<FMDrum> fm1_;
+  std::unique_ptr<FMDrum> fm2_;
+  std::unique_ptr<FMDrum> fm3_;
   std::unique_ptr<Lazer> lz_;
 
   DCA dca_;

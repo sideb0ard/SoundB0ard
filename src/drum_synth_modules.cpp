@@ -29,14 +29,12 @@ BassDrum::BassDrum() {
   osc1_ = std::make_unique<QBLimitedOscillator>();
   osc1_->m_waveform = SINE;
   osc1_->m_osc_fo = frequency_;
-  osc1_->m_osc_fo = 220;
   osc1_->m_amplitude = 1;
   osc1_->Update();
 
   osc2_ = std::make_unique<QBLimitedOscillator>();
   osc2_->m_waveform = SINE;
   osc2_->m_osc_fo = frequency_;
-  osc2_->m_osc_fo = 220;
   osc2_->m_amplitude = 1;
   osc2_->Update();
 
@@ -460,93 +458,84 @@ double PulseTrigger::GenNext() {
   return 0;
 }
 
-///// TOM / CONGA  /////////////////////////////
+///// FM DRUM /////////////////////////////
 
-TomConga::TomConga() {
-  noise_ = std::make_unique<QBLimitedOscillator>();
-  noise_->m_waveform = NOISE;
-  noise_->m_amplitude = 0.6;
-  noise_->Update();
-
-  noise_eg_.SetRampMode(true);
-  noise_eg_.m_reset_to_zero = true;
-  noise_eg_.SetEgMode(DIGITAL);
-  noise_eg_.SetAttackTimeMsec(10);
-  noise_eg_.SetDecayTimeMsec(207);
-  noise_eg_.Update();
-
-  noise_filter_ = std::make_unique<FilterSem>();
-  noise_filter_->SetType(LPF2);
-  noise_filter_->SetFcControl(10000);
-  noise_filter_->SetQControlGUI(5);
-  noise_filter_->Update();
+FMDrum::FMDrum() {
+  carrier_ = std::make_unique<QBLimitedOscillator>();
+  carrier_->m_waveform = SINE;
+  carrier_->m_osc_fo = 220;
+  carrier_->m_amplitude = 1;
+  carrier_->Update();
 
   eg_.SetRampMode(true);
   eg_.m_reset_to_zero = true;
   eg_.SetEgMode(DIGITAL);
   eg_.SetAttackTimeMsec(10);
-  eg_.SetDecayTimeMsec(180);
+  eg_.SetDecayTimeMsec(207);
   eg_.Update();
 
-  osc1_ = std::make_unique<QBLimitedOscillator>();
-  osc1_->m_waveform = SINE;
-  osc1_->m_osc_fo = 220;
-  osc1_->m_amplitude = 1;
-  osc1_->Update();
+  modulator_ = std::make_unique<QBLimitedOscillator>();
+  modulator_->m_waveform = SINE;
+  modulator_->m_osc_fo = carrier_->m_osc_fo * modulator_freq_ratio_;
+  modulator_->m_amplitude = 0.6;
+  modulator_->Update();
+
+  modulator_eg_.SetRampMode(true);
+  modulator_eg_.m_reset_to_zero = true;
+  modulator_eg_.SetEgMode(DIGITAL);
+  modulator_eg_.SetAttackTimeMsec(8);
+  modulator_eg_.SetDecayTimeMsec(180);
+  modulator_eg_.Update();
 
   distortion_.SetParam("threshold", 0.5);
   delay_ = std::make_unique<StereoDelay>();
 }
 
-void TomConga::NoteOn(double vel) {
+void FMDrum::NoteOn(double vel) {
   velocity_ = vel;
 
-  click_.Trigger();
-
-  noise_->StartOscillator();
-  noise_eg_.StartEg();
-
-  osc1_->StartOscillator();
+  carrier_->StartOscillator();
   eg_.StartEg();
+
+  modulator_->StartOscillator();
+  modulator_eg_.StartEg();
 }
 
-StereoVal TomConga::Generate() {
+StereoVal FMDrum::Generate() {
   StereoVal out = {.left = 0, .right = 0};
-  if (osc1_->m_note_on || noise_->m_note_on) {
-    noise_->Update();
-    double noise_eg_out = noise_eg_.DoEnvelope(nullptr);
-    double noise_out = noise_->DoOscillate(nullptr) * noise_eg_out * 0.2;
-    noise_filter_->Update();
-    noise_out = noise_filter_->DoFilter(noise_out);
 
-    osc1_->Update();
-    double osc1_eg_out = eg_.DoEnvelope(nullptr);
-    double osc1_out = osc1_->DoOscillate(nullptr) * osc1_eg_out;
+  if (carrier_->m_note_on) {
+    modulator_->Update();
+    double mod_eg_out = modulator_eg_.DoEnvelope(nullptr);
+    double mod_out =
+        modulator_->DoOscillate(nullptr) * mod_eg_out * modulator_->m_amplitude;
+
+    carrier_->SetPhaseMod(mod_out);
+    carrier_->Update();
+    double carrier_eg_out = eg_.DoEnvelope(nullptr);
+    double carrier_out = carrier_->DoOscillate(nullptr) * carrier_eg_out;
 
     //// OUTPUT //////////////////////////
-
-    double osc_out = osc1_out + click_.GenNext();
-    if (is_conga_) osc_out += noise_out;
 
     double out_left = 0.0;
     double out_right = 0.0;
 
     dca_.Update();
-    dca_.DoDCA(osc_out, osc_out, &out_left, &out_right);
+    dca_.DoDCA(carrier_out, carrier_out, &out_left, &out_right);
 
     out = {.left = out_left * velocity_, .right = out_right * velocity_};
 
     out = distortion_.Process(out);
   }
 
-  if (eg_.GetState() == OFFF) {
-    osc1_->StopOscillator();
-    eg_.StopEg();
+  if (modulator_eg_.GetState() == OFFF) {
+    modulator_->StopOscillator();
+    modulator_eg_.StopEg();
   }
 
-  if (noise_eg_.GetState() == OFFF) {
-    noise_->StopOscillator();
-    noise_eg_.StopEg();
+  if (eg_.GetState() == OFFF) {
+    carrier_->StopOscillator();
+    eg_.StopEg();
   }
 
   out = delay_->Process(out);

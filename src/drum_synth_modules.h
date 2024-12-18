@@ -158,55 +158,19 @@ class HiHat : public DrumModule {
   // std::unique_ptr<MoogLadder> high_filter_;
 };
 
-const double kLowCongaHighFreq = 220;
-const double kLowCongaLowFreq = 165;
-const double kLowCongaOscDecay = 180;
-const double kLowCongaNoiseDecay = 200;
-
-const double kMidCongaHighFreq = 310;
-const double kMidCongaLowFreq = 250;
-const double kMidCongaOscDecay = 100;
-const double kMidCongaNoiseDecay = 155;
-
-const double kHighCongaHighFreq = 455;
-const double kHighCongaLowFreq = 370;
-const double kHighCongaOscDecay = 180;
-const double kHighCongaNoiseDecay = 125;
-
-const double kLowTomHighFreq = 100;
-const double kLowTomLowFreq = 80;
-const double kLowTomOscDecay = 200;
-const double kLowTomNoiseDecay = 200;
-
-const double kMidTomHighFreq = 160;
-const double kMidTomLowFreq = 120;
-const double kMidTomOscDecay = 130;
-const double kMidTomNoiseDecay = 155;
-
-const double kHighTomHighFreq = 220;
-const double kHighTomLowFreq = 165;
-const double kHighTomOscDecay = 200;
-const double kHighTomNoiseDecay = 125;
-
-class TomConga : public DrumModule {
+class FMDrum : public DrumModule {
  public:
-  TomConga();
-  virtual ~TomConga() = default;
+  FMDrum();
+  virtual ~FMDrum() = default;
 
   void NoteOn(double vel) override;
   StereoVal Generate() override;
 
-  PulseTrigger click_;
+  std::unique_ptr<QBLimitedOscillator> carrier_;
 
-  std::unique_ptr<QBLimitedOscillator> noise_;
-  EnvelopeGenerator noise_eg_;
-  // std::unique_ptr<FilterSem> noise_filter_;
-  std::unique_ptr<FilterSem> noise_filter_;
-
-  std::unique_ptr<QBLimitedOscillator> osc1_;
-  EnvelopeGenerator eg_;
-
-  bool is_conga_{false};
+  std::unique_ptr<QBLimitedOscillator> modulator_;
+  EnvelopeGenerator modulator_eg_;
+  double modulator_freq_ratio_{2};
 };
 
 const double kDefaultPitchOscRange = 47;

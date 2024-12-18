@@ -26,9 +26,9 @@ DrumSynth::DrumSynth() {
   hh_ = std::make_unique<HiHat>();
   hh2_ = std::make_unique<HiHat>();
   cp_ = std::make_unique<HandClap>();
-  lt_ = std::make_unique<TomConga>();
-  mt_ = std::make_unique<TomConga>();
-  ht_ = std::make_unique<TomConga>();
+  fm1_ = std::make_unique<FMDrum>();
+  fm2_ = std::make_unique<FMDrum>();
+  fm3_ = std::make_unique<FMDrum>();
   lz_ = std::make_unique<Lazer>();
 
   LoadSettings(DrumSettings());
@@ -59,17 +59,17 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   out.left += clap_out.left;
   out.right += clap_out.right;
 
-  auto lt_out = lt_->Generate();
-  out.left += lt_out.left;
-  out.right += lt_out.right;
+  auto fm1_out = fm1_->Generate();
+  out.left += fm1_out.left;
+  out.right += fm1_out.right;
 
-  auto mt_out = mt_->Generate();
-  out.left += mt_out.left;
-  out.right += mt_out.right;
+  auto fm2_out = fm2_->Generate();
+  out.left += fm2_out.left;
+  out.right += fm2_out.right;
 
-  auto ht_out = ht_->Generate();
-  out.left += ht_out.left;
-  out.right += ht_out.right;
+  auto fm3_out = fm3_->Generate();
+  out.left += fm3_out.left;
+  out.right += fm3_out.right;
 
   auto lz_out = lz_->Generate();
   out.left += lz_out.left;
@@ -270,32 +270,80 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "cp_delay_sync_len")
     settings_.cp_delay_sync_len = val;
 
-  else if (name == "lt_vol")
-    settings_.lt_vol = val;
-  else if (name == "lt_pan")
-    settings_.lt_pan = val;
-  else if (name == "lt_tuning")
-    settings_.lt_tuning = val;
-  else if (name == "lt_is_conga")
-    settings_.lt_is_conga = val;
+  else if (name == "fm1_vol")
+    settings_.fm1_vol = val;
+  else if (name == "fm1_pan")
+    settings_.fm1_pan = val;
+  else if (name == "fm1_car_freq")
+    settings_.fm1_carrier_freq = val;
+  else if (name == "fm1_mod_freq_rat")
+    settings_.fm1_modulator_freq_ratio = val;
+  else if (name == "fm1_car_eg_attack")
+    settings_.fm1_carrier_eg_attack = val;
+  else if (name == "fm1_car_eg_decay")
+    settings_.fm1_carrier_eg_decay = val;
+  else if (name == "fm1_car_eg_sustain")
+    settings_.fm1_carrier_eg_sustain = val;
+  else if (name == "fm1_car_eg_release")
+    settings_.fm1_carrier_eg_release = val;
+  else if (name == "fm1_mod_eg_attack")
+    settings_.fm1_modulator_eg_attack = val;
+  else if (name == "fm1_mod_eg_decay")
+    settings_.fm1_modulator_eg_decay = val;
+  else if (name == "fm1_mod_eg_sustain")
+    settings_.fm1_modulator_eg_sustain = val;
+  else if (name == "fm1_mod_eg_release")
+    settings_.fm1_modulator_eg_release = val;
 
-  else if (name == "mt_vol")
-    settings_.mt_vol = val;
-  else if (name == "mt_pan")
-    settings_.mt_pan = val;
-  else if (name == "mt_tuning")
-    settings_.mt_tuning = val;
-  else if (name == "mt_is_conga")
-    settings_.mt_is_conga = val;
+  else if (name == "fm2_vol")
+    settings_.fm2_vol = val;
+  else if (name == "fm2_pan")
+    settings_.fm2_pan = val;
+  else if (name == "fm2_car_freq")
+    settings_.fm2_carrier_freq = val;
+  else if (name == "fm2_mod_freq_rat")
+    settings_.fm2_modulator_freq_ratio = val;
+  else if (name == "fm2_car_eg_attack")
+    settings_.fm2_carrier_eg_attack = val;
+  else if (name == "fm2_car_eg_decay")
+    settings_.fm2_carrier_eg_decay = val;
+  else if (name == "fm2_car_eg_sustain")
+    settings_.fm2_carrier_eg_sustain = val;
+  else if (name == "fm2_car_eg_release")
+    settings_.fm2_carrier_eg_release = val;
+  else if (name == "fm2_mod_eg_attack")
+    settings_.fm2_modulator_eg_attack = val;
+  else if (name == "fm2_mod_eg_decay")
+    settings_.fm2_modulator_eg_decay = val;
+  else if (name == "fm2_mod_eg_sustain")
+    settings_.fm2_modulator_eg_sustain = val;
+  else if (name == "fm2_mod_eg_release")
+    settings_.fm2_modulator_eg_release = val;
 
-  else if (name == "ht_vol")
-    settings_.ht_vol = val;
-  else if (name == "ht_pan")
-    settings_.ht_pan = val;
-  else if (name == "ht_tuning")
-    settings_.ht_tuning = val;
-  else if (name == "ht_is_conga")
-    settings_.ht_is_conga = val;
+  else if (name == "fm3_vol")
+    settings_.fm3_vol = val;
+  else if (name == "fm3_pan")
+    settings_.fm3_pan = val;
+  else if (name == "fm3_car_freq")
+    settings_.fm3_carrier_freq = val;
+  else if (name == "fm3_mod_freq_rat")
+    settings_.fm3_modulator_freq_ratio = val;
+  else if (name == "fm3_car_eg_attack")
+    settings_.fm3_carrier_eg_attack = val;
+  else if (name == "fm3_car_eg_decay")
+    settings_.fm3_carrier_eg_decay = val;
+  else if (name == "fm3_car_eg_sustain")
+    settings_.fm3_carrier_eg_sustain = val;
+  else if (name == "fm3_car_eg_release")
+    settings_.fm3_carrier_eg_release = val;
+  else if (name == "fm3_mod_eg_attack")
+    settings_.fm3_modulator_eg_attack = val;
+  else if (name == "fm3_mod_eg_decay")
+    settings_.fm3_modulator_eg_decay = val;
+  else if (name == "fm3_mod_eg_sustain")
+    settings_.fm3_modulator_eg_sustain = val;
+  else if (name == "fm3_mod_eg_release")
+    settings_.fm3_modulator_eg_release = val;
 
   else if (name == "lz_vol")
     settings_.lz_vol = val;
@@ -403,15 +451,45 @@ std::string DrumSynth::Info() {
   ss << "     cp_delay_wetmix:" << settings_.cp_delay_wetmix
      << " cp_delay_sync_tempo:" << settings_.cp_delay_sync_tempo
      << " cp_delay_sync_len:" << settings_.cp_delay_sync_len << std::endl;
-  ss << COOL_COLOR_ORANGE "     lt(5): lt_vol:" << settings_.lt_vol
-     << " lt_pan:" << settings_.lt_pan << " lt_tuning:" << settings_.lt_tuning
-     << " lt_is_conga:" << settings_.lt_is_conga << std::endl;
-  ss << COOL_COLOR_YELLOW_MELLOW "     mt(6): mt_vol:" << settings_.mt_vol
-     << " mt_pan:" << settings_.mt_pan << " mt_tuning:" << settings_.mt_tuning
-     << " mt_is_conga:" << settings_.mt_is_conga << std::endl;
-  ss << COOL_COLOR_ORANGE "     ht(7): ht_vol:" << settings_.ht_vol
-     << " ht_pan:" << settings_.ht_pan << " ht_tuning:" << settings_.ht_tuning
-     << " ht_is_conga:" << settings_.ht_is_conga << std::endl;
+  ss << COOL_COLOR_ORANGE "     fm1(5): fm1_vol:" << settings_.fm1_vol
+     << " fm1_pan:" << settings_.fm1_pan
+     << " fm1_car_freq:" << settings_.fm1_carrier_freq
+     << " fm1_mod_freq_rat:" << settings_.fm1_modulator_freq_ratio << std::endl;
+  ss << "     fm1_car_eg_attack:" << settings_.fm1_carrier_eg_attack
+     << " fm1_car_eg_decay:" << settings_.fm1_carrier_eg_decay
+     << " fm1_car_eg_sustain:" << settings_.fm1_carrier_eg_sustain
+     << " fm1_car_eg_release:" << settings_.fm1_carrier_eg_release << std::endl;
+  ss << "     fm1_mod_eg_attack:" << settings_.fm1_modulator_eg_attack
+     << " fm1_mod_eg_decay:" << settings_.fm1_modulator_eg_decay
+     << " fm1_mod_eg_sustain:" << settings_.fm1_modulator_eg_sustain
+     << " fm1_mod_eg_release:" << settings_.fm1_modulator_eg_release
+     << std::endl;
+  ss << COOL_COLOR_YELLOW_MELLOW "     fm2(6): fm2_vol:" << settings_.fm2_vol
+     << " fm2_pan:" << settings_.fm2_pan
+     << " fm2_car_freq:" << settings_.fm2_carrier_freq
+     << " fm2_mod_freq_rat:" << settings_.fm2_modulator_freq_ratio << std::endl;
+  ss << "     fm2_car_eg_attack:" << settings_.fm2_carrier_eg_attack
+     << " fm2_car_eg_decay:" << settings_.fm2_carrier_eg_decay
+     << " fm2_car_eg_sustain:" << settings_.fm2_carrier_eg_sustain
+     << " fm2_car_eg_release:" << settings_.fm2_carrier_eg_release << std::endl;
+  ss << "     fm2_mod_eg_attack:" << settings_.fm2_modulator_eg_attack
+     << " fm2_mod_eg_decay:" << settings_.fm2_modulator_eg_decay
+     << " fm2_mod_eg_sustain:" << settings_.fm2_modulator_eg_sustain
+     << " fm2_mod_eg_release:" << settings_.fm2_modulator_eg_release
+     << std::endl;
+  ss << COOL_COLOR_ORANGE "     fm3(7): fm3_vol:" << settings_.fm3_vol
+     << " fm3_pan:" << settings_.fm3_pan
+     << " fm3_car_freq:" << settings_.fm3_carrier_freq
+     << " fm3_mod_freq_rat:" << settings_.fm3_modulator_freq_ratio << std::endl;
+  ss << "     fm3_car_eg_attack:" << settings_.fm3_carrier_eg_attack
+     << " fm3_car_eg_decay:" << settings_.fm3_carrier_eg_decay
+     << " fm3_car_eg_sustain:" << settings_.fm3_carrier_eg_sustain
+     << " fm3_car_eg_release:" << settings_.fm3_carrier_eg_release << std::endl;
+  ss << "     fm3_mod_eg_attack:" << settings_.fm3_modulator_eg_attack
+     << " fm3_mod_eg_decay:" << settings_.fm3_modulator_eg_decay
+     << " fm3_mod_eg_sustain:" << settings_.fm3_modulator_eg_sustain
+     << " fm3_mod_eg_release:" << settings_.fm3_modulator_eg_release
+     << std::endl;
   ss << COOL_COLOR_YELLOW_MELLOW "     lz(8): lz_vol:" << settings_.lz_vol
      << " lz_pan:" << settings_.lz_pan << " lz_freq:" << settings_.lz_freq
      << " lz_attack:" << settings_.lz_attack
@@ -472,16 +550,16 @@ void DrumSynth::NoteOn(midi_event ev) {
       hh2_->NoteOn(velocity);
       break;
     case (5):
-      // Low Tom / Conga
-      lt_->NoteOn(velocity);
+      // FM Drum 1
+      fm1_->NoteOn(velocity);
       break;
     case (6):
-      // Mid Tom / Conga
-      mt_->NoteOn(velocity);
+      // FM Drum 2
+      fm2_->NoteOn(velocity);
       break;
     case (7):
-      // High Tom / Conga
-      ht_->NoteOn(velocity);
+      // FM Drum 3
+      fm3_->NoteOn(velocity);
       break;
     case (8):
       // Lazer
@@ -621,21 +699,63 @@ void DrumSynth::Save(std::string new_preset_name) {
             << kSEP;
   presetzzz << "hh2_delay_sync_len=" << settings_.hh2_delay_sync_len << kSEP;
 
-  // 5 - Low Conga / Tom
-  presetzzz << "lt_vol=" << settings_.lt_vol << kSEP;
-  presetzzz << "lt_pan=" << settings_.lt_pan << kSEP;
-  presetzzz << "lt_tuning=" << settings_.lt_tuning << kSEP;
-  presetzzz << "lt_is_conga=" << settings_.lt_is_conga << kSEP;
-  // 6 - Mid Conga / Tom
-  presetzzz << "mt_vol=" << settings_.mt_vol << kSEP;
-  presetzzz << "mt_pan=" << settings_.mt_pan << kSEP;
-  presetzzz << "mt_tuning=" << settings_.mt_tuning << kSEP;
-  presetzzz << "mt_is_conga=" << settings_.mt_is_conga << kSEP;
-  // 7 - High Conga / Tom
-  presetzzz << "ht_vol=" << settings_.ht_vol << kSEP;
-  presetzzz << "ht_pan=" << settings_.ht_pan << kSEP;
-  presetzzz << "ht_tuning=" << settings_.ht_tuning << kSEP;
-  presetzzz << "ht_is_conga=" << settings_.ht_is_conga << kSEP;
+  // 5 - FM Drum
+  presetzzz << "fm1_vol=" << settings_.fm1_vol << kSEP;
+  presetzzz << "fm1_pan=" << settings_.fm1_pan << kSEP;
+  presetzzz << "fm1_car_freq=" << settings_.fm1_carrier_freq << kSEP;
+  presetzzz << "fm1_mod_freq_rat=" << settings_.fm1_modulator_freq_ratio
+            << kSEP;
+  presetzzz << "fm1_car_eg_attack=" << settings_.fm1_carrier_eg_attack << kSEP;
+  presetzzz << "fm1_car_eg_decay=" << settings_.fm1_carrier_eg_decay << kSEP;
+  presetzzz << "fm1_car_eg_sustain=" << settings_.fm1_carrier_eg_sustain
+            << kSEP;
+  presetzzz << "fm1_car_eg_release=" << settings_.fm1_carrier_eg_release
+            << kSEP;
+  presetzzz << "fm1_mod_eg_attack=" << settings_.fm1_modulator_eg_attack
+            << kSEP;
+  presetzzz << "fm1_mod_eg_decay=" << settings_.fm1_modulator_eg_decay << kSEP;
+  presetzzz << "fm1_mod_eg_sustain=" << settings_.fm1_modulator_eg_sustain
+            << kSEP;
+  presetzzz << "fm1_mod_eg_release=" << settings_.fm1_modulator_eg_release
+            << kSEP;
+  // 6 - FM Drum
+  presetzzz << "fm2_vol=" << settings_.fm2_vol << kSEP;
+  presetzzz << "fm2_pan=" << settings_.fm2_pan << kSEP;
+  presetzzz << "fm2_car_freq=" << settings_.fm2_carrier_freq << kSEP;
+  presetzzz << "fm2_mod_freq_rat=" << settings_.fm2_modulator_freq_ratio
+            << kSEP;
+  presetzzz << "fm2_car_eg_attack=" << settings_.fm2_carrier_eg_attack << kSEP;
+  presetzzz << "fm2_car_eg_decay=" << settings_.fm2_carrier_eg_decay << kSEP;
+  presetzzz << "fm2_car_eg_sustain=" << settings_.fm2_carrier_eg_sustain
+            << kSEP;
+  presetzzz << "fm2_car_eg_release=" << settings_.fm2_carrier_eg_release
+            << kSEP;
+  presetzzz << "fm2_mod_eg_attack=" << settings_.fm2_modulator_eg_attack
+            << kSEP;
+  presetzzz << "fm2_mod_eg_decay=" << settings_.fm2_modulator_eg_decay << kSEP;
+  presetzzz << "fm2_mod_eg_sustain=" << settings_.fm2_modulator_eg_sustain
+            << kSEP;
+  presetzzz << "fm2_mod_eg_release=" << settings_.fm2_modulator_eg_release
+            << kSEP;
+  // 7 - FM Drum
+  presetzzz << "fm3_vol=" << settings_.fm3_vol << kSEP;
+  presetzzz << "fm3_pan=" << settings_.fm3_pan << kSEP;
+  presetzzz << "fm3_car_freq=" << settings_.fm3_carrier_freq << kSEP;
+  presetzzz << "fm3_mod_freq_rat=" << settings_.fm3_modulator_freq_ratio
+            << kSEP;
+  presetzzz << "fm3_car_eg_attack=" << settings_.fm3_carrier_eg_attack << kSEP;
+  presetzzz << "fm3_car_eg_decay=" << settings_.fm3_carrier_eg_decay << kSEP;
+  presetzzz << "fm3_car_eg_sustain=" << settings_.fm3_carrier_eg_sustain
+            << kSEP;
+  presetzzz << "fm3_car_eg_release=" << settings_.fm3_carrier_eg_release
+            << kSEP;
+  presetzzz << "fm3_mod_eg_attack=" << settings_.fm3_modulator_eg_attack
+            << kSEP;
+  presetzzz << "fm3_mod_eg_decay=" << settings_.fm3_modulator_eg_decay << kSEP;
+  presetzzz << "fm3_mod_eg_sustain=" << settings_.fm3_modulator_eg_sustain
+            << kSEP;
+  presetzzz << "fm3_mod_eg_release=" << settings_.fm3_modulator_eg_release
+            << kSEP;
   // 8 - Lazer
   presetzzz << "lz_vol=" << settings_.lz_vol << kSEP;
   presetzzz << "lz_pan=" << settings_.lz_pan << kSEP;
@@ -753,38 +873,50 @@ void DrumSynth::Update() {
   cp_->delay_->SetSync(settings_.cp_delay_sync_tempo);
   cp_->delay_->SetSyncLen(settings_.cp_delay_sync_len);
 
-  lt_->dca_.m_amplitude_control = settings_.lt_vol;
-  lt_->dca_.m_pan_control = settings_.lt_pan;
-  double hi_freq = kLowTomHighFreq;
-  double lo_freq = kLowTomLowFreq;
-  if (settings_.lt_is_conga) {
-    hi_freq = kLowCongaHighFreq;
-    lo_freq = kLowCongaLowFreq;
-  }
-  double lt_freq = (settings_.lt_tuning / 100) * (hi_freq - lo_freq) + lo_freq;
-  lt_->osc1_->m_osc_fo = lt_freq;
+  fm1_->dca_.m_amplitude_control = settings_.fm1_vol;
+  fm1_->dca_.m_pan_control = settings_.fm1_pan;
+  fm1_->carrier_->m_osc_fo = settings_.fm1_carrier_freq;
+  fm1_->eg_.SetAttackTimeMsec(settings_.fm1_carrier_eg_attack);
+  fm1_->eg_.SetDecayTimeMsec(settings_.fm1_carrier_eg_decay);
+  fm1_->eg_.SetSustainLevel(settings_.fm1_carrier_eg_sustain);
+  fm1_->eg_.SetReleaseTimeMsec(settings_.fm1_carrier_eg_release);
+  //
+  fm1_->modulator_->m_osc_fo =
+      fm1_->carrier_->m_osc_fo * settings_.fm1_modulator_freq_ratio;
+  fm1_->modulator_eg_.SetAttackTimeMsec(settings_.fm1_modulator_eg_attack);
+  fm1_->modulator_eg_.SetDecayTimeMsec(settings_.fm1_modulator_eg_decay);
+  fm1_->modulator_eg_.SetSustainLevel(settings_.fm1_modulator_eg_sustain);
+  fm1_->modulator_eg_.SetReleaseTimeMsec(settings_.fm1_modulator_eg_release);
 
-  mt_->dca_.m_amplitude_control = settings_.mt_vol;
-  mt_->dca_.m_pan_control = settings_.mt_pan;
-  hi_freq = kMidTomHighFreq;
-  lo_freq = kMidTomLowFreq;
-  if (settings_.mt_is_conga) {
-    hi_freq = kMidCongaHighFreq;
-    lo_freq = kMidCongaLowFreq;
-  }
-  double mt_freq = (settings_.mt_tuning / 100) * (hi_freq - lo_freq) + lo_freq;
-  mt_->osc1_->m_osc_fo = mt_freq;
+  fm2_->dca_.m_amplitude_control = settings_.fm2_vol;
+  fm2_->dca_.m_pan_control = settings_.fm2_pan;
+  fm2_->carrier_->m_osc_fo = settings_.fm2_carrier_freq;
+  fm2_->eg_.SetAttackTimeMsec(settings_.fm2_carrier_eg_attack);
+  fm2_->eg_.SetDecayTimeMsec(settings_.fm2_carrier_eg_decay);
+  fm2_->eg_.SetSustainLevel(settings_.fm2_carrier_eg_sustain);
+  fm2_->eg_.SetReleaseTimeMsec(settings_.fm2_carrier_eg_release);
+  //
+  fm2_->modulator_->m_osc_fo =
+      fm2_->carrier_->m_osc_fo * settings_.fm2_modulator_freq_ratio;
+  fm2_->modulator_eg_.SetAttackTimeMsec(settings_.fm2_modulator_eg_attack);
+  fm2_->modulator_eg_.SetDecayTimeMsec(settings_.fm2_modulator_eg_decay);
+  fm2_->modulator_eg_.SetSustainLevel(settings_.fm2_modulator_eg_sustain);
+  fm2_->modulator_eg_.SetReleaseTimeMsec(settings_.fm2_modulator_eg_release);
 
-  ht_->dca_.m_amplitude_control = settings_.ht_vol;
-  ht_->dca_.m_pan_control = settings_.ht_pan;
-  hi_freq = kHighTomHighFreq;
-  lo_freq = kHighTomLowFreq;
-  if (settings_.ht_is_conga) {
-    hi_freq = kHighCongaHighFreq;
-    lo_freq = kHighCongaLowFreq;
-  }
-  double ht_freq = (settings_.ht_tuning / 100) * (hi_freq - lo_freq) + lo_freq;
-  ht_->osc1_->m_osc_fo = ht_freq;
+  fm3_->dca_.m_amplitude_control = settings_.fm3_vol;
+  fm3_->dca_.m_pan_control = settings_.fm3_pan;
+  fm3_->carrier_->m_osc_fo = settings_.fm3_carrier_freq;
+  fm3_->eg_.SetAttackTimeMsec(settings_.fm3_carrier_eg_attack);
+  fm3_->eg_.SetDecayTimeMsec(settings_.fm3_carrier_eg_decay);
+  fm3_->eg_.SetSustainLevel(settings_.fm3_carrier_eg_sustain);
+  fm3_->eg_.SetReleaseTimeMsec(settings_.fm3_carrier_eg_release);
+  //
+  fm3_->modulator_->m_osc_fo =
+      fm3_->carrier_->m_osc_fo * settings_.fm3_modulator_freq_ratio;
+  fm3_->modulator_eg_.SetAttackTimeMsec(settings_.fm3_modulator_eg_attack);
+  fm3_->modulator_eg_.SetDecayTimeMsec(settings_.fm3_modulator_eg_decay);
+  fm3_->modulator_eg_.SetSustainLevel(settings_.fm3_modulator_eg_sustain);
+  fm3_->modulator_eg_.SetReleaseTimeMsec(settings_.fm3_modulator_eg_release);
 
   lz_->dca_.m_amplitude_control = settings_.lz_vol;
   lz_->dca_.m_pan_control = settings_.lz_pan;
@@ -1015,33 +1147,81 @@ DrumSettings Map2DrumSettings(std::string name,
     else if (key == "hh2_delay_sync_len")
       preset.hh2_delay_sync_len = dval;
 
-    // 5 - Low Conga / Tom
-    else if (key == "lt_vol")
-      preset.lt_vol = dval;
-    else if (key == "lt_pan")
-      preset.lt_pan = dval;
-    else if (key == "lt_tuning")
-      preset.lt_tuning = dval;
-    else if (key == "lt_is_conga")
-      preset.lt_is_conga = dval;
-    // 6 - Mid Conga / Tom
-    else if (key == "mt_vol")
-      preset.mt_vol = dval;
-    else if (key == "mt_pan")
-      preset.mt_pan = dval;
-    else if (key == "mt_tuning")
-      preset.mt_tuning = dval;
-    else if (key == "mt_is_conga")
-      preset.mt_is_conga = dval;
-    // 7 - High Conga / Tom
-    else if (key == "ht_vol")
-      preset.ht_vol = dval;
-    else if (key == "ht_pan")
-      preset.ht_pan = dval;
-    else if (key == "ht_tuning")
-      preset.ht_tuning = dval;
-    else if (key == "ht_is_conga")
-      preset.ht_is_conga = dval;
+    // 5 - FM1
+    else if (key == "fm1_vol")
+      preset.fm1_vol = dval;
+    else if (key == "fm1_pan")
+      preset.fm1_pan = dval;
+    else if (key == "fm1_car_freq")
+      preset.fm1_carrier_freq = dval;
+    else if (key == "fm1_car_eg_attack")
+      preset.fm1_carrier_eg_attack = dval;
+    else if (key == "fm1_car_eg_decay")
+      preset.fm1_carrier_eg_decay = dval;
+    else if (key == "fm1_car_eg_sustain")
+      preset.fm1_carrier_eg_sustain = dval;
+    else if (key == "fm1_car_eg_release")
+      preset.fm1_carrier_eg_release = dval;
+    else if (key == "fm1_mod_freq_rat")
+      preset.fm1_modulator_freq_ratio = dval;
+    else if (key == "fm1_mod_eg_attack")
+      preset.fm1_modulator_eg_attack = dval;
+    else if (key == "fm1_mod_eg_decay")
+      preset.fm1_modulator_eg_decay = dval;
+    else if (key == "fm1_mod_eg_sustain")
+      preset.fm1_modulator_eg_sustain = dval;
+    else if (key == "fm1_mod_eg_release")
+      preset.fm1_modulator_eg_release = dval;
+    // 6 - FM2
+    else if (key == "fm2_vol")
+      preset.fm2_vol = dval;
+    else if (key == "fm2_pan")
+      preset.fm2_pan = dval;
+    else if (key == "fm2_car_freq")
+      preset.fm2_carrier_freq = dval;
+    else if (key == "fm2_car_eg_attack")
+      preset.fm2_carrier_eg_attack = dval;
+    else if (key == "fm2_car_eg_decay")
+      preset.fm2_carrier_eg_decay = dval;
+    else if (key == "fm2_car_eg_sustain")
+      preset.fm2_carrier_eg_sustain = dval;
+    else if (key == "fm2_car_eg_release")
+      preset.fm2_carrier_eg_release = dval;
+    else if (key == "fm2_mod_freq_rat")
+      preset.fm2_modulator_freq_ratio = dval;
+    else if (key == "fm2_mod_eg_attack")
+      preset.fm2_modulator_eg_attack = dval;
+    else if (key == "fm2_mod_eg_decay")
+      preset.fm2_modulator_eg_decay = dval;
+    else if (key == "fm2_mod_eg_sustain")
+      preset.fm2_modulator_eg_sustain = dval;
+    else if (key == "fm2_mod_eg_release")
+      preset.fm2_modulator_eg_release = dval;
+    // 7 - FM3
+    else if (key == "fm3_vol")
+      preset.fm3_vol = dval;
+    else if (key == "fm3_pan")
+      preset.fm3_pan = dval;
+    else if (key == "fm3_car_freq")
+      preset.fm3_carrier_freq = dval;
+    else if (key == "fm3_car_eg_attack")
+      preset.fm3_carrier_eg_attack = dval;
+    else if (key == "fm3_car_eg_decay")
+      preset.fm3_carrier_eg_decay = dval;
+    else if (key == "fm3_car_eg_sustain")
+      preset.fm3_carrier_eg_sustain = dval;
+    else if (key == "fm3_car_eg_release")
+      preset.fm3_carrier_eg_release = dval;
+    else if (key == "fm3_mod_freq_rat")
+      preset.fm3_modulator_freq_ratio = dval;
+    else if (key == "fm3_mod_eg_attack")
+      preset.fm3_modulator_eg_attack = dval;
+    else if (key == "fm3_mod_eg_decay")
+      preset.fm3_modulator_eg_decay = dval;
+    else if (key == "fm3_mod_eg_sustain")
+      preset.fm3_modulator_eg_sustain = dval;
+    else if (key == "fm3_mod_eg_release")
+      preset.fm3_modulator_eg_release = dval;
 
     // 8 - Lazer
     else if (key == "lz_vol")
