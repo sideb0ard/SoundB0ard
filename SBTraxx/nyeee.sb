@@ -1,0 +1,47 @@
+
+let nahblah_gen = gen()
+{
+  setup()
+  {
+    let t = 200233;
+    let ntz = [46, 53, 51, 56];
+    let nx = 0;
+  }
+  run()
+  {
+    let numz = (t * 4) <<  2 + ( t >> 3);
+    t++;
+    let pat = bits(numz);
+    for (let i = 0; i < 16; i++) {
+      if (pat[i] == 1) {
+        note_on_at(sb2, 0, i * pp);
+        note_on_at(dx, ntz[nx], i * pp);
+        nx = incr(nx, 0, len(ntz));
+      }
+    }
+  }
+}
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [46, 0, 0, 0,  0, 53, 0, 0,  0, 0, 51, 0,  46, 0, 51, 0];
+    let mel2 = [46, 0, 0, 0,  0, 0, 56, 0,  0, 51, 0, 0,  46, 0, 0, 0];
+    let melz = [mel1, mel1, mel1, mel2];
+    let mx = 0;
+  }
+  run()
+  {
+    let mel = melz[mx];
+    mx = incr(mx, 0, len(melz));
+
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp, dur = 100);
+      }
+    }
+  }
+}
+
+

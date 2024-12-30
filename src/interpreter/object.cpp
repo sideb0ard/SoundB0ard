@@ -326,7 +326,12 @@ std::string Array::Inspect() {
   int i = 0;
   for (auto &e : elements_) {
     elems << e->Inspect();
-    if (i < len - 1) elems << ", ";
+    if (i < len - 1) {
+      elems << ", ";
+      if (i % 4 == 3) {
+        elems << " ";
+      }
+    }
     i++;
   }
   std::stringstream return_val;

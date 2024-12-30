@@ -1,2 +1,148 @@
 # C
 let key = 36;
+
+
+let kickblah_gen = gen()
+{
+  setup()
+  {
+    let hatz = rand_array(16, 0, 1);
+    let beatog = [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0];
+    let perc = rand_array(16, 0, 6);
+    let carz = [187, 203, 78, 179, 156];
+    let cx = 0;
+    let carz2 = [13, 23, 79, 156];
+    let cx2 = 0;
+  }
+  run()
+  {
+    let beat = beatog;
+    if (count % 6 == 4) {
+      beat = gen2stepbeat();
+    }
+    if (count % 16 < 14) {
+      for (let i = 0; i < 16; i++) {
+        if (hatz[i] == 1) {
+          #note_on_at(sb2, 2, i * pp);
+        }
+        if (beat[i] == 1) {
+          note_on_at(sbdrum, 0, i * pp);
+        }
+      }
+    }
+    if (count % 2 == 1) {
+      note_on_at(sb2, 4, 12 * pp);
+      cmbeat(sb2, 3);
+    }
+    if (count % 8 == 0) {
+      perc = rand_array(16, 0, 6);
+      hatz = rand_array(16, 0, 1);
+    }
+
+    if (count % 4 < 2) {
+      for (let i = 0; i < 16; i++) {
+        if (perc[i] == 0) {
+          note_on_at(sb2, 5, i * pp);
+          set sb2:fm1_car_freq carz[cx] at=i*pp;
+          cx = incr(cx, 0, len(carz));
+        }
+        if (perc[i] == 1) {
+          note_on_at(sb2, 6, i * pp);
+          set sb2:fm2_car_freq carz2[cx2] at=i*pp;
+          cx2 = incr(cx2, 0, len(carz2));
+        }
+        if (perc[i] == 2) {
+          note_on_at(sb2, 7, i * pp);
+          set sb2:fm3_car_freq carz[cx] at=i*pp;
+        }
+      }
+    }
+  }
+}
+
+let basslah_gen = gen()
+{
+  setup()
+  {
+    let bass1 = [24, 0, 0, 24,  0, 0, 31, 0,  0, 31, 0, 28,  0, 28, 0, 0];
+    let bass2 = [36, 0, 24, 0,  31, 31, 0, 0,  0, 31, 0, 0,  0, 0, 0, 0];
+    let bassz = [bass1, bass1, bass1, bass2];
+    let bax = 0;
+    let eazzz = [2, 20, 200, 150, 50, 75, 500];
+    let eax = 0;
+    let o2outz = [81, 50, 95, 90, 85, 99, 74];
+    let ox = 0;
+  }
+  run()
+  {
+    if (count % 7 < 6) {
+      let bass = bassz[bax];
+      bax = incr(bax, 0, len(bassz));
+
+      for (let i = 0; i < 16; i++) {
+        if (bass[i] > 0) {
+          note_on_at(dx2, bass[i], i * pp, dur = 200);
+          set dx2:e1att eazzz[eax] at=i*pp;
+          eax = incr(eax, 0, len(eazzz));
+        }
+      }
+      set dx2:op2out o2outz[ox];
+      ox = incr(ox, 0, len(o2outz));
+    }
+  }
+}
+
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [36, 0, 45, 0,  0, 0, 47, 0,  0, 0, 45, 0,  47, 47, 0, 0];
+    let mel2 = [0, 47, 0, 0,  45, 0, 47, 0,  47, 0, 45, 0,  47, 0, 0, 0];
+    let melz = [mel1, mel2];
+    let mx = 0;
+    let durz = [100, 150, 200, 400, 500, 1000];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = melz[mx];
+    mx = incr(mx, 0, len(melz));
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+let moogblah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [36, 0, 40, 36,  36, 36, 36, 36,  36, 43, 36, 36,  36, 36, 36, 36];
+    let mel2 = [36, 36, 40, 36,  36, 0, 36, 36,  36, 43, 0, 36,  36, 36, 36, 36];
+    let mel3 = [40, 0, 40, 43,  36, 0, 36, 45,  36, 43, 0, 36,  36, 40, 36, 41];
+    let dr = 40;
+    let melz = [mel1, mel2, mel1, mel3];
+    let mx = 0;
+  }
+  run()
+  {
+    let mel = melz[mx];
+    mx = incr(mx, 0, len(melz));
+
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        #note_on_at(mo, mel[i], i * pp, dur = dr);
+        note_on_at(dx2, mel[i], i * pp, dur = dr);
+        dr = dr + 10;
+        if (dr > 240) {
+          dr = 40;
+        }
+      }
+    }
+  }
+}
+
