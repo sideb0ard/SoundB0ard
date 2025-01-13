@@ -1,0 +1,136 @@
+
+let percblah_gen = gen()
+{
+  setup()
+  {
+    let counth = 0;
+    let countq = 0;
+    let freqz = [12, 43, 62, 16, 32];
+    let frx = 0;
+    let ratz = [13.4, 71.4, 42.3, 47.7, 13];
+    let rx =0;
+    let attz = [1, 10, 50, 100, 120];
+    let ax = 0;
+    let decz = [100, 50, 500, 200, 70, 290];
+    let dex = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (countq % 3 == 0) {
+        note_on_at(sbdrum, 5, i * pp);
+        set sbdrum:fm1_car_freq freqz[frx];
+        set sbdrum:fm2_mod_freq_rat ratz[rx];
+        set sbdrum:fm1_car_eg_attack attz[ax];
+        ax = incr(ax, 0, len(attz));
+        set sbdrum:fm2_car_eg_attack attz[ax];
+        ax = incr(ax, 0, len(attz));
+      }
+      if (countq % 5 == 0) {
+        note_on_at(sbdrum, 6, i * pp);
+        frx = incr(frx,0,len(freqz));
+        rx = incr(rx,0,len(ratz));
+        set sbdrum:fm1_car_eg_decay attz[ax];
+        ax = incr(ax, 0, len(attz));
+        set sbdrum:fm2_car_eg_decay attz[ax];
+        ax = incr(ax, 0, len(attz));
+      }
+      countq++;
+    }
+    #let ppt= 3840 / 12;
+    #for (let i = 0; i < 12; i++) {
+      #  if (counth % 3 == 0) {
+        #    note_on_at(sbdrum, 5, i * ppt);
+        #  }
+      #  if (counth % 2 == 0) {
+        #    note_on_at(sbdrum, 6, i * ppt);
+        #  }
+      #  counth++;
+      #  set sbdrum:fm2_car_freq freqz[frx];
+      #  set sbdrum:fm1_mod_freq_rat ratz[rx];
+      #  frx = incr(frx,0,len(freqz));
+      #  rx = incr(rx,0,len(ratz));
+      #}
+  }
+}
+
+let snblah_gen = gen()
+{
+  setup()
+  {
+    let beatbase = bjork(3, 8);
+    # let hitz = [3, 3, 1];
+    let hitz = [2, 2, 4, 8];
+    let hx = 0;
+    let varz = [4, 5, 7];
+    let vx = 0;
+    let frqz = [50, 100, 150, 200, 250, 250, 200, 150];
+    let frx = 0;
+  }
+  run()
+  {
+    let beat = beatbase;
+    if (count % 4 == 3) {
+      beat = bjork(varz[vx], 8);
+      vx = incr(vx, 0, len(varz));
+    }
+    let ppq = 3840 / 8;
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(sbdrum, hitz[hx], i * ppq);
+        if (hitz[hx] == 8) {
+          set sbdrum:lz_freq frqz[frx] at=i*ppq;
+          frx = incr(frx, 0, len(frqz));
+        }
+        hx = incr(hx, 0, len(hitz));
+      }
+    }
+
+  }
+}
+
+let plblah_fn = fn(midi_num, pat)
+{
+  for (let i = 0; i < 16; i++) {
+    if (pat[i] == 1) {
+      note_on_at(sb2, midi_num, i * pp);
+    }
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let beatA = [1, 0, 0, 1,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0];
+    let snareA = [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let beatB = [1, 1, 0, 1,  0, 1, 1, 0,  0, 1, 0, 1,  0, 0, 0, 0];
+    let snareB = [0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0];
+    let beatC = [0, 0, 0, 0,  0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 0, 0];
+    let snareC = [0, 0, 0, 0,  1, 0, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0];
+    let cddecider = 0;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      plblah_fn(0, beatA);
+      plblah_fn(3, snareA);
+    } else {
+      if (count % 4 == 1) {
+        plblah_fn(0, beatB);
+        plblah_fn(3, snareB);
+      } else {
+        if (cddecider % 2 == 0) {
+          plblah_fn(0, beatC);
+          plblah_fn(3, snareC);
+        } else {
+          dmbeat(sb2, 0);
+          cmbeat(sb2, 3);
+        }
+        cddecider++;
+      }
+    }
+
+  }
+}
+

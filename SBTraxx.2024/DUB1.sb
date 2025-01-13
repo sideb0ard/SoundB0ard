@@ -37,6 +37,7 @@ let dblah_gen = gen()
       playblah_fn(3, cp);
       playblah_fn(4, ohz);
     }
+
   }
 }
 
@@ -146,10 +147,12 @@ let momelblah_gen = gen()
   run()
   {
 
-    let chrd = notes_in_chord(chrdz[chx], key);
-    chx = incr(chx, 0, len(chrdz));
-    note_on_at(dx3, chrd, 4 * pp);
-    note_on_at(dx3, chrd, 12 * pp);
+    if (count % 8 < 6) {
+      let chrd = notes_in_chord(chrdz[chx], key);
+      chx = incr(chx, 0, len(chrdz));
+      note_on_at(mo, chrd, 4 * pp);
+      note_on_at(mo, chrd, 12 * pp);
+    }
   }
 }
 

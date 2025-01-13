@@ -2372,9 +2372,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            int key_value = key->value_;
 
-           int key_modifier = 0;
-           if (args_size == 3) {
+           int chord_modifier = 0;
+           if (args_size > 2) {
              auto mod = std::dynamic_pointer_cast<object::Number>(args[2]);
+             if (mod) chord_modifier = mod->value_;
+           }
+
+           int key_modifier = 0;
+           if (args_size > 3) {
+             auto mod = std::dynamic_pointer_cast<object::Number>(args[3]);
              if (mod) key_modifier = mod->value_;
            }
 
@@ -2382,7 +2388,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                std::vector<std::shared_ptr<object::Object>>());
 
            std::vector<int> notez = interpreter_sound_cmds::GetNotesInChord(
-               root_note_value, key_value, key_modifier);
+               root_note_value, key_value, chord_modifier, key_modifier);
 
            for (int i = 0; i < (int)notez.size(); i++) {
              return_array->elements_.push_back(

@@ -673,6 +673,9 @@ void Mixer::PrintMidiInfo() {
         "vi-IV-I-V\n";
   ss << "Chord Mods: None(0), Seventh(1), Seventh Inv(2) Root Inv(3) "
         "Power(4)\n";
+  ss << "Key Mods: None(0), Natural Minor(1), Harmonic Minor Inv(2) Melodic "
+        "Minor(3) "
+        "Phrygian(4)\n";
   ss << "Filters: LPF1, HPF1, LPF2, HPF2, BPF2, BSF2, LPF4, HPF4, BPF4\n";
   ss << "Major Scale: W W H W W W H // Minor Scale: W H W W H W W\n"
      << ANSI_COLOR_RESET;

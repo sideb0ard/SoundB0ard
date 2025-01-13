@@ -90,7 +90,7 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "bd_q")
     settings_.bd_q = val;
   else if (name == "bd_ntone")
-    settings_.bd_tone = val;
+    settings_.bd_ntone = val;
   else if (name == "bd_nq")
     settings_.bd_q = val;
   else if (name == "bd_decay")
@@ -233,9 +233,9 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.cp_pan = val;
   else if (name == "cp_nvol")
     settings_.cp_nvol = val;
-  else if (name == " cp_nattack")
+  else if (name == "cp_nattack") {
     settings_.cp_nattack = val;
-  else if (name == " cp_ndecay")
+  } else if (name == "cp_ndecay")
     settings_.cp_ndecay = val;
   else if (name == "cp_tone")
     settings_.cp_tone = val;
