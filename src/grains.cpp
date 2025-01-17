@@ -36,6 +36,8 @@ void SoundGrainSample::Initialize(SoundGrainParams params) {
   active = true;
 }
 
+void SoundGrainSample::SetReadIdx(int idx) { audiobuffer_cur_pos = idx; }
+
 StereoVal SoundGrainSample::Generate() {
   StereoVal out = {0., 0.};
   if (!active) return out;

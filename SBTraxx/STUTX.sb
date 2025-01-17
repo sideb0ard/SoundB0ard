@@ -1,0 +1,38 @@
+
+# let tmb = loop(dloops/timbaland2bar.aiff);  note_off(tmb, 0);
+let tmbblah_gen = gen()
+{
+  setup()
+  {
+    let playmask = 2;
+    let playpos = 0;
+    let durz = [10, 50, 100, 200, 40, 20, 50, 300];
+    let drx = 0;
+    let liftz = [8, 2, 4, 6, 12];
+    let lfx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (i % playmask == playpos) {
+        note_on_at(tmb, i, i * pp, dur = durz[drx]);
+      } else {
+        note_on_at(sbdrum, 0, i * pp, dur = durz[drx]);
+      }
+
+    }
+    drx = incr(drx, 0, len(durz));
+    if (count % 2 == 0) {
+      playmask = incr(playmask, 1, 8);
+      if (count % 4 == 0) {
+        playpos = incr(playpos, 0, playmask);
+      }
+    }
+
+    if (count % liftz[lfx] == 0) {
+      sched(0, 100, 15000, 3840 * liftz[lfx], "set sbdrum:bd_tone %");
+      #lfx = incr(lfx, 0, len(liftz));
+    }
+  }
+}
+

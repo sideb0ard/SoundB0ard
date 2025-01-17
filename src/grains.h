@@ -24,6 +24,7 @@ struct SoundGrainParams {
 struct SoundGrain {
   virtual StereoVal Generate() = 0;
   virtual void Initialize(SoundGrainParams) = 0;
+  virtual void SetReadIdx(int idx) = 0;
   virtual ~SoundGrain() = default;
   SoundGrainType type;
 };
@@ -36,6 +37,7 @@ struct SoundGrainSample : public SoundGrain {
 
   StereoVal Generate() override;
   void Initialize(SoundGrainParams) override;
+  void SetReadIdx(int idx) override;
 
   int grain_len_frames{0};
   int grain_frame_counter{0};

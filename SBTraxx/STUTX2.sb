@@ -1,0 +1,175 @@
+
+let playblah_fn = fn(midi_num, pat )
+{
+  for (let i = 0; i < 16; i++) {
+    if (pat[i] == 1) {
+      note_on_at(sbdrum, midi_num, i * pp);
+    }
+  }
+}
+
+# load_preset(sbdrum, "SNZ");
+
+# let dbr = loop(noises/loudDubNoise.aiff); note_off(dbr, 0);
+#  let sndc = loop(noises/sndCrunchHit.aiff); note_off(sndc, 0);
+
+let stblah_gen = gen()
+{
+  setup()
+  {
+    let kick =  [1, 0, 1, 0,   0, 0, 1, 0,   1, 0, 1, 0,   0, 0, 0, 0];
+    let snare = [0, 0, 0, 0,   1, 0, 0, 0,   0, 0, 0, 0,   1, 0, 1, 0];
+    let chz =   [1, 1, 0, 1,   0, 0, 0, 0,   1, 0, 1, 0,   1, 0, 1, 0];
+    let percz = [dbr, sndc];
+    let px = 0;
+    let durz = [10, 20, 40, 60, 100, 400];
+    let drx = 0;
+  }
+  run()
+  {
+    playblah_fn(0, kick);
+    playblah_fn(1, snare);
+    for (let i = 0; i < 16; i++) {
+      let offs = 40;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (chz[i] == 1) {
+        note_on_at(percz[px], i, i * pp + offs, dur = durz[drx], vel = 80 + rand(47));
+        px = incr(px, 0, len(percz));
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+    if (count % 7 == 0) {
+      set percz[px]:reverse 1;
+    }
+    if (count % 4 == 0) {
+      set percz[px]:stutter 1;
+    }
+    if (count % 4 == 3) {
+      #solo(sbdrum, at=4*pp);
+      #note_on_at(dbr, 0, at=8*pp, dur = 3840 / 2);
+      let haf = 3840 / 2;
+
+      let beat = bjork(3, 8);
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(sbdrum, 1, haf + i * pp, dur = durz[drx]);
+        }
+      }
+    }
+    if (count % 6 == 0) {
+      sched(0, 1, 200, 3840, "set sbdrum:sd_decay %");
+      sched(3840, 1, 1, 0, "set sbdrum:sd_decay %");
+    }
+    if (count % 11 == 0) {
+      sched(0, 4, 70, 3840, "set sbdrum:sd_delay_ms %");
+      sched(3840, 4, 4, 0, "set sbdrum:sd_delay_ms %");
+
+      sched(0, 0, 70, 3840*2, "set sbdrum:sd_delay_feedback_pct %");
+      sched(3840*2, 0, 0, 0, "set sbdrum:sd_delay_feedback_pct %");
+    }
+  }
+}
+
+# let pxp = loop(glitchz/pxp.aiff); note_off(pxp, 0);
+# let blrp = loop(glitchz/BLURP.aiff); note_off(blrp, 0);
+# let rebp = loop(noises/RevPercMatmos.aiff); note_off(rebp, 0);
+
+let db2blah_gen = gen()
+{
+  setup()
+  {
+    let kick =  [1, 0, 0, 0,   0, 0, 1, 0,   0, 1, 0, 1,   1, 0, 0, 0];
+    let snare = [1, 1, 0, 0,   0, 0, 1, 1,   0, 0, 0, 0,   1, 1, 0, 0];
+    let percz = [pxp, blrp, rebp];
+    let px = 0;
+    let durz = [10, 20, 30, 50, 100, 150];
+    let drx = 0;
+  }
+  run()
+  {
+    let beat = kick;
+    if (count % 4 == 3) {
+      beat = rand_beat();
+    }
+    playblah_fn(0, beat);
+    let invbeat = invert(beat);
+    #print("INV:", invbeat);
+#    playblah_fn(1, snare);
+    for (let i = 0; i < 16; i++) {
+      if (invbeat[i] == 1) {
+        note_on_at(percz[px], i, i * pp, dur = durz[drx], vel = 80 + rand(47));
+        px = incr(px, 0, len(percz));
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+let controllblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 8 < 4) {
+      stblah_gen();
+    } else {
+      db2blah_gen();
+    }
+
+  }
+}
+
+let key = 41;
+# minor key
+let key_mod = 1;
+# notes_in_key(key, key_mod);
+# [41, 43, 44, 46,  48, 49, 51, 53]
+
+# dx risable
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [0, 41, 0, 44,  0, 44, 0, 51,  0, 0, 49, 0,  0, 44, 0, 0];
+    let mel2 = [41, 0, 0, 43,  44, 0, 0, 51,  48, 0, 49, 0,  0, 41, 0, 0];
+    let melz = [mel1, mel1, mel2];
+    let mx = 0;
+    let drz = [ 100, 200, 300, 50];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = melz[mx];
+    mx = incr(mx, 0, len(melz));
+    if (count % 8 == 7) {
+      mel = down(mel, 12);
+      solo(dx, at=8*pp);
+    }
+
+    if (count % 5 == 4) {
+      sched(0, 60, 90, 3840, "set dx:op2out %");
+      sched(3840, 60, 60, 0, "set dx:op2out %");
+    }
+
+    for (let i = 0; i < 16; i++) {
+      let v = 100 + rand(27);
+      let offz = 30;
+      if (count % 2 == 0) {
+        offz = 0;
+      }
+      if (count % 4 == 2) {
+        v = 127;
+      }
+
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp + offz, dur = drz[drx], vel = v);
+        drx = incr(drx, 0, len(drz));
+      }
+    }
+  }
+}
+

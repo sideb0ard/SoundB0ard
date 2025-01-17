@@ -487,12 +487,27 @@ void Granulator::SetDegradeBy(int degradation) {
 }
 
 void Granulator::NoteOn(midi_event ev) {
-  (void)ev;
+  started_ = true;
+  int sixteenth_pos = ev.data1 % 16;
+  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  buffer->cur_midi_idx = sixteenth_pos * 240;
+  int decimal_percent_of_loop =
+      buffer->cur_midi_idx / (PPBAR * buffer->loop_len);
+  double new_read_idx = decimal_percent_of_loop * buffer->audio_buffer.size();
+  grain_a_->SetReadIdx(new_read_idx);
+  grain_b_->SetReadIdx(new_read_idx);
+  next_grain_launch_sample_time_ = 0;
   eg_.StartEg();
+}
+
+void Granulator::AllNotesOff() {
+  started_ = true;
+  eg_.NoteOff();
 }
 
 void Granulator::NoteOff(midi_event ev) {
   (void)ev;
+  started_ = true;
   eg_.NoteOff();
 }
 

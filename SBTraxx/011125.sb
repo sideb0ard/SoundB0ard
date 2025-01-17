@@ -10,8 +10,11 @@ let plblah_fn = fn(midi_num, pat)
     inst = sbdrum;
   }
   for (let i = 0; i < 16; i++) {
-    let v = 80 + rand(47);
+    let v = 100 + rand(27);
     if (i % 4 == 0) {
+      v = 127;
+    }
+    if (midi_num == 0) {
       v = 127;
     }
     let offset = -15;
@@ -41,20 +44,28 @@ let dblah_gen = gen()
     let snareC = [0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0];
     let hatzC = [1, 0, 1, 1,  1, 0, 1, 1,  1, 1, 0, 1,  1, 0, 1, 1];
     let cddecider = 0;
+
+    let percz = rand_array(16, 0, 4);
   }
   run()
   {
+    #let inbetweens = invert(beatA);
+    let inbetweens = mask(percz, beatA);
     if (count % 2 == 0) {
       plblah_fn(0, beatA);
       plblah_fn(3, snareA);
       #plblah_fn(2, hatzA);
     } else {
       if (count % 4 == 1) {
+        #inbetweens = invert(beatB);
+        inbetweens = mask(percz, beatB);
         plblah_fn(0, beatB);
         plblah_fn(3, snareB);
         #plblah_fn(2, hatzA);
       } else {
         if (cddecider % 2 == 0) {
+          #inbetweens = invert(beatC);
+          inbetweens = mask(percz, beatC);
           plblah_fn(0, beatC);
           plblah_fn(3, snareC);
           plblah_fn(2, hatzC);
@@ -66,6 +77,23 @@ let dblah_gen = gen()
         cddecider++;
       }
     }
+    #print(inbetweens);
+
+    for (let i = 0; i < 16; i++) {
+      if (inbetweens[i] == 1) {
+        note_on_at(grnr, 0, i * pp, dur = 300);
+      }
+      if (inbetweens[i] == 2) {
+        note_on_at(sts, 0, i * pp, dur = 200);
+      }
+      if (inbetweens[i] == 3) {
+        note_on_at(xen, 0, i * pp, dur = 200);
+      }
+      if (inbetweens[i] == 4) {
+        note_on_at(betd, 0, i * pp, dur = 200);
+      }
+    }
+
     if (count % 4 == 3) {
       sched(0, 0, 97, 3840, "set sb2:cp_delay_feedback_pct %");
       sched(3840, 0, 0, 0, "set sb2:cp_delay_feedback_pct %");
@@ -73,6 +101,7 @@ let dblah_gen = gen()
     if (count % 7 == 6) {
       sched(0, 50, 150, 3840*2, "set sb2:bd_decay %");
       sched(3840*2, 50, 50, 0, "set sb2:bd_decay %");
+      percz = rand_array(16, 0, 5);
     }
   }
 }

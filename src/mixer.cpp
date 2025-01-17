@@ -872,13 +872,10 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
         }
         if (action->duration) {
           int midi_off_tick = midi_note_on_time + action->duration;
-
           midi_event event_off =
               new_midi_event(MIDI_OFF, midinum, action->velocity);
-
           auto ev =
               DelayedMidiEvent(midi_off_tick, event_off, action->soundgen_num);
-
           _action_items.push_back(ev);
         }
       }

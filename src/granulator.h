@@ -26,6 +26,7 @@ class Granulator : public SoundGenerator {
   void EventNotify(broadcast_event event, mixer_timing_info tinfo) override;
   void NoteOn(midi_event ev) override;
   void NoteOff(midi_event ev) override;
+  void AllNotesOff() override;
   void SetParam(std::string name, double val) override;
 
   void AddBuffer(std::unique_ptr<FileBuffer> fb) override;
