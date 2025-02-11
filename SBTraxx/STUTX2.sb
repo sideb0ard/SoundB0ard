@@ -1,3 +1,12 @@
+# load_preset(sbdrum, "SNZ"); load_preset(dx, "default"); bpm 104
+# let dbr = loop(noises/loudDubNoise.aiff); note_off(dbr, 0);
+# let sndc = loop(noises/sndCrunchHit.aiff); note_off(sndc, 0);
+# let pxp = loop(glitchz/pxp.aiff); note_off(pxp, 0);
+# let blrp = loop(glitchz/BLURP.aiff); note_off(blrp, 0);
+# let rebp = loop(noises/RevPercMatmos.aiff); note_off(rebp, 0);
+
+# p1 $ controllblah_gen
+# p2 $ melblah_gen
 
 let playblah_fn = fn(midi_num, pat )
 {
@@ -8,10 +17,6 @@ let playblah_fn = fn(midi_num, pat )
   }
 }
 
-# load_preset(sbdrum, "SNZ");
-
-# let dbr = loop(noises/loudDubNoise.aiff); note_off(dbr, 0);
-#  let sndc = loop(noises/sndCrunchHit.aiff); note_off(sndc, 0);
 
 let stblah_gen = gen()
 {
@@ -72,10 +77,6 @@ let stblah_gen = gen()
   }
 }
 
-# let pxp = loop(glitchz/pxp.aiff); note_off(pxp, 0);
-# let blrp = loop(glitchz/BLURP.aiff); note_off(blrp, 0);
-# let rebp = loop(noises/RevPercMatmos.aiff); note_off(rebp, 0);
-
 let db2blah_gen = gen()
 {
   setup()
@@ -129,13 +130,13 @@ let key_mod = 1;
 # notes_in_key(key, key_mod);
 # [41, 43, 44, 46,  48, 49, 51, 53]
 
-# dx risable
+# dx risable // yrrztup // default
 let melblah_gen = gen()
 {
   setup()
   {
     let mel1 = [0, 41, 0, 44,  0, 44, 0, 51,  0, 0, 49, 0,  0, 44, 0, 0];
-    let mel2 = [41, 0, 0, 43,  44, 0, 0, 51,  48, 0, 49, 0,  0, 41, 0, 0];
+    let mel2 = [41, 0, 0, 46,  44, 0, 0, 51,  48, 0, 49, 0,  41, 0, 53, 0];
     let melz = [mel1, mel1, mel2];
     let mx = 0;
     let drz = [ 100, 200, 300, 50];
@@ -170,6 +171,47 @@ let melblah_gen = gen()
         drx = incr(drx, 0, len(drz));
       }
     }
+
+    if (count % 8 < 4) {
+      dx2blah_gen();
+    } else {
+      dx22blah_gen();
+    }
   }
 }
 
+let dx2blah_gen = gen()
+{
+  setup()
+  {
+    # notes_in_key(key, key_mod);
+    # [41, 43, 44, 46,  48, 49, 51, 53]
+    let mel = [0, 0, 44, 0,  0, 0, 44, 0,  0, 43, 0, 0,  0, 0, 44, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx2, mel[i], i * pp, dur = 100);
+      }
+    }
+  }
+}
+
+let dx22blah_gen = gen()
+{
+  setup()
+  {
+    # notes_in_key(key, key_mod);
+    # [41, 43, 44, 46,  48, 49, 51, 53]
+    let mel = [41, 0, 0, 44,  41, 0, 0, 43,  0, 48, 0, 46,  0, 0, 41, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx2, mel[i], i * pp, dur = 400);
+      }
+    }
+  }
+}

@@ -1,12 +1,11 @@
-# dx drmrrr
+## load_preset(dx, "SMMTH"); load_preset(dx2, "jazz_organ"); load_preset(sb2, "THUG");
+## add_fx(dx, "sidechain", sb2); send("delay", dx);
+## let shkr = loop(skrslazrs/SHØCK07.wav); note_off(shkr, 0);
+## bpm 120; vol dx2 1;
+## let dx3 = fm(); load_preset(dx3, "WURBKl");
 
-# load_preset(dx, "SMMTH"); load_preset(dx2, "drmrrr");
-# load_preset(dx, "SMMTH"); load_preset(dx2, "narf2");
-# load_preset(dx, "SMMTH"); load_preset(dx2, "MAW1");
 
-# add_fx(dx, "sidechain", sb2); send("delay", dx);
-
-# p2 $ pblah_gen
+# p1 $ pblah_gen
 
 let setupblah_fn = fn()
 {
@@ -15,14 +14,53 @@ let setupblah_fn = fn()
   dx_midi_assign();
 }
 
+let key = 48;
+# mode 1 => minor key
+let key_mode = 1;
+let notez = notes_in_key(key, key_mode);
+
+let moblah_gen = gen()
+{
+  setup()
+  {
+    # [48, 50, 51, 53,  55, 56, 58, 60];
+    let midxz1 = [56, 0, 0, 50,  0, 50, 0, 0,  0, 60, 0, 0,  0, 0, 51, 0];
+    #let midxz1 = [7, 0, 2, 4, 2, 0, 0, 3, 5, 7, 7, 4, 2, 4, 5, 4];
+    #let midxz2 = [0, 4, 2, 6, 0, 4, 6, 5, 0, 3, 3, 5, 2, 0, 5, 2];
+    let midxz2 = [48, 50, 0, 60,  60, 50, 0, 0,  0, 60, 0, 50,  0, 0, 51, 0];
+
+    let durz = [10, 40, 50, 100, 120, 170];
+    let drzx = 0;
+    let velz = [80, 90, 110, 127, 90];
+    let vx = 0;
+  }
+  run()
+  {
+    let midxz = midxz1;
+    if (count % 3 == 2) {
+      midxz = midxz2;
+    }
+
+    if (count % 8 == 4) {
+      midxz = down(midxz, 12);
+    }
+
+    if (count % 11 == 4) {
+      midxz = reverse(midxz);
+    }
+
+    for (let i = 0; i < 16; i++) {
+      note_on_at(dx3, midxz[i] - 12, i * pp, dur = durz[drzx], vel = velz[vx]);
+      drzx = incr(drzx, 0, len(durz));
+      vx = incr(vx, 0, len(velz));
+    }
+  }
+}
+
 let EPICblah_gen = gen()
 {
   setup()
   {
-    let key = 48;
-    # mode 1 => minor key
-    let key_mode = 1;
-    let notez = notes_in_key(key, key_mode);
     let chordz = [0, 5, 2, 6];
     let chx = 0;
     let on_atz = [0, 3840 - 480];
@@ -42,7 +80,7 @@ let EPICblah_gen = gen()
         chx = incr(chx, 0, len(chordz));
         let chrd = notes_in_chord(root_note, key, 0, key_mode);
         #print(chrd, on_at);
-        note_on_at(dx, chrd, on_at, dur = durz[onx]);
+        note_on_at(dx, chrd, on_at, dur = durz[onx], vel = 100);
         onx = incr(onx, 0, len(on_atz));
       }
     }
@@ -66,8 +104,8 @@ let sinblah_gen = gen()
   }
   run()
   {
-    # let mel = down(mels[mx], 12);
-    let mel = up(mels[mx], 12);
+    let mel = down(mels[mx], 12);
+    #let mel = up(mels[mx], 12);
     mx = incr(mx, 0, len(mels));
 
     for (let i = 0; i < 16; i++) {
@@ -128,37 +166,75 @@ let playdrum_fn = fn(midi_num, pat)
   }
 }
 
+let cas = sample("garage/CabasaHiMPC6011.wav");
+let hhc = sample("garage/HHCH-606_80.wav");
+let lst = sample("garage/SideStick_Lindrum_24.wav");
+
 let dblah_gen = gen()
 {
   setup()
   {
-    let kbeat =  [1, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0];
+    let kbeat1 =  [1, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0];
+    let kbeat2 = [1, 0, 1, 0,  0, 1, 1, 1,  1, 0, 1, 1,  0, 0, 0, 0];
     let hbeat =  [0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0,  0, 0, 1, 0];
+
+    let sampz = [cas, hhc, shkr, lst];
+    let sx = 0;
+
+    let velz = [70, 80, 90, 50, 110];
+    let vx = 0;
   }
   run()
   {
+    let kbeat = kbeat1;
+    if (count % 8 == 6) {
+      kbeat = kbeat2;
+    }
     if (count % 4 < 3) {
       playdrum_fn(0, kbeat);
     }
-    if (count % 6 < 5) {
-      playdrum_fn(2, hbeat);
+    if (count % 2 == 1) {
+      sched(0, 700, 5000, 3840*2, "set sb2:bd_tone %");
     }
-  }
-}
+    if (count % 3 == 1) {
+      sched(0, 70, 190, 3840*3, "set sb2:bd_decay %");
+    }
 
-let snblah_gen = gen()
-{
-  setup()
-  {
-  }
-  run()
-  {
+    sched(0, 0.4, 0.05, 3840, "set sb2:hh_vol %");
+
+    if (count % 6 < 4) {
+      let beat = hbeat;
+      if (count % 4 == 3) {
+        beat = rand_array(16, 0, 1);
+      }
+      playdrum_fn(2, beat);
+    }
+
+    if (count % 5 < 3) {
+      let invbeat = invert(kbeat);
+      for (let i = 0; i < 16; i++) {
+        if (invbeat[i] == 1) {
+          let samp = sampz[sx];
+          sx = incr(sx, 0, len(sampz));
+          note_on_at(samp, 1, i * pp, dur = 50, vel = velz[vx]);
+          vx = incr(vx, 0, len(velz));
+        }
+      }
+    }
+
+    if (count % 13 == 12) {
+      sched(0, 0, 90, 3840*2, "set sb2:hh_delay_feedback_pct %");
+      sched(3840*2, 0, 0, 0, "set sb2:hh_delay_feedback_pct %");
+      sched(0, 2, 23, 3840*3, "set sb2:hh_delay_ms %");
+      sched(3840*3, 3, 3, 0, "set sb2:hh_delay_ms %");
+    }
+
+    # SBDRUM CLAPS
     if (count % 4 == 3) {
       cmbeat(sbdrum, 3);
     }
   }
 }
-
 
 let pblah_gen = gen()
 {
@@ -177,47 +253,147 @@ let pblah_gen = gen()
     let vx = 0;
     let attz = [10, 50, 80, 150, 110, 250, 300];
     let ax = 0;
+
+    let mcntr = 0;
+    set sbdrum:fm1_vol 0.2;
+    set sbdrum:fm2_vol 0.3;
+    set sbdrum:fm3_vol 0.3;
+
   }
   run()
   {
 
-    if (count % 2 == 0) {
-      note_on(sbdrum, 0);
-    }
+    if (mcntr < 32) {
+      # if (count % 2 == 0) {
+        #   note_on(sbdrum, 0);
+        # }
 
-    if (count % 11 < 10) {
-      for (let i = 0; i < 16; i++) {
-        let offset = 20;
-        if (i % 2 == 0) {
-          offset = 0;
-        }
-        note_on_at(sbdrum, 2, i * pp + offset, vel = velz[vx] + rand(20));
-      }
-    }
-
-    if (count % 13 < 12) {
-      let ppat = ppatz[ppx];
-      ppx = incr(ppx, 0, len(ppatz));
-      for (let i = 0; i < 16; i++) {
-        if (ppat[i] == 1) {
-          note_on_at(sbdrum, percz[prx], i * pp, dur = durz[drx], vel = velz[vx]);
-          drx = incr(drx, 0, len(durz));
-          vx = incr(vx, 0, len(velz));
-          prx = incr(prx, 0, len(percz));
+      if (count % 13 < 12) {
+        let ppat = ppatz[ppx];
+        ppx = incr(ppx, 0, len(ppatz));
+        for (let i = 0; i < 16; i++) {
+          if (ppat[i] == 1) {
+            note_on_at(sbdrum, percz[prx], i * pp, dur = durz[drx], vel = velz[vx]);
+            drx = incr(drx, 0, len(durz));
+            vx = incr(vx, 0, len(velz));
+            prx = incr(prx, 0, len(percz));
+          }
         }
       }
+
+      if (count % 2 == 0) {
+        if (percz[prx] == 5) {
+          set sbdrum:fm1_car_eg_attack attz[ax];
+        }
+        if (percz[prx] == 6) {
+          set sbdrum:fm2_car_eg_attack attz[ax];
+        }
+        if (percz[prx] == 7) {
+          set sbdrum:fm3_car_eg_attack attz[ax];
+        }
+        ax = incr(ax, 0, len(attz));
+      }
+      if (mcntr > 8) {
+        if (count % 4 < 2) {
+          EPICblah_gen();
+        } else {
+          sin2blah_gen();
+        }
+      }
+      if (mcntr > 12) {
+        if (count % 6 < 4) {
+          moblah_gen();
+        }
+      }
+
+      if (mcntr == 14) {
+        sched(0, 0.2, 0, 3840 * 6, "set sbdrum:fm1_vol %");
+      }
+      if (mcntr == 17) {
+        sched(0, 0.3, 0, 3840 * 7, "set sbdrum:fm2_vol %");
+      }
+      if (mcntr == 24) {
+        sched(0, 0.3, 0, 3840 * 4, "set sbdrum:fm3_vol %");
+      }
+
+      if (mcntr > 12) {
+        dblah_gen();
+      }
+    } else {
+      if (mcntr < 50) {
+        if (mcntr < 40) {
+          # >= 32
+          if (count % 2 == 0) {
+            mamahblah_gen();
+          } else {
+            EPICbla2h_gen();
+          }
+
+          if (mcntr >= 36) {
+            dblah_gen();
+          }
+        } else {
+          # FINISH
+          mamahblah_gen();
+          EPICblah_gen();
+        }
+      }
     }
-    if (count % 2 == 0) {
-      if (percz[prx] == 5) {
-        set sbdrum:fm1_car_eg_attack attz[ax];
+    mcntr++;
+    print(mcntr, " ",  count);
+  }
+}
+
+let EPICbla2h_gen = gen()
+{
+  setup()
+  {
+    let chordz = [0, 5, 2, 6];
+    let chx = 0;
+    let beat = [1, 1, 1, 1,  0, 0, 1, 0,  1, 1, 0, 1,  0, 0, 0, 0];
+    let durz = [300, 600, 1500, 50, 1000];
+    let onx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      sched(0, 0, 0.6, 3840*2, "vol dx %");
+      sched(3840*2, 0, 0, 0 , "vol dx %")
+    }
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        let root_note = notez[chordz[chx]];
+        chx = incr(chx, 0, len(chordz));
+        let chrd = notes_in_chord(root_note, key, 0, key_mode);
+        note_on_at(dx, chrd, i* pp, dur = durz[onx], vel = 100 + rand(27));
+        onx = incr(onx, 0, len(on_atz));
       }
-      if (percz[prx] == 6) {
-        set sbdrum:fm2_car_eg_attack attz[ax];
+    }
+    if (count % 6 == 1) {
+      sched(0, 10, 99, 3840*2, "set mixer:delay:fb %");
+      sched(3840 * 2, 10, 10, 0, "set mixer:delay:fb %");
+    }
+  }
+}
+
+let mamahblah_gen = gen()
+{
+  setup()
+  {
+    # [48, 50, 51, 53,  55, 56, 58, 60]
+    let mel1 = [48, 0, 0, 0,  55, 0, 0, 0,  51, 0, 0, 0,  53, 0, 48, 0];
+    let mel2 = [55, 0, 0, 50,  0, 0, 55, 0,  0, 51, 0, 0,  0, 0, 48, 0];
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx3, mel[i], i * pp, dur = 50);
       }
-      if (percz[prx] == 7) {
-        set sbdrum:fm3_car_eg_attack attz[ax];
-      }
-      ax = incr(ax, 0, len(attz));
     }
   }
 }

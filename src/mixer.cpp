@@ -110,7 +110,6 @@ void Action::Run() {
 }
 
 Mixer::Mixer(WebsocketServer &server) : websocket_server_{server} {
-  volume = 0.7;
   UpdateBpm(DEFAULT_BPM);
 
   for (int i = 0; i < MAX_NUM_PROC; i++)

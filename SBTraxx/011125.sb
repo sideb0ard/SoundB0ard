@@ -1,7 +1,20 @@
-# bpm 90
-# load_preset(sbdrum, "HRF2");  load_preset(sb2, "MODrr");
-# load_preset(dx, "SMMTH2"); load_preset(dx2, "DZT2");
-# let dx3 = fm(); load_preset(dx3, "WURBKl");
+#bpm 90
+#load_preset(sbdrum, "011125SB");  load_preset(sb2, "011125SB2");
+#load_preset(dx, "SMMTH2"); load_preset(dx2, "yrrztup");
+#let dx3 = fm(); load_preset(dx3, "LOWES");
+#
+#let grnr = loop(loops2/markysnares.wav); note_off(grnr, 0);
+# let sts = loop(loops2/bleepsloop.wav); note_on(sts, 0);
+#let xen = loop(loops2/hiphoosNhats.wav); note_off(xen, 0);
+#let betd = loop(loops2/whatsup.wav); note_off(betd, 0);
+
+# p1 $ dblah_gen;
+# p2 $ chblah_gen;
+# p3 $ melblah_gen;
+
+let key = 49;
+# minor
+let key_type = 1;
 
 let plblah_fn = fn(midi_num, pat)
 {
@@ -11,11 +24,14 @@ let plblah_fn = fn(midi_num, pat)
   }
   for (let i = 0; i < 16; i++) {
     let v = 100 + rand(27);
-    if (i % 4 == 0) {
+    if (midi_num == 0 && i % 4 == 0) {
       v = 127;
     }
     if (midi_num == 0) {
       v = 127;
+    }
+    if (midi_num == 3) {
+      v = 100;
     }
     let offset = -15;
     if (i % 2 == 0) {
@@ -80,17 +96,18 @@ let dblah_gen = gen()
     #print(inbetweens);
 
     for (let i = 0; i < 16; i++) {
+      let v = 80 + rand(30);
       if (inbetweens[i] == 1) {
-        note_on_at(grnr, 0, i * pp, dur = 300);
+        note_on_at(grnr, 0, i * pp, dur = 30, vel = v);
       }
       if (inbetweens[i] == 2) {
-        note_on_at(sts, 0, i * pp, dur = 200);
+        note_on_at(sts, 0, i * pp, dur = 200, vel = v);
       }
       if (inbetweens[i] == 3) {
-        note_on_at(xen, 0, i * pp, dur = 200);
+        note_on_at(xen, 0, i * pp, dur = 200, vel = v);
       }
       if (inbetweens[i] == 4) {
-        note_on_at(betd, 0, i * pp, dur = 200);
+        note_on_at(betd, 0, i * pp, dur = 200, vel = v);
       }
     }
 
@@ -106,10 +123,6 @@ let dblah_gen = gen()
   }
 }
 
-let key = 49;
-# minor
-let key_type = 1;
-
 # argyarpG
 # load_preset(dx, "SMMTH"); load_preset(dx2, "rrrsmth");
 # dx simplePAINOUPDATE flurpE DATRZ2 // rrrsmth
@@ -120,7 +133,7 @@ let chblah_gen = gen()
     let notez = notes_in_key(key, key_type);
     # I V
     #let prog = [0, 0, 4, 5, 0, 4, 3];
-    let prog = [0, 3, 4];
+    let prog = [4, 0];
     let px = 0;
     let rhythm1 = [1, 0, 1, 0,  1, 0, 1, 0,  0, 0, 1, 0,  0, 1, 0, 0];
     let rhythm2 = [1, 0, 0, 1,  0, 1, 0, 1,  1, 0, 1, 0,  0, 1, 0, 1];
@@ -151,7 +164,9 @@ let chblah_gen = gen()
 
     chx = incr(chx, 0, len(chrdmodz));
     dnx = incr(dnx, 0, len(dnz));
-    px = incr(px, 0, len(prog));
+    if (count % 4 == 3) {
+      px = incr(px, 0, len(prog));
+    }
     for (let i = 0; i < 16; i++) {
       let v = 90 + rand(37);
       if (i % 4 == 0) {
@@ -163,10 +178,6 @@ let chblah_gen = gen()
       if (rhythm[i] == 1) {
         note_on_at(dx, chrd, i * pp, dur = durz[drx], vel = v);
         drx = incr(drx, 0, len(durz));
-      } else {
-        if (count % 2 == 1) {
-          note_on_at(dx2, chrd, i * pp, dur=durz[drx], vel = v);
-        }
       }
     }
     if (count % 4 == 2) {
@@ -176,7 +187,7 @@ let chblah_gen = gen()
   }
 }
 
-# dx3 SNURFz WURBKl
+# dx3 SNURFz WURBKl SMURFc raggalo400sus loweeeerrr
 let melblah_gen = gen()
 {
   setup()
@@ -184,7 +195,7 @@ let melblah_gen = gen()
     let mel1 = [51, 0, 0, 57,  0, 0, 61, 0,  52, 0, 0, 56,  0, 51,0 , 49];
     let mel2 = [0, 0, 49, 0,  0, 56, 0, 0,  0, 0, 52, 56,  0, 0, 0, 49];
     let mel3 = [49, 56, 49, 56,  49, 56, 51, 49,  49, 56, 52, 56,  49, 0, 0, 49];
-    let durz = [60, 340, 70, 640, 50];
+    let durz = [60, 40, 170, 64, 150];
     let drx = 0;
     let melz = [mel3, mel1, mel2, mel1, mel1, mel2, mel3];
     let melx = 0;
@@ -212,6 +223,46 @@ let melblah_gen = gen()
     if (count % 9 == 0) {
       sched(0, 0.5, 17, 3840 * 3, "set dx3:l1_rate %");
       sched(3840 * 3, 7, 7, 0, "set dx3:l1_rate %");
+    }
+  }
+}
+
+let dx2blah_gen = gen()
+{
+  setup()
+  {
+    # [37, 39, 40, 42,  44, 45, 47, 49];
+    let mel1 = [37, 37, 0, 0,  0, 37, 0, 0,  0, 0, 40, 0,  0, 39, 0, 0];
+    let mel2 = [0, 0, 39, 0,  0, 37, 0, 0,  45, 0, 0, 44,  0, 0, 37, 0];
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 2 == 1) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx2, mel[i], i * pp, dur = 200);
+      }
+    }
+  }
+}
+
+let modrumzblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    let vinc = 127 / 16;
+    let snarrr = rand_array(16, 0, 1);
+    for (let i = 0; i < 16; i++) {
+      if (snarrr[i] == 1) {
+        note_on_at(sb2, 1, i * pp, vel = i + 1 * vinc);
+        note_on_at(sbdrum, 1, i * pp, vel = i + 1 * vinc);
+      }
     }
   }
 }

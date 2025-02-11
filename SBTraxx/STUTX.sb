@@ -1,5 +1,16 @@
 
+# bpm 104;
 # let tmb = loop(dloops/timbaland2bar.aiff);  note_off(tmb, 0);
+# add_fx(dx, "sidechain", tmb);
+# load_preset(dx, "WURBKl"); load_preset(dx2, "WURBKl");
+# load_preset(dx, "MAW2"); load_preset(dx2, "dreamlandarp");
+# load_preset(dx, "MAW2"); load_preset(dx2, "SMMTH");
+# load_preset(dx, "MAW2"); load_preset(dx2, "yrrztup");
+
+# p1 $ tmbblah_gen
+# p2 $ melblah_gen
+# p3 $ mel2blah_gen
+
 let tmbblah_gen = gen()
 {
   setup()
@@ -10,28 +21,105 @@ let tmbblah_gen = gen()
     let drx = 0;
     let liftz = [8, 2, 4, 6, 12];
     let lfx = 0;
+    let pidx = 0;
   }
   run()
   {
-    for (let i = 0; i < 16; i++) {
-      if (i % playmask == playpos) {
-        note_on_at(tmb, i, i * pp, dur = durz[drx]);
-      } else {
-        note_on_at(sbdrum, 0, i * pp, dur = durz[drx]);
+    if (count % 4 < 3) {
+      for (let i = 0; i < 16; i++) {
+        if (i % playmask == playpos) {
+          note_on_at(tmb, pidx, i * pp, dur = durz[drx]);
+        }
       }
+    } else {
+      for (let i = 0; i < 16; i++) {
+        if (i % playmask == playpos) {
+          note_on_at(tmb, pidx, i * pp, dur = durz[drx]);
+        } else {
+          note_on_at(sbdrum, 0, i * pp);
+        }
+        if (i % 4 == 0) {
+          pidx = incr(pidx, 0, 16);
+        }
+      }
+    }
 
-    }
     drx = incr(drx, 0, len(durz));
-    if (count % 2 == 0) {
-      playmask = incr(playmask, 1, 8);
-      if (count % 4 == 0) {
-        playpos = incr(playpos, 0, playmask);
-      }
-    }
+    playmask = incr(playmask, 1, 8);
+    playpos = incr(playpos, 0, playmask);
 
     if (count % liftz[lfx] == 0) {
       sched(0, 100, 15000, 3840 * liftz[lfx], "set sbdrum:bd_tone %");
       #lfx = incr(lfx, 0, len(liftz));
+    }
+  }
+}
+
+# E
+let key = 28;
+# minor
+let keymod = 1;
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let notez = notes_in_key(key, keymod);
+    # [28, 30, 31, 33,  35, 36, 38, 40]
+    let nidx1 = [7, 5, 2, 3, 5, 5, 0, 1, 3, 5, 7, 7, 4, 2, 4, 5];
+    let nidx2 =  [0, 0, 2, 4, 6, 7, 5, 2, 3, 3,  0, 0, 3, 4, 7, 7];
+    let nidxz = [nidx1, nidx2];
+    let nx = 0;
+    let drz = [100, 200, 300, 600];
+    let drx = 0;
+  }
+  run()
+  {
+    let nidx = nidx1;
+    if (count % 8 > 3) {
+      nidx = nidx2;
+    }
+    for (let i = 0; i < 16; i++) {
+      let note = notez[nidx[nx]];
+      nx = incr(nx, 0, len(nidx));
+      note_on_at(dx, note, i * pp, dur = drz[drx]);
+    }
+    drx = incr(drx, 0, len(drz));
+    if (count % 8 == 7) {
+      solo(dx, at=8*pp);
+    }
+
+  }
+}
+
+let mel2blah_gen = gen()
+{
+  setup()
+  {
+    let notez = notes_in_key(key, keymod);
+    # [28, 30, 31, 33,  35, 36, 38, 40]
+    let nidx1 = [5, 7, 7, 4, 2, 7, 6, 3, 2, 4, 5, 3, 6, 4, 2, 4];
+    let nidx2 = [1, 0, 3, 4, 5, 2, 0, 3, 3, 1, 0, 1, 4, 5, 7, 6];
+    let nx = 0;
+    let drz = [100, 200, 300, 600];
+    let drx = 0;
+    let beat = [1, 1, 0, 1,  0, 0, 1, 0,  1, 1, 1, 1,  0, 0, 0, 0];
+  }
+  run()
+  {
+    let nidx = nidx1;
+    if (count % 8 > 3) {
+      nidx = nidx2;
+      beat = rand_beat();
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        let note = notez[nidx[nx]];
+        nx = incr(nx, 0, len(nidx));
+        note_on_at(dx2, note, i * pp, dur = drz[drx]);
+        drx = incr(drx, 0, len(drz));
+      }
     }
   }
 }
