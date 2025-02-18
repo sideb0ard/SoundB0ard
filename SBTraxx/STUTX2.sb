@@ -1,9 +1,9 @@
-# load_preset(sbdrum, "SNZ"); load_preset(dx, "default"); bpm 104
-# let dbr = loop(noises/loudDubNoise.aiff); note_off(dbr, 0);
-# let sndc = loop(noises/sndCrunchHit.aiff); note_off(sndc, 0);
-# let pxp = loop(glitchz/pxp.aiff); note_off(pxp, 0);
-# let blrp = loop(glitchz/BLURP.aiff); note_off(blrp, 0);
-# let rebp = loop(noises/RevPercMatmos.aiff); note_off(rebp, 0);
+load_preset(sbdrum, "SNZ"); load_preset(dx, "default"); bpm 104
+let dbr = loop(noises/loudDubNoise.aiff); note_off(dbr, 0);
+let sndc = loop(noises/sndCrunchHit.aiff); note_off(sndc, 0);
+let pxp = loop(glitchz/pxp.aiff); note_off(pxp, 0);
+let blrp = loop(glitchz/BLURP.aiff); note_off(blrp, 0);
+let rebp = loop(noises/RevPercMatmos.aiff); note_off(rebp, 0);
 
 # p1 $ controllblah_gen
 # p2 $ melblah_gen

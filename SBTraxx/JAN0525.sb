@@ -1,11 +1,11 @@
-## load_preset(dx, "SMMTH"); load_preset(dx2, "jazz_organ"); load_preset(sb2, "THUG");
-## add_fx(dx, "sidechain", sb2); send("delay", dx);
-## let shkr = loop(skrslazrs/SHØCK07.wav); note_off(shkr, 0);
-## bpm 120; vol dx2 1;
-## let dx3 = fm(); load_preset(dx3, "WURBKl");
+# load_preset(dx, "SMMTH"); load_preset(dx2, "jazz_organ"); load_preset(sb2, "THUG");
+# let shkr = loop(skrslazrs/SHØCK07.wav); note_off(shkr, 0);
+# bpm 120; vol dx2 1;
+# load_preset(dx3, "WURBKl");
 
 
-# p1 $ pblah_gen
+# let dx3 = fm();
+# p1 $ pblah_gen ; sched(0, 0.7, 0, 3840 * 2, "vol kdr %")
 
 let setupblah_fn = fn()
 {
@@ -123,7 +123,8 @@ let sin2blah_gen = gen()
   {
     let sinmel1 =  [51, 0, 0, 51,  0, 0, 51, 0,  0, 55, 0, 0,  51, 0, 0, 0];
     let sinmel2 =  [0, 58, 0, 0,  51, 0, 0, 51,  58, 0, 0, 48,  0, 48, 0, 0];
-    let mels = [sinmel1, sinmel1, sinmel2];
+    # let mels = [sinmel1, sinmel1, sinmel2];
+    let mels = [sinmel1];
     let mx = 0;
     let durz = [100, 200, 500, 1000, 400, 50, 50, 1000, 10, 2000];
     let drx = 0;
@@ -189,6 +190,7 @@ let dblah_gen = gen()
     let kbeat = kbeat1;
     if (count % 8 == 6) {
       kbeat = kbeat2;
+      # note_on(shkr, 0, dur = 0);
     }
     if (count % 4 < 3) {
       playdrum_fn(0, kbeat);
@@ -259,6 +261,8 @@ let pblah_gen = gen()
     set sbdrum:fm2_vol 0.3;
     set sbdrum:fm3_vol 0.3;
 
+    let finished = false;
+
   }
   run()
   {
@@ -321,6 +325,9 @@ let pblah_gen = gen()
       }
     } else {
       if (mcntr < 50) {
+        if (mcntr == 50) {
+          print("MCNTR:", mctr);
+        }
         if (mcntr < 40) {
           # >= 32
           if (count % 2 == 0) {
@@ -337,10 +344,16 @@ let pblah_gen = gen()
           mamahblah_gen();
           EPICblah_gen();
         }
+      } else {
+        if (!finished) {
+          print("LAST SECTION");
+          finished = true;
+        }
+        mamahblah_gen();
       }
     }
     mcntr++;
-    print(mcntr, " ",  count);
+    #print(mcntr, " ",  count);
   }
 }
 

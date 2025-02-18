@@ -328,16 +328,6 @@ StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
   val.left = val.left * volume * eg_amp * pan_left;
   val.right = val.right * volume * eg_amp * pan_right;
 
-  double fft_left_out = fftp_left_chan_.ProcessData(val.left);
-  double fft_right_out = fftp_right_chan_.ProcessData(val.right);
-
-  if (use_fft_) {
-    // std::cout << "val.left:" << val.left << " fft buff:" << fft_out
-    //           << std::endl;
-    val.left = fft_left_out;
-    val.right = fft_right_out;
-  }
-
   val = Effector(val);
 
   return val;

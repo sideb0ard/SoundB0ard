@@ -1,8 +1,16 @@
 # bpm 96;
-# load_preset(sbdrum, "KITSUNE"); load_preset(dx, "DZT2"); load_preset(dx2, "WRRNGZ");
+# load_preset(sbdrum, "KITSUNE"); load_preset(dx, "DZT2");
+# load_preset(dx2, "WRRNGZ");
 # let nz = loop(hallow/detroitrDRONE.wav); note_off(nz, 0);
 
+# p1 $ db2blah_gen
+# p3 $ mel2blah_gen
+# p1 $ breakblah_gen
+
+# p2 $ melblah_gen ; p3 $ bsslah_gen
+
 # p1 $ Controllblah_gen
+# p1 $ melblah_gen
 
 let play_fn = fn(midi_note, pat)
 {
@@ -14,7 +22,7 @@ let play_fn = fn(midi_note, pat)
       if (i % 2 == 1) {
         offset = 7;
       }
-      v = 100 - i;
+      v = 60 - i;
     }
     if (midi_note == 3 || midi_note == 1) {
       offset = 20;
@@ -329,7 +337,9 @@ let sectiontwo_gen = gen()
   }
   run()
   {
-    db2blah_gen();
+    if (count % 4 == 3) {
+      db2blah_gen();
+    }
     mel2blah_gen();
 
     sectionidx++;
@@ -344,7 +354,7 @@ let Controllblah_gen = gen()
   }
   run()
   {
-    if (cntr % 16 < 8) {
+    if (cntr % 16 < 13) {
       sectionone_gen();
     } else {
       sectiontwo_gen();

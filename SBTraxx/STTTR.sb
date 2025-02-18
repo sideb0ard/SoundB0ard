@@ -1,10 +1,23 @@
-#bpm 96;
-#load_preset(sbdrum, "STRZ");
-#load_preset(dx, "SMURFc");
-#let qs1 = loop(qebo/QEBO-LOCKDOWNFM-37FMSNARE5.wav); note_off(qs1, 0);
-#let qs2 = loop(qebo/QEBO-LOCKDOWNFM-40FMSNARE8.wav); note_off(qs2, 0);
-#let qe3 = loop(qebo/QEBO-LOCKDOWNFM-22FMPERCUSSION15.wav); note_off(qe3, 0);
-#let kd = loop(bd/technotronBD.aiff); note_off(kd, 0);
+# bpm 96; vol dx 1;
+# load_preset(sbdrum, "LOGRe2"); set sbdrum:bd_key 25;
+# load_preset(dx, "SMURFc"); load_preset(dx2, "MAW2");
+# let qs1 = loop(qebo/QEBO-LOCKDOWNFM-37FMSNARE5.wav); note_off(qs1, 0);
+# let qs2 = loop(qebo/QEBO-LOCKDOWNFM-40FMSNARE8.wav); note_off(qs2, 0);
+# let qe3 = loop(qebo/QEBO-LOCKDOWNFM-22FMPERCUSSION15.wav); note_off(qe3, 0);
+# let kd = loop(bd/technotronBD.aiff); note_off(kd, 0);
+# let sqrp = loop(bombz/BSQWASPR13.wav); note_off(sqrp, 0);
+# let snrt = loop(bombz/BSQ_M501_s.wav); note_off(snrt, 0);
+# let ovn = loop(hallow/ovalNOTE.wav); note_off(ovn, 0);
+# let rsb = loop(hallow/rustieBLINT.wav); note_off(rsb, 0);
+
+# p1 $ beatlah_gen; vol dx 1
+# p2 $ bsslah_gen
+# p3 $ glitblah_gen
+# p4 $ melblah_gen
+# p1 $ ""; p2 $ ""
+# p1 $ beatlah_gen
+# p2 $ bsslah2_gen;
+# p4 $ melblah2_gen
 
 let play_beat = fn(midi_num, pat)
 {
@@ -34,6 +47,7 @@ let snarerollblah_fn = fn()
   }
 }
 
+
 let beatlah_gen = gen()
 {
   setup()
@@ -42,25 +56,41 @@ let beatlah_gen = gen()
     let cpz = [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
     let chz = [1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0];
     let ohz = [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    let percz = [sqrp, snrt, ovn, rsb];
+    let prx = 0;
+    let prxmax = 1;
+    let drz = [20, 50, 70, 40, 100];
+    let drx = 0;
   }
   run()
   {
     if (count % 16 < 15) {
       play_beat(0, bdz);
-      #play_beat(4, ohz);
-      # for (let i = 0; i < 16; i++) {
-        #   if (bdz[i] == 1) {
-          #     note_on_at(kd, 6, i * pp);
-          #   }
-        # }
+      for (let i = 0; i < 16; i++) {
+        if (bdz[i] == 1) {
+          note_on_at(kd, 6, i * pp);
+        }
+      }
     }
     if (count % 4 < 3) {
       cmbeat(sbdrum, 1);
     } else {
+      play_beat(4, ohz);
       snarerollblah_fn()
     }
     if (count % 2 == 1) {
       play_beat(2, chz);
+    }
+    if (count % 3 == 2) {
+      let invbeat = invert(bdz);
+      for (let i = 0; i < 16; i++) {
+        if (invbeat[i] == 1) {
+          note_on_at(percz[prx], i, i * pp, dur = drz[drx]);
+          prx = incr(prx, 0, prxmax);
+          drx = incr(drx, 0, len(drz));
+        }
+      }
+      prxmax = incr(prxmax, 1, len(percz));
     }
   }
 }
@@ -84,12 +114,10 @@ let bsslah_gen = gen()
     if (count % 4 == 3) {
       bass = bass2;
     }
-    if (count % 32 < 31) {
-      for (let i = 0; i < 16; i++) {
-        if (bass[i] > 0) {
-          note_on_at(dx, bass[i], i * pp, dur = drz[drx]);
-          drx = incr(drx, 0, len(drz));
-        }
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] > 0) {
+        note_on_at(dx, bass[i], i * pp, dur = drz[drx]);
+        drx = incr(drx, 0, len(drz));
       }
     }
   }
@@ -111,7 +139,7 @@ let glitblah_gen = gen()
     }
     for (let i = 0; i < 16; i++) {
       if (pat[i] < len(qez)) {
-        note_on_at(qez[pat[i]], i, i * pp, dur = drz[drx], vel = 80 + rand(30));
+        note_on_at(qez[pat[i]], i, i * pp, dur = drz[drx], vel = 20 + rand(30));
       }
     }
     drx = incr(drx, 0, len(drz));
@@ -146,3 +174,47 @@ let melblah_gen = gen()
   }
 }
 
+let bsslah2_gen = gen()
+{
+  setup()
+  {
+    # [25, 27, 29, 30,  32, 34, 36, 37]
+    let bass1 = [0, 25, 0, 0,  0, 0, 25, 0,  0, 25, 49, 0,  37, 0, 25, 0];
+
+    let drz = [40, 80, 60, 70, 40];
+    let drx = 0;
+  }
+  run()
+  {
+    let bass = bass1;
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] > 0) {
+        note_on_at(dx, bass[i], i * pp, dur = drz[drx]);
+        drx = incr(drx, 0, len(drz));
+      }
+    }
+  }
+}
+
+let melblah2_gen = gen()
+{
+  setup()
+  {
+    # notes_in_key(37)
+    # [37, 39, 41, 42,  44, 46, 48, 49]
+    let mel1 = [37, 0, 0, 44,  0, 39, 0, 0,  49, 0, 41, 0,  56, 0, 37, 0];
+    let drz = [100, 180, 170, 180, 150];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = down(mel1, 12);
+
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx2, mel[i], i * pp, dur = drz[drx]);
+        drx = incr(drx, 0, len(drz));
+      }
+    }
+  }
+}

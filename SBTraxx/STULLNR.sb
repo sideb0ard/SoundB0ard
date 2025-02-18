@@ -7,9 +7,25 @@
 # let plbrd = loop(pads/italianDreamWithBirdz.aiff); note_off(plbrd, 0);
 # let ready = loop(voices/readyOrNot2.wav); note_off(ready, 0); set ready:len 2;
 # load_preset(mo, "flexxy0c");
-# let dx3 = fm(); load_preset(dx3, "WURBKl"); load_preset(sbdrum, "TRUNK");
-
+# load_preset(dx, "SMMTH2");
+# load_preset(dx3, "WURBKl"); load_preset(sbdrum, "TRUNK");
+#
+#let dx3 = fm();
 # p1 $ pcontblah_gen
+
+# p1 $ melblah_gen
+# p2 $ dbe2blah_gen;
+# p3 $ dabasslah_gen
+# p4 $ bsslah_gen
+# dbe2blah_gen && bsslah_gen only
+# p3 $ ""; p1 $ ""
+# bsslah_gen only
+# let kdr = loop(dloops2/kdrttd.wav); set kdr:len 2; vol kdr 0 ;
+# sched(0, 0, 0.9, 3840, "vol kdr %");
+# p4 $ bssBOOMlah_gen; vol dx3 1
+# p1 $ gliblah_gen
+# p2 $ dabass2lah_gen
+
 
 let playblah_fn = fn(mid_num, pat)
 {
@@ -156,7 +172,6 @@ let key = 50;
 # minor
 let keymod = 1;
 
-# load_preset(dx, "SMMTH2");
 let melblah_gen = gen()
 {
   setup()
@@ -183,10 +198,6 @@ let melblah_gen = gen()
           note_on_at(dx, chrd, i * pp, dur = drz[drx], vel = 80 + rand(47));
         }
       }
-    }
-    if (count % 5 == 4) {
-      sched(0, 1, 2, 3840, "set dx:o1rat %");
-      sched(3840, 1, 1, 0, "set dx:o1rat %");
     }
   }
 }
@@ -299,3 +310,71 @@ let gen2melblah_gen = gen()
   }
 }
 
+let bssBOOMlah_gen = gen()
+{
+  setup()
+  {
+    # [50, 52, 53, 55,  57, 58, 60, 62]
+    let bass1 = [50, 0, 0, 50,  0, 50, 0, 50,  0, 50, 0, 0,  50, 0, 50, 0];
+    let bazz = [bass1];
+    let bx = 0;
+    let d = 50;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      bx = incr(bx, 0, len(bazz));
+    }
+    let bass = down(bazz[bx],24);
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] > 0) {
+        note_on_at(dx3, bass[i], i * pp, dur = d);
+        d = d + 10;
+        if (d > 200) {
+          d = 40;
+        }
+      }
+    }
+    if (count % 4 == 3) {
+      solo(dx3, at=10*pp);
+    }
+  }
+}
+
+let gliblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 7 == 3) {
+      set kdr:stutter 1;
+    }
+    if (count % 8 == 2) {
+      set kdr:scramble 1;
+    }
+  }
+}
+
+
+let dabass2lah_gen = gen()
+{
+  setup()
+  {
+    let bass1 = [26, 0, 0, 14,  0, 26, 0, 14,  0, 0, 19, 0,  14, 0, 26, 0];
+    let drz = [40, 100, 150, 200, 10, 50, 300];
+    let drx = 0;
+
+  }
+  run()
+  {
+    let bass = bass1;
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] > 0) {
+        note_on_at(mo, bass[i], i * pp, dur = drz[drx], vel = 110 + rand(17));
+        drx = incr(drx, 0, len(drz));
+      }
+    }
+  }
+}
