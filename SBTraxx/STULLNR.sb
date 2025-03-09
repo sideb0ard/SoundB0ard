@@ -6,26 +6,28 @@
 # let bonv = loop(nuloopz/bongoOutVOCAL.wav); note_off(bonv, 0);
 # let plbrd = loop(pads/italianDreamWithBirdz.aiff); note_off(plbrd, 0);
 # let ready = loop(voices/readyOrNot2.wav); note_off(ready, 0); set ready:len 2;
+# let callme = sample(voices/callme.wav); add_fx(callme, "delay");
 # load_preset(mo, "flexxy0c");
 # load_preset(dx, "SMMTH2");
 # load_preset(dx3, "WURBKl"); load_preset(sbdrum, "TRUNK");
 #
 #let dx3 = fm();
-# p1 $ pcontblah_gen
 
 # p1 $ melblah_gen
 # p2 $ dbe2blah_gen;
 # p3 $ dabasslah_gen
-# p4 $ bsslah_gen
-# dbe2blah_gen && bsslah_gen only
-# p3 $ ""; p1 $ ""
-# bsslah_gen only
-# let kdr = loop(dloops2/kdrttd.wav); set kdr:len 2; vol kdr 0 ;
-# sched(0, 0, 0.9, 3840, "vol kdr %");
-# p4 $ bssBOOMlah_gen; vol dx3 1
-# p1 $ gliblah_gen
-# p2 $ dabass2lah_gen
 
+# p1 $ "";
+# p2 $ ""
+# let kdr = loop(dloops2/kdrttd.wav); set kdr:len 2; vol kdr 0 ; add_fx(kdr, "distort")
+# sched(0, 0, 1, 3840*2, "vol kdr %");
+# p4 $ bssBOOMlah_gen; vol dx3 0.7
+# p1 $ gliblah_gen; p3 $""
+# p2 $ dabass2lah_gen ; p4 $ bssBOOM2lah_gen
+# p4 $ callblah_gen
+# vol kdr 0
+# p5 $ dumbblah_gen
+# p6 $ modrumzblah_gen; load_preset(sbdrum, "HRF2");
 
 let playblah_fn = fn(mid_num, pat)
 {
@@ -335,8 +337,36 @@ let bssBOOMlah_gen = gen()
         }
       }
     }
-    if (count % 4 == 3) {
-      solo(dx3, at=10*pp);
+    if (count % 16 == 15) {
+      solo(dx3, at=12*pp);
+    }
+  }
+}
+
+let bssBOOM2lah_gen = gen()
+{
+  setup()
+  {
+    # [50, 52, 53, 55,  57, 58, 60, 62]
+    let bass1 = [50, 0, 52, 50,  0, 50, 0, 52,  0, 50, 0, 57,  50, 0, 0, 0];
+    let bazz = [bass1];
+    let bx = 0;
+    let d = 50;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      bx = incr(bx, 0, len(bazz));
+    }
+    let bass = down(bazz[bx],24);
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] > 0) {
+        note_on_at(dx3, bass[i], i * pp, dur = d);
+        d = d + 10;
+        if (d > 200) {
+          d = 40;
+        }
+      }
     }
   }
 }
@@ -378,3 +408,92 @@ let dabass2lah_gen = gen()
     }
   }
 }
+
+let callblah_gen = gen()
+{
+  setup()
+  {
+    let dr = 500;
+    let px = 4;
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      note_on_at(callme, 1, px * pp, dur = dr, vel = 100);
+      px = px + 2;
+      if (px > 15) {
+        px = px - 15;
+      }
+      dr = dr + 50;
+      if (dr > 400) {
+        dr = 150;
+      }
+      sched(0, 0, 99, 3840, "set callme:fx0:fb %");
+      sched(3840, 0, 0, 0, "set callme:fx0:fb %");
+    }
+  }
+}
+
+let dumbblah_gen = gen()
+{
+  setup()
+  {
+    # [50, 52, 53, 55,  57, 58, 60, 62]
+    # [62, 64, 65, 67,  69, 70, 72, 74]
+    # [26, 28, 29, 31,  33, 34, 36, 38]
+    let mel1 = [0, 0, 26, 0,  0, 0, 26, 0,  0, 0, 28, 0,  50, 0, 0, 55];
+    let mel2 = [26, 0, 0, 50,  0, 0, 57, 0,  28, 0, 0, 50,  0, 33, 0, 0];
+    let drz = [50, 100, 150, 200];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp, dur = drz[drx]);
+        drx = incr(drx, 0, len(drz));
+      }
+    }
+  }
+}
+
+let modrumzblah_gen = gen()
+{
+  setup()
+  {
+    let bdz = [1, 0, 0, 1,  0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    #let perx = [qeb, stp, giut];
+    let perx = [ready];
+    let prx = 0;
+    let perccount = 0;
+    let drzz = 10;
+  }
+  run()
+  {
+    cmbeat(sbdrum, 3);
+    cmbeat(sbdrum, 1);
+    playblah_fn(0, bdz);
+
+    if (count % 4 == 3) {
+      let hatz = rand_array(16, 0, 1);
+      for (let i = 0; i < 16; i++) {
+        let offz = 20;
+        if (i % 2 == 0) {
+          offz = 0;
+        }
+        if (hatz[i] == 1) {
+          note_on_at(sbdrum, 2, i * pp + offz, vel = 20 + rand(30));
+        } else {
+          note_on_at(perx[prx], 1, i * pp + offz, vel = 10, dur = drzz);
+          prx = incr(prx, 0, len(perx));
+          drzz = incr(drzz, 10, 100);
+        }
+      }
+    }
+  }
+}
+

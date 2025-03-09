@@ -1,16 +1,16 @@
-# bpm 96;
-# load_preset(sbdrum, "KITSUNE"); load_preset(dx, "DZT2");
-# load_preset(dx2, "WRRNGZ");
-# let nz = loop(hallow/detroitrDRONE.wav); note_off(nz, 0);
-
-# p1 $ db2blah_gen
-# p3 $ mel2blah_gen
-# p1 $ breakblah_gen
-
-# p2 $ melblah_gen ; p3 $ bsslah_gen
+bpm 96;
+load_preset(sbdrum, "KITSUNE"); load_preset(dx, "DZT2");
+load_preset(dx2, "WRRNGZ");
+let nz = loop(hallow/detroitrDRONE.wav); note_off(nz, 0);
 
 # p1 $ Controllblah_gen
+
 # p1 $ melblah_gen
+
+let key = 47;
+# minor key scale
+let keymod = 1;
+
 
 let play_fn = fn(midi_note, pat)
 {
@@ -115,10 +115,6 @@ let breakblah_gen = gen()
     }
   }
 }
-
-let key = 47;
-# minor key scale
-let keymod = 1;
 
 # DZT2
 let melblah_gen = gen()

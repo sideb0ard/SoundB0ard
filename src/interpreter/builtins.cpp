@@ -2212,6 +2212,9 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            cmd = "let dx2 = fm(); vol dx2 0.7; load_preset(dx2, \"MAW2\");";
            eval_command_queue.push(cmd);
 
+           cmd = "let dx3 = fm(); vol dx3 0.7; load_preset(dx3, \"SMMTH2\");";
+           eval_command_queue.push(cmd);
+
            cmd = "let mo = moog();";
            eval_command_queue.push(cmd);
 

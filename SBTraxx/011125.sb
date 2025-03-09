@@ -2,7 +2,6 @@
 # load_preset(sbdrum, "011125SB");  load_preset(sb2, "011125SB2");
 # load_preset(dx, "SMMTH2"); load_preset(dx2, "yrrztup");
 # load_preset(dx3, "SNURFz");
-#
 # let grnr = loop(loops2/markysnares.wav); note_off(grnr, 0);
 # let sts = loop(loops2/bleepsloop.wav); note_on(sts, 0);
 # let xen = loop(loops2/hiphoosNhats.wav); note_off(xen, 0);
@@ -14,6 +13,11 @@
 # p2 $ chblah_gen;
 # p4 $ melblah_gen;
 # p5 $ dx2blah_gen;
+
+# send("delay", dx3);
+# sched(0, 0, 490, 3840 * 4, "set mixer:delay:ms %")
+# sched(0, 0, 90, 3840 * 4, "set mixer:delay:fb %")
+# finish on chblah_gen and melblah_gen
 
 # G
 let key = 49;

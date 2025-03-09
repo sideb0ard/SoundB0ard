@@ -1,34 +1,34 @@
-# bpm 104;
-# let tmb = loop(dloops/timbaland2bar.aiff);  note_off(tmb, 0);
-# add_fx(dx, "sidechain", tmb);
-# load_preset(dx, "WUBBBWUB"); load_preset(dx2, "MAW2");
-# let dx3 = fm(); load_preset(dx3, "wuuurodx");
-# load_preset(sb2, "LOGRe");
-# let cmdel = loop(NewLoopz/comeDELAY.wav); note_off(cmdel, 0);
-# let stel = loop(garage/SideStick_Lindrum_24.wav); note_off(stel, 0);
-# let moreg = loop(aaassembly/moREGGAe.wav); note_off(moreg, 0);
-# let kpl = sample(drones/kidspaul.wav);
-# let trn = sample(perc/triangle.aiff);
-# let tfsh = sample(perc/tuffShaker.aiff); send("delay", tfsh);
-# let scc = sample(perc/scratchClap.aiff);
-# let uus = sample(perc/uus.wav);
-# let revr = sample(perc/revnoise.aiff);
+#bpm 104;
+#let tmb = loop(dloops/timbaland2bar.aiff);  note_off(tmb, 0);
+#add_fx(dx, "sidechain", tmb);
+#load_preset(dx, "WUBBBWUB"); load_preset(dx2, "MAW2");
+#load_preset(dx3, "wuuurodx");
+#load_preset(sb2, "LOGRe");
+#let cmdel = loop(NewLoopz/comeDELAY.wav); note_off(cmdel, 0);
+#let stel = loop(garage/SideStick_Lindrum_24.wav); note_off(stel, 0);
+#let moreg = loop(aaassembly/moREGGAe.wav); note_off(moreg, 0);
+#let trn = sample(perc/triangle.aiff);
+#let tfsh = sample(perc/tuffShaker.aiff); send("delay", tfsh);
+#let scc = sample(perc/scratchClap.aiff);
+#let uus = sample(perc/uus.wav);
+#let revr = sample(perc/revnoise.aiff);
 
 # p1 $ tmbblah_gen
-# p2 $ melblah_gen -> bsslah_gen
+# p2 $ bsslah_gen
 # p3 $ mel2blah_gen
-# note_on(kpl, 1, dur = 0, vel = 90);
 # p1 $ ""
 # p4 $ dbblah_gen ; p1 $ tmbblah_gen; p2 $ ""
-# p2 $ bsslah_gen
+#
 # p5 $ dx3blah_gen
 
 # p1 $ ""; p4 $ ""
 # p2 $ ""
 # p1 $ cpppblah_gen // mel2blah_gen // dx3blah2_gen
 # p2 $ dbb2lah_gen; p3 $ ""
-# p4 $ tmb2blah_gen ;  cpppblah_gen // dbb2lah_gen
-# p5 $ dx3blah_gen
+# p4 $ tmb2blah_gen ;  add_fx(dx3, "sidechain", tmb)
+# p5 $ dx3blah2_gen
+# p2 $ "";
+# p5 # ""
 
 let tmbblah_gen = gen()
 {
@@ -302,24 +302,41 @@ let tmb2blah_gen = gen()
     let beat = rand_beat();
     let smpz = [stel, tfsh, uus, revr];
     let sx = 0;
+    let px = 0;
+    let pincr = 1;
+    let dz = [10, 20, 50, 100, 200, 500];
+    let dzx = 0;
   }
   run()
   {
-    if (count % 4 < 3) {
+
+    if (count % 8 < 4) {
+      for (let i = 0; i < 16; i++) {
+        note_on_at(tmb, px, i * pp, dur = dz[dzx]);
+        dzx = incr(dzx, 0, len(dz));
+        if (i % pincr == 0) {
+          px = incr(px, 0, 16);
+        }
+      }
+      pincr = incr(pincr, 1, 7);
+    } else {
       for (let i = 0; i < 16; i++) {
         if (beat[i] == 1) {
-          note_on_at(tmb, i, (16 - i) * pp);
+          note_on_at(tmb, i, (16 - i) * pp, dur = dz[dzx]);
         } else {
-          note_on_at(smpz[sx], 0, i * pp);
+          note_on_at(smpz[sx], 0, i * pp, dur = dz[dzx]);
           sx = incr(sx, 0, len(smpz));
         }
       }
+
+      if (count % 4 == 3) {
+        beat = rand_beat();
+        solo(tmb, at=10 * pp);
+        sched(0, 20, 130, 3840, "set mixer:delay:ms %");
+        sched(3840, 0, 0, 0, "set mixer:delay:ms %");
+        sched(0, 0, 67, 3040, "set mixer:delay:fb %");
+        sched(3840, 0, 0, 0, "set mixer:delay:fb %");
+      }
     }
-    if (count % 4 == 3) {
-      beat = rand_beat();
-      solo(tmb, at=10 * pp);
-    }
-    sched(0, 20, 130, 3840, "set mixer:delay:ms %");
-    sched(0, 0, 67, 3040, "set mixer:delay:fb %");
   }
 }

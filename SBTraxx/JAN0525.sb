@@ -5,7 +5,7 @@
 
 
 # let dx3 = fm();
-# p1 $ pblah_gen ; sched(0, 0.7, 0, 3840 * 2, "vol kdr %")
+# p1 $ pblah_gen ; sched(0, 0.7, 0, 3840 * 2, "vol kdr %"); p2 $ ""
 
 let setupblah_fn = fn()
 {

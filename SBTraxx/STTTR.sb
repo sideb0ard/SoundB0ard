@@ -16,8 +16,7 @@
 # p4 $ melblah_gen
 # p1 $ ""; p2 $ ""
 # p1 $ beatlah_gen
-# p2 $ bsslah2_gen;
-# p4 $ melblah2_gen
+# p2 $ bsslah2_gen; p4 $ melblah2_gen
 
 let play_beat = fn(midi_num, pat)
 {
