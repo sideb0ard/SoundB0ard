@@ -1,16 +1,23 @@
-load_preset(sbdrum, "SNZ"); load_preset(dx, "default"); bpm 104
-load_preset(dx2, "MAW2"); load_preset(dx3, "elellelele");
-let dbr = loop(noises/loudDubNoise.aiff); note_off(dbr, 0);
-let sndc = loop(noises/sndCrunchHit.aiff); note_off(sndc, 0);
-let pxp = loop(glitchz/pxp.aiff); note_off(pxp, 0);
-let blrp = loop(glitchz/BLURP.aiff); note_off(blrp, 0);
-let rebp = loop(noises/RevPercMatmos.aiff); note_off(rebp, 0);
+# load_preset(sbdrum, "SNZ"); load_preset(dx, "default"); bpm 104
+# load_preset(dx2, "MAW2"); load_preset(dx3, "elellelele");
+# let dbr = loop(noises/loudDubNoise.aiff); note_off(dbr, 0);
+# let sndc = loop(noises/sndCrunchHit.aiff); note_off(sndc, 0);
+# let pxp = loop(glitchz/pxp.aiff); note_off(pxp, 0);
+# let blrp = loop(glitchz/BLURP.aiff); note_off(blrp, 0);
+# let rebp = loop(noises/RevPercMatmos.aiff); note_off(rebp, 0);
 
 # p1 $ controllblah_gen
 # p2 $ melblah_gen
 
-# p3 $ dx3blah_gen
-# p4 $ moeaablah_gen
+# p3 $ dx3blah_gen; p1 $""; p2 $ ""
+
+# p1 $ controllblah_gen
+
+# p4 $ moeaablah_gen; p2 $ melblah_gen;  p1 $ ""; p3 $ ""
+# p2 $ ""
+# p5 $ wwwaablah_gen
+# p1 $ controllblah_gen
+#
 
 let key = 41;
 # minor key
@@ -268,6 +275,28 @@ let moeaablah_gen = gen()
     for (let i = 0; i < 16; i++) {
       if (ccz[i] == 1) {
         note_on_at(sbdrum, 2, i * pp, vel = 50 + rand(50));
+      }
+    }
+  }
+}
+
+let wwwaablah_gen = gen()
+{
+  setup()
+  {
+    # [41, 43, 44, 46,  48, 49, 51, 53];
+    let mel1 =  [0, 0, 41, 0,  0, 0, 41, 0,  0, 0, 41, 0,  0, 48, 0, 0];
+    let mel2 =  [0, 0, 43, 0,  0, 0, 46, 0,  0, 0, 43, 0,  0, 44, 0, 0];
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 7 == 0) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(mo, mel[i], i * pp, dur = 70);
       }
     }
   }

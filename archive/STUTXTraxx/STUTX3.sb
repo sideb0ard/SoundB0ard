@@ -1,7 +1,7 @@
-bpm 96;
-load_preset(sbdrum, "KITSUNE"); load_preset(dx, "DZT2");
-load_preset(dx2, "WRRNGZ");
-let nz = loop(hallow/detroitrDRONE.wav); note_off(nz, 0);
+# bpm 96;
+# load_preset(sbdrum, "KITSUNE"); load_preset(dx, "DZT2");
+# load_preset(dx2, "WRRNGZ");
+# let nz = loop(hallow/detroitrDRONE.wav); note_off(nz, 0);
 
 # p1 $ Controllblah_gen
 

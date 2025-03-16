@@ -1,20 +1,23 @@
-#bpm 104;
-#let tmb = loop(dloops/timbaland2bar.aiff);  note_off(tmb, 0);
-#add_fx(dx, "sidechain", tmb);
-#load_preset(dx, "WUBBBWUB"); load_preset(dx2, "MAW2");
-#load_preset(dx3, "wuuurodx");
-#load_preset(sb2, "LOGRe");
-#let cmdel = loop(NewLoopz/comeDELAY.wav); note_off(cmdel, 0);
-#let stel = loop(garage/SideStick_Lindrum_24.wav); note_off(stel, 0);
-#let moreg = loop(aaassembly/moREGGAe.wav); note_off(moreg, 0);
-#let trn = sample(perc/triangle.aiff);
-#let tfsh = sample(perc/tuffShaker.aiff); send("delay", tfsh);
-#let scc = sample(perc/scratchClap.aiff);
-#let uus = sample(perc/uus.wav);
-#let revr = sample(perc/revnoise.aiff);
+bpm 104;
+let tmb = loop(dloops/timbaland2bar.aiff);  note_off(tmb, 0);
+add_fx(dx, "sidechain", tmb);
+load_preset(dx, "CTZ"); load_preset(dx2, "MAW2");
+load_preset(dx3, "wuuurodx");
+load_preset(sb2, "LOGRe");
+let cmdel = loop(NewLoopz/comeDELAY.wav); note_off(cmdel, 0);
+let stel = loop(garage/SideStick_Lindrum_24.wav); note_off(stel, 0);
+let moreg = loop(aaassembly/moREGGAe.wav); note_off(moreg, 0);
+let trn = sample(perc/triangle.aiff);
+let tfsh = sample(perc/tuffShaker.aiff); send("delay", tfsh);
+let scc = sample(perc/scratchClap.aiff);
+let uus = sample(perc/uus.wav);
+let revr = sample(perc/revnoise.aiff);
 
+# dxz - datrx // pointty // CTZ // pandaFORM // skirissh // SNURLPA // SMMTH
+# ETZ
+#
 # p1 $ tmbblah_gen
-# p2 $ bsslah_gen
+# p2 $ bssAAAAAAlah_gen
 # p3 $ mel2blah_gen
 # p1 $ ""
 # p4 $ dbblah_gen ; p1 $ tmbblah_gen; p2 $ ""
@@ -29,6 +32,9 @@
 # p5 $ dx3blah2_gen
 # p2 $ "";
 # p5 # ""
+# p2 $ ""; set dx3:fx0:active 0
+# p4 $ bssAAAAAAlah_gen ; p2 $ dbblah_gen
+
 
 let tmbblah_gen = gen()
 {
@@ -74,12 +80,28 @@ let tmbblah_gen = gen()
   }
 }
 
+let bssAAAAAAlah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 8 < 4) {
+      bssAAlah_gen();
+    } else {
+      bssAAlah2_gen();
+    }
+  }
+}
+
 # E
 let key = 28;
 # minor
 let keymod = 1;
 
-let melblah_gen = gen()
+# dx - pointty
+let bssAAlah2_gen = gen()
 {
   setup()
   {
@@ -175,7 +197,7 @@ let dbblah_gen = gen()
   }
 }
 
-let bsslah_gen = gen()
+let bssAAlah_gen = gen()
 {
   setup()
   {

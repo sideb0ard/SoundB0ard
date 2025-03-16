@@ -1,7 +1,7 @@
-# load_preset(dx, "SMMTH"); load_preset(dx2, "jazz_organ"); load_preset(sb2, "THUG");
-# let shkr = loop(skrslazrs/SHØCK07.wav); note_off(shkr, 0);
-# bpm 120; vol dx2 1;
-# load_preset(dx3, "WURBKl");
+#load_preset(dx, "SMMTH"); load_preset(dx2, "jazz_organ"); load_preset(sb2, "THUG");
+#let shkr = loop(skrslazrs/SHØCK07.wav); note_off(shkr, 0);
+#bpm 120; vol dx2 1;
+#load_preset(dx3, "WURBKl");
 
 
 # let dx3 = fm();

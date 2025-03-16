@@ -1,0 +1,226 @@
+# bpm 125
+# load_preset(dx, "datrx"); load_preset(dx3, "narf2"); vol dx3 1
+# load_preset(sbdrum, "grrooovv"); load_preset(dx2, "WUFFbbgf");
+# let dcg = loop(dloops2/discoCONGO.wav); vol dcg 0;
+# let hdzdd =  loop(dloops2/hatzDISCo.wav); add_fx(hdzdd, "distort"); vol hdzdd 0;
+# let youdidnt = sample(voices/youdidnthink.wav); send("delay", youdidnt);
+# let newj = loop(dloops2/newjackwav.wav); set newj:len 2 ; vol newj 0;
+# newjblah_fn();
+
+# dx datrx // jazz_organ // surgefizz2 // nast0rcG
+# dx3 WURBKl // GUNDx // fnord0 // beump // ptnchnn // narf2
+
+# Key - F#
+let key = 30;
+# melodic minor
+let key_mod = 3;
+# notes_in_key(30, 3)
+# [30, 32, 33, 35,  37, 39, 40, 42]
+
+# p1 $ mblah_gen
+# p2 $ drumblah_gen
+# p3 $ bsslah_gen
+# p4 $ vocblah_gen
+# p5 $ vocblah_gen
+# p6 $ chordblah_gen
+# p7 $ newjblah_gen
+
+let doscozblah_fn = fn()
+{
+  sched(0, 0, 0.7, 3840, "vol dcg %");
+  sched(0, 0, 0.5, 3840 * 2, "vol hdzdd %");
+}
+
+let mblah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [30, 0, 0, 33,  30, 0, 0, 37,  30, 0, 0, 33,  30, 0, 0, 35];
+    let mel2 = [0, 32, 0, 0,  0, 35, 0, 0,  0, 33, 0, 0,  32, 0, 30, 0];
+    let durz = [170, 40, 370, 120, 200, 300, 700];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+
+    if (count % 13 == 12) {
+      solo(dx, at = 12*pp);
+    }
+  }
+}
+
+let bsslah_gen = gen()
+{
+  setup()
+  {
+    # [18, 20, 21, 23,  25, 27, 28, 30]
+    let bmel1 = [0, 0, 18, 0,  0, 0, 18, 0,  0, 0, 18, 0,  0, 18, 0, 0];
+    let bmel2 =  [18, 0, 0, 25,  18, 0, 0, 25,  0, 0, 0, 25,  0, 18, 0, 0];
+  }
+  run()
+  {
+    let bmel = bmel1;
+    if (count % 4 == 3) {
+      bmel = bmel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (bmel[i] > 0) {
+        note_on_at(dx3, bmel[i], i * pp, dur = 280);
+      }
+    }
+    # if (count % 16 == 0) {
+      #   doscozblah_fn();
+      # }
+  }
+}
+
+
+let playblah_fn = fn(mid_note, pat)
+{
+  for (let i = 0; i < 16; i++) {
+    if (pat[i] == 1) {
+      note_on_at(sbdrum ,mid_note, i * pp);
+    }
+  }
+}
+
+let drumblah_gen = gen()
+{
+  setup()
+  {
+    let kd =  [1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0];
+    let hhz = [1, 0, 1, 1,  0, 1, 0, 0,  0, 0, 1, 0,  1, 0, 1, 0];
+  }
+  run()
+  {
+    if (count % 4 < 3) {
+      playblah_fn(0, kd);
+    } else {
+      cmbeat(sbdrum, 3);
+      cmbeat(sbdrum, 2);
+      set dcg:scramble 1;
+      set hdzdd:stutter 1;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      let offz = 40;
+      if (i % 2 == 0) {
+        offz = 0;
+      }
+      if (hhz[i] == 1) {
+        note_on_at(sbdrum, 2, i * pp + offz, vel = 30 + rand(30));
+      }
+    }
+  }
+}
+
+let vocblah_gen = gen()
+{
+  setup()
+  {
+    let lenz = [50, 100, 500, 1000, 400, 200];
+    let lx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      note_on_at(youdidnt, 1, 8 * pp, dur = lenz[lx]);
+      lx = incr(lx, 0, len(lenz));
+      sched(0, 20, 99, 3840, "set mixer:delay:fb %");
+      sched(0, 0, 390, 3840, "set mixer:delay:ms %");
+    }
+  }
+}
+
+let chordblah_gen = gen()
+{
+  setup()
+  {
+    let ntz =  notes_in_key(30, 3);
+    # [30, 32, 33, 35,  37, 39, 40, 42];
+    let chrdz = [0, 0, 5, 4, 2];
+    let cx = 0;
+    let beat1 = [1, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0];
+    let beat2 = [1, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0];
+  }
+  run()
+  {
+
+    let beat = beat1;
+    if (count % 7 == 6) {
+      beat = beat2;
+    }
+    let chrd = notes_in_chord(ntz[chrdz[cx]], 30, 1, 3);
+    cx = incr(cx, 0, len(chrdz));
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(dx2, chrd, i * pp, dur = 300);
+      }
+    }
+    if (count % 4 == 0) {
+      sched(0, 0.1, 0.5, 3840 * 3, "vol dx2 %");
+    }
+    if (count % 4 == 3) {
+      sched(0, 0.5, 0.1, 3840,  "vol dx2 %");
+    }
+  }
+}
+
+let snblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 6 == 5) {
+      let pat = rand_array(16, 0, 1);
+
+      for (let i = 0; i < 16; i++) {
+        if ([pat[i] == 1) {
+          note_on_at(sbdrum, 1, i * pp, dur = 10);
+        }
+      }
+    }
+  }
+}
+
+let newjblah_fn = fn()
+{
+  sched(0, 0, 0.7, 3840, "vol newj %");
+}
+
+let newjblah_gen = gen()
+{
+  setup()
+  {
+    let beat1 = [1, 0, 0, 0,  1, 0, 1, 0,  0, 0, 1, 0,  1, 0, 0, 0];
+    let drz = [50, 100, 250, 500, 200];
+    let drx = 0;
+  }
+  run()
+  {
+    let beat = beat1;
+    if (count % 3 == 0) {
+      beat = rand_beat();
+    }
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(newj, i, i * pp, dur = drz[drx]);
+        drx = incr(drx, 0, len(drz));
+      }
+    }
+  }
+}
+
