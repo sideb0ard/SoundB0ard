@@ -22,14 +22,16 @@ void SoundGrainSample::Initialize(SoundGrainParams params) {
   audiobuffer_num_channels = params.num_channels;
   degrade_by = params.degrade_by;
 
+  incr = params.incr;
+
   reverse_mode = params.reverse_mode;
   if (params.reverse_mode) {
     audiobuffer_cur_pos =
         params.starting_idx + (params.dur_frames * params.num_channels) - 1;
-    incr = -1.0;
+    incr *= -1.0;
   } else {
     audiobuffer_cur_pos = params.starting_idx;
-    incr = 1;
+    incr *= 1;
   }
   audio_buffer = params.audio_buffer;
 

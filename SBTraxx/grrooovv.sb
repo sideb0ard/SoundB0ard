@@ -1,13 +1,15 @@
 # bpm 125
-# load_preset(dx, "datrx"); load_preset(dx3, "narf2"); vol dx3 1
+# load_preset(dx, "SMMTH2"); load_preset(dx3, "narf2"); vol dx3 1
 # load_preset(sbdrum, "grrooovv"); load_preset(dx2, "WUFFbbgf");
 # let dcg = loop(dloops2/discoCONGO.wav); vol dcg 0;
 # let hdzdd =  loop(dloops2/hatzDISCo.wav); add_fx(hdzdd, "distort"); vol hdzdd 0;
 # let youdidnt = sample(voices/youdidnthink.wav); send("delay", youdidnt);
 # let newj = loop(dloops2/newjackwav.wav); set newj:len 2 ; vol newj 0;
+
 # newjblah_fn();
 
-# dx datrx // jazz_organ // surgefizz2 // nast0rcG
+# SMMTH2
+# dx datrx // jazz_organ // surgefizz2 // nast0rcG // SLURXZZ
 # dx3 WURBKl // GUNDx // fnord0 // beump // ptnchnn // narf2
 
 # Key - F#
@@ -20,7 +22,6 @@ let key_mod = 3;
 # p1 $ mblah_gen
 # p2 $ drumblah_gen
 # p3 $ bsslah_gen
-# p4 $ vocblah_gen
 # p5 $ vocblah_gen
 # p6 $ chordblah_gen
 # p7 $ newjblah_gen
@@ -35,22 +36,40 @@ let mblah_gen = gen()
 {
   setup()
   {
-    let mel1 = [30, 0, 0, 33,  30, 0, 0, 37,  30, 0, 0, 33,  30, 0, 0, 35];
-    let mel2 = [0, 32, 0, 0,  0, 35, 0, 0,  0, 33, 0, 0,  32, 0, 30, 0];
-    let durz = [170, 40, 370, 120, 200, 300, 700];
+    # let mel1 = [30, 0, 0, 33,  30, 0, 0, 37,  30, 0, 0, 33,  30, 0, 0, 35];
+    # let mel2 = [0, 32, 0, 0,  0, 35, 0, 0,  0, 33, 0, 0,  32, 0, 30, 0];
+    let mel1 = [30, 0, 33, 33,  30, 32, 0, 37,  30, 0, 37, 33,  30, 0, 0, 35];
+    let mel2 = [0, 32, 0, 0,  30, 35, 0, 0,  0, 33, 42, 0,  32, 0, 30, 54];
+    #let durz = [170, 40, 370, 120, 200, 300, 700];
+    let durz = [70, 40, 37, 20, 200, 70, 400];
     let drx = 0;
+    let velz = [127, 90, 100, 120, 127, 100, 120, 127, 100];
+    let vx = 0;
+    # 2 8
+    let dx2ratz = [8, 2, 1, 0.5];
+    let dx2rx = 0;
+    # 15 12
+    let dx4ratz = [12, 15, 10];
+    let dx4rx = 0;
   }
   run()
   {
     let mel = mel1;
     if (count % 4 == 3) {
       mel = mel2;
+      set dx:o2rat dx2ratz[dx2rx];
+      dx2rx = incr(dx2rx, 0, len(dx2ratz));
+    }
+    if (count % 3 == 2) {
+      set dx:o4rat dx4ratz[dx4rx];
+      dx4rx = incr(dx4rx, 0, len(dx4ratz));
     }
 
     for (let i = 0; i < 16; i++) {
       if (mel[i] > 0) {
-        note_on_at(dx, mel[i], i * pp, dur = durz[drx]);
+        note_on_at(dx, mel[i], i * pp, dur = durz[drx], vel = velz[vx]);
         drx = incr(drx, 0, len(durz));
+        vx = incr(vx, 0, len(velz));
       }
     }
 
@@ -101,6 +120,7 @@ let drumblah_gen = gen()
   {
     let kd =  [1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0];
     let hhz = [1, 0, 1, 1,  0, 1, 0, 0,  0, 0, 1, 0,  1, 0, 1, 0];
+    let ohz = [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 1, 0, 0];
   }
   run()
   {
@@ -111,6 +131,7 @@ let drumblah_gen = gen()
       cmbeat(sbdrum, 2);
       set dcg:scramble 1;
       set hdzdd:stutter 1;
+      playblah_fn(4, ohz);
     }
 
     for (let i = 0; i < 16; i++) {

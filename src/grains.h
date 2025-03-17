@@ -18,6 +18,7 @@ struct SoundGrainParams {
   bool reverse_mode{0};
   int num_channels{0};
   int degrade_by{0};
+  double incr{1};
   std::vector<double> *audio_buffer;
 };
 

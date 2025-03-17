@@ -247,6 +247,7 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
       .num_channels = buffer->num_channels,
       .degrade_by = degrade_by_,
       .audio_buffer = &buffer->audio_buffer,
+      .incr = grain_pitch_,
   };
 
   grain->Initialize(params);
@@ -574,9 +575,7 @@ void Granulator::SetParam(std::string name, double val) {
   else if (name == "release")
     eg_.SetReleaseTimeMsec(val);
   else if (name == "pitch") {
-    use_fft_ = val;
-    fftp_left_chan_.SetPitchSemitones(val);
-    fftp_right_chan_.SetPitchSemitones(val);
+    SetGrainPitch(val);
   }
 }
 
