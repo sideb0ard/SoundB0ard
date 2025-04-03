@@ -35,3 +35,10 @@ bool IsMidiNoteInKey(int midi_note, int key_midi_num);
 bool IsNote(std::string input);
 std::vector<int> ScaleMelodyToKey(const std::vector<int> &melody_in,
                                   int root_midi, int scale);
+
+namespace audioutils {
+// windowing functions.
+double sinc(double x);
+double han(double x, double window_len);
+double blackman(double x, double window_len);
+}  // namespace audioutils

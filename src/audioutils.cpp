@@ -395,3 +395,26 @@ std::vector<int> ScaleMelodyToKey(const std::vector<int> &melody_in,
   }
   return melody_out;
 }
+
+namespace audioutils {
+
+double sinc(double x) {
+  if (std::fabs(x) < std::numeric_limits<double>::epsilon()) {
+    return 1.0;
+  } else {
+    return std::sin(M_PI * x) / (M_PI * x);
+  }
+}
+
+double han(double x, double window_len) {
+  return 0.5 - 0.5 * std::cos(2 * M_PI * x / window_len);
+}
+
+double blackman(double x, double window_len) {
+  if (x >= 0 && x <= window_len) {
+    return 0.42 - 0.5 * std::cos(2 * M_PI * x / window_len) +
+           0.08 * std::cos(4 * M_PI * x / window_len);
+  }
+  return 0;
+}
+}  // namespace audioutils
