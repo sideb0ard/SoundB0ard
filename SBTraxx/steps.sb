@@ -1,0 +1,56 @@
+#let dloop = loop(dloops/raggaWinz.aiff);
+# let dloop2 = loop(dloops2/snapBETA.wav);
+# p2 $ "bd*4"
+
+let stepblah_gen = gen()
+{
+  setup()
+  {
+    let steps = 16;
+    let step_incr = 2;
+    let cur_step = 0;
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      for (let i = 0; i < 16; i++) {
+        note_on_at(dloop, cur_step, i * pp, dur = pp);
+        cur_step = (cur_step + step_incr) % 16;
+      }
+    }
+    if (count % 4 == 0) {
+      step_incr = (step_incr + 2) % 16;
+    }
+    # if (count % 9 < 8) {
+      #   for (let i = 0; i < 16; i++) {
+        #     note_on_at(dloop2, cur_step, i * pp, dur = pp);
+        #     cur_step = (cur_step + step_incr) % 16;
+        #   }
+      # }
+
+    if (count % 3 == 0 ) {
+      set dloop:stutter 1;
+      #set dloop2:scramble 1;
+    }
+    if (count % 7 == 0 ) {
+      #set dloop2:stutter 1;
+      set dloop:scramble 1;
+    }
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (count % 4 == 0) {
+        note_on_at(sbdrum, 0, i * pp);
+      }
+    }
+  }
+}
+

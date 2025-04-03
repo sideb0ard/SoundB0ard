@@ -1,0 +1,146 @@
+# bpm 132;
+#
+# let db = sample("bd/mkKick.aiff");
+# let ch = sample(ch/chezHat.aiff);
+# let ch2 = sample(ch/LOUhat.aiff);
+# let oh = sample(oh/CasioMT70OpenHihat2.aif);
+#
+# let gcp = sample(cp/gaborClap.aiff);
+
+# dx - yrrztup
+# let nas = loop(dloops2/NAS.wav); note_off(nas, 0);
+# let disc = loop(dloops2/dicsoc.wav); note_off(disc, 0);
+
+# D#
+let key = 15;
+let key_mod = 1;
+let notes = notes_in_key(key, key_mod);
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [27, 27, 0, 35,  27, 0, 34, 0,  0, 27, 0, 32,  37, 27, 0, 30];
+    let mel2 = [39, 0, 0, 42,  0, 0, 44, 0,  27, 0, 0, 46,  47, 47, 0, 0];
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx2, mel[i], i * pp, dur = 60, vel = 100 + rand(20));
+      }
+    }
+  }
+}
+
+let bassblah_gen = gen()
+{
+  setup()
+  {
+    # I-vi-IV-V
+    #let chrdprg = [0, 5, 3, 4];
+    # vi-IV-I-V
+    #let chrdprg = [5, 3, 0, 4];
+    # vi-ii-V-I
+    let chrdprg = [5, 1, 4, 0];
+    let chx = 0;
+    let bpat =  [0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 1, 0,  1, 0, 0, 1];
+    let cx = 0;
+    let durz = [100, 250, 300, 500, 10, 50];
+    let drx = 0;
+  }
+  run()
+  {
+    let chrd = notes_in_chord(notes[chrdprg[chx]], key, 0, key_mod);
+    chx = incr(chx, 0, len(chrdprg));
+    for (let i = 0; i < 16; i++) {
+      if (bpat[i] == 1) {
+        let chrdidx = 0;
+        note_on_at(dx, chrd[chrdidx], i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+
+let hatblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    let ppt = 3840 / 24;
+    let ppq = 3840 / 4;
+
+    if (count % 2 == 0) {
+      for (let i = 0; i < 4; i++) {
+        if (rand(8) < 5) {
+          note_on_at(ch, 1,  i * ppq + 2 * ppt, dur = 50, vel = 80 + rand(40));
+        }
+        note_on_at(ch2, 1, i * ppq + 3 * ppt, dur = 50, vel = 80 + rand(40));
+      }
+    }
+  }
+}
+
+let sampblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    let ppt = 3840 / 24;
+    let ppq = 3840 / 4;
+
+    if (count % 2 == 1) {
+      for (let i = 0; i < 4; i++) {
+        if (rand(8) < 5) {
+          note_on_at(disc, 1,  i * ppq + 3 * ppt, dur = 50, vel = 80 + rand(40));
+        }
+        note_on_at(nas, 1, i * ppq + 2 * ppt, dur = 40, vel = 80 + rand(40));
+      }
+    }
+  }
+}
+
+let dbblah_gen = gen()
+{
+  setup()
+  {
+    let bbeat = [1, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 1, 0];
+
+    let htz = rand_array(24, 0, 1);
+  }
+  run()
+  {
+    if (count % 4 ==0) {
+      note_on(sbdrum, 0, dur = 1500);
+      let ohz = mask(rand_array(16, 0, 1), "fff0");
+      for (let i = 0; i < 16; i++) {
+        if (ohz[i] == 1) {
+          note_on_at(oh, 1, i * pp);
+        }
+      }
+
+    }
+    for (let i = 0; i < 16; i++) {
+      if (count % 4 == 0 && i == 0) {
+      } else {
+        if (bbeat[i] == 1) {
+          note_on_at(db, 1, i * pp);
+        }
+      }
+    }
+    if (count % 2 == 1) {
+      cmbeat(sbdrum, 3);
+    }
+  }
+}
+
