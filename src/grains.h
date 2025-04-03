@@ -18,7 +18,7 @@ struct SoundGrainParams {
   bool reverse_mode{0};
   int num_channels{0};
   int degrade_by{0};
-  double incr{1};
+  double pitch_scale{1};
   std::vector<double> *audio_buffer;
 };
 
@@ -47,7 +47,9 @@ struct SoundGrainSample : public SoundGrain {
 
   std::vector<double> *audio_buffer;
   double audiobuffer_cur_pos{0};
-  double incr{0};
+  double pitch_scale{1};
+  double incr{1};
+  std::vector<double> pitched_audio_buffer{0};
 
   int degrade_by{0};
 

@@ -247,7 +247,7 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
       .num_channels = buffer->num_channels,
       .degrade_by = degrade_by_,
       .audio_buffer = &buffer->audio_buffer,
-      .incr = grain_pitch_,
+      .pitch_scale = grain_pitch_,
   };
 
   grain->Initialize(params);
