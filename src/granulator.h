@@ -36,10 +36,10 @@ class Granulator : public SoundGenerator {
  public:
   bool started_{false};
 
-  std::vector<std::unique_ptr<FileBuffer>> file_buffers_{};
-  int cur_file_buffer_idx_{0};
-  // TODO - control matrix for buffer playback
-  int cur_buffer_play_count_{0};
+  std::unique_ptr<FileBuffer> file_buffer_;
+
+  double pitch_ratio_{1};
+  std::vector<double> pitched_buffer_{};
 
   SoundGrainType grain_type_{SoundGrainType::Sample};
   std::unique_ptr<SoundGrain> grain_a_;
@@ -54,8 +54,6 @@ class Granulator : public SoundGenerator {
   int grains_per_sec_{0};
   int grain_duration_frames_{0};
   int grain_spacing_frames_{0};
-
-  double grain_pitch_{1};
 
   bool reverse_mode_{false};
   bool reverse_pending_{false};
@@ -80,7 +78,7 @@ class Granulator : public SoundGenerator {
                               //
 
  public:
-  void SetGrainPitch(double pitch);
+  void SetPitch(double pitch_ratio);
   void SetIncrSpeed(double speed);
   void SetGrainDuration(int dur);
   void SetGrainDensity(int gps);

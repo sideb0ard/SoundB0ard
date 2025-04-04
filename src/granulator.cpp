@@ -1,5 +1,6 @@
 #include "granulator.h"
 
+#include <audioutils.h>
 #include <libgen.h>
 #include <sndfile.h>
 #include <stdlib.h>
@@ -51,13 +52,15 @@ void ScramblePattern(std::array<int, 16> &pattern) {
   pattern[15] = 0;
 }
 
+void check_idx(int *index, int buffer_len) {
+  while (*index < 0.0) *index += buffer_len;
+  while (*index >= buffer_len) *index -= buffer_len;
+}
+
 }  // namespace
 
 void Granulator::Reset() {
-  for (auto &b : file_buffers_) {
-    b->audio_buffer_read_idx = 0;
-  }
-  cur_file_buffer_idx_ = 0;
+  file_buffer_->audio_buffer_read_idx = 0;
   active_grain_ = grain_a_.get();
   incoming_grain_ = grain_b_.get();
   reverse_mode_ = false;
@@ -85,7 +88,7 @@ Granulator::Granulator(std::string filename, unsigned int loop_mode) {
   grain_a_ = std::make_unique<SoundGrainSample>();
   grain_b_ = std::make_unique<SoundGrainSample>();
 
-  file_buffers_.push_back(std::make_unique<FileBuffer>(filename));
+  file_buffer_ = std::make_unique<FileBuffer>(filename);
   SetLoopMode(loop_mode);
   Start();
 }
@@ -95,7 +98,7 @@ Granulator::~Granulator() {
 }
 
 void Granulator::AddBuffer(std::unique_ptr<FileBuffer> fb) {
-  file_buffers_.push_back(std::move(fb));
+  file_buffer_ = std::move(fb);
 }
 
 void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
@@ -108,42 +111,45 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   }
   if (!started_) return;
 
-  if (tinfo.is_start_of_loop) {
-    //   std::cout << "YO<START OF LOOP: Midi IDX:" << cur_midi_idx_
-    //             << " sizteen:" << cur_sixteenth_ << " SAMP:" <<
-    //             tinfo.cur_sample
-    //             << std::endl;
-    std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
-    if (cur_buffer_play_count_ % (buffer->loop_len * buffer->play_for) == 0) {
-      switch (buffer->next_action) {
-        case PlayFirst:
-          cur_file_buffer_idx_ = 0;
-          cur_buffer_play_count_ = 0;
-          break;
-        case PlayNext:
-          cur_file_buffer_idx_ =
-              (cur_file_buffer_idx_ + 1) % file_buffers_.size();
-          cur_buffer_play_count_ = 0;
-          break;
-        case PlayPrevious:
-          cur_file_buffer_idx_ = (cur_file_buffer_idx_ - 1);
-          if (cur_file_buffer_idx_ < 0)
-            cur_file_buffer_idx_ = file_buffers_.size() - 1;
-          cur_buffer_play_count_ = 0;
-          break;
-        case PlayRandom:
-          cur_file_buffer_idx_ = rand() % file_buffers_.size();
-          cur_buffer_play_count_ = 0;
-          break;
-        case NextAction::Stop:
-          Stop();
-          break;
-      }
-    }
-    cur_buffer_play_count_++;
-  }
+  // if (tinfo.is_start_of_loop) {
+  //   //   std::cout << "YO<START OF LOOP: Midi IDX:" << cur_midi_idx_
+  //   //             << " sizteen:" << cur_sixteenth_ << " SAMP:" <<
+  //   //             tinfo.cur_sample
+  //   //             << std::endl;
+  //   std::unique_ptr<FileBuffer> &buffer = file_buffer_;
+  //   if (cur_buffer_play_count_ % (buffer->loop_len * buffer->play_for) == 0)
+  //   {
+  //     switch (buffer->next_action) {
+  //       case PlayFirst:
+  //         cur_file_buffer_idx_ = 0;
+  //         cur_buffer_play_count_ = 0;
+  //         break;
+  //       case PlayNext:
+  //         cur_file_buffer_idx_ =
+  //             (cur_file_buffer_idx_ + 1) % file_buffers_.size();
+  //         cur_buffer_play_count_ = 0;
+  //         break;
+  //       case PlayPrevious:
+  //         cur_file_buffer_idx_ = (cur_file_buffer_idx_ - 1);
+  //         if (cur_file_buffer_idx_ < 0)
+  //           cur_file_buffer_idx_ = file_buffers_.size() - 1;
+  //         cur_buffer_play_count_ = 0;
+  //         break;
+  //       case PlayRandom:
+  //         cur_file_buffer_idx_ = rand() % file_buffers_.size();
+  //         cur_buffer_play_count_ = 0;
+  //         break;
+  //       case NextAction::Stop:
+  //         Stop();
+  //         break;
+  //     }
+  //   }
+  //   cur_buffer_play_count_++;
+  // }
 
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  std::unique_ptr<FileBuffer> &buffer = file_buffer_;
+  std::vector<double> *audio_buffer = &buffer->audio_buffer;
+  if (pitch_ratio_ != 1) audio_buffer = &pitched_buffer_;
 
   double decimal_percent_of_loop = 0;
   if (tinfo.is_midi_tick) {
@@ -152,21 +158,20 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
     if (buffer->loop_mode == LoopMode::loop_mode) {
       decimal_percent_of_loop =
           buffer->cur_midi_idx / (PPBAR * buffer->loop_len);
-      double new_read_idx =
-          decimal_percent_of_loop * buffer->audio_buffer.size();
+      double new_read_idx = decimal_percent_of_loop * audio_buffer->size();
       if (reverse_mode_)
-        new_read_idx = (buffer->audio_buffer.size() - 1) - new_read_idx;
+        new_read_idx = (audio_buffer->size() - 1) - new_read_idx;
 
       new_read_idx =
           fmodf((fmodf(new_read_idx, buffer->size_of_sixteenth *
                                          buffer->plooplen * buffer->loop_len) +
                  buffer->poffset * buffer->size_of_sixteenth),
-                buffer->audio_buffer.size());
+                audio_buffer->size());
 
       // this ensures new_read_idx is even
       if (buffer->num_channels == 2) new_read_idx -= ((int)new_read_idx & 1);
 
-      if (new_read_idx < 0 || new_read_idx > buffer->audio_buffer.size() - 1) {
+      if (new_read_idx < 0 || new_read_idx > audio_buffer->size() - 1) {
         new_read_idx = 0;
         std::cout << "OH YA:" << new_read_idx
                   << " bufflen:" << (buffer->audio_buffer.size() - 1)
@@ -183,7 +188,7 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
             fmodf((buffer->scrambled_pattern[buffer->cur_sixteenth] *
                    buffer->size_of_sixteenth) +
                       rel_pos_within_a_sixteenth,
-                  buffer->audio_buffer.size());
+                  audio_buffer->size());
       }
     }
   }
@@ -232,22 +237,22 @@ void Granulator::LaunchGrain(SoundGrain *grain, mixer_timing_info tinfo) {
   if (quasi_grain_fudge_ != 0)
     duration_frames += rand() % (int)(quasi_grain_fudge_ * 44.1);
 
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  std::unique_ptr<FileBuffer> &file_buffer = file_buffer_;
+  std::vector<double> *audio_buffer = &file_buffer->audio_buffer;
+  if (pitch_ratio_ != 1) audio_buffer = &pitched_buffer_;
 
-  int grain_idx = buffer->audio_buffer_read_idx;
+  int grain_idx = file_buffer->audio_buffer_read_idx;
   if (granular_spray_frames_ > 0)
-    grain_idx +=
-        (rand() % granular_spray_frames_) % buffer->audio_buffer.size();
+    grain_idx += (rand() % granular_spray_frames_) % audio_buffer->size();
 
   SoundGrainParams params = {
       .grain_type = SoundGrainType::Sample,
       .dur_frames = duration_frames,
       .starting_idx = grain_idx,
       .reverse_mode = reverse_mode_,
-      .num_channels = buffer->num_channels,
+      .num_channels = file_buffer->num_channels,
       .degrade_by = degrade_by_,
-      .audio_buffer = &buffer->audio_buffer,
-      .pitch_scale = grain_pitch_,
+      .audio_buffer = audio_buffer,
   };
 
   grain->Initialize(params);
@@ -335,24 +340,22 @@ StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
 }
 
 std::string Granulator::Status() {
-  // FileBuffer &buffer = file_buffers_[cur_file_buffer_idx_];
   std::stringstream ss;
   if (!active || volume == 0)
     ss << ANSI_COLOR_RESET;
   else
     ss << ANSI_COLOR_RED;
   ss << "SBPlayer // vol:" << volume << " pan:" << pan
-     << " pitch:" << grain_pitch_ << "\n";
+     << " pitch:" << pitch_ratio_ << "\n";
   int idx = 0;
-  for (const auto &buffer : file_buffers_) {
-    ss << "      " << idx++ << " " << buffer->filename << " idx:"
-       << (int)(100. / buffer->audio_buffer.size() *
-                buffer->audio_buffer_read_idx)
-       << " mode:" << kLoopModeNames[buffer->loop_mode] << "("
-       << buffer->loop_mode << ")"
-       << " len:" << buffer->loop_len << " play_for:" << buffer->play_for
-       << " next_action:" << kNextAction[buffer->next_action] << "\n";
-  }
+  ss << "      " << idx++ << " " << file_buffer_->filename << " idx:"
+     << (int)(100. / file_buffer_->audio_buffer.size() *
+              file_buffer_->audio_buffer_read_idx)
+     << " mode:" << kLoopModeNames[file_buffer_->loop_mode] << "("
+     << file_buffer_->loop_mode << ")"
+     << " len:" << file_buffer_->loop_len
+     << " play_for:" << file_buffer_->play_for
+     << " next_action:" << kNextAction[file_buffer_->next_action] << "\n";
   ss << ANSI_COLOR_RESET;
   return ss.str();
 }
@@ -363,7 +366,7 @@ std::string Granulator::Info() {
 
   std::stringstream ss;
   ss << INSTRUMENT_COLOR << "\nSBPlayer // vol:" << volume << " pan:" << pan
-     << " pitch:" << grain_pitch_ << "\ngrain_dur_ms:" << grain_duration_frames_
+     << " pitch:" << pitch_ratio_ << "\ngrain_dur_ms:" << grain_duration_frames_
      << " grains_per_sec:" << grains_per_sec_
      << " quasi_grain_fudge:" << quasi_grain_fudge_
      << " grain_spray_ms:" << granular_spray_frames_ / 44.1
@@ -373,13 +376,12 @@ std::string Granulator::Info() {
      << " grain_ramp_time:" << grain_ramp_time_ << "\n";
 
   int idx = 0;
-  for (const auto &buffer : file_buffers_) {
-    ss << ANSI_COLOR_WHITE << idx++ << " " << buffer->filename
-       << " speed:" << buffer->incr_speed
-       << " mode:" << kLoopModeNames[buffer->loop_mode]
-       << " poffset:" << buffer->poffset << " plooplen:" << buffer->plooplen
-       << " pinc:" << buffer->pinc;
-  }
+  ss << ANSI_COLOR_WHITE << idx++ << " " << file_buffer_->filename
+     << " speed:" << file_buffer_->incr_speed
+     << " mode:" << kLoopModeNames[file_buffer_->loop_mode]
+     << " poffset:" << file_buffer_->poffset
+     << " plooplen:" << file_buffer_->plooplen
+     << " pinc:" << file_buffer_->pinc;
 
   return ss.str();
 }
@@ -413,21 +415,60 @@ void Granulator::SetQuasiGrainFudge(int fudgefactor) {
   quasi_grain_fudge_ = fudgefactor;
 }
 
-void Granulator::SetGrainPitch(double pitch) {
-  std::cout << "YO REPITCH YO!\n";
-  grain_pitch_ = pitch;
+// google gemini derived version
+std::vector<double> resample(const std::vector<double> &input, int num_channels,
+                             double pitch_ratio) {
+  std::cout << "RESAMPLE!\n";
+  int input_size = input.size() / num_channels;
+  int output_size = static_cast<int>(input_size * (1 / pitch_ratio));
+  std::vector<double> output(output_size * num_channels, 0.0);
+
+  int window_size = 31;
+
+  for (int n = 0; n < output_size; ++n) {
+    double input_index = static_cast<double>(n) / (1 / pitch_ratio);
+    int left = static_cast<int>(floor(input_index));
+
+    for (int k = -(window_size / 2); k <= (window_size / 2); ++k) {
+      int input_sample_idx = left + k;
+      check_idx(&input_sample_idx, input.size());
+
+      double window_value = audioutils::blackman(
+          k + (window_size / 2), window_size);  // Shift window to be centered
+
+      int read_idx = input_sample_idx * num_channels;
+      check_idx(&read_idx, input.size());
+
+      // Left channel
+      output[n * num_channels] +=
+          input[read_idx] * audioutils::sinc(input_index - input_sample_idx) *
+          window_value;
+      // Right channel
+      read_idx += 1;
+      check_idx(&read_idx, input.size());
+      output[n * num_channels + 1] +=
+          input[read_idx] * audioutils::sinc(input_index - input_sample_idx) *
+          window_value;
+    }
+  }
+  return output;
+}
+
+void Granulator::SetPitch(double pitch_ratio) {
+  pitch_ratio_ = pitch_ratio;
+  pitched_buffer_ = resample(file_buffer_->audio_buffer,
+                             file_buffer_->num_channels, pitch_ratio_);
 }
 
 void Granulator::SetIncrSpeed(double speed) {
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
-  buffer->incr_speed = speed;
+  file_buffer_->incr_speed = speed;
 }
 
 void Granulator::SetReverseMode(bool b) { reverse_mode_ = b; }
 
 void Granulator::SetLoopMode(unsigned int m) {
   volume = 0.2;
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  std::unique_ptr<FileBuffer> &buffer = file_buffer_;
   switch (m) {
     case (0):
       buffer->loop_mode = LoopMode::loop_mode;
@@ -448,7 +489,7 @@ void Granulator::SetLoopMode(unsigned int m) {
   }
 }
 void Granulator::SetScramblePending() {
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  std::unique_ptr<FileBuffer> &buffer = file_buffer_;
   buffer->scramble_pending = true;
   ScramblePattern(buffer->scrambled_pattern);
 }
@@ -460,16 +501,14 @@ void Granulator::SetStopPending(int loops) {
 }
 
 void Granulator::SetStutterPending() {
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
-  buffer->stutter_pending = true;
-  StutterPattern(buffer->scrambled_pattern);
+  file_buffer_->stutter_pending = true;
+  StutterPattern(file_buffer_->scrambled_pattern);
 }
 void Granulator::SetReversePending() { reverse_pending_ = true; }
 
 void Granulator::SetLoopLen(double bars) {
   if (bars != 0) {
-    std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
-    buffer->SetLoopLen(bars);
+    file_buffer_->SetLoopLen(bars);
   }
 }
 
@@ -480,11 +519,14 @@ void Granulator::SetDegradeBy(int degradation) {
 void Granulator::NoteOn(midi_event ev) {
   started_ = true;
   int sixteenth_pos = ev.data1 % 16;
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  std::unique_ptr<FileBuffer> &buffer = file_buffer_;
   buffer->cur_midi_idx = sixteenth_pos * 240;
   int decimal_percent_of_loop =
       buffer->cur_midi_idx / (PPBAR * buffer->loop_len);
-  double new_read_idx = decimal_percent_of_loop * buffer->audio_buffer.size();
+
+  auto audio_buffer = &buffer->audio_buffer;
+  if (pitch_ratio_ != 1) audio_buffer = &pitched_buffer_;
+  double new_read_idx = decimal_percent_of_loop * audio_buffer->size();
   grain_a_->SetReadIdx(new_read_idx);
   grain_b_->SetReadIdx(new_read_idx);
   next_grain_launch_sample_time_ = 0;
@@ -503,30 +545,30 @@ void Granulator::NoteOff(midi_event ev) {
 }
 
 void Granulator::SetPidx(int val) {
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  std::unique_ptr<FileBuffer> &buffer = file_buffer_;
   buffer->poffset = abs(val - buffer->cur_sixteenth) % 16;
 }
 
 void Granulator::SetPOffset(int p) {
   if (p >= 0 && p <= 15) {
-    std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+    std::unique_ptr<FileBuffer> &buffer = file_buffer_;
     buffer->poffset = p;
   }
 }
 
 void Granulator::SetPlooplen(int plooplen) {
   if (plooplen > 0 && plooplen <= 16) {
-    std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+    std::unique_ptr<FileBuffer> &buffer = file_buffer_;
     buffer->plooplen = plooplen;
   }
 }
 void Granulator::SetPinc(int pinc) {
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  std::unique_ptr<FileBuffer> &buffer = file_buffer_;
   buffer->pinc = pinc;
 }
 
 void Granulator::SetParam(std::string name, double val) {
-  std::unique_ptr<FileBuffer> &buffer = file_buffers_[cur_file_buffer_idx_];
+  std::unique_ptr<FileBuffer> &buffer = file_buffer_;
   if (name == "active") {
     Start();
   } else if (name == "on") {
@@ -538,8 +580,10 @@ void Granulator::SetParam(std::string name, double val) {
   else if (name == "mode") {
     SetLoopMode(val);
   } else if (name == "idx") {
+    auto audio_buffer = &buffer->audio_buffer;
+    if (pitch_ratio_ != 1) audio_buffer = &pitched_buffer_;
     if (val <= 100) {
-      double pos = val / 100. * buffer->audio_buffer.size();
+      double pos = val / 100. * audio_buffer->size();
       buffer->SetAudioBufferReadIdx(pos);
     }
   } else if (name == "len")
@@ -575,15 +619,12 @@ void Granulator::SetParam(std::string name, double val) {
   else if (name == "release")
     eg_.SetReleaseTimeMsec(val);
   else if (name == "pitch") {
-    SetGrainPitch(val);
+    SetPitch(val);
   }
 }
 
 void Granulator::SetSubParam(int id, std::string name, double val) {
-  if (id < file_buffers_.size()) {
-    std::unique_ptr<FileBuffer> &buffer = file_buffers_[id];
-    buffer->SetParam(name, val);
-  }
+  file_buffer_->SetParam(name, val);
 }
 
 }  // namespace SBAudio
