@@ -33,6 +33,11 @@ int GetMidiNumForKey(char c) {
   }
 }
 
+void check_idx(int *index, int buffer_len) {
+  while (*index < 0.0) *index += buffer_len;
+  while (*index >= buffer_len) *index -= buffer_len;
+}
+
 }  // namespace
 
 int GetRootNote(int key, int index) {
@@ -417,4 +422,41 @@ double blackman(double x, double window_len) {
   }
   return 0;
 }
+
+std::vector<double> resample(const std::vector<double> &input, int num_channels,
+                             double pitch_ratio) {
+  int input_size = input.size() / num_channels;
+  int output_size = static_cast<int>(input_size * (1 / pitch_ratio));
+  std::vector<double> output(output_size * num_channels, 0.0);
+
+  int window_size = 31;
+
+  for (int n = 0; n < output_size; ++n) {
+    double input_index = static_cast<double>(n) / (1 / pitch_ratio);
+    int left = static_cast<int>(floor(input_index));
+
+    for (int k = -(window_size / 2); k <= (window_size / 2); ++k) {
+      int input_sample_idx = left + k;
+      check_idx(&input_sample_idx, input.size());
+
+      double window_value = blackman(
+          k + (window_size / 2), window_size);  // Shift window to be centered
+
+      int read_idx = input_sample_idx * num_channels;
+      check_idx(&read_idx, input.size());
+
+      // Left channel
+      output[n * num_channels] +=
+          input[read_idx] * sinc(input_index - input_sample_idx) * window_value;
+      // Right channel
+      read_idx += 1;
+      check_idx(&read_idx, input.size());
+      output[n * num_channels + 1] +=
+          input[read_idx] * audioutils::sinc(input_index - input_sample_idx) *
+          window_value;
+    }
+  }
+  return output;
+}
+
 }  // namespace audioutils

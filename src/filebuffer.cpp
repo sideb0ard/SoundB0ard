@@ -9,7 +9,7 @@ namespace SBAudio {
 const std::array<std::string, 3> kLoopModeNames = {"LOOP", "STATIC", "SMUDGE"};
 
 void FileBuffer::ImportFile(std::string filename) {
-  AudioBufferDetails deetz = ImportFileContents(audio_buffer, filename);
+  AudioBufferDetails deetz = ImportFileContents(audio_buffer_, filename);
   num_channels = deetz.num_channels;
   SetLoopLen(1);
 }
@@ -17,13 +17,15 @@ void FileBuffer::ImportFile(std::string filename) {
 void FileBuffer::SetParam(std::string param, double value) {
   if (param == "idx") {
     if (value <= 100) {
-      double pos = value / 100. * audio_buffer.size();
+      double pos = value / 100. * GetAudioBuffer()->size();
       SetAudioBufferReadIdx(pos);
     }
   } else if (param == "len")
     SetLoopLen(value);
   else if (param == "pidx")
     SetPidx(value);
+  else if (param == "pitch")
+    SetPitch(value);
   else if (param == "poffset")
     SetPOffset(value);
   else if (param == "plooplen")
@@ -58,6 +60,13 @@ void FileBuffer::SetParam(std::string param, double value) {
 
 void FileBuffer::SetPidx(int val) { poffset = abs(val - cur_sixteenth) % 16; }
 
+void FileBuffer::SetPitch(double pitch_ratio) {
+  pitch_ratio_ = pitch_ratio;
+  pitched_audio_buffer_ =
+      audioutils::resample(audio_buffer_, num_channels, pitch_ratio_);
+  SetLoopLen(loop_len);
+}
+
 void FileBuffer::SetPOffset(int poffset) {
   if (poffset >= 0 && poffset <= 15) {
     poffset = poffset;
@@ -73,15 +82,22 @@ void FileBuffer::SetPinc(int p) { pinc = p; }
 void FileBuffer::SetLoopLen(double bars) {
   if (bars != 0) {
     loop_len = bars;
-    size_of_sixteenth = audio_buffer.size() / bars / 16.;
+    size_of_sixteenth = GetAudioBuffer()->size() / bars / 16.;
   }
 }
 
 void FileBuffer::SetAudioBufferReadIdx(size_t pos) {
-  if (pos < 0 || pos >= audio_buffer.size()) {
+  if (pos < 0 || pos >= GetAudioBuffer()->size()) {
     return;
   }
   audio_buffer_read_idx = pos;
+}
+
+std::vector<double>* FileBuffer::GetAudioBuffer() {
+  if (pitch_ratio_ != 1) {
+    return &pitched_audio_buffer_;
+  }
+  return &audio_buffer_;
 }
 
 }  // namespace SBAudio

@@ -23,7 +23,8 @@ enum NextAction {
   Stop,
 };
 
-struct FileBuffer {
+class FileBuffer {
+ public:
   FileBuffer() = default;
   FileBuffer(std::string filename) : filename{filename} {
     ImportFile(filename);
@@ -39,9 +40,12 @@ struct FileBuffer {
   void SetPOffset(int poffset);
   void SetPlooplen(int plooplen);
   void SetPinc(int pinc);
+  void SetPitch(double pitch_ratio);
   void SetLoopMode(unsigned int m);
   void SetScramblePending();
   void SetStutterPending();
+
+  std::vector<double>* GetAudioBuffer();
 
   bool scramble_mode{false};
   bool scramble_pending{false};
@@ -50,7 +54,6 @@ struct FileBuffer {
   bool stutter_pending{false};
 
   std::string filename{};
-  std::vector<double> audio_buffer{};
   int num_channels{2};
 
   LoopMode loop_mode{LoopMode::loop_mode};
@@ -74,6 +77,12 @@ struct FileBuffer {
 
   int play_for{1};  // loops
   NextAction next_action{PlayFirst};
+
+  double pitch_ratio_{1};
+
+ private:
+  std::vector<double> audio_buffer_{};
+  std::vector<double> pitched_audio_buffer_{};
 };
 
 }  // namespace SBAudio

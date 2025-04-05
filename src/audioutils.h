@@ -41,4 +41,7 @@ namespace audioutils {
 double sinc(double x);
 double han(double x, double window_len);
 double blackman(double x, double window_len);
+
+std::vector<double> resample(const std::vector<double> &input, int num_channels,
+                             double pitch_ratio);
 }  // namespace audioutils
