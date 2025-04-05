@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include <array>
+#include <future>
 #include <string>
 #include <vector>
 
@@ -26,8 +27,8 @@ enum NextAction {
 class FileBuffer {
  public:
   FileBuffer() = default;
-  FileBuffer(std::string filename) : filename{filename} {
-    ImportFile(filename);
+  FileBuffer(std::string filename) : filename_{filename} {
+    ImportFile(filename_);
   };
   ~FileBuffer() = default;
 
@@ -46,43 +47,44 @@ class FileBuffer {
   void SetStutterPending();
 
   std::vector<double>* GetAudioBuffer();
+  void CheckPendingRepitch();
 
-  bool scramble_mode{false};
-  bool scramble_pending{false};
+  bool scramble_mode_{false};
+  bool scramble_pending_{false};
 
-  bool stutter_mode{false};
-  bool stutter_pending{false};
+  bool stutter_mode_{false};
+  bool stutter_pending_{false};
 
-  std::string filename{};
-  int num_channels{2};
+  std::string filename_{};
+  int num_channels_{2};
 
-  LoopMode loop_mode{LoopMode::loop_mode};
-  int loop_len{-1};
+  LoopMode loop_mode_{LoopMode::loop_mode};
+  int loop_len_{-1};
 
-  int size_of_sixteenth{0};
-  int audio_buffer_read_idx{0};
+  int size_of_sixteenth_{0};
+  int audio_buffer_read_idx_{0};
 
-  std::array<int, 16> scrambled_pattern{0};
+  std::array<int, 16> scrambled_pattern_{0};
 
-  int cur_sixteenth{0};
+  int cur_sixteenth_{0};
 
-  double incr_speed{1};
-  double cur_midi_idx{0};
+  double incr_speed_{1};
+  double cur_midi_idx_{0};
 
-  double plooplen{16};
-  double poffset{0};
-  int pinc{1};
-  bool pbounce{false};
-  bool preverse{false};
-
-  int play_for{1};  // loops
-  NextAction next_action{PlayFirst};
+  double plooplen_{16};
+  double poffset_{0};
+  int pinc_{1};
 
   double pitch_ratio_{1};
+  double pending_pitch_ratio_{0};
+
+  std::mutex pending_pitch_mutex_;
 
  private:
   std::vector<double> audio_buffer_{};
   std::vector<double> pitched_audio_buffer_{};
+  // run repitch operation in an async task and switch out
+  std::future<std::vector<double>> pending_pitched_audio_buffer_;
 };
 
 }  // namespace SBAudio
