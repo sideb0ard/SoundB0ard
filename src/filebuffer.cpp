@@ -89,8 +89,6 @@ void FileBuffer::CheckPendingRepitch() {
 
   if (pending_pitched_audio_buffer_.wait_for(std::chrono::seconds(0)) ==
       std::future_status::ready) {
-    std::cout << "PENDING...\n";
-    // if (pending_pitch_mutex_.try_lock()) {
     std::lock_guard<std::mutex> lock(pending_pitch_mutex_);
     pitched_audio_buffer_ = pending_pitched_audio_buffer_.get();
     pitch_ratio_ = pending_pitch_ratio_;

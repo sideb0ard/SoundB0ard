@@ -25,9 +25,6 @@ DrumSampler::DrumSampler(std::string filename) {
     return;
   }
 
-  glitch_mode = false;
-  glitch_rand_factor = 20;
-
   type = DRUMSAMPLER_TYPE;
 
   eg.SetEgMode(ANALOG);
@@ -45,45 +42,55 @@ DrumSampler::DrumSampler(std::string filename) {
 
 StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
   (void)tinfo;
+  file_buffer_->CheckPendingRepitch();
 
-  double left_val = 0;
-  double right_val = 0;
-  if (!is_playing) return {left_val, right_val};
+  StereoVal out = {0., 0.};
+  if (!is_playing) return out;
 
   if (stop_pending_ && eg.m_state == OFFF) {
     is_playing = false;
-    return {left_val, right_val};
+    return out;
   }
 
   double amp_env = eg.DoEnvelope(NULL);
   if (amp_env == 0) {
     is_playing = false;
-    return {left_val, right_val};
+    return out;
   }
 
+  std::vector<double> *audio_buffer = file_buffer_->GetAudioBuffer();
+
   double amp = scaleybum(0, 127, 0, 1, velocity);
-  left_val += buffer[play_idx] * amp;
 
-  if (channels == 2)
-    right_val += buffer[play_idx + 1] * amp;
-  else
-    right_val = left_val;
+  int read_idx = (int)file_buffer_->audio_buffer_read_idx_;
 
-  if (!glitch_mode || glitch_rand_factor > (rand() % 100)) {
-    if (reverse_mode)
-      play_idx -= channels * buffer_pitch;
-    else
-      play_idx += channels * buffer_pitch;
-    // this ensures play_idx is even
-    if (channels == 2) play_idx -= ((int)play_idx & 1);
-
-    if (play_idx >= buf_end_pos) {
+  if (read_idx >= audio_buffer->size()) {
+    is_playing = false;
+    return out;
+  }
+  if (file_buffer_->num_channels_ > 1) {
+    if (read_idx + 1 >= audio_buffer->size()) {
       is_playing = false;
+      return out;
     }
-    if (play_idx < 0) {
-      is_playing = false;
-      reverse_mode = false;
-    }
+  }
+
+  out.left = (*audio_buffer)[read_idx] * amp;
+  if (file_buffer_->num_channels_ == 1) {
+    out.right = out.left;
+  } else if (file_buffer_->num_channels_ == 2) {
+    int read_idx_right = read_idx + 1;
+    out.right = (*audio_buffer)[read_idx_right] * amp;
+  }
+
+  file_buffer_->audio_buffer_read_idx_ += (incr_ * file_buffer_->num_channels_);
+
+  if (file_buffer_->audio_buffer_read_idx_ >= audio_buffer->size()) {
+    is_playing = false;
+  }
+  if (file_buffer_->audio_buffer_read_idx_ < 0) {
+    is_playing = false;
+    reverse_mode = false;
   }
 
   float out_vol = volume * amp_env;
@@ -94,8 +101,9 @@ StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
   double pan_right = 0.707;
   calculate_pan_values(pan, &pan_left, &pan_right);
 
-  StereoVal out = {.left = left_val * out_vol * pan_left,
-                   .right = right_val * out_vol * pan_right};
+  out.left *= out_vol * pan_left;
+  out.right *= out_vol * pan_right;
+
   out = Effector(out);
   return out;
 }
@@ -107,10 +115,9 @@ std::string DrumSampler::Status() {
     ss << ANSI_COLOR_RESET;
   else
     ss << COOL_COLOR_PINK;
-
-  ss << "Sampler(" << filename << ")"
-     << " vol:" << volume << " pan:" << pan << " pitch:" << buffer_pitch
-     << ANSI_COLOR_RESET;
+  ss << "Sampler(" << file_buffer_->filename_ << ")"
+     << " vol:" << volume << " pan:" << pan
+     << " pitch:" << file_buffer_->pitch_ratio_ << ANSI_COLOR_RESET;
 
   return ss.str();
 }
@@ -119,13 +126,13 @@ std::string DrumSampler::Info() {
   std::stringstream ss;
   ss << std::setprecision(2) << std::fixed;
   ss << ANSI_COLOR_BLUE << "\nSample ";
-  ss << ANSI_COLOR_WHITE << filename << ANSI_COLOR_BLUE;
-  ss << "\nvol:" << volume << " pan:" << pan << " pitch:" << buffer_pitch;
+  ss << ANSI_COLOR_WHITE << file_buffer_->filename_ << ANSI_COLOR_BLUE;
+  ss << "\nvol:" << volume << " pan:" << pan
+     << " pitch:" << file_buffer_->pitch_ratio_;
   ss << " attack_ms:" << eg.m_attack_time_msec;
   ss << " decay_ms:" << eg.m_decay_time_msec
      << " release_ms:" << eg.m_release_time_msec;
-  ss << "\nreverse:" << reverse_mode << " glitch:" << glitch_mode
-     << " gpct:" << glitch_rand_factor;
+  ss << "\nreverse:" << reverse_mode;
   return ss.str();
 }
 
@@ -136,8 +143,12 @@ void DrumSampler::Start() {
 
 void DrumSampler::NoteOn(midi_event ev) {
   is_playing = true;
-  play_idx = 0;
-  if (reverse_mode) play_idx = bufsize - 2;
+  file_buffer_->audio_buffer_read_idx_ = 0;
+  if (reverse_mode) {
+    file_buffer_->audio_buffer_read_idx_ =
+        file_buffer_->GetAudioBuffer()->size() - 2;
+    incr_ = -1;
+  }
   velocity = ev.data2;
   eg.StartEg();
   stop_pending_ = false;
@@ -153,36 +164,19 @@ void DrumSampler::PitchBend(midi_event ev) {
   SetPitch(pitch_val);
 }
 
-bool DrumSampler::ImportFile(std::string fname) {
-  AudioBufferDetails deetz = ImportFileContents(buffer, fname);
-  if (deetz.buffer_length == 0) return false;
-
-  filename = deetz.filename;
-  bufsize = deetz.buffer_length;
-  buf_end_pos = bufsize;
-  buffer_pitch = 1.0;
-  samplerate = deetz.sample_rate;
-  channels = deetz.num_channels;
-  return true;
+bool DrumSampler::ImportFile(std::string filename) {
+  file_buffer_ = std::make_unique<FileBuffer>(filename);
+  if (file_buffer_) return true;
+  return false;
 }
 
-void DrumSampler::SetPitch(double v) {
-  if (v >= 0. && v <= 2.0)
-    buffer_pitch = v;
-  else
-    printf("Must be in the range of 0.0 .. 2.0\n");
-}
+void DrumSampler::SetPitch(double v) { file_buffer_->SetPitch(v); }
 
 void DrumSampler::SetAttackTime(double val) { eg.SetAttackTimeMsec(val); }
 void DrumSampler::SetDecayTime(double val) { eg.SetDecayTimeMsec(val); }
 void DrumSampler::SetSustainLvl(double val) { eg.SetSustainLevel(val); }
 void DrumSampler::SetReleaseTime(double val) { eg.SetReleaseTimeMsec(val); }
 
-void DrumSampler::SetGlitchMode(bool b) { glitch_mode = b; }
-
-void DrumSampler::SetGlitchRandFactor(int pct) {
-  if (pct >= 0 && pct <= 100) glitch_rand_factor = pct;
-}
 void DrumSampler::SetParam(std::string name, double val) {
   if (name == "pitch")
     SetPitch(val);
@@ -192,12 +186,9 @@ void DrumSampler::SetParam(std::string name, double val) {
     SetDecayTime(val);
   else if (name == "release_ms")
     SetReleaseTime(val);
-  else if (name == "reverse")
+  else if (name == "reverse") {
     reverse_mode = val;
-  else if (name == "glitch")
-    glitch_mode = val;
-  else if (name == "gpct") {
-    if (val >= 0 && val <= 100) glitch_rand_factor = val;
+    incr_ = -1 * reverse_mode;
   }
 }
 

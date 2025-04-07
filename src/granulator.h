@@ -38,9 +38,6 @@ class Granulator : public SoundGenerator {
 
   std::unique_ptr<FileBuffer> file_buffer_;
 
-  double pitch_ratio_{1};
-  std::vector<double> pitched_buffer_{};
-
   SoundGrainType grain_type_{SoundGrainType::Sample};
   std::unique_ptr<SoundGrain> grain_a_;
   std::unique_ptr<SoundGrain> grain_b_;
