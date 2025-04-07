@@ -1,0 +1,18 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+
+    let beat = [1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(sbdrum, 0, i * pp);
+      }
+    }
+  }
+}
+
