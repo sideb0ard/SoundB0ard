@@ -40,6 +40,7 @@ void FileBuffer::SetPitch(double pitch_ratio) {
   std::lock_guard<std::mutex> lock(pending_pitch_mutex_);
   if (pitch_ratio == 1) {
     pitch_ratio_ = pitch_ratio;
+    size_of_sixteenth_ = audio_buffer_.size() / loop_len_ / 16.;
     return;
   }
 
