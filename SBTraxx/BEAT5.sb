@@ -1,0 +1,180 @@
+
+#bpm 130
+##load_preset(dx, "OVLAZ");
+#load_preset(dx2, "BEx5");
+#load_preset(dx3, "pointty");
+
+# D#
+let key = 39;
+# minor
+let key_mod = 1;
+let notez = notes_in_key(key, key_mod);
+
+#set sbdrum:bd_key key
+
+let checkit = sample(voices/CHECKIT.wav);
+
+# p1 $ kerriblah_gen
+# p2 $ dbbblah_gen
+# p3 $ hhahblah_gen
+# p4 $ moooblah_gen
+
+let kerriblah_gen = gen()
+{
+  setup()
+  {
+    # I and IV
+    let chrdz = [0, 0, 4, 4, 4, 4];
+    let chx = 0;
+    let chord_modz = [2, 2, 2, 2, 3, 3];
+    let chmx = 0;
+    let durz = [100, 10, 20, 500, 100, 200, 400, 500, 50];
+    let drx = 0;
+
+    let main_beat = [1, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 1, 0];
+
+    let bfx  =0;
+
+    let durz3 = [10, 10, 20, 40, 40, 70, 60, 80];
+    let drx3 = 0;
+
+    let op3outz = [30, 50, 60, 30, 60, 90];
+    let op3x = 0;
+
+    let downz = [36, 24, 12];
+    let dox = 0;
+
+  }
+  run()
+  {
+    let beat = main_beat;
+    if (count % 4 == 3) {
+      beat = rand_beat();
+      # set dx:op3out op3outz[op3x];
+      # op3x = incr(op3x, 0, len(op3outz));
+      dox = incr(dox, 0, len(downz));
+    }
+
+    if (count % 8 < 6) {
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          let chrd = down(notes_in_chord(notez[chrdz[chx]], key, chord_modz[chmx], key_mod), downz[dox]);
+          print(chrd);
+          note_on_at(dx, chrd, i * pp, dur = durz[drx]);
+          chmx = incr(chmx, 0, len(chord_modz));
+          chx = incr(chx, 0, len(chrdz));
+          drx = incr(drx, 0, len(durz));
+        }
+      }
+    }
+
+    if (count % 7 < 5) {
+      let velincr = 120 / 16;
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 0) {
+          note_on_at(dx3, notez[chrdz[chx]], i * pp, vel = i * velincr, dur = durz3[drx3]);
+          bfx = incr(bfx, 0, len(notez));
+          drx3 = incr(drx3, 0, len(durz3));
+        }
+      }
+    }
+  }
+}
+
+let dbbblah_gen = gen()
+{
+  setup()
+  {
+    let durz = [150, 400, 200, 0];
+    let drx = 0;
+  }
+  run()
+  {
+    note_on_at(sbdrum, 0, 0);
+    note_on_at(sbdrum, 7, 0);
+    note_on_at(sbdrum, 0, 10 * pp);
+    if (count % 4 < 2) {
+      cmbeat(sbdrum, 3);
+    }
+    note_on_at(checkit, 1, 12 * pp, dur = durz[drx]);
+    drx = incr(drx, 0, len(durz));
+  }
+}
+
+let ch1 = sample(ch/CH_RP_B_03.wav);
+let ch2 = sample(ch/LOUhat.aiff);
+let ch3 = sample(ch/dr606closedhh.aif);
+let oh1 = sample(oh/mawopenhh2.aiff);
+
+let hhahblah_gen = gen()
+{
+  setup()
+  {
+    let chhz = [ch1, ch2, ch3];
+    let chx = 0;
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      for (let i = 0; i < 16; i++) {
+        let offs = 60;
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+        if (i % 4 == 0) {
+          note_on_at(chhz[chx], 1, i * pp, dur = 10, vel = 10 + rand(50));
+          chx = incr(chx, 0, len(chhz));
+        }
+        if (i % 4 == 1 && rand(100) < 90) {
+          note_on_at(chhz[chx], 1, i * pp + offs, dur = 10, vel = 20 + rand(40));
+          chx = incr(chx, 0, len(chhz));
+        } else {
+          note_on_at(chhz[chx], 1, (i+2) * pp + 60, dur = 10, vel = 10 + rand(50));
+          chx = incr(chx, 0, len(chhz));
+        }
+        if (i % 4 == 2) {
+          note_on_at(oh1, 1, i * pp, dur = 50, vel = 10 + rand(40));
+        }
+      }
+    }
+  }
+}
+
+let scp = sample(cp/2stepCLAP.aiff);
+
+let moooblah_gen = gen()
+{
+  setup()
+  {
+    let chrdz = [0, 0, 3, 4];
+    let chx = 0;
+    let beat1 = [0, 0, 1, 1,  0, 1, 0, 1,  0, 0, 1, 0,  1, 0, 1, 0];
+    let beat2 = [1, 1, 0, 0,  1, 1, 0, 1,  1, 1, 0, 0,  1, 0, 0, 0];
+  }
+  run()
+  {
+    let beat = beat1;
+    if (count % 6 == 5) {
+      beat = beat2;
+    }
+    let chrd = up(notes_in_chord(notez[chrdz[chx]], key, 2), 12);
+    chx = incr(chx, 0, len(chrdz));
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(dx2, chrd, i * pp,  dur = 300, vel = 80);
+      }
+    }
+    note_on_at(scp, 1, 12 * pp + 60, vel = 70);
+  }
+}
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+
