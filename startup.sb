@@ -761,6 +761,8 @@ let bassgen = fn()
   return rhm;
 }
 
+let PI = 3.14159265358897932;
+let TWO_PI = 2 * PI;
 let golden_ratio = 1.61803398875;
 
 let golden_step = fn(last)

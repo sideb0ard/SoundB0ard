@@ -49,8 +49,8 @@ const float kMidiFreqTable[128] = {
     11839.8212890625000000, 12543.8535156250000000};
 
 float Midi2Freq(const int midinum) {
-  if (midinum < 0 || midinum > 127) return 0;
-  return kMidiFreqTable[midinum];
+  int clamped_num = std::clamp(midinum, 0, 127);
+  return kMidiFreqTable[clamped_num];
 }
 
 int Freq2Midi(const float freq) {

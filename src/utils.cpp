@@ -623,9 +623,21 @@ double do_pn_sequence(unsigned *pn_register) {
 }
 
 void CheckWrapIndex(double *index) {
-  while (*index < 0.0) *index += 1.0;
+  int max_attempts = 100;
+  int attempt_num = 0;
+  while (*index < 0.0 && attempt_num < max_attempts) {
+    *index += 1.0;
+    attempt_num++;
+  };
 
-  while (*index >= 1.0) *index -= 1.0;
+  while (*index >= 1.0 && attempt_num < max_attempts) {
+    *index -= 1.0;
+    attempt_num++;
+  };
+  if (attempt_num >= max_attempts) {
+    std::cout << "WUFF - OVERFLOW? IDX IS" << *index << std::endl;
+    *index = 0;
+  }
 }
 
 double do_blep_n(const double *blep_table, double table_len, double modulo,
