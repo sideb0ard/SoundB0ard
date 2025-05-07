@@ -1,0 +1,65 @@
+# D#
+let key = 39;
+# natural minor
+let key_mod = 1;
+
+
+
+let arpblah_gen = gen()
+{
+  setup()
+  {
+    let notz = notes_in_key(key, key_mod);
+    let l = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (i % 2 == 0) {
+        let note = notz[0];
+        if (l % 2 == 0) {
+          note = note + 12;
+        }
+        l++;
+        if (i > 8 ) {
+          note = notz[4];
+        }
+        if (i == 12 ) {
+          note = notz[0] + 1;
+        }
+        note_on_at(dx, note, i * pp, dur = pp);
+      }
+    }
+
+  }
+}
+
+let arp2blah_gen = gen()
+{
+  setup()
+  {
+    let notez = notes_in_key(key, key_mod);
+    # let chrdz = [0, 3, 4];
+    let chrdz = [5, 3, 0, 4];
+    let dchrdz = [ [ 5, 5 ], [3, 3], [0, 0], [0, 4] ];
+    let chx = 0;
+    let durz = [100, 30, 400, 60, 100, 120, 160, 150];
+    let drx = 0;
+    let velz = [120, 100, 90, 90, 90, 100];
+    let vx = 0;
+  }
+  run()
+  {
+    let chrd = notes_in_chord(notez[chrdz[chx]], key, 2, key_mod);
+    chx = incr(chx, 0, len(chrdz));
+    let pp = 3840 / 8;
+    let ix = 0;
+    for (let i = 0; i < 8; i++) {
+      note_on_at(dx, chrd[ix], i * pp, dur = durz[drx], vel = velz[vx]);
+      drx = incr(drx, 0, len(durz));
+      ix = incr(ix, 0, 3);
+      vx = incr(vx, 0, len(velz));
+    }
+  }
+}
+

@@ -1,0 +1,123 @@
+
+# load_preset(dx, "naespacepiano"); set dx:l1_dest1 1
+# load_preset(dx2, "MAW2");
+# load_preset(dx3, "ONESZ");
+
+# p6 < osc 16 "0.2 0.6" "vol dx3 %"
+
+let fchord = [53, 56, 60];
+let dfachord = [65, 62, 69];
+let achord = [57, 60, 64];
+let prog = [fchord, fchord, dfachord, achord];
+let px = 0;
+
+
+# p1 $ chordprog
+# vol dx 0; sched(0, 0, 0.7, 3840, "vol dx %"); p2 $ drrrblah_gen
+# p3 $ arpblah_gen
+# p4 $ drrrrFUUUblah_gen
+# p5 $ dx3blah_gen
+# p6 < osc 16 "0.2 0.6"  "vol dx3 %"
+
+let drrrblah_gen = gen()
+{
+  setup()
+  {
+    let dronestarted = false;
+  }
+  run()
+  {
+    let chrd = prog[px];
+    if (!dronestarted) {
+      note_on(dx, chrd, dur = 0);
+      dronestarted = true;
+    } else {
+      dronestarted = false;
+      note_off(dx, 0);
+      note_on_at(dx, chrd, 0, dur = 3839);
+    }
+  }
+}
+let drrrrFUUUblah_gen = gen()
+{
+  setup()
+  {
+    let portaz = [0, 2000, 750];
+    let porx = 0;
+
+    let o2ratz = [1, 1, 1, 2, 12];
+    let o2x = 0;
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set dx:porta portaz[porx];
+      porx = incr(porx, 0, len(portaz));
+      set dx:o2rat o2ratz[o2x];
+      o2x = incr(o2x, 0, len(o2ratz));
+    }
+  }
+}
+
+
+let arpblah_gen = gen()
+{
+  setup()
+  {
+    let arpat = rand_array(8, 0, 2);
+    let octz = [12, 0, 24, 24, 0];
+    let ox = 0;
+  }
+  run()
+  {
+    let chrd = down(prog[px], octz[ox]);
+    let ix = 0;
+    let ppe = 3840 / 8;
+    for (let i = 0; i < 8; i++) {
+      note_on_at(dx2, chrd[arpat[i]], i * ppe, dur = 30);
+      ix = incr(ix, 0, len(chrd));
+    }
+    if (count % 8 == 7) {
+      arpat = rand_array(8, 0, 2);
+      ox = incr(ox, 0, len(octz));
+    }
+  }
+}
+
+let chordprog = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    px = incr(px, 0, len(prog));
+  }
+}
+
+# load_preset(dx3, "murhh");
+# load_preset(dx3, "buttz");
+# load_preset(dx3, "rrrkan");
+
+let dx3blah_gen = gen()
+{
+  setup()
+  {
+    #let notez = [45, 41, 45, 40];
+    let notez = [45, 41, 45, 46];
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      note_on_at(dx3, notez[0], 0. dur = 3830);
+    }
+    if (count % 4 == 1) {
+      note_on_at(dx3, notez[1], 0, dur = 3830);
+    }
+    if (count % 4 == 2) {
+      note_on_at(dx3, notez[0], 0, dur = 1920);
+      note_on_at(dx3, notez[3], 1920, dur = 3840 * 2);
+    }
+  }
+}
+

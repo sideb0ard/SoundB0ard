@@ -1,0 +1,745 @@
+let mcp = sample(cp/mawClapDelayed.aiff);
+let ch1 = sample(ch/hatttz.aiff);
+let ch2 = sample(ch/timbaHat1.aiff);
+let ch3 = sample(ch/timabHat2.aiff);
+let ch4 = sample(qebo/QEBO-LOCKDOWNFM-02FMHIGHHAT1.wav);
+let ch5 = sample(qebo/QEBO-LOCKDOWNFM-30FMPERCUSSION7.wav);
+let ch6 = sample(rims/timbaRim.aiff);
+let chz = [ch1, ch2, ch3, ch4, ch5, ch6];
+
+let gsd = sample(sd/giggleSnapSnare.aiff);
+let hsd = sample(sd/heyasnare.aiff);
+let yo = sample(voices/yo.wav);
+let yo2 = sample(voices/eskiYO.wav);
+let gdb = sample(bd/gaborKick.aiff);
+let af = sample(perc/af.wav);
+
+let japark = sample(fieldrecz/japanpark.wav);
+
+let ohmaw = sample(oh/mawopenhh2.aiff);
+
+let SWING = 10;
+
+bpm 120;
+let mwal = loop(loops2/MAWCHRD.wav); set mwal:len 2; note_off(mwal, 0);
+set gsd:pitch 1.5;
+set ch1:pitch 2
+set ch2:pitch 1.5
+set ch3:pitch 1.2
+set ch4:pitch 2
+set ch5:pitch 1.4
+set hsd:pitch 1.2; vol hsd 0.4;
+load_preset(dx, "DATRZ3");
+load_preset(dx2, "bssndcc");
+load_preset(dx3, "OCWARF");
+
+# p1 $ kikblah_gen ; p2 $ hhblah_gen; p3 $ yoblah_gen
+# p4 $ dxblah_gen
+# p1 $ "" // # NEEDS BIG BUILD UP
+# p5 $ dx3blah_gen
+# p1 $ dblah_gen; vol dx3 1
+
+# p1 $ "";
+
+# p4 $ dx2blah_gen; p1 $ ""; p5 $ dx3blahTOO_gen
+
+# p4 $ ""; p2 $ ""
+
+# p6 $ meeeelblah_gen
+# p7 $ mmmblah_gen; p5 $ ""
+
+# p1 $ bbdddblah_gen ; p4 $ ""; p6 $ "" ; p7 $ momelblah_gen
+
+# send("delay", yo2);
+# p2 $ hh2blah_gen; p7 $ ""; p1 $ ""
+
+# p1 $ sbdblah_gen ; p4 $ dxblah_gen ; p5 $ ""; p7 $ mmmblah_gen
+
+
+
+let playblah_gen = gen()
+{
+  setup()
+  {
+    let playcount = 0;
+  }
+  run()
+  {
+    print("PLAYCOUNT:", playcount);
+    if (playcount == 0) {
+      sched(3840, 0, 0.6, 3840 * 10, "vol ch1 %; vol ch2 %; vol ch3 %; vol ch4 %; vol ch5 %");
+      p1 $ kikblah_gen;
+      p2 $ hhblah_gen;
+      p3 $ yoblah_gen;
+    }
+    if (playcount == 4) {
+      note_on_at(yo2, 1, 10 * pp, dur = 0);
+      solo(yo2, at=10*pp);
+      p4 $ dxblah_gen;
+    }
+    if (playcount == 8) {
+      p1 $ ""; p2 $ "";
+    }
+    if (playcount == 10) {
+      p5 $ dx3blah_gen;
+    }
+    if (playcount == 12) {
+      p1 $ dblah_gen;
+      vol dx3 1;
+      p2 $ hhblah_gen;
+    }
+    if (playcount == 16) {
+      p1 $ "";
+      p2 $ ""; p5 $ "";
+    }
+    if (playcount == 18) {
+      note_on_at(yo2, 1, 10 * pp, dur = 0);
+      solo(yo2, at=10*pp);
+      p4 $ dx2blah_gen;
+      p5 $ dx3blahTOO_gen;
+    }
+    if (playcount == 20) {
+      p6 $ meeeelblah_gen;
+      p4 $ ""; p5 $ "";
+    }
+    if (playcount == 21) {
+      p7 $ mmmblah_gen;
+      p3 $ "";
+    }
+    if (playcount == 22) {
+      p1 $ bbdddblah_gen;
+      p6 $ "";
+      p7 $ momelblah_gen;
+      p2 $ hhblah_gen;
+    }
+    if (playcount == 28) {
+      note_on_at(yo2, 1, 10 * pp, dur = 0);
+      solo(yo2, at=10*pp);
+      send("delay", yo2);
+      p2 $ hh2blah_gen;
+      p7 $ "";
+      p1 $ "";
+    }
+    if (playcount == 30) {
+      p1 $ sbdblah_gen;
+      p4 $ dxblah_gen;
+      p5 $ "";
+      p2 $ "";
+      p7 $ mmmblah_gen;
+      vol dx2 1;
+    }
+    if (playcount == 32) {
+      p1 $ kikblah_gen;
+      p2 $ hhblah_gen;
+    }
+    if (playcount == 40) {
+      p1 $ "";
+    }
+    if (playcount == 42) {
+      p2 $ "";
+      note_on_at(yo2, 1, 10 * pp, dur = 0);
+      solo(yo2, at=10*pp);
+      p4 $ "";
+    }
+    if (playcount == 44) {
+      p1 $ kikblah_gen;
+      p2 $ hhblah_gen;
+      p7 $ "";
+      p4 $ dxblah_gen;
+    }
+    if (playcount == 48) {
+      p7 $ mmmblah_gen;
+      p2 $ "";
+    }
+    if (playcount == 50) {
+      p1 $ "";
+    }
+    if (playcount == 60) {
+      note_on_at(yo2, 1, 10 * pp, dur = 0);
+      solo(yo2, at=10*pp);
+      p4 $"" ;
+      p7 $"" ;
+    }
+
+    playcount++;
+  }
+}
+
+
+
+let kikblah_gen = gen()
+{
+  setup()
+  {
+    let kdpat1 =  [1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    let kdpat2 =  [1, 0, 0, 0,  0, 0, 0, 1,  0, 1, 0, 0,  0, 0, 0, 0];
+    let kdpat3 =  [1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 1, 0,  0, 0, 0, 0];
+    let kdpat4 =  [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0];
+    let beatz = [kdpat1, kdpat2, kdpat3, kdpat4];
+    let bx = 0;
+    let durz = [20, 30, 50, 80, 100, 110, 200];
+    let drx = 0;
+    let velz = [50, 80, 100, 100, 70, 50, 20, 40, 41];
+    let vx = 0;
+  }
+  run()
+  {
+    if (count % 16 < 14) {
+      let beat = beatz[bx];
+      bx = incr(bx, 0, len(beatz));
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(gdb, 1, i * pp);
+        }
+        if (i == 7 || i == 9) {
+          if (rand(100) < 80) {
+            note_on_at(af, 1, i * pp, dur = durz[drx], vel = velz[vx]);
+            vx = incr(vx, 0, len(velz));
+            drx = incr(drx, 0, len(durz));
+          }
+        }
+
+        if (i % 8 == 4) {
+          note_on_at(hsd, 1, i * pp, dur = 180);
+        }
+
+        if (count % 2 == 1) {
+          if (i == 12) {
+            note_on_at(mwal, 1, i * pp, dur = 550);
+          }
+        }
+      }
+    }
+  }
+}
+
+let kikiooblah_gen = gen()
+{
+  setup()
+  {
+    let bdz =[1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    let sdz =[0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 1];
+    let mel1 = [26, 0, 26, 0,  0, 26, 0, 24,  0, 0, 26, 0,  0, 24, 0, 0];
+    let mel2 = [26, 0, 0, 26,  0, 0, 29, 0,  0, 28, 0, 0,  26, 0, 26, 0];
+  }
+  run()
+  {
+    let beat = mel1;
+    if (count % 4 == 3) {
+      beat = mel2;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] > 0) {
+        note_on_at(lbd, 1, i * pp);
+      }
+      if (count % 2 == 0) {
+        if (sdz[i] == 1) {
+          let v = 80;
+          if (i % 4 == 0) {
+            v = 127;
+          }
+          note_on_at(mcp, 1, i * pp, vel = v);
+        }
+      }
+    }
+  }
+}
+
+
+let drumzblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 12 < 8) {
+      kikblah_gen();
+    } else {
+      if (count % 12 < 10) {
+        dblah_gen();
+      } else {
+        kikiooblah_gen();
+      }
+    }
+
+    if (count % 13 < 12) {
+      hhblah_gen();
+    }
+  }
+}
+
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+    let beat = [1, 0, 0, 1,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0];
+  }
+  run()
+  {
+    if (count % 4 < 3) {
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(sbdrum, 0, i * pp);
+          #note_on_at(mwal, i, i * pp, dur = 840);
+        }
+      }
+      for (let i = 0; i < 4; i++) {
+        note_on_at(mwal, i, 12 * pp + i * pp, dur = 500);
+      }
+    }
+
+    cbeat(mcp);
+    cbeat(gsd);
+    if (count % 4 == 3) {
+      cbeat(hsd);
+    }
+  }
+}
+
+let yoblah_gen = gen()
+{
+  setup()
+  {
+    let yoz = [yo, yo2];
+    let yx = 0;
+    let yozp = [10, 14, 15, 12, 10];
+    let yozx = 0;
+    let durz = [100, 500, 0, 300, 0];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      note_on_at(yoz[yx], 1, yozp[yozx] * pp, dur = durz[drx]);
+      drx = incr(drx, 0, len(durz));
+      yx = incr(yx, 0, len(yoz));
+      yozx = incr(yozx, 0, len(yozp));
+    }
+  }
+}
+
+let yeah = sample(voices/KRSYEAH.wav);
+
+let yoblah2_gen = gen()
+{
+  setup()
+  {
+    let yoz = [yo, yo2, yeah];
+    let yx = 0;
+    let yozp = [10, 14, 15, 12, 10, 15, 11];
+    let yozx = 0;
+    let durz = [100, 50, 0, 30, 0, 100];
+    let drx = 0;
+  }
+  run()
+  {
+
+    if (count % 2 == 1) {
+      let beat = rand_beat();
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(yoz[yx], 1, i * pp, dur = durz[drx]);
+          drx = incr(drx, 0, len(durz));
+          yx = incr(yx, 0, len(yoz));
+        }
+      }
+    }
+  }
+}
+
+let hhblah_gen = gen()
+{
+  setup()
+  {
+    let chx = 0;
+  }
+  run()
+  {
+    let pat = rand_array(16, 0, len(chz) + 5);
+    let pp = 3840 / 16;
+
+    for (let i = 0; i < 16; i++) {
+      let offs = 70;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (i % 4 == 0) {
+        note_on_at(chz[chx], 1, i * pp + offs, dur = 30, vel = 50 + rand(50));
+        chx = incr(chx, 0, len(chz));
+      }
+      if (i % 4 == 1 && rand(100) < 80) {
+        note_on_at(chz[chx], 1, i * pp + offs, dur = 30, vel = 50 + rand(50));
+        chx = incr(chx, 0, len(chz));
+      }
+      if (i % 4 == 2) {
+        note_on_at(ohmaw, 1, i * pp + offs, dur = 30, vel = 50 + rand(50));
+        chx = incr(chx, 0, len(chz));
+      }
+      if (i % 4 == 3 && rand(100) < 20) {
+        note_on_at(chz[chx], 1, i * pp + offs, dur = 30, vel = 50 + rand(50));
+        chx = incr(chx, 0, len(chz));
+      }
+    }
+
+  }
+}
+
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [26, 0, 26, 0,  0, 26, 0, 24,  0, 0, 26, 0,  0, 24, 0, 0];
+    let mel2 = [26, 0, 0, 26,  0, 0, 29, 0,  0, 28, 0, 0,  26, 0, 26, 0];
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      let offs = 10;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp + offs , dur = 200);
+      }
+    }
+  }
+}
+
+let dx2blah_gen = gen()
+{
+  setup()
+  {
+    let mel1 = [0, 0, 36, 0,  36, 26, 0, 24,  0, 0, 26, 0,  0, 24, 0, 0];
+    let mel2 = [0, 0, 0, 36,  0, 0, 29, 0,  36, 0, 0, 36,  31, 0, 35, 0];
+
+    let idx = 0;
+    let maxx = 3;
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+
+    if (count % 8 < 6) {
+      for (let i = 0; i < 16; i++) {
+        let offs = SWING;
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+        if (mel[i] > 0) {
+          note_on_at(dx, mel[i], i * pp + offs , dur = 200);
+        }
+      }
+    } else {
+      for (let i = 0; i < 16; i++) {
+        let offs = SWING;
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+        if (mel[idx] > 0) {
+          note_on_at(dx, mel[idx], i * pp + offs , dur = 300);
+        }
+        idx = incr(idx, 0, maxx);
+      }
+      maxx = incr(maxx, 4, 16);
+    }
+
+  }
+}
+
+let key = 24;
+let dx3blah_gen = gen()
+{
+  setup()
+  {
+    let addz = [0, 12, 24, 36, 48];
+    let ax = 0;
+    let beat1 = [0, 1, 0, 1,  1, 0, 1, 0,  1, 1, 0, 1,  1, 0, 1, 1];
+    let beat2 = [0, 1, 1, 0,  1, 1, 0, 1,  1, 0, 1, 1,  0, 1, 0, 1];
+  }
+  run()
+  {
+    let beat = beat1;
+    if (count % 8 == 6 || count % 8 == 7) {
+      beat = beat2;
+    }
+    let ntz = notes_in_key(key + addz[ax]);
+    ax = incr(ax, 0, len(addz));
+    let mel = generate_melody(16, ntz, count % 16);
+    for (let i = 0; i < 16; i++) {
+      let offz = 70;
+      if (i % 2 == 0) {
+        offz = 0;
+      }
+      if (beat[i] == 1) {
+        note_on_at(dx3, mel[i], i * pp + offz, dur = 50);
+      }
+    }
+  }
+}
+
+let dx3blahTOO_gen = gen()
+{
+  setup()
+  {
+    let notez = notes_in_key(key);
+    # [24, 26, 28, 29,  31, 33, 35, 36]
+    #let mel1 = [26, 0, 26, 0,  0, 26, 0, 24,  0, 0, 26, 0,  0, 24, 0, 0];
+    let mel1 = [0, 28, 0, 24,  0, 0, 31, 0,  0, 31, 0, 0,  0, 0, 35, 0];
+    #let mel2 = [26, 0, 0, 26,  0, 0, 29, 0,  0, 28, 0, 0,  26, 0, 26, 0];
+    let mel2 = [0, 0, 31, 0,  31, 0, 0, 0,  33, 0, 0, 0,  0, 26, 0, 0];
+    #let mel1 = [55, 0, 0, 0,  0, 0, 55, 0,  48, 0, 0, 0,  0, 57, 0, 0];
+    #let mel2 = [0, 0, 0, 0,  0, 41, 0, 0,  0, 0, 0, 0,  0, 0, 36, 0];
+    #let mel3 = [0, 0, 0, 0,  0, 0, 0, 0,  48, 0, 0, 0,  0, 0, 0, 0];
+    #let mel4 = [48, 0, 0, 0,  48, 0, 0, 0,  0, 0, 57, 0,  55, 0, 0, 0];
+    #let melz = [mel1, mel2, mel3, mel4];
+    let durz = [100, 400, 300, 500, 50, 50, 70];
+    let drx = 0;
+
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx3, mel[i], i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+
+let generate_melody = fn(mel_len, notez, mod)
+{
+
+  let mel = rand_array(mel_len, 0, 0);
+  let mincr = TWO_PI / mel_len;
+
+  let modfreq = mod * mincr;
+
+
+  for (let i = 0; i < mel_len; i++) {
+    let val = sin(i * mincr * modfreq);
+    # val = notes_in_key(key, key_mod)[floor(scale(val, -1, 1, 0, 7))];
+    val = notez[floor(scale(val, -1, 1, 0, len(notez)))];
+    mel[i] = val;
+  }
+  return mel;
+}
+
+let momelblah_gen = gen()
+{
+  setup()
+  {
+    let chdz = [0, 3, 1, 4];
+    let chx = 0;
+    let notez = notes_in_key(key);
+  }
+  run()
+  {
+    let chrd = notes_in_chord(notez[chdz[chx]] + 24, key, 1);
+    chx = incr(chx, 0, len(chdz));
+    note_on_at(dx2, chrd, 2 * pp, dur = 100);
+    note_on_at(dx2, chrd, 10 * pp, dur = 100);
+    if (count % 4 == 3) {
+      note_on_at(dx2, chrd, 14 * pp, dur = 50, vel = 80);
+    }
+  }
+}
+
+let meeeelblah_gen = gen()
+{
+  setup()
+  {
+    let msz = 16;
+    let ntz = notes_in_key(key + 24) + notes_in_key(key + -12) + notes_in_key(key + 60);
+    let durz = [100, 220, 30, 40, 50];
+    let drx = 0;
+    let beat = rand_array(msz, 0, 1);
+  }
+  run()
+  {
+    let mel = generate_melody(msz, ntz, count % 16);
+    let pp = 3480 / msz;
+    for (let i = 0; i < msz; i++) {
+      let off = SWING;
+      if (i % 2 == 0) {
+        off = 0;
+      }
+      if (beat[i] == 1) {
+        note_on_at(dx3, mel[i], i * pp + off, dur= durz[drx], vel = 100 + rand(20));
+      }
+    }
+    drx = incr(drx, 0, len(durz));
+    if (count % 8 == 7) {
+      beat = rand_array(msz, 0, 1);
+    }
+  }
+}
+
+let mmmblah_gen = gen()
+{
+  setup()
+  {
+    let modz = [0.8, 1, 1.2, 2, 4.3];
+    let mx = 0;
+    let durz = [90, 150, 100, 200, 100, 300];
+    let drx = 0;
+    let beat1 = [0, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 1];
+    let beat2 = [0, 1, 1, 0,  1, 0, 0, 0,  1, 0, 0, 1,  0, 1, 0, 1];
+
+    # let mel1 = [26, 0, 26, 0,  0, 26, 0, 24,  0, 0, 26, 0,  0, 24, 0, 0];
+    # let mel2 = [26, 0, 0, 26,  0, 0, 29, 0,  0, 28, 0, 0,  26, 0, 26, 0];
+  }
+  run()
+  {
+    let beat = beat1;
+    if (count % 4 == 3) {
+      beat = beat2;
+    }
+    let chrdkey = notes_in_key(key)[4];
+    let ntz = notes_in_key(chrdkey);
+    let mel = generate_melody(16, ntz, modz[mx]);
+    mx = incr(mx, 0, len(modz));
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        let offs = 10;
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+        if (mel[i] > 0) {
+          note_on_at(dx2, mel[i], i * pp + offs, dur = durz[drx]);
+          drx = incr(drx, 0, len(durz));
+        }
+      }
+    }
+  }
+}
+
+let nbd = sample(bd/boomB.aiff);
+let lbd = sample(bd/lm1-kick.aif);
+let pcp = sample(cp/procClap.aiff);
+let bbdddblah_gen = gen()
+{
+  setup()
+  {
+    let beat1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 1, 0];
+    let beat2 = [0, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1];
+  }
+  run()
+  {
+
+    let beat = beat1;
+    let beat2 = beat2;
+    if (count % 3 == 0) {
+      beat = rand_beat();
+      beat2 = invert(beat);
+    }
+    for (let i = 0; i < 16; i++) {
+      let offs = 10;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (beat[i] == 1) {
+        note_on_at(nbd, 1, i * pp + offs);
+      }
+      if (beat2[i] == 1) {
+        note_on_at(lbd, 1, i * pp + offs);
+      }
+
+      if (i % 8 == 4) {
+        note_on_at(pcp, 1, i * pp);
+      }
+    }
+  }
+}
+
+
+let sbdblah_gen = gen()
+{
+  setup()
+  {
+    let kck = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    let snr = [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (kck[i] == 1) {
+        note_on_at(sbdrum, 0, i * pp);
+      }
+      if (snr[i] == 1) {
+        note_on_at(sbdrum, 6, i * pp);
+      }
+    }
+    if (count % 4 == 3) {
+      cbeat(hsd);
+    }
+  }
+}
+
+# sched(0, 0.7, 0, 3840 * 4, "vol yo2 %");
+# send("delay", yo2);
+let hh2blah_gen = gen()
+{
+  setup()
+  {
+    let chx = 0;
+    let yoz = [yo2];
+    let yx = 0;
+    let durz = [80, 140, 180, 320, 500];
+    let drx = 0;
+
+    let dfbz = [50, 80, 90, 10, 20];
+    let dfx = 0;
+    let fbz = [0, 100, 200, 300, 400, 800];
+    let fbx = 0;
+  }
+  run()
+  {
+
+    let pat = rand_array(16, 0, len(chz) + 2);
+    let pp = 3840 / 16;
+
+
+    set mixer:delay:ms fbz[fbx];
+    set mixer:delay:fb dfbz[dfx];
+    dfx = incr(dfx, 0, len(dfbz));
+    fbx = incr(fbx, 0, len(fbz));
+    for (let i = 0; i < 16; i++) {
+      let offs = 70;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (i % 4 == 0) {
+        note_on_at(chz[chx], 1, i * pp + offs, dur = 30, vel = 50 + rand(50));
+        chx = incr(chx, 0, len(chz));
+      }
+      if (i % 4 == 1 && rand(100) < 80) {
+        note_on_at(chz[chx], 1, i * pp + offs, dur = 30, vel = 50 + rand(50));
+        chx = incr(chx, 0, len(chz));
+      }
+      if (i % 4 == 3 && rand(100) < 20) {
+        note_on_at(chz[chx], 1, i * pp + offs, dur = 30, vel = 50 + rand(50));
+        chx = incr(chx, 0, len(chz));
+      }
+    }
+
+    note_on_at(yoz[yx], 1, 14 * pp, dur = durz[drx]);
+    drx = incr(drx, 0, len(durz));
+    yx = incr(yx, 0, len(yoz));
+  }
+}
