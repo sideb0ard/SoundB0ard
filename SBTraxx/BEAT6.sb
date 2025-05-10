@@ -7,7 +7,7 @@ let ch5 = sample(qebo/QEBO-LOCKDOWNFM-30FMPERCUSSION7.wav);
 let ch6 = sample(rims/timbaRim.aiff);
 let chz = [ch1, ch2, ch3, ch4, ch5, ch6];
 
-let gsd = sample(sd/giggleSnapSnare.aiff);
+let gsd = sample(sd/giggleSnapSnare.aiff); vol gsd 0.6;
 let hsd = sample(sd/heyasnare.aiff);
 let yo = sample(voices/yo.wav);
 let yo2 = sample(voices/eskiYO.wav);
@@ -17,6 +17,8 @@ let af = sample(perc/af.wav);
 let japark = sample(fieldrecz/japanpark.wav);
 
 let ohmaw = sample(oh/mawopenhh2.aiff);
+
+let youdidnt = sample(voices/youdidnthink.wav);
 
 let SWING = 10;
 
@@ -31,8 +33,11 @@ set ch5:pitch 1.4
 set hsd:pitch 1.2; vol hsd 0.4;
 load_preset(dx, "DATRZ3");
 load_preset(dx2, "bssndcc");
-load_preset(dx3, "OCWARF");
+#load_preset(dx3, "OCWARF");
+load_preset(dx3, "MWWHM");
+load_preset(mo, "spacey");
 
+#load_preset(dx3, "OCWARF");
 # p1 $ kikblah_gen ; p2 $ hhblah_gen; p3 $ yoblah_gen
 # p4 $ dxblah_gen
 # p1 $ "" // # NEEDS BIG BUILD UP
@@ -67,100 +72,126 @@ let playblah_gen = gen()
   {
     print("PLAYCOUNT:", playcount);
     if (playcount == 0) {
-      sched(3840, 0, 0.6, 3840 * 10, "vol ch1 %; vol ch2 %; vol ch3 %; vol ch4 %; vol ch5 %");
       p1 $ kikblah_gen;
       p2 $ hhblah_gen;
-      p3 $ yoblah_gen;
-    }
-    if (playcount == 4) {
+      p4 $ dxblah_gen;
+      let chrd = notes_in_chord(key, key, 1);
+      note_on(dx3, up(chrd, 12), dur = 3840, vel = 80);
       note_on_at(yo2, 1, 10 * pp, dur = 0);
       solo(yo2, at=10*pp);
-      p4 $ dxblah_gen;
     }
     if (playcount == 8) {
+      note_on_at(yo, 1, 10*pp, dur = 0);
+      solo(yo, at=10*pp);
       p1 $ ""; p2 $ "";
     }
-    if (playcount == 10) {
-      p5 $ dx3blah_gen;
-    }
     if (playcount == 12) {
-      p1 $ dblah_gen;
-      vol dx3 1;
-      p2 $ hhblah_gen;
+      p5 $ dx3blah_gen;
+      let chrd = notes_in_chord(key + 36, key, 1);
+      note_on(dx3, down(chrd, 24), dur = 3840, vel = 80);
+      sched(3840, 0, 0.6, 3840 * 10, "vol ch1 %; vol ch2 %; vol ch3 %; vol ch4 %; vol ch5 %");
+    }
+    if (playcount == 13 || playcount == 14) {
+      solo(dx3, at = 10 * pp);
     }
     if (playcount == 16) {
-      p1 $ "";
-      p2 $ ""; p5 $ "";
-    }
-    if (playcount == 18) {
-      note_on_at(yo2, 1, 10 * pp, dur = 0);
-      solo(yo2, at=10*pp);
-      p4 $ dx2blah_gen;
-      p5 $ dx3blahTOO_gen;
+      p1 $ kikblah_gen;
+      p2 $ hhblah_gen;
+      p4 $ dxblah_gen;
     }
     if (playcount == 20) {
-      p6 $ meeeelblah_gen;
-      p4 $ ""; p5 $ "";
-    }
-    if (playcount == 21) {
-      p7 $ mmmblah_gen;
-      p3 $ "";
+      p1 $ dblah_gen;
+      p2 $ "";
     }
     if (playcount == 22) {
+      p1 $ "";
+      p5 $ "";
+    }
+    if (playcount == 24) {
+      note_on_at(yo, 1, 10 * pp, dur = 0);
+      solo(yo, at=10*pp);
+      p4 $ dx2blah_gen;
+      p6 $ meeeelblah_gen;
+      p4 $ ""; p5 $ "";
+      p7 $ mmmblah_gen;
+    }
+    if (playcount == 25) {
+      note_on_at(yo2, 1, 10 * pp, dur = 0);
+      solo(yo2, at=10*pp);
+      p3 $ "";
       p1 $ bbdddblah_gen;
       p6 $ "";
       p7 $ momelblah_gen;
       p2 $ hhblah_gen;
     }
-    if (playcount == 28) {
-      note_on_at(yo2, 1, 10 * pp, dur = 0);
-      solo(yo2, at=10*pp);
-      send("delay", yo2);
-      p2 $ hh2blah_gen;
-      p7 $ "";
+    if (playcount == 30) {
+      p8 $ momelCOMPblah_gen;
+    }
+    if (playcount == 36) {
+      solo(dx3, at=8*pp);
+    }
+    if (playcount == 37) {
+      p8 $ "";
+    }
+    if (playcount == 40) {
+      p8 $ momelCOMPblah_gen;
+    }
+    if (playcount == 42) {
+      solo(dx3, at=8*pp);
       p1 $ "";
     }
-    if (playcount == 30) {
+    if (playcount == 46) {
+      note_on_at(yo2, 1, 10 * pp, dur = 0);
+      send("delay", yo2);
+      #p2 $ hh2blah_gen;
+      p7 $ "";
+      p1 $ "";
+      p8 $ "";
+    }
+    if (playcount == 50) {
       p1 $ sbdblah_gen;
       p4 $ dxblah_gen;
       p5 $ "";
       p2 $ "";
       p7 $ mmmblah_gen;
+      p8 $ momelCOMPblah_gen;
       vol dx2 1;
     }
-    if (playcount == 32) {
+    if (playcount == 52) {
       p1 $ kikblah_gen;
       p2 $ hhblah_gen;
     }
-    if (playcount == 40) {
+    if (playcount == 54) {
       p1 $ "";
+      sched(3840, 0, 0.6, 3840 * 4, "vol mo %");
+      p9 $ moSPACblah_gen;
     }
-    if (playcount == 42) {
+    if (playcount == 56) {
       p2 $ "";
-      note_on_at(yo2, 1, 10 * pp, dur = 0);
-      solo(yo2, at=10*pp);
+      note_on_at(yo, 1, 10 * pp, dur = 0);
       p4 $ "";
     }
-    if (playcount == 44) {
+    if (playcount == 60) {
       p1 $ kikblah_gen;
       p2 $ hhblah_gen;
       p7 $ "";
+      p8 $ "";
       p4 $ dxblah_gen;
     }
-    if (playcount == 48) {
+    if (playcount == 68) {
       p7 $ mmmblah_gen;
       p2 $ "";
     }
-    if (playcount == 50) {
+    if (playcount == 70) {
       p1 $ "";
+      p9 $ "";
     }
-    if (playcount == 60) {
+    if (playcount == 74) {
       note_on_at(yo2, 1, 10 * pp, dur = 0);
-      solo(yo2, at=10*pp);
       p4 $"" ;
       p7 $"" ;
+      note_on(youdidnt, 1, dur = 0);
     }
-
     playcount++;
   }
 }
@@ -401,7 +432,7 @@ let dxblah_gen = gen()
       mel = mel2;
     }
     for (let i = 0; i < 16; i++) {
-      let offs = 10;
+      let offs = SWING;
       if (i % 2 == 0) {
         offs = 0;
       }
@@ -461,10 +492,14 @@ let dx3blah_gen = gen()
 {
   setup()
   {
-    let addz = [0, 12, 24, 36, 48];
+    let addz = [0, 12, 24, -12];
     let ax = 0;
-    let beat1 = [0, 1, 0, 1,  1, 0, 1, 0,  1, 1, 0, 1,  1, 0, 1, 1];
-    let beat2 = [0, 1, 1, 0,  1, 1, 0, 1,  1, 0, 1, 1,  0, 1, 0, 1];
+    # let beat1 = [0, 1, 0, 1,  1, 0, 1, 0,  1, 1, 0, 1,  1, 0, 1, 1];
+    # let beat2 = [0, 1, 1, 0,  1, 1, 0, 1,  1, 0, 1, 1,  0, 1, 0, 1];
+    let beat1 = [1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 1, 1];
+    let beat2 = [1, 1, 0, 0,  0, 0, 1, 0,  0, 1, 0, 0,  0, 1, 0, 1];
+    let durz = [50, 100, 70, 120, 40];
+    let drx = 0;
   }
   run()
   {
@@ -472,16 +507,20 @@ let dx3blah_gen = gen()
     if (count % 8 == 6 || count % 8 == 7) {
       beat = beat2;
     }
+    if (count % 16 == 15) {
+      beat = rand_beat();
+    }
     let ntz = notes_in_key(key + addz[ax]);
     ax = incr(ax, 0, len(addz));
     let mel = generate_melody(16, ntz, count % 16);
     for (let i = 0; i < 16; i++) {
-      let offz = 70;
+      let offz = -1 * SWING;
       if (i % 2 == 0) {
         offz = 0;
       }
       if (beat[i] == 1) {
-        note_on_at(dx3, mel[i], i * pp + offz, dur = 50);
+        note_on_at(dx3, mel[i], i * pp + offz, dur = durz[drx], vel = 80 + rand(40));
+        drx = incr(drx, 0, len(durz));
       }
     }
   }
@@ -559,13 +598,38 @@ let momelblah_gen = gen()
     }
   }
 }
+let momelCOMPblah_gen = gen()
+{
+  setup()
+  {
+    let chdz = [0, 3, 1, 4];
+    let chx = 0;
+    let notez = notes_in_key(key);
+    let ix = 0;
+    let maxix = 1;
+    let durz = [20, 30, 40, 50, 60];
+    let drx = 0;
+  }
+  run()
+  {
+    let chrd = notes_in_chord(notez[chdz[chx]] + 24, key, 1);
+    chx = incr(chx, 0, len(chdz));
+    let ppq = 3840 / 8;
+    for (let i = 0; i < 16; i++) {
+      note_on_at(dx3, chrd[ix] - 24, i * pp, dur = durz[drx]);
+      ix = incr(ix, 0, maxix);
+    }
+    drx = incr(drx, 0, len(durz));
+    maxix = incr(maxix, 0, 4);
+  }
+}
 
 let meeeelblah_gen = gen()
 {
   setup()
   {
     let msz = 16;
-    let ntz = notes_in_key(key + 24) + notes_in_key(key + -12) + notes_in_key(key + 60);
+    let ntz = notes_in_key(key) + notes_in_key(key + -12) + notes_in_key(key + 12);
     let durz = [100, 220, 30, 40, 50];
     let drx = 0;
     let beat = rand_array(msz, 0, 1);
@@ -743,3 +807,36 @@ let hh2blah_gen = gen()
     yx = incr(yx, 0, len(yoz));
   }
 }
+
+let moSPACblah_gen = gen()
+{
+  setup()
+  {
+    # 72, 69, 67
+    let prog = [7, 5, 4];
+    let px = 0;
+  }
+  run()
+  {
+    let root = notes_in_key(key + 36)[prog[px]];
+    let chrd = notes_in_chord(root, key, 1);
+    if (count % 2 == 1) {
+
+      px = incr(px, 0, len(prog));
+      note_on(mo, chrd, dur = 3840);
+    }
+
+    if (count % 8 == 7) {
+      let ppq = 3840 / 8;
+      for (let i = 0; i < 8; i++) {
+        let v = 60 + rand(40);
+        let note = chrd[0];
+        if (i % 2 == 1) {
+          note = chrd[2];
+        }
+        note_on_at(mo, note, i * ppq, dur = ppq, vel = v);
+      }
+    }
+  }
+}
+
