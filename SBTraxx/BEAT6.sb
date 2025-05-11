@@ -22,8 +22,10 @@ let youdidnt = sample(voices/youdidnthink.wav);
 
 let SWING = 10;
 
+let loon = sample(noises/loon-bird.aiff);
 bpm 120;
 let mwal = loop(loops2/MAWCHRD.wav); set mwal:len 2; note_off(mwal, 0);
+add_fx(mwal, "distort"); vol mwal 0.6;
 set gsd:pitch 1.5;
 set ch1:pitch 2
 set ch2:pitch 1.5
@@ -36,6 +38,8 @@ load_preset(dx2, "bssndcc");
 #load_preset(dx3, "OCWARF");
 load_preset(dx3, "MWWHM");
 load_preset(mo, "spacey");
+send("delay", [mwal, loon]);
+send("reverb", [mwal, loon]);
 
 #load_preset(dx3, "OCWARF");
 # p1 $ kikblah_gen ; p2 $ hhblah_gen; p3 $ yoblah_gen
@@ -87,9 +91,13 @@ let playblah_gen = gen()
     }
     if (playcount == 12) {
       p5 $ dx3blah_gen;
+      p4 $ "";
       let chrd = notes_in_chord(key + 36, key, 1);
       note_on(dx3, down(chrd, 24), dur = 3840, vel = 80);
       sched(3840, 0, 0.6, 3840 * 10, "vol ch1 %; vol ch2 %; vol ch3 %; vol ch4 %; vol ch5 %");
+      note_on_at(yo2, 1, 10 * pp, dur = 0);
+      solo(yo2, at=10*pp);
+      sched(0, 1, 0, 3840 * 4, "vol loon %");
     }
     if (playcount == 13 || playcount == 14) {
       solo(dx3, at = 10 * pp);
@@ -101,21 +109,11 @@ let playblah_gen = gen()
     }
     if (playcount == 20) {
       p1 $ dblah_gen;
-      p2 $ "";
-    }
-    if (playcount == 22) {
-      p1 $ "";
-      p5 $ "";
-    }
-    if (playcount == 24) {
       note_on_at(yo, 1, 10 * pp, dur = 0);
       solo(yo, at=10*pp);
-      p4 $ dx2blah_gen;
-      p6 $ meeeelblah_gen;
-      p4 $ ""; p5 $ "";
-      p7 $ mmmblah_gen;
+      p2 $ "";
     }
-    if (playcount == 25) {
+    if (playcount == 24) {
       note_on_at(yo2, 1, 10 * pp, dur = 0);
       solo(yo2, at=10*pp);
       p3 $ "";
@@ -126,9 +124,16 @@ let playblah_gen = gen()
     }
     if (playcount == 30) {
       p8 $ momelCOMPblah_gen;
+      p5 $ "";
+      p1 $ "";
+    }
+    if (playcount == 34) {
+      p1 $ bbdddblah_gen;
     }
     if (playcount == 36) {
       solo(dx3, at=8*pp);
+      send("delay", hsd);
+      p2 $ "";
     }
     if (playcount == 37) {
       p8 $ "";
@@ -143,9 +148,7 @@ let playblah_gen = gen()
     if (playcount == 46) {
       note_on_at(yo2, 1, 10 * pp, dur = 0);
       send("delay", yo2);
-      #p2 $ hh2blah_gen;
-      p7 $ "";
-      p1 $ "";
+      p2 $ hh2blah_gen;
       p8 $ "";
     }
     if (playcount == 50) {
@@ -153,8 +156,7 @@ let playblah_gen = gen()
       p4 $ dxblah_gen;
       p5 $ "";
       p2 $ "";
-      p7 $ mmmblah_gen;
-      p8 $ momelCOMPblah_gen;
+      #p8 $ momelCOMPblah_gen;
       vol dx2 1;
     }
     if (playcount == 52) {
@@ -162,21 +164,24 @@ let playblah_gen = gen()
       p2 $ hhblah_gen;
     }
     if (playcount == 54) {
-      p1 $ "";
+      p1 $ bbdddblah_gen;
       sched(3840, 0, 0.6, 3840 * 4, "vol mo %");
       p9 $ moSPACblah_gen;
+      note_on(loon, 1, dur = 0);
+      sched(0, 1, 0, 3840 * 4, "vol loon %");
     }
     if (playcount == 56) {
-      p2 $ "";
       note_on_at(yo, 1, 10 * pp, dur = 0);
       p4 $ "";
     }
     if (playcount == 60) {
       p1 $ kikblah_gen;
       p2 $ hhblah_gen;
+      send("delay", hsd);
       p7 $ "";
       p8 $ "";
-      p4 $ dxblah_gen;
+      p4 $ dx2blah_gen;
+      p9 $ "";
     }
     if (playcount == 68) {
       p7 $ mmmblah_gen;
@@ -184,7 +189,7 @@ let playblah_gen = gen()
     }
     if (playcount == 70) {
       p1 $ "";
-      p9 $ "";
+      p4 $ "";
     }
     if (playcount == 74) {
       note_on_at(yo2, 1, 10 * pp, dur = 0);
@@ -230,17 +235,22 @@ let kikblah_gen = gen()
           }
         }
 
-        if (i % 8 == 4) {
-          note_on_at(hsd, 1, i * pp, dur = 180);
-        }
+        # if (i % 8 == 4) {
+          #   note_on_at(hsd, 1, i * pp, dur = 180);
+          # }
 
-        if (count % 2 == 1) {
-          if (i == 12) {
-            note_on_at(mwal, 1, i * pp, dur = 550);
+        if (count % 4 == 1) {
+          if (i == 14) {
+            note_on_at(mwal, 0, i * pp, dur = 750);
           }
         }
       }
+      if (count % 3 < 2) {
+        cbeat(hsd);
+      }
+      #cbeat(gsd);
     }
+
   }
 }
 
@@ -500,6 +510,8 @@ let dx3blah_gen = gen()
     let beat2 = [1, 1, 0, 0,  0, 0, 1, 0,  0, 1, 0, 0,  0, 1, 0, 1];
     let durz = [50, 100, 70, 120, 40];
     let drx = 0;
+    let adjz = [-1 , 2, 1, 0.5];
+    let ax = 0;
   }
   run()
   {
@@ -514,7 +526,7 @@ let dx3blah_gen = gen()
     ax = incr(ax, 0, len(addz));
     let mel = generate_melody(16, ntz, count % 16);
     for (let i = 0; i < 16; i++) {
-      let offz = -1 * SWING;
+      let offz = adjz[ax] * SWING;
       if (i % 2 == 0) {
         offz = 0;
       }
@@ -523,6 +535,7 @@ let dx3blah_gen = gen()
         drx = incr(drx, 0, len(durz));
       }
     }
+    ax = incr(ax, 0, len(adjz));
   }
 }
 
