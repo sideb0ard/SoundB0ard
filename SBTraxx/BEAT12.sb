@@ -1,0 +1,211 @@
+
+bpm 96;
+load_preset(sbdrum, "TWULB");
+# kazzzing
+load_preset(dx, "WAYNWATN");
+load_preset(dx2, "garage");
+
+let drumblah_gen = gen()
+{
+  setup()
+  {
+    let beat1 = [1, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 1, 0];
+    let beat2 = [0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+  }
+  run()
+  {
+    if (count % 16 < 15) {
+      let beat = beat1;
+      if (count % 8 == 6) {
+        beat = beat2;
+      }
+      if (count % 13 == 0) {
+        beat = rand_beat();
+      }
+
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(sbdrum, 0, i * pp);
+        }
+      }
+    }
+
+    if (count % 2 == 1) {
+      note_on_at(sbdrum, 3, 8 * pp + 170, dur = 100);
+    }
+    if (count % 7 == 1) {
+      note_on_at(sbdrum, 3, 15 * pp + 170, dur = 100, vel = 60);
+    }
+  }
+}
+
+# C
+let key = 24;
+let keymod = 1;
+let notes = notes_in_key(key, keymod);
+
+let blasssah_gen = gen()
+{
+  setup()
+  {
+    let bassl1 = [1, 0, 1, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    let bassl2 = [0, 1, 0, 0,  1, 0, 0, 0,  1, 0, 0, 1,  0, 1, 0, 0];
+    let durz = [250, 400, 250, 100, 200, 100];
+    let drx = 0;
+  }
+  run()
+  {
+    let bass = bassl1;
+    if (count % 3 == 2) {
+      bass = bassl2;
+    }
+    if (count % 13 == 0) {
+      bass = bassgen();
+    }
+    let note = notes[0];
+    if (count % 2 == 1) {
+      note = notes[2];
+    }
+    if (count % 8 == 7) {
+      note = notes[4];
+    }
+
+    for (let i = 0; i < 16; i++) {
+      let offs = 80;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (bass[i] == 1) {
+        note_on_at(dx, note, i * pp + offs, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+let dink = sample(perc/dinkSweep.wav);
+let shk = sample(perc/tuffShaker.aiff);
+let sshk = sample(perc/shimmyshaker.aiff);
+let dbc = sample(notes/duBChord.aiff);
+
+let percblah_gen = gen()
+{
+  setup()
+  {
+    let percz = [dink, shk, sshk, dbc];
+    let pat = rand_array(16, 0, 6);
+    let durz = [30, 50, 60, 10, 10, 40, 100, 0];
+    let drx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      let offs = 70;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (pat[i] < len(percz)) {
+        note_on_at(percz[pat[i]], 1, i * pp + offs, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+    if (count % 8 == 7) {
+      pat = rand_array(16, 0, 6);
+    }
+  }
+}
+
+let arpblah_gen = gen()
+{
+  setup()
+  {
+    let arplen = 16;
+    let idx = 0;
+    let velz = [120, 120, 100, 90, 90, 120, 100];
+    let vx = 0;
+    let durz = [40, 20, 30, 50, 90];
+    let drx = 0;
+    # I-vi-IV-V
+    let prog = [[0,0], [0, 5], [3, 5], [3, 4]];
+    let px = 0;
+  }
+  run()
+  {
+    if (count % 13 == 11) {
+      arplen = 12;
+    }
+    let ppe = 3840 / arplen;
+
+    # if (count % 8 == 0) {
+      #   sched(0, 10, 90, 3840 * 4, "set dx2:op2out %");
+      # }
+
+    let cur_chord = prog[px];
+    let root_one = notes[cur_chord[0]];
+    let root_two = notes[cur_chord[1]];
+    let hafway = arplen / 2;
+    for (let i = 0; i < arplen; i++) {
+      let root = root_one;
+      if (i>= hafway) {
+        root = root_two;
+      }
+      let chord = notes_in_chord(root, key, 1, keymod);
+      let offs = 30;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      print(chord[idx]);
+      note_on_at(dx2, chord[idx], i * ppe + offs, dur = 150, vel = velz[vx]);
+      idx = incr(idx, 0, len(chord));
+      vx = incr(vx, 0, len(velz));
+    }
+    drx = incr(drx, 0, len(durz));
+    if (count % 31 == 30) {
+      solo(dx2, at=10*pp);
+    }
+  }
+}
+
+let sn1 = sample(sd/stickjhit2.aif);
+let sn2 = sample(sd/rvrbSnr.aiff);
+let sn3 = sample(sd/mawhsnare2.aiff);
+
+let snblah_gen = gen()
+{
+  setup()
+  {
+    let snz = [sn1, sn2, sn3];
+    let sx = 0;
+    let durz = [10, 20, 30, 40, 50, 90];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      let ppe = 3480 / 8;
+      let pps = 3840 / 16;
+      let ppf = 3840 / 32;
+      for (let i = 0; i < 4; i++) {
+        note_on_at(snz[sx], 1, i * ppe, dur = durz[drx], vel = 50);
+        sx = incr(sx, 0, len(snz));
+      }
+      let startidx = 3840 / 2;
+      for (let i = 0; i < 4; i++) {
+        note_on_at(snz[sx], 1, startidx + i * pps, dur = durz[drx], vel = 70);
+        sx = incr(sx, 0, len(snz));
+      }
+      startidx = startidx + (3840 / 4);
+      for (let i = 0; i < 8; i++) {
+        note_on_at(snz[sx], 1, startidx + i * ppf, dur = durz[drx], vel = 90);
+        sx = incr(sx, 0, len(snz));
+      }
+      drx = incr(drx, 0, len(durz));
+    }
+    if (count % 32 == 31) {
+      solo(sn1, at=12*pp);
+      solo(sn2, at=12*pp);
+      solo(sn3, at=12*pp);
+    }
+  }
+}
+

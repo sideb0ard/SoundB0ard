@@ -1,0 +1,20 @@
+
+# C
+let key = 36;
+let chordblah_gen = gen()
+{
+  setup()
+  {
+    let notez =  notes_in_key(key);
+    let prog = [3, 4, 0, 1];
+    let px = 0;
+  }
+  run()
+  {
+    let chord = notes_in_chord(notez[prog[px]], key, 1);
+    print(chord);
+    px = incr(px, 0, len(prog));
+    note_on_at(mo, chord, 0, dur = 3800);
+  }
+}
+

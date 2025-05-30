@@ -1,0 +1,123 @@
+
+#load_preset(mo, "lowend");
+
+let key = 26;
+# minor key
+let keymod = 1;
+let notez = notes_in_key(key, keymod);
+
+let moblah_gen = gen()
+{
+  setup()
+  {
+    let mainbass = [1, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 1,  1, 0, 0, 0];
+    let durz = [100, 200, 250, 350, 300];
+    let drx = 0;
+    let root = notez[0];
+    let chrd = notes_in_chord(root, key, 0, keymod);
+    let prog = [2, 1, 1, 0,  2, 2, 1, 0,  0, 0, 0, 0,  1, 2, 1, 1];
+    let px = 0;
+
+  }
+  run()
+  {
+    let bass = mainbass;
+    if (count % 4 == 3) {
+      bass = bassgen();
+    }
+    if (count % 8 == 7) {
+      prog = rand_array(16, 0, 2);
+    }
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] == 1) {
+        let note = chrd[prog[px]];
+        px = incr(px, 0, len(prog));
+        note_on_at(dx2, note, i * pp, dur = durz[drx]);
+      }
+    }
+    drx = incr(drx, 0, len(durz));
+  }
+}
+
+let arpblah_gen = gen()
+{
+  setup()
+  {
+    # I-V-vi-IV
+    let chordprog = [[0, 0], [0, 0], [0, 4], [4, 4], [5, 3], [3, 3]];
+    let cx = 0;
+    let noteprog = [3, 2, 0, 3,  1, 0, 1, 2,  3, 1, 3, 2,  2, 3, 3, 2];
+    let nx = 0;
+  }
+  run()
+  {
+    let mynotez = chordprog[cx];
+    cx = incr(cx, 0, len(chordprog));
+    let note1 = notez[mynotez[0]];
+    let note2 = notez[mynotez[1]];
+    let chrd1 = notes_in_chord(note1, key, 1, keymod);
+    let chrd2 = notes_in_chord(note2, key, 1, keymod);
+    let ppq = 3840 / 8;
+    for (let i = 0; i < 8; i++) {
+      let chrd = chrd1;
+      if (i > 3) {
+        chrd = chrd2;
+      }
+      note_on_at(dx, chrd[noteprog[nx]], i * ppq, dur = 30);
+      nx = incr(nx, 0, len(noteprog));
+    }
+    if (count % 8 == 7) {
+      sched(0, 160, 16000, 3840 * 8, "set dx:fx0:freq %");
+      noteprog = rand_array(16, 0, 3);
+    }
+  }
+}
+
+let kblah_gen = gen()
+{
+  setup()
+  {
+    let beat = [1, 0, 0, 1,  0, 0, 1, 0,  0, 0, 1, 0,  1, 0, 0, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if(beat[i] == 1) {
+        note_on_at(sbdrum, 0, i * pp);
+      }
+    }
+    if (count % 8 == 7) {
+      note_on_at(sbdrum, 0, 15 * pp, vel = 70);
+    }
+  }
+}
+
+let hh1 = sample(ch/LOUhat.aiff);
+let hh2 = sample(ch/pumpDistortHH.wav);
+let hh3 = sample(ch/weekendCHat.aiff);
+
+let hhhblah_gen = gen()
+{
+  setup()
+  {
+    let hatz = [hh1, hh2, hh3];
+    let hx = 0;
+    let hpat = [1, 0, 1, 1,  0, 0, 1, 0,  0, 1, 0, 0,  1, 1, 1, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      let offz = 90;
+      if (i % 2 == 0) {
+        offz = 0;
+      }
+      if (hpat[i] == 1) {
+        note_on_at(hatz[hx], 1, i * pp + offz, dur = 10);
+        hx = incr(hx, 0, len(hatz));
+      }
+    }
+    if (count % 2 == 0) {
+    }
+  }
+}
+

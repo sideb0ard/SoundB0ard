@@ -1,0 +1,451 @@
+
+# Key D#
+let key = 15;
+
+let playh_fn = fn(samp, pat, dr, shvel)
+{
+  for (let i = 0; i < 16; i++) {
+    let v = 128;
+    if (shvel) {
+      v = 40 + rand(40);
+    }
+    if (pat[i] == 1) {
+      note_on_at(samp, 1, i * pp, dur = dr, vel = v);
+    }
+  }
+}
+
+#p1 $ drblah_gen
+
+let oh = sample(oh/hhopen7.aif); vol oh 0.4;
+let ch = sample(ch/ralphiHatz2.aiff); vol ch 0.6;
+let cl = sample(perc/808clave.aif); vol cl 0.3;
+let bd = sample(bd/tuffKick.aiff);
+let bd2 = sample(bd/BD_909_48.wav);
+let clp = sample(cp/djkhaledClap.aiff); vol clp 0.6;
+let goodt = sample(voices/goodtimescometomeNOW.aiff);
+
+send("delay", goodt);
+bpm 120;
+load_preset(dx, "BELTRAMz");
+load_preset(dx3, "DONK");
+add_fx(cl, "filter");
+
+# p1 $ drblah_gen;
+# p2 $ clblah_gen;
+# p3 $ dddblah_gen;
+# p4 $ dxblah_gen;
+# p5 $ dx2blah_gen;
+# p6 $ cppblah_gen
+# p7 $ melz3blah_gen;
+
+
+let drblah_gen = gen()
+{
+  setup()
+  {
+    let bdz =  [1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0];
+    let durz = [10, 50, 100, 200, 100, 400, 100, 400, 100];
+    let drx = 0;
+  }
+  run()
+  {
+    playh_fn(bd, bdz, durz[drx], false);
+    drx = incr(drx, 0, len(durz));
+  }
+}
+
+let hhblah_gen = gen()
+{
+  setup()
+  {
+    let chz =  [1, 1, 0, 1,  1, 1, 0, 0,  1, 1, 0, 1,  1, 1, 0, 1];
+    let ohz =  [0, 0, 1, 0,  0, 0, 1, 1,  0, 0, 1, 0,  0, 0, 1, 0];
+    let durz = [10, 50, 100, 200, 100, 400, 100, 400, 100];
+    let drx = 0;
+  }
+  run()
+  {
+    playh_fn(ch, chz, durz[drx], true);
+    playh_fn(oh, ohz, durz[drx], true);
+    drx = incr(drx, 0, len(durz));
+  }
+}
+let clblah_gen = gen()
+{
+  setup()
+  {
+    let rimz =  [1, 1, 0, 1,  0, 1, 0, 1,  0, 1, 0, 0,  1, 0, 1, 0];
+  }
+  run()
+  {
+    playh_fn(cl, rimz, 10, true);
+    if (count % 16 == 0) {
+      sched(0, 200, 2000, 3840*16, "set cl:fx0:freq %");
+    }
+  }
+}
+
+let dddblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 == 0) {
+        note_on_at(sbdrum, 0, i * pp);
+        # note_on_at(bd2, 1, i * pp);
+      }
+    }
+  }
+}
+
+
+let dxblah_gen = gen()
+{
+  setup()
+  {
+    let bss = [1, 1, 1, 0,  0, 1, 1, 1,  0, 0, 1, 0,  0, 1, 0, 0];
+    let durz = [100, 100, 100, 100, 100, 100, 100, 110, 123];
+    let drx = 0;
+    let ratz = [2, 2, 2, 2, 2, 2, 4, 2, 6, 2, 8];
+    let rx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (bss[i] == 1) {
+        note_on_at(dx, 18, i * pp, dur = durz[drx]);
+      }
+    }
+    if (count % 4 == 0) {
+      drx = incr(drx, 0, len(durz));
+    }
+    let change_at = 0;
+    if (ratz[rx] != 2) {
+      change_at = 8 * pp;
+    }
+    set dx:o2rat ratz[rx] at=change_at;
+    rx = incr(rx, 0, len(ratz));
+
+  }
+}
+
+let dxFINblah_gen = gen()
+{
+  setup()
+  {
+    let bss = [1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 1, 0, 0];
+    let durz = [100, 100, 100, 100, 100, 100, 100, 110, 123];
+    let drx = 0;
+    let ratz = [2, 2, 2, 2, 2, 2, 4, 2, 6, 2, 8];
+    let rx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (bss[i] == 1) {
+        note_on_at(dx, 18, i * pp, dur = durz[drx]);
+      }
+    }
+    if (count % 4 == 0) {
+      drx = incr(drx, 0, len(durz));
+    }
+    let change_at = 0;
+    if (ratz[rx] != 2) {
+      change_at = 8 * pp;
+    }
+    set dx:o2rat ratz[rx] at=change_at;
+    rx = incr(rx, 0, len(ratz));
+
+  }
+}
+let dx2blah_gen = gen()
+{
+  setup()
+  {
+    # let bss = [15, 0, 17, 0,  0, 15, 17, 18,  15, 0, 15, 0,  17, 0, 0, 17];
+    let bss1 = [15, 0, 0, 15,  0, 0, 15, 0,  0, 15, 0, 0,  15, 0, 0, 0];
+    let bss2 = [0, 0, 15, 0,  0, 0, 15, 0,  0, 15, 15, 0,  0, 0, 0, 15];
+    let durz = [100, 100, 300, 400, 300, 600, 110, 150, 500];
+    let drx = 0;
+    let ratz = [2, 2, 2, 2, 2, 2, 4];
+    let rx = 0;
+    let ratz = [5.65, 11, 12, 13, 19];
+    let rzx = 0;
+    let lratz = [0.5, 2, 6, 12, 15];
+    let lx = 0;
+    set dx2:l1_wav 3;
+    set dx2:l1_dest1 2;
+  }
+  run()
+  {
+    let bss = bss1;
+    if (count % 4 == 3) {
+      bss = bss2;
+    }
+    for (let i = 0; i < 16; i++) {
+      let off = 20;
+      if (i % 2 == 0) {
+        off = 0;
+      }
+      if (bss[i] > 0) {
+        note_on_at(dx2, bss[i], i * pp + off, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+    if (count % 2 == 0) {
+      set dx2:o2rat ratz[rzx];
+      rzx = incr(rzx, 0, len(ratz));
+    }
+    if (count % 3 == 0) {
+      set dx2:l1_rate lratz[lx];
+      lx = incr(lx, 0, len(lratz));
+    }
+  }
+}
+
+# let dx2blah_gen = gen()
+# {
+#   setup()
+#   {
+#     let mel1 = [0, 0, 1, 0,  0, 0, 1, 0,  0, 1, 1, 0,  0, 0, 0, 1];
+#     let mel2 = [1, 0, 0, 1,  0, 0, 1, 0,  1, 0, 1, 1,  0, 1, 1, 0];
+#     let durz = [50, 100, 150, 200, 250, 300];
+#     let drx = 0;
+#     let ntz = [15, 18, 17];
+#     let nx = 0;
+#     let ntcount = [3, 5 ,7, 11];
+#     let ntx = 0;
+#     let note_play_count = 0;
+#   }
+#   run()
+#   {
+#     let mel = mel1;
+#     if (count % 4 == 3 ) {
+#       mel = mel2;
+#     }
+#     for (let i = 0; i < 16; i++) {
+#       if (mel[i] == 1) {
+#         note_on_at(dx2, ntz[nx], i * pp, dur = durz[drx]);
+#         note_play_count++;
+#         if (note_play_count % ntcount[ntx]) {
+#           nx = incr(nx, 0, len(ntz));
+#           note_play_count = 0;
+#           ntx = incr(ntx, 0, len(ntcount));
+#         }
+#       }
+#     }
+#     if (count % 4 == 3) {
+#       drx = incr(drx, 0, len(durz));
+#     }
+#   }
+# }
+
+let cppblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 2) {
+      cbeat(clp);
+    }
+    if (count % 3 == 0) {
+      sched(0, 0, 90, 3840 * 3, "set mixer:delay:fb %");
+    }
+    if (count % 4 == 0) {
+      sched(0, 10, 490, 3840 * 4, "set mixer:delay:ms %");
+    }
+  }
+}
+
+# p1 $ drblah_gen;
+# p2 $ clblah_gen;
+# p3 $ dddblah_gen;
+# p4 $ dxblah_gen;
+# p5 $ dx2blah_gen;
+# p6 $ cppblah_gen
+# p7 $ melz3blah_gen;
+
+let playITblah_gen = gen()
+{
+  setup()
+  {
+    let countr = 0;
+  }
+  run()
+  {
+    print(countr);
+    if (countr == 0) {
+      p1 $ drblah_gen;
+      p4 $ dxblah_gen;
+      p5 $ hhblah_gen;
+      sched(0, 0, 0.8, 3840 * 16, "vol dx %");
+    }
+    if (countr == 8) {
+      p2 $ clblah_gen;
+    }
+    if (countr == 16) {
+      solo(dx, at=12*pp);
+      p3 $ dddblah_gen;
+    }
+    if (countr == 32) {
+      p1 $ "";
+      p3 $ "";
+      p6 $ cppblah_gen;
+      p4 $ dx2blah_gen;
+    }
+    if (countr == 36) {
+      p1 $ drblah_gen;
+      p2 $ "";
+      p5 $ "";
+      p3 $ dddblah_gen;
+    }
+    if (countr == 42) {
+      p5 $ hhblah_gen;
+    }
+    if (countr == 48) {
+      p11 $ melblah_gen;
+      note_on_at(goodt, 1, 12 * pp, dur = 0);
+      p4 $ "";
+      p3 $ "";
+    }
+    if (countr == 56) {
+      p5 $ "";
+    }
+    if (countr == 64) {
+      send("delay", clp);
+      p2 $ clblah_gen;
+      sched(3840, 0, 0.6, 3840 * 4, "vol dx %");
+      p4 $ dxblah_gen;
+      p5 $ hhblah_gen;
+      p7 $ "";
+      p11 $ "";
+      p6 $ "";
+    }
+    if (countr == 74) {
+      p1 $ "";
+      p2 $ "";
+      p5 $ "";
+      sched(3840, 0, 0.7, 3840 * 3, "vol ch %");
+      p13 $ "ch*16";
+      p3 $ dddblah_gen;
+      p4 $ dxFINblah_gen;
+      load_preset(dx2, "OILY");
+      p11 $ smellyblah_gen;
+    }
+    if (countr == 96) {
+      p1 $ "";
+      p5 $ "";
+      p3 $ "";
+      p13 $ "";
+    }
+    if (countr == 100) {
+      p4 $ "";
+      p11 $ "";
+      play noises/soulIIsoulSTOP.wav;
+    }
+    countr++;
+  }
+}
+# let pblah_gen = gen()
+# {
+#   setup()
+#   {
+#   }
+#   run()
+#   {
+#     if (count % 4 == 3) {
+#       set pier:stutter 1;
+#     }
+#     if (count % 7 == 2) {
+#       set pier:scramble 1;
+#     }
+#     if (count % 11 == 7) {
+#       set pier:reverse 1;
+#     }
+#   }
+# }
+
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let notez = [30, 32, 33, 35,  37, 38, 40, 42];
+    #let notez = [27, 29, 30, 32,  34, 35, 37, 39];
+    let mel1 = [7, 7, 0, 0,  5, 7, 6, 3];
+    let mel2 = [7, 7, 4, 4,  5, 5, 5, 5];
+    let durz = [30, 40, 30, 20, 40];
+    let drx = 0;
+    let ratz = [2, 4 ,5, 6 ,3];
+    let rx = 0;
+  }
+  run()
+  {
+    let notz = notez;
+    if (count % 13 == 10) {
+      notz = down(notez, 12);
+    }
+    let mel = mel1;
+    if (count % 8 == 7) {
+      mel = mel2;
+    }
+    let ppe = 3840 / 8;
+    for (let i = 0; i < 8; i++) {
+      note_on_at(dx3, notz[mel[i]], i * ppe, dur = durz[drx]);
+    }
+    drx = incr(drx, 0, len(durz));
+    if (count % 3 == 0) {
+      set dx3:o3rat ratz[rx];
+      rx = incr(rx, 0, len(ratz));
+    }
+  }
+}
+
+# dx2 OVLAZ //  notrd // OILY2oo // OILY // kruts // MSLICX
+let smellyblah_gen = gen()
+{
+  setup()
+  {
+    let notez = [39, 41, 42, 44,  46, 47, 49, 51];
+    let mel1 = [0, 0, 0, 3,  2, 0, 7, 8,  0, 5, 0, 1,  7, 0, 6, 1];
+    let durz = [20, 30, 50, 100, 10, 10, 150, 100, 500];
+    let drx = 0;
+    let preez = ["kruts", "OILY"];
+    let px = 0;
+  }
+  run()
+  {
+    let mel = mel1;
+    let notz = notez;
+    if (count % 7 == 6) {
+      notz = down(notez, 12);
+      mel = rand_array(16, 0, 8);
+    }
+    for (let i = 0; i < 16; i++) {
+      let off = 30;
+      if (i % 2 == 0) {
+        off = 0;
+      }
+      if (mel[i] > 0) {
+        note_on_at(dx2, notz[mel[i]], i * pp + off, dur = durz[drx]);
+      } else {
+        note_on_at(dx2, notz[0], i * pp + off, dur = durz[drx]);
+      }
+      drx = incr(drx, 0, len(durz));
+    }
+    if (count % 5 == 0) {
+      sched(0, 0.2, 0.6, 3840 * 4, "vol dx2 %");
+    }
+    if (count % 4 == 0) {
+      load_preset(dx2, preez[px]);
+      px = incr(px, 0, len(preez));
+    }
+  }
+}
+

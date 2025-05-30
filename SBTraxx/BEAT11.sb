@@ -1,0 +1,57 @@
+
+let key = 29;
+let chordtype = 2;
+let keymod = 1;
+let notesz = notes_in_key(key, keymod);
+
+let arpblah_gen = gen()
+{
+  setup()
+  {
+    let idx = 0;
+    let imax = 1;
+    let inc = 1;
+    # 0 is forward / 1 is backwards
+    let dir = 0;
+    # vi-ii-V-I
+    let prog = [[5,5], [5, 5], [1,1], [1,4], [4, 0], [0, 0]];
+    let px = 0;
+    # midi pulses per eighth note
+    let ppe = 3840 / 8;
+    let durz = [50, 100, 150, 20, 30, 10, 70];
+    let drx = 0;
+  }
+  run()
+  {
+    let chrdz = prog[px];
+    #print(chrdz);
+    let chrd1 = chrdz[0];
+    let chrd2 = chrdz[1];
+    px = incr(px, 0, len(prog));
+    for (let i = 0; i < 8; i++) {
+      let offset = 30;
+      if (i % 2 == 0) {
+        offset = 0;
+      }
+      let chrd = chrd1;
+      if (i >= 4) {
+        chrd = chrd2;
+      }
+      let chord = notes_in_chord(notesz[chrd], key, chordtype, keymod);
+      let chidx = idx;
+      if (dir == 1) {
+        chidx = len(chord) - 1 -idx;
+      }
+      let note = chord[chidx];
+      idx = incr(idx, 0, imax);
+      note_on_at(dx, note, i * ppe + offset, dur = durz[drx]);
+      drx = incr(drx, 0, len(durz));
+    }
+
+    if (count % 8 == 7) {
+      dir = 1 - dir;
+      imax = incr(imax, 0, 4);
+    }
+  }
+}
+
