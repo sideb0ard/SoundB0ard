@@ -19,8 +19,8 @@ double QBLimitedOscillator::DoOscillate(double *aux_output) {
   double calc_modulo = m_modulo + m_phase_mod;
   CheckWrapIndex(&calc_modulo);
   if (std::isinf(calc_modulo)) {
-    std::cout << "WUFF - inF number! modulo is " << m_modulo
-              << " and phase mod is " << m_phase_mod << std::endl;
+    // TODO - find out why this is sometimes infinite.
+    calc_modulo = 0;
   }
 
   switch (m_waveform) {

@@ -2,27 +2,121 @@ let ch = sample(ch/chezHat.aiff);
 let oh = sample(oh/2stepOPENhh.aiff);
 let hype = sample(voices/hype.wav);
 
-#bpm 90
-#set hype:pitch 1.2
-#load_preset(dx, "OCWARF2");
-#load_preset(dx2, "MAW2");
-#load_preset(dx3, "pgnal");
-#load_preset(mo, "zzang");
-#load_preset(sbdrum, "BEAT4");
+let sk1 = sample(scratchz/booish.wav);
+let sk2 = sample(scratchz/cskm.wav);
+let sk3 = sample(scratchz/krs1.wav); vol sk3 0.4;
+let sk4 = sample(scratchz/scrt.wav);
+let sk5 = sample(scratchz/skqc.wav);
+
+let tellme = sample(voices/tellmeSUMMING.wav); vol tellme 0.4;
+
+bpm 90
+let skz = [sk1, sk2, sk3, sk4, sk5];
+set hype:pitch 1.2
+load_preset(dx, "OCWAR2"); vol dx 1; set dx:e2att 2000;
+#load_preset(dx2, "MAW2"); set dx2:e2att 300;
+load_preset(dx2, "SMURFc"); set dx2:e2att 300; vol dx2 0.5;
+load_preset(dx3, "pgnal");
+load_preset(mo, "zzang");
+load_preset(sbdrum, "BEAT42");
 
 # load_preset(dx, "fnord0");
 
-# p1 $ mellblah_gen
-# p5 $ dxblah_gen
-# p3 $ drmblah_gen
 
 # p4 $ hypeblah_gen; p3 $ ""
 
-# p1 $ mellblah2_gen;
-# p2 $ mmeelblah_gen ; p3 $ drmblah_gen
-# p6 $ dxxxxblah_gen
-# p7 $ scratchblah_gen
-# p7 $ tellblah_gen
+# mellblah_gen // OPENER WUUUURP
+# mellblah2_gen; // SIMILAR
+# dxblah_gen // pgnal - melody
+# drmblah_gen // DRUMS
+# mmeelblah_gen ;  // DA BASS
+# dxxxxblah_gen // DA BASS COMP?
+# scratchblah_gen
+# tellblah_gen
+# memmmlblah_gen // dx3 - OCWARF2
+
+let playablah_gen = gen()
+{
+  setup()
+  {
+    let count = 0;
+  }
+  run()
+  {
+    print(count);
+    if (count == 0) {
+      p1 $ mellblah_gen;
+    }
+    if (count == 4) {
+      sched(3840, 0, 0.7, 3840 * 4, "vol dx3 %");
+      p2 $ dxblah_gen;
+    }
+    if (count == 7) {
+      p4 $ hypeblah_gen;
+      p3 $ drmblah_gen;
+      p7 $ tellblah_gen;
+    }
+    if (count == 12) {
+      p7 $ "";
+    }
+    if (count == 15) {
+      solo(dx3, at=12*pp);
+      tellblah_gen();
+    }
+    if (count == 16) {
+      p1 $ mmeelblah_gen;
+    }
+    if (count == 20) {
+      p2 $ "";
+      p3 $ "";
+      tellblah_gen();
+      p7 $ tellblah_gen;
+    }
+    if (count == 24) {
+      p3 $ drmblah_gen;
+      p4 $ dxxxxblah_gen;
+      p7 $ "";
+    }
+    if (count == 32) {
+      p3 $ "";
+      send("delay", skz);
+      p4 $ "";
+      p7 $ scratchblah_gen;
+    }
+    if (count == 34) {
+      p1 $ mellblah2_gen;
+    }
+    if (count == 36) {
+      load_preset(dx3 ,"OCWARF2");
+      p2 $ memmmlblah_gen;
+    }
+    if (count == 40) {
+      p7 $ "";
+      p3 $ "";
+      p1 $ mmeelblah_gen;
+    }
+    if (count == 44) {
+      p3 $ drmblah_gen;
+      sched(0, 0, 0.7, 3840 * 4, "vol dx3 %");
+      send("delay", tellme);
+      send("delay", hype);
+      p4 $ hypeblah_gen;
+      p7 $ tellblah_gen;
+    }
+    if (count == 48) {
+      p2 $ "";
+    }
+    if (count == 50) {
+      p3 $ "";
+      p3 $ scratchblah_gen;
+      p1 $ "";
+    }
+
+
+
+    count++;
+  }
+}
 
 let drmblah_gen = gen()
 {
@@ -44,21 +138,21 @@ let drmblah_gen = gen()
         offs = 0;
       }
       if (i % 4 == 0) {
-        note_on_at(ch, 1, i * pp + offs, dur = 50, vel = 50 + rand(50));
+        note_on_at(ch, 1, i * pp + offs, dur = 50, vel = 20 + rand(50));
       }
 
       if (i % 4 == 1 || i % 4 == 4) {
         if (rand(100) < 70) {
-          note_on_at(ch, 1, i * pp + offs, dur = 50, vel = 50 + rand(50));
+          note_on_at(ch, 1, i * pp + offs, dur = 50, vel = 20 + rand(50));
         }
       }
       if (i % 4 == 2) {
-        note_on_at(oh, 1, i * pp + offs, dur = 100, vel = 50 + rand(50));
+        note_on_at(oh, 1, i * pp + offs, dur = 100, vel = 20 + rand(50));
       }
 
       if (i == 11 || i == 13) {
         if (rand(100) < 50) {
-          note_on_at(sbdrum, 7, i * pp + offs, dur = 90);
+          note_on_at(sbdrum, 7, i * pp + offs, vel = 50 + rand(40), dur = 90);
         }
       }
     }
@@ -101,15 +195,49 @@ let mellblah_gen = gen()
   }
   run()
   {
+    if (count % 4 == 0) {
+      sched(0, 35, 95, 3840 * 2, "set dx2:op2out %");
+    }
     mel = generate_melody(16, notez, modz[mx]);
     mx = incr(mx, 0, len(modz));
     for (let i = 0; i < 16; i++) {
-      let offs = 35;
+      let offs = 75;
       #let offs = 0;
       if (i % 2 == 0) {
         offs = 0;
       }
       if (mel[i] > 0) {
+        note_on_at(dx2, mel[i], i * pp + offs, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+
+let mell2blah_gen = gen()
+{
+  setup()
+  {
+    let durz = [90, 120, 30, 140, 50, 160, 160, 60, 60, 190];
+    let drx = 0;
+    let basebeat = [1, 0, 0, 1,  0, 1, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0];
+  }
+  run()
+  {
+    let beat = basebeat;
+    if (count % 4 == 3) {
+      beat = rand_beat();
+    }
+    mel = generate_melody(16, up(notez, 24), modz[mx]);
+    mx = incr(mx, 0, len(modz));
+    for (let i = 0; i < 16; i++) {
+      let offs = 75;
+      #let offs = 0;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (beat[i] ==1) {
         note_on_at(dx2, mel[i], i * pp + offs, dur = durz[drx]);
         drx = incr(drx, 0, len(durz));
       }
@@ -237,14 +365,14 @@ let dxxxxblah_gen = gen()
     let ntz = [0, 3, 4, 1, 5, 1];
     let nx = 0;
 
-    let durz = [10, 20, 50, 100];
+    let durz = [150, 200, 300, 170];
     let drx = 0;
   }
   run()
   {
     for (let i = 0; i < 16; i++) {
       if (mel[i] == 1) {
-        note_on_at(dx, notez[ntz[nx]], i * pp, dur = 100);
+        note_on_at(dx, notez[ntz[nx]], i * pp, dur = durz[drx]);
         nx = incr(nx, 0, len(ntz));
       }
     }
@@ -294,7 +422,6 @@ let mellblah3_gen = gen()
   }
 }
 
-let tellme = sample(voices/tellmeSUMMING.wav);
 let tellblah_gen = gen()
 {
   setup()
@@ -311,16 +438,14 @@ let tellblah_gen = gen()
         drx = incr(drx, 0, len(durz));
       }
     }
+    if (count % 4 == 0) {
+      sched(0, 10, 90, 3840 * 3, "set mixer:delay:fb %");
+    }
+    if (count % 7 == 0) {
+      sched(0, 10, 290, 3840 * 6, "set mixer:delay:ms %");
+    }
   }
 }
-
-let sk1 = sample(scratchz/booish.wav);
-let sk2 = sample(scratchz/cskm.wav);
-let sk3 = sample(scratchz/krs1.wav);
-let sk4 = sample(scratchz/scrt.wav);
-let sk5 = sample(scratchz/skqc.wav);
-let skz = [sk1, sk2, sk3, sk4, sk5];
-# send("delay", skz);
 
 let scratchblah_gen = gen()
 {
@@ -345,10 +470,46 @@ let scratchblah_gen = gen()
         fbx = incr(fbx, 0, len(fbz));
       }
     }
+    if (count % 4 == 0) {
+      sched(0, 10, 90, 3840 * 3, "set mixer:delay:fb %");
+    }
+    if (count % 7 == 0) {
+      sched(0, 10, 290, 3840 * 6, "set mixer:delay:ms %");
+    }
 
 
     if (count % 8 == 7) {
       beat = rand_beat();
+    }
+  }
+}
+
+let memmmlblah_gen = gen()
+{
+  setup()
+  {
+    let notz = [69, 72, 76];
+    let bjz = [3, 5, 7, 4];
+    let bx = 0;
+  }
+  run()
+  {
+    let beat = bjork(bjz[bx], 16);
+    bx = incr(bx, 0, len(bjz));
+    let nt1 = 69;
+    let nt2 = 69;
+    if (count % 2 == 1) {
+      nt1 = 72;
+      nt2 = 76;
+    }
+    for (let i = 0; i < 16; i++) {
+      let nt = nt1;
+      if (i > 7) {
+        nt = nt2;
+      }
+      if (beat[i] == 1) {
+        note_on_at(dx3, nt, i * pp, dur = 100);
+      }
     }
   }
 }

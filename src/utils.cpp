@@ -635,7 +635,6 @@ void CheckWrapIndex(double *index) {
     attempt_num++;
   };
   if (attempt_num >= max_attempts) {
-    std::cout << "WUFF - OVERFLOW? IDX IS" << *index << std::endl;
     *index = 0;
   }
 }
