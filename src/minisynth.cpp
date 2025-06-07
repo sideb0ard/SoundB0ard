@@ -420,7 +420,6 @@ void MiniSynth::NoteOn(midi_event ev) {
     if (!v->m_note_on) {
       IncrementVoiceTimestamps();
       v->NoteOn(midinote, velocity, Midi2Freq(midinote), m_last_note_frequency);
-
       m_last_note_frequency = Midi2Freq(midinote);
       steal_note = false;
       break;
@@ -455,7 +454,6 @@ void MiniSynth::NoteOff(midi_event ev) {
 void MiniSynth::PitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
   unsigned int data2 = ev.data2;
-  // printf("Pitch bend, babee: %d %d\n", data1, data2);
   int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
 
   if (actual_pitch_bent_val != 8192) {
@@ -464,7 +462,6 @@ void MiniSynth::PitchBend(midi_event ev) {
     double scaley_val =
         // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
         scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
-    // printf("Cents to bend - %f\n", scaley_val);
     for (int i = 0; i < MAX_VOICES; i++) {
       voices_[i]->m_osc1->m_cents = scaley_val;
       voices_[i]->m_osc2->m_cents = scaley_val + 2.5;
@@ -772,7 +769,6 @@ void MiniSynth::IncrementVoiceTimestamps() {
     if (voices_[i]->m_note_on) voices_[i]->m_timestamp++;
   }
 }
-
 std::shared_ptr<MiniSynthVoice> MiniSynth::GetOldestVoice() {
   int timestamp = -1;
   std::shared_ptr<MiniSynthVoice> found_voice = NULL;
@@ -784,6 +780,7 @@ std::shared_ptr<MiniSynthVoice> MiniSynth::GetOldestVoice() {
       }
     }
   }
+
   return found_voice;
 }
 

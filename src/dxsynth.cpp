@@ -237,7 +237,7 @@ void DXSynth::SetOpFreq(unsigned int op, float val) {
 
 void DXSynth::NoteOn(midi_event ev) {
   bool steal_note = true;
-  int voicecount = 0;
+
   for (auto v : voices_) {
     if (!v->m_note_on) {
       IncrementVoiceTimestamps();
