@@ -1,5 +1,6 @@
 #include "drum_synth_modules.h"
 
+#include <cassert>
 #include <iostream>
 
 namespace SBAudio {

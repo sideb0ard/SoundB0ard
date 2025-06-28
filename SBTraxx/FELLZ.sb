@@ -1,0 +1,57 @@
+
+# 3840 midi ticks per loop. # bpm 140
+# 60 / 140 = 0.428571 sec per beat, 428.571 ms
+# 4 beats in a loop, so 4 * 428.571 = 1714.28 ms == 3840 ticks
+# 100 / 1714.28 * 1000 = 58.3335 %
+# 58.3335 % of 3840 = 2240.01
+# 1000ms == 2240.01 midi ticks
+let onz = [2240, 4480, 1120];
+let offz = [1120, 2240, 1120, 4480];
+
+
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let onx = 0;
+    let offx = 0;
+
+    let next_on_at = 0;
+  }
+  run()
+  {
+    let max_attempts = 10;
+    for (let i = 0; i < max_attempts; i++) {
+      print("I:", i);
+      if (i == 4) {
+        print("BREAK");
+        break;
+      }
+      print("UYO");
+    }
+
+    #let next_on_for = onz[onx];
+    #let next_off_for = offz[offx];
+    # onx = incr(onx, 0, len(onz));
+    # offx = incr(offx, 0, len(offz));
+
+    # note_on_at(dx, 37, next_on_at, dur = next_on_for);
+
+    # let full_duration = next_on_for + next_off_for;
+    # let next_on_at = next_on_at + full_duration;
+    # print("NEXT ON AT:", next_on_at);
+
+    # if (next_on_at > 3840) {
+      #   next_on_at = next_on_at % 3840;
+      #   print("BREAK");
+      #   break;
+      # }
+
+    # print("ON AT:", next_on_at, " :", next_off_for, " DUR:", full_duration);
+
+  }
+
+}
+}
+

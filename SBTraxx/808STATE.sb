@@ -1,20 +1,124 @@
 
-# C
-let key = 36;
+let bd = sample(bd/dm02_909_kickdrum_002_drive.wav);
+let ch = sample(ch/CH_909_15.wav);
+let oh = sample(oh/OH_909_15.wav);
+let loon = sample(noises/loon-bird.aiff);
+
+# load_preset(mo, "808"); vol mo 0.5;
+# load_preset(dx, "twklz");
+# send("delay", loon);
+# bpm 128;
+# let rvs = loop(loops/raveStabsCmon.aiff); set rvs:len 2; vol rvs 0;
+
+let cpx = 0;
 let chordblah_gen = gen()
 {
   setup()
   {
-    let notez =  notes_in_key(key);
-    let prog = [3, 4, 0, 1];
-    let px = 0;
+    let fmaj7 = [53, 57, 60, 64];
+    let gmaj7 = [55, 59, 62, 66];
+    let cmaj7 = [48, 52, 55, 59];
+    let dmaj7 = [50, 54, 57, 61];
+    let prog = [fmaj7, gmaj7, cmaj7, dmaj7];
   }
   run()
   {
-    let chord = notes_in_chord(notez[prog[px]], key, 1);
-    print(chord);
-    px = incr(px, 0, len(prog));
+    let chord = prog[cpx];
+    #print(chord);
     note_on_at(mo, chord, 0, dur = 3800);
+    cpx = incr(cpx, 0, len(prog));
+
+  }
+}
+
+let loonblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 2 == 0) {
+      note_on(loon, 1, dur = 0);
+    }
+  }
+}
+
+
+let drblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    note_on_at(bd, 1, 0);
+    note_on_at(bd, 1, 4 * pp);
+    note_on_at(bd, 1, 8 * pp);
+    note_on_at(bd, 1, 12 * pp);
+    note_on_at(bd, 1, 14 * pp);
+  }
+}
+
+let hhblah_gen = gen()
+{
+  setup()
+  {
+    let hhz = [1, 1, 1, 0,  0, 1, 1, 1,  1, 1, 0, 1,  0, 0, 1, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      let off = 20;
+      if (i % 2 == 0) {
+        off = 0;
+      }
+      let v = 60 + rand(50);
+      if (hhz[i] == 1) {
+        note_on_at(ch, 1, i * pp + off, vel = v);
+      } else {
+        note_on_at(oh, 1, i * pp + off, vel = v);
+      }
+    }
+
+  }
+}
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let bmel1 = [38, 0, 40, 43,  45, 43, 0, 45,  0, 40, 43, 0,  40, 0, 49, 0];
+    let bmel2 = [0, 39, 0, 41,  0, 46, 0, 51,  41, 41, 39, 0,  46, 0, 48, 0];
+  }
+  run()
+  {
+    let mel = bmel1;
+    if (cpx % 2 == 0) {
+      mel = bmel2;
+    }
+    mel = down(mel, 12);
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx, mel[i], i * pp);
+      }
+    }
+  }
+}
+
+let bssslah_gen = gen()
+{
+  setup()
+  {
+    let bass = [41, 0, 0, 41,  0, 0, 41, 0,  0, 41, 0, 0,  41, 0, 51, 49];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] > 0) {
+        note_on_at(dx2, bass[i] - 24, i * pp, dur = 40);
+      }
+    }
   }
 }
 

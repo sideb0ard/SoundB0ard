@@ -103,11 +103,11 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.bd_detune_cents = val;
   else if (name == "bd_hard_sync")
     settings_.bd_hard_sync = val;
-  else if (name == "bd_dist_en")
+  else if (name == "bd_dist_en") {
     settings_.bd_use_distortion = val;
-  else if (name == "bd_dist")
+  } else if (name == "bd_dist") {
     settings_.bd_distortion_threshold = val;
-  else if (name == "bd_delay_en")
+  } else if (name == "bd_delay_en")
     settings_.bd_use_delay = val;
   else if (name == "bd_delay_mode")
     settings_.bd_delay_mode = val;
