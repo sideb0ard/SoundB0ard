@@ -8,7 +8,9 @@
 
 extern Mixer *mixr;
 
-StereoDelay::StereoDelay() { enabled_ = true; }
+StereoDelay::StereoDelay() {
+  enabled_ = true;
+}
 
 void StereoDelay::Reset() {
   m_left_delay_.ResetDelay();

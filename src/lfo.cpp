@@ -9,7 +9,9 @@
 #include "oscillator.h"
 #include "utils.h"
 
-LFO::LFO() { m_lfo_mode = LFOSYNC; }
+LFO::LFO() {
+  m_lfo_mode = LFOSYNC;
+}
 
 double LFO::DoOscillate(double *quad_phase_output) {
   if (!m_note_on) {
@@ -172,4 +174,6 @@ void LFO::StartOscillator() {
   m_note_on = true;
 }
 
-void LFO::StopOscillator() { m_note_on = false; }
+void LFO::StopOscillator() {
+  m_note_on = false;
+}

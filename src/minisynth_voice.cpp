@@ -303,4 +303,6 @@ bool MiniSynthVoice::DoVoice(double *left_output, double *right_output) {
   return true;
 }
 
-void MiniSynthVoice::SetFilterMod(double mod) { m_filter.SetFcMod(mod); }
+void MiniSynthVoice::SetFilterMod(double mod) {
+  m_filter.SetFcMod(mod);
+}

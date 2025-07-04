@@ -72,7 +72,9 @@ void Granulator::Reset() {
   stop_pending_ = false;
 }
 
-Granulator::Granulator() { grain_type_ = SoundGrainType::Signal; }
+Granulator::Granulator() {
+  grain_type_ = SoundGrainType::Signal;
+}
 
 Granulator::Granulator(std::string filename, unsigned int loop_mode) {
   type = LOOPER_TYPE;
@@ -342,7 +344,9 @@ std::string Granulator::Info() {
   return ss.str();
 }
 
-void Granulator::Start() { Reset(); }
+void Granulator::Start() {
+  Reset();
+}
 
 void Granulator::Stop() {
   eg_.Release();
@@ -379,7 +383,9 @@ void Granulator::SetIncrSpeed(double speed) {
   file_buffer_->incr_speed_ = speed;
 }
 
-void Granulator::SetReverseMode(bool b) { reverse_mode_ = b; }
+void Granulator::SetReverseMode(bool b) {
+  reverse_mode_ = b;
+}
 
 void Granulator::SetLoopMode(unsigned int m) {
   volume = 0.2;
@@ -419,7 +425,9 @@ void Granulator::SetStutterPending() {
   file_buffer_->stutter_pending_ = true;
   StutterPattern(file_buffer_->scrambled_pattern_);
 }
-void Granulator::SetReversePending() { reverse_pending_ = true; }
+void Granulator::SetReversePending() {
+  reverse_pending_ = true;
+}
 
 void Granulator::SetLoopLen(double bars) {
   if (bars != 0) {
@@ -472,7 +480,9 @@ void Granulator::SetPlooplen(int plooplen) {
     file_buffer_->plooplen_ = plooplen;
   }
 }
-void Granulator::SetPinc(int pinc) { file_buffer_->pinc_ = pinc; }
+void Granulator::SetPinc(int pinc) {
+  file_buffer_->pinc_ = pinc;
+}
 
 void Granulator::SetParam(std::string name, double val) {
   std::unique_ptr<FileBuffer> &buffer = file_buffer_;

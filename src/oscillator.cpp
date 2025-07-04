@@ -12,9 +12,13 @@
 #include "soundgenerator.h"
 #include "utils.h"
 
-Oscillator::Oscillator() { m_pn_register = rand(); }
+Oscillator::Oscillator() {
+  m_pn_register = rand();
+}
 
-void Oscillator::IncModulo() { m_modulo += m_inc; }
+void Oscillator::IncModulo() {
+  m_modulo += m_inc;
+}
 
 bool Oscillator::CheckWrapModulo() {
   if (m_inc > 0 && m_modulo >= 1.0) {
@@ -28,18 +32,32 @@ bool Oscillator::CheckWrapModulo() {
   return false;
 }
 
-void Oscillator::ResetModulo(double d) { m_modulo = d; }
+void Oscillator::ResetModulo(double d) {
+  m_modulo = d;
+}
 
-void Oscillator::SetAmplitudeMod(double amp_val) { m_amp_mod = amp_val; }
+void Oscillator::SetAmplitudeMod(double amp_val) {
+  m_amp_mod = amp_val;
+}
 
-void Oscillator::SetFoModExp(double fo_mod_val) { m_fo_mod = fo_mod_val; }
+void Oscillator::SetFoModExp(double fo_mod_val) {
+  m_fo_mod = fo_mod_val;
+}
 
-void Oscillator::SetPitchBendMod(double mod_val) { m_pitch_bend_mod = mod_val; }
-void Oscillator::SetFoModLin(double fo_mod_val) { m_fo_mod_lin = fo_mod_val; }
+void Oscillator::SetPitchBendMod(double mod_val) {
+  m_pitch_bend_mod = mod_val;
+}
+void Oscillator::SetFoModLin(double fo_mod_val) {
+  m_fo_mod_lin = fo_mod_val;
+}
 
-void Oscillator::SetPhaseMod(double mod_val) { m_phase_mod = mod_val; }
+void Oscillator::SetPhaseMod(double mod_val) {
+  m_phase_mod = mod_val;
+}
 
-void Oscillator::SetPwMod(double mod_val) { m_pw_mod = mod_val; }
+void Oscillator::SetPwMod(double mod_val) {
+  m_pw_mod = mod_val;
+}
 
 void Oscillator::Reset() {
   m_modulo = 0.0;

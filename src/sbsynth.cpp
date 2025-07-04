@@ -147,7 +147,9 @@ void SBSynth::Start() {
   if (active) return;  // no-op
   active = true;
 }
-void SBSynth::Stop() { active = false; }
+void SBSynth::Stop() {
+  active = false;
+}
 
 void SBSynth::NoteOn(midi_event ev) {
   unsigned int midinote = ev.data1;

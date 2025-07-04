@@ -35,7 +35,9 @@ WTOscillator::WTOscillator() {
   CreateWaveTables();
 }
 
-WTOscillator::~WTOscillator() { DestroyWaveTables(); }
+WTOscillator::~WTOscillator() {
+  DestroyWaveTables();
+}
 
 void WTOscillator::Reset() {
   Oscillator::Reset();
@@ -118,7 +120,9 @@ void WTOscillator::StartOscillator() {
   m_note_on = true;
 }
 
-void WTOscillator::StopOscillator() { m_note_on = false; }
+void WTOscillator::StopOscillator() {
+  m_note_on = false;
+}
 
 void WTOscillator::Update() {
   Oscillator::Update();

@@ -170,12 +170,22 @@ bool DrumSampler::ImportFile(std::string filename) {
   return false;
 }
 
-void DrumSampler::SetPitch(double v) { file_buffer_->SetPitch(v); }
+void DrumSampler::SetPitch(double v) {
+  file_buffer_->SetPitch(v);
+}
 
-void DrumSampler::SetAttackTime(double val) { eg.SetAttackTimeMsec(val); }
-void DrumSampler::SetDecayTime(double val) { eg.SetDecayTimeMsec(val); }
-void DrumSampler::SetSustainLvl(double val) { eg.SetSustainLevel(val); }
-void DrumSampler::SetReleaseTime(double val) { eg.SetReleaseTimeMsec(val); }
+void DrumSampler::SetAttackTime(double val) {
+  eg.SetAttackTimeMsec(val);
+}
+void DrumSampler::SetDecayTime(double val) {
+  eg.SetDecayTimeMsec(val);
+}
+void DrumSampler::SetSustainLvl(double val) {
+  eg.SetSustainLevel(val);
+}
+void DrumSampler::SetReleaseTime(double val) {
+  eg.SetReleaseTimeMsec(val);
+}
 
 void DrumSampler::SetParam(std::string name, double val) {
   if (name == "pitch")

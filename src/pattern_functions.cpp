@@ -66,7 +66,9 @@ void PatternReverse::TransformPattern(
   std::rotate(events.begin(), events.begin() + (PPSIXTEENTH - 1), events.end());
 }
 
-std::string PatternReverse::String() const { return "rev"; }
+std::string PatternReverse::String() const {
+  return "rev";
+}
 
 void PatternTranspose::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,

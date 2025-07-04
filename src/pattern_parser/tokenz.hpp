@@ -2,8 +2,7 @@
 
 #include <string>
 
-namespace pattern_parser
-{
+namespace pattern_parser {
 using TokenType = std::string;
 
 const TokenType PATTERN_COMMA = ",";
@@ -24,18 +23,17 @@ const TokenType PATTERN_QUESTIONMARK = "?";
 const TokenType PATTERN_COLON = ":";
 const TokenType PATTERN_CARET = "^";
 
-class Token
-{
-  public:
-    Token() {}
-    Token(TokenType type, std::string literal)
-        : type_{type}, literal_{literal} {};
+class Token {
+ public:
+  Token() {}
+  Token(TokenType type, std::string literal)
+      : type_{type}, literal_{literal} {};
 
-    friend std::ostream &operator<<(std::ostream &, const Token &);
+  friend std::ostream &operator<<(std::ostream &, const Token &);
 
-  public:
-    TokenType type_;
-    std::string literal_;
+ public:
+  TokenType type_;
+  std::string literal_;
 };
 
-} // namespace pattern_parser
+}  // namespace pattern_parser

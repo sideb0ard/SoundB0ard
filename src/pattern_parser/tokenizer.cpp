@@ -6,7 +6,9 @@
 
 namespace pattern_parser {
 
-Tokenizer::Tokenizer(std::string input) : input_{input} { ReadChar(); }
+Tokenizer::Tokenizer(std::string input) : input_{input} {
+  ReadChar();
+}
 
 bool Tokenizer::ReadInput(std::string input) {
   input_ += input;
@@ -161,6 +163,8 @@ void Tokenizer::SkipWhiteSpace() {
     ReadChar();
 }
 
-std::string Tokenizer::GetInput() { return input_; }
+std::string Tokenizer::GetInput() {
+  return input_;
+}
 
 }  // namespace pattern_parser

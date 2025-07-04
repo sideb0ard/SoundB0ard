@@ -1,0 +1,39 @@
+---
+Checks: >
+  bugprone-*,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -bugprone-easily-swappable-parameters,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -readability-magic-numbers,
+  -modernize-use-trailing-return-type,
+  -cppcoreguidelines-avoid-c-arrays,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -readability-uppercase-literal-suffix
+
+WarningsAsErrors: >
+  bugprone-use-after-move,
+  bugprone-dangling-handle,
+  clang-analyzer-core.NullDereference
+
+CheckOptions:
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.FunctionCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: modernize-loop-convert.MaxCopySize
+    value: 32
+  - key: performance-move-const-arg.CheckTriviallyCopyableMove
+    value: false
+
+HeaderFilterRegex: 'src/.*\.(h|hpp)$'
+FormatStyle: file

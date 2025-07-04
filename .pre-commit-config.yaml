@@ -1,0 +1,145 @@
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: trailing-whitespace
+        exclude: ^(.*\.md|.*\.txt)$
+      - id: end-of-file-fixer
+        exclude: ^(.*\.md|.*\.txt)$
+      - id: mixed-line-ending
+
+  # C++ formatting with clang-format
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v18.1.5
+    hooks:
+      - id: clang-format
+        files: \.(cpp|hpp|c|h)$
+        args: [-i]  # Apply fixes in-place
+
+  # C++ static analysis with cppcheck
+  - repo: local
+    hooks:
+      - id: cppcheck
+        name: cppcheck
+        entry: cppcheck
+        language: system
+        files: \.(cpp|c)$
+        args:
+          - --enable=warning,style,performance
+          - --std=c++20
+          - --suppress=missingIncludeSystem
+          - --suppress=unusedFunction
+          - --suppress=unmatchedSuppression
+          - --error-exitcode=1
+          - --inline-suppr
+
+  # Build check to ensure code compiles
+  - repo: local
+    hooks:
+      - id: cmake-build-check
+        name: cmake-build-check
+        entry: bash
+        language: system
+        args:
+          - -c
+          - |
+            if [ ! -d "build" ]; then mkdir build; fi
+            cd build
+            cmake .. && make -j4
+        files: \.(cpp|hpp|c|h|cmake)$|CMakeLists\.txt$
+        pass_filenames: false
+
+  # Check for common C++ issues
+  - repo: local
+    hooks:
+      - id: check-cpp-includes
+        name: check-cpp-includes
+        entry: bash
+        language: system
+        args:
+          - -c
+          - |
+            # Check for missing include guards in headers
+            for file in "$@"; do
+              if [[ "$file" =~ \.(h|hpp)$ ]]; then
+                if ! grep -q "#pragma once\|#ifndef.*_H\|#ifndef.*_HPP" "$file"; then
+                  echo "Missing include guard in $file"
+                  exit 1
+                fi
+              fi
+            done
+        files: \.(h|hpp)$
+
+  # Check for potential memory issues patterns
+  - repo: local
+    hooks:
+      - id: check-memory-patterns
+        name: check-memory-patterns
+        entry: bash
+        language: system
+        args:
+          - -c
+          - |
+            # Check for dangerous patterns
+            dangerous_patterns=(
+              "strcpy\s*\("
+              "strcat\s*\("
+              "sprintf\s*\("
+              "gets\s*\("
+            )
+
+            for file in "$@"; do
+              for pattern in "${dangerous_patterns[@]}"; do
+                if grep -qE "$pattern" "$file"; then
+                  echo "Dangerous function found in $file: $(grep -E "$pattern" "$file")"
+                  echo "Consider using safer alternatives (strncpy, strncat, snprintf, fgets)"
+                  exit 1
+                fi
+              done
+            done
+        files: \.(cpp|c)$
+
+  # Enforce consistent naming conventions
+  - repo: local
+    hooks:
+      - id: check-naming-conventions
+        name: check-naming-conventions
+        entry: bash
+        language: system
+        args:
+          - -c
+          - |
+            # Check for consistent file naming (snake_case)
+            for file in "$@"; do
+              basename=$(basename "$file")
+              if [[ "$basename" =~ ^[a-z][a-z0-9_]*\.(cpp|hpp|c|h)$ ]]; then
+                continue
+              elif [[ "$basename" =~ CMakeLists\.txt$ ]]; then
+                continue
+              else
+                echo "File $file should use snake_case naming"
+                exit 1
+              fi
+            done
+        files: \.(cpp|hpp|c|h)$|CMakeLists\.txt$
+
+  # Check CMake files
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+        args: [--in-place]
+      - id: cmake-lint
+
+# Configuration for specific tools
+default_stages: [pre-commit]
+fail_fast: false

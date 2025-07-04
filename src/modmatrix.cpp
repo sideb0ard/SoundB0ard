@@ -82,7 +82,9 @@ std::shared_ptr<ModMatrixRow> CreateMatrixRow(unsigned src, unsigned dest,
   return row;
 }
 
-int ModulationMatrix::GetMatrixSize() { return matrix_core.size(); }
+int ModulationMatrix::GetMatrixSize() {
+  return matrix_core.size();
+}
 
 void ModulationMatrix::ClearSources() {
   std::fill(std::begin(sources), std::end(sources), 0);

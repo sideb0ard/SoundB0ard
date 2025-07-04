@@ -17,15 +17,25 @@ class CircularBuffer {
     }
   }
 
-  T& front() { return buffer[head]; }
+  T& front() {
+    return buffer[head];
+  }
 
-  T& back() { return buffer[(tail - 1 + buffer.size()) % buffer.size()]; }
+  T& back() {
+    return buffer[(tail - 1 + buffer.size()) % buffer.size()];
+  }
 
-  size_t get_size() { return size; }
+  size_t get_size() {
+    return size;
+  }
 
-  bool empty() const { return size == 0; }
+  bool empty() const {
+    return size == 0;
+  }
 
-  bool full() const { return size == buffer.size(); }
+  bool full() const {
+    return size == buffer.size();
+  }
 
  private:
   std::vector<T> buffer;

@@ -82,7 +82,9 @@ void midi_event_cp(midi_event *from, midi_event *to) {
   to->data2 = from->data2;
 }
 
-void midi_event_clear(midi_event *ev) { memset(ev, 0, sizeof(midi_event)); }
+void midi_event_clear(midi_event *ev) {
+  memset(ev, 0, sizeof(midi_event));
+}
 
 void midi_event_print(midi_event *ev) {
   char event_type[10] = {};

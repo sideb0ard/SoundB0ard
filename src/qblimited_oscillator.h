@@ -2,20 +2,19 @@
 
 #include "oscillator.h"
 
-struct QBLimitedOscillator : public Oscillator
-{
-    QBLimitedOscillator() = default;
-    ~QBLimitedOscillator() = default;
+struct QBLimitedOscillator : public Oscillator {
+  QBLimitedOscillator() = default;
+  ~QBLimitedOscillator() = default;
 
-    double DoOscillate(double *quad_phase_output) override;
+  double DoOscillate(double *quad_phase_output) override;
 
-    void StartOscillator() override;
-    void StopOscillator() override;
+  void StartOscillator() override;
+  void StopOscillator() override;
 
-    void Reset() override;
+  void Reset() override;
 
-    double DoSawtooth(double modulo, double dInc);
-    double DoSquare(double modulo, double dInc);
-    double DoTriangle(double modulo, double dInc, double dFo,
-                      double dSquareModulator, double *pZ_register);
+  double DoSawtooth(double modulo, double dInc);
+  double DoSquare(double modulo, double dInc);
+  double DoTriangle(double modulo, double dInc, double dFo,
+                    double dSquareModulator, double *pZ_register);
 };

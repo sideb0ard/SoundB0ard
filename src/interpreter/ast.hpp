@@ -34,7 +34,9 @@ class Node {
   Node() = default;
   explicit Node(Token toke) : token_{toke} {}
   virtual ~Node() = default;
-  virtual std::string TokenLiteral() const { return token_.literal_; }
+  virtual std::string TokenLiteral() const {
+    return token_.literal_;
+  }
   virtual std::string String() const = 0;
 
  public:
@@ -72,7 +74,9 @@ class StringLiteral : public Expression {
  public:
   StringLiteral(Token token, std::string val)
       : Expression{token}, value_{val} {}
-  std::string String() const override { return value_; }
+  std::string String() const override {
+    return value_;
+  }
 
  public:
   std::string value_;

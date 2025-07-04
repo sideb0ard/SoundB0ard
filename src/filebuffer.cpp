@@ -34,7 +34,9 @@ void FileBuffer::SetParam(std::string param, double value) {
     SetPinc(value);
 }
 
-void FileBuffer::SetPidx(int val) { poffset_ = abs(val - cur_sixteenth_) % 16; }
+void FileBuffer::SetPidx(int val) {
+  poffset_ = abs(val - cur_sixteenth_) % 16;
+}
 
 void FileBuffer::SetPitch(double pitch_ratio) {
   std::lock_guard<std::mutex> lock(pending_pitch_mutex_);
@@ -61,7 +63,9 @@ void FileBuffer::SetPlooplen(int p) {
     plooplen_ = p;
   }
 }
-void FileBuffer::SetPinc(int p) { pinc_ = p; }
+void FileBuffer::SetPinc(int p) {
+  pinc_ = p;
+}
 
 void FileBuffer::SetLoopLen(double bars) {
   if (bars != 0) {

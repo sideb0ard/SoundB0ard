@@ -71,7 +71,9 @@ void AudioEngine::setTempo(double tempo) {
   mSharedEngineData.requestedTempo = tempo;
 }
 
-double AudioEngine::quantum() const { return mSharedEngineData.quantum; }
+double AudioEngine::quantum() const {
+  return mSharedEngineData.quantum;
+}
 
 void AudioEngine::setQuantum(double quantum) {
   std::lock_guard<std::mutex> lock(mEngineDataGuard);
@@ -86,7 +88,9 @@ void AudioEngine::setStartStopSyncEnabled(const bool enabled) {
   mLink.enableStartStopSync(enabled);
 }
 
-void AudioEngine::setSampleRate(double sampleRate) { mSampleRate = sampleRate; }
+void AudioEngine::setSampleRate(double sampleRate) {
+  mSampleRate = sampleRate;
+}
 
 AudioEngine::EngineData AudioEngine::pullEngineData() {
   auto engineData = EngineData{};

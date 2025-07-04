@@ -9,7 +9,9 @@
 
 #include "defjams.h"
 
-unsigned int EnvelopeGenerator::GetState() { return m_state; }
+unsigned int EnvelopeGenerator::GetState() {
+  return m_state;
+}
 
 bool EnvelopeGenerator::IsActive() {
   if (m_state != RELEASE && m_state != OFFF && !m_release_pending) return true;
@@ -87,7 +89,9 @@ void EnvelopeGenerator::SetAttackTimeMsec(double time) {
   CalculateAttackTime();
 }
 
-void EnvelopeGenerator::SetHoldTimeMsec(double time) { hold_time_ms_ = time; }
+void EnvelopeGenerator::SetHoldTimeMsec(double time) {
+  hold_time_ms_ = time;
+}
 
 void EnvelopeGenerator::SetDecayTimeMsec(double time) {
   m_decay_time_msec = time;
@@ -109,7 +113,9 @@ void EnvelopeGenerator::SetSustainLevel(double level) {
   if (m_state != RELEASE) CalculateReleaseTime();
 }
 
-void EnvelopeGenerator::SetRampMode(bool b) { ad_mode = b; }
+void EnvelopeGenerator::SetRampMode(bool b) {
+  ad_mode = b;
+}
 
 void EnvelopeGenerator::SetSustainOverride(bool b) {
   m_sustain_override = b;
@@ -131,7 +137,9 @@ void EnvelopeGenerator::Release() {
   if (m_state == SUSTAIN) m_state = RELEASE;
 }
 
-void EnvelopeGenerator::StopEg() { m_state = OFFF; }
+void EnvelopeGenerator::StopEg() {
+  m_state = OFFF;
+}
 
 void EnvelopeGenerator::InitGlobalParameters(GlobalEgParams *params) {
   global_eg_params = params;

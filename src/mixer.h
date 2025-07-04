@@ -54,7 +54,9 @@ struct Action {
   ~Action() = default;
 
   void Run();
-  bool IsActive() { return active_; }
+  bool IsActive() {
+    return active_;
+  }
 
   double start_val_{0};
   double end_val_{0};
@@ -146,7 +148,9 @@ struct Mixer {
   std::string StatusSgz(bool all);
 
   void PrintRecordingBuffer();
-  MultiEventMidiPattern RecordingBuffer() { return recording_buffer_; }
+  MultiEventMidiPattern RecordingBuffer() {
+    return recording_buffer_;
+  }
   MultiEventMidiPattern recording_buffer_;
 
   void UpdateBpm(int bpm);
@@ -188,7 +192,9 @@ struct Mixer {
   void AddFileToMonitor(std::string filepath);
 
   // for sending websocket to p5.js
-  void EnableWebSocket(bool en) { websocket_enabled_ = en; }
+  void EnableWebSocket(bool en) {
+    websocket_enabled_ = en;
+  }
 };
 
 #endif  // MIXER_H

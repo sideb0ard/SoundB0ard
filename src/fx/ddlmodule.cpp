@@ -4,7 +4,9 @@
 #include <string.h>
 #include <utils.h>
 
-DDLModule::DDLModule() { ResetDelay(); }
+DDLModule::DDLModule() {
+  ResetDelay();
+}
 
 void DDLModule::Update() {
   m_feedback = m_feedback_pct / 100.0;

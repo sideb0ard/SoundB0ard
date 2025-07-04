@@ -34,7 +34,7 @@ namespace {
 
 std::vector<std::string> env_names = {"att", "dec", "rel"};
 
-std::pair<double, double> GetBoundaries(std::string param) {
+std::pair<double, double> GetBoundaries(const std::string &param) {
   if (param.find("pct") != std::string::npos) return std::make_pair(0, 100);
   for (const auto &p : env_names) {
     if (param.find(p) != std::string::npos) return std::make_pair(1, 5000);
@@ -274,7 +274,9 @@ void Mixer::Ps(bool all) {
   repl_queue.push(ss.str());
 }
 
-void Mixer::Now() { audio_reply_queue.push(timing_info.midi_tick); }
+void Mixer::Now() {
+  audio_reply_queue.push(timing_info.midi_tick);
+}
 
 void Mixer::Help() {
   std::string reply;
@@ -549,8 +551,22 @@ int Mixer::GenNext(float *out, int frames_per_buffer,
     StereoVal fx_delay_send{};
     StereoVal fx_reverb_send{};
     StereoVal fx_distort_send{};
-    for (int k = 0; k < sound_generators_idx_; k++) {
+    // Cache the size to avoid race conditions with other threads modifying it
+    int safe_generators_count =
+        (sound_generators_idx_ < static_cast<int>(sound_generators_.size()))
+            ? sound_generators_idx_
+            : static_cast<int>(sound_generators_.size());
+
+    for (int k = 0; k < safe_generators_count; k++) {
+      // Additional bounds check
+      if (k >= sound_generators_.size()) break;
+
       auto &sg = sound_generators_[k];
+      // Null check before dereferencing
+      if (!sg) {
+        soundgen_cur_val_[k] = StereoVal{};
+        continue;
+      }
       soundgen_cur_val_[k] = sg->GenNext(timing_info);
 
       bool collect_value = false;
@@ -604,6 +620,7 @@ bool Mixer::DelSoundgen(int soundgen_num) {
 
 bool Mixer::IsValidSoundgenNum(int sg_num) {
   if (sg_num >= 0 && sg_num < sound_generators_idx_ &&
+      sg_num < static_cast<int>(sound_generators_.size()) &&
       sound_generators_[sg_num])
     return true;
 
@@ -999,7 +1016,9 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
   }
 }
 
-void Mixer::ResetMidiRecording() { recording_buffer_.fill({}); }
+void Mixer::ResetMidiRecording() {
+  recording_buffer_.fill({});
+}
 
 void Mixer::AssignSoundGeneratorToMidiController(int soundgen_id) {
   if (IsValidSoundgenNum(soundgen_id)) {
@@ -1016,7 +1035,9 @@ void Mixer::RecordMidiToggle() {
   midi_recording = 1 - midi_recording;
 }
 
-void Mixer::PrintMidiToggle() { midi_print = 1 - midi_print; }
+void Mixer::PrintMidiToggle() {
+  midi_print = 1 - midi_print;
+}
 
 void Mixer::HandleMidiControlMessage(int data1, int data2) {
   if (midi_mapped_controls_.count(data1)) {
@@ -1076,15 +1097,13 @@ void Mixer::CheckForExternalMidiEvents() {
 
 void Mixer::CheckForAudioActionQueueMessages() {
   while (auto opt_action = audio_queue.try_pop()) {
-    if (opt_action) {
-      auto &action = opt_action.value();
-      if (action->delayed_by > 0) {
-        action->start_at = timing_info.midi_tick + action->delayed_by;
-        action->delayed_by = 0;
-        delayed_action_items_.push_back(std::move(action));
-      } else {
-        ProcessActionMessage(std::move(action));
-      }
+    auto &action = opt_action.value();
+    if (action->delayed_by > 0) {
+      action->start_at = timing_info.midi_tick + action->delayed_by;
+      action->delayed_by = 0;
+      delayed_action_items_.push_back(std::move(action));
+    } else {
+      ProcessActionMessage(std::move(action));
     }
   }
 }
@@ -1151,12 +1170,16 @@ void Mixer::CheckForDelayedEvents() {
   }
 }
 
-void Mixer::PrintRecordingBuffer() { PrintMultiMidi(recording_buffer_); }
+void Mixer::PrintRecordingBuffer() {
+  PrintMultiMidi(recording_buffer_);
+}
 void Mixer::AddMidiMapping(int id, std::string param) {
   midi_mapped_controls_[id] = param;
 }
 
-void Mixer::ResetMidiMappings() { midi_mapped_controls_.clear(); }
+void Mixer::ResetMidiMappings() {
+  midi_mapped_controls_.clear();
+}
 void Mixer::PrintMidiMappings() {
   for (const auto &[id, param] : midi_mapped_controls_) {
     std::cout << "ID:" << id << " // Param:" << param << std::endl;

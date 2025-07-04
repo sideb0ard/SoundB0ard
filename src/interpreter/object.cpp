@@ -91,20 +91,28 @@ bool operator<(HashKey const &lhs, HashKey const &rhs) {
   }
 }
 
-ObjectType Number::Type() { return NUMBER_OBJ; }
+ObjectType Number::Type() {
+  return NUMBER_OBJ;
+}
 object::HashKey Number::HashKey() {
   return object::HashKey(Type(), (uint64_t)value_);
 }
 
-std::string BitOp::Inspect() { return bitop_; }
-std::string BitOp::Type() { return BITOP_OBJ; }
+std::string BitOp::Inspect() {
+  return bitop_;
+}
+std::string BitOp::Type() {
+  return BITOP_OBJ;
+}
 
 std::string Boolean::Inspect() {
   std::stringstream val;
   val << (value_ ? "true" : "false");
   return val.str();
 }
-ObjectType Boolean::Type() { return BOOLEAN_OBJ; }
+ObjectType Boolean::Type() {
+  return BOOLEAN_OBJ;
+}
 object::HashKey Boolean::HashKey() {
   uint64_t val = 0;
   if (value_) val = 1;
@@ -117,11 +125,19 @@ object::HashKey String::HashKey() {
   return object::HashKey(Type(), (uint64_t)hasher(value_));
 }
 
-std::string Break::Inspect() { return "break"; }
-ObjectType Break::Type() { return BREAK_OBJ; }
+std::string Break::Inspect() {
+  return "break";
+}
+ObjectType Break::Type() {
+  return BREAK_OBJ;
+}
 
-std::string Null::Inspect() { return "null"; }
-ObjectType Null::Type() { return NULL_OBJ; }
+std::string Null::Inspect() {
+  return "null";
+}
+ObjectType Null::Type() {
+  return NULL_OBJ;
+}
 
 std::string StepSequencer::Inspect() {
   std::stringstream ss;
@@ -139,14 +155,20 @@ std::string StepSequencer::Inspect() {
   return ss.str();
 }
 
-ObjectType StepSequencer::Type() { return STEP_SEQUENCER_OBJ; }
+ObjectType StepSequencer::Type() {
+  return STEP_SEQUENCER_OBJ;
+}
 
 FMSynth::FMSynth() {
   soundgen_id_ = AddSoundGenerator(DXSYNTH_TYPE);
   soundgenerator_type = DXSYNTH_TYPE;
 }
-std::string FMSynth::Inspect() { return "FM synth."; }
-ObjectType FMSynth::Type() { return SYNTH_OBJ; }
+std::string FMSynth::Inspect() {
+  return "FM synth.";
+}
+ObjectType FMSynth::Type() {
+  return SYNTH_OBJ;
+}
 
 object::HashKey SoundGenerator::HashKey() {
   return object::HashKey(Type(), (uint64_t)soundgen_id_);
@@ -156,44 +178,72 @@ SBSynth::SBSynth() {
   soundgen_id_ = AddSoundGenerator(SBSYNTH_TYPE);
   soundgenerator_type = SBSYNTH_TYPE;
 }
-std::string SBSynth::Inspect() { return "SB synth."; }
-ObjectType SBSynth::Type() { return SYNTH_OBJ; }
+std::string SBSynth::Inspect() {
+  return "SB synth.";
+}
+ObjectType SBSynth::Type() {
+  return SYNTH_OBJ;
+}
 
 MoogSynth::MoogSynth() {
   soundgen_id_ = AddSoundGenerator(MINISYNTH_TYPE);
   soundgenerator_type = MINISYNTH_TYPE;
 }
-std::string MoogSynth::Inspect() { return "Moog synth."; }
-ObjectType MoogSynth::Type() { return SYNTH_OBJ; }
+std::string MoogSynth::Inspect() {
+  return "Moog synth.";
+}
+ObjectType MoogSynth::Type() {
+  return SYNTH_OBJ;
+}
 
 DrumSynth::DrumSynth() {
   soundgen_id_ = AddSoundGenerator(DRUMSYNTH_TYPE);
   soundgenerator_type = DRUMSYNTH_TYPE;
 }
-std::string DrumSynth::Inspect() { return "Drum synth."; }
-ObjectType DrumSynth::Type() { return SYNTH_OBJ; }
+std::string DrumSynth::Inspect() {
+  return "Drum synth.";
+}
+ObjectType DrumSynth::Type() {
+  return SYNTH_OBJ;
+}
 
 Sample::Sample(std::string sample_path) {
   sample_path_ = sample_path;
   soundgen_id_ = AddSoundGenerator(DRUMSAMPLER_TYPE, sample_path);
   soundgenerator_type = DRUMSAMPLER_TYPE;
 }
-std::string Sample::Inspect() { return "sample."; }
-ObjectType Sample::Type() { return SAMPLE_OBJ; }
+std::string Sample::Inspect() {
+  return "sample.";
+}
+ObjectType Sample::Type() {
+  return SAMPLE_OBJ;
+}
 
 Granular::Granular(std::string sample_path, int loop_mode) {
   soundgen_id_ = AddSoundGenerator(LOOPER_TYPE, sample_path, loop_mode);
   soundgenerator_type = LOOPER_TYPE;
 }
-std::string Granular::Inspect() { return "Granular."; }
-ObjectType Granular::Type() { return GRANULAR_OBJ; }
+std::string Granular::Inspect() {
+  return "Granular.";
+}
+ObjectType Granular::Type() {
+  return GRANULAR_OBJ;
+}
 
-std::string ReturnValue::Inspect() { return value_->Inspect(); }
-ObjectType ReturnValue::Type() { return RETURN_VALUE_OBJ; }
+std::string ReturnValue::Inspect() {
+  return value_->Inspect();
+}
+ObjectType ReturnValue::Type() {
+  return RETURN_VALUE_OBJ;
+}
 
 Error::Error(std::string err_msg) : message_{err_msg} {}
-std::string Error::Inspect() { return "ERROR: " + message_; }
-ObjectType Error::Type() { return ERROR_OBJ; }
+std::string Error::Inspect() {
+  return "ERROR: " + message_;
+}
+ObjectType Error::Type() {
+  return ERROR_OBJ;
+}
 
 double Phasor::Generate() {
   signal_ = scale(counter_, 0, frequency_, 0, 1);
@@ -202,13 +252,17 @@ double Phasor::Generate() {
   return signal_;
 }
 
-ObjectType Phasor::Type() { return PHASOR_OBJ; }
+ObjectType Phasor::Type() {
+  return PHASOR_OBJ;
+}
 std::string Phasor::Inspect() {
   std::stringstream reply;
   reply << "phasor. freq:" << frequency_;
   return reply.str();
 }
-ObjectType Function::Type() { return FUNCTION_OBJ; }
+ObjectType Function::Type() {
+  return FUNCTION_OBJ;
+}
 std::string Function::Inspect() {
   std::stringstream params;
   int len = parameters_.size();
@@ -226,7 +280,9 @@ std::string Function::Inspect() {
   return return_val.str();
 }
 
-ObjectType Generator::Type() { return GENERATOR_OBJ; }
+ObjectType Generator::Type() {
+  return GENERATOR_OBJ;
+}
 std::string Generator::Inspect() {
   std::stringstream params;
   int len = parameters_.size();
@@ -249,24 +305,34 @@ std::string At::Inspect() {
   val << value_;
   return val.str();
 }
-ObjectType At::Type() { return AT_OBJ; }
+ObjectType At::Type() {
+  return AT_OBJ;
+}
 
 std::string Duration::Inspect() {
   std::stringstream val;
   val << value_;
   return val.str();
 }
-ObjectType Duration::Type() { return DURATION_OBJ; }
+ObjectType Duration::Type() {
+  return DURATION_OBJ;
+}
 
 std::string Velocity::Inspect() {
   std::stringstream val;
   val << value_;
   return val.str();
 }
-ObjectType Velocity::Type() { return VELOCITY_OBJ; }
+ObjectType Velocity::Type() {
+  return VELOCITY_OBJ;
+}
 
-ObjectType ForLoop::Type() { return FORLOOP_OBJ; }
-std::string ForLoop::Inspect() { return "FOR LOOP"; }
+ObjectType ForLoop::Type() {
+  return FORLOOP_OBJ;
+}
+std::string ForLoop::Inspect() {
+  return "FOR LOOP";
+}
 
 MidiArray::MidiArray(MultiEventMidiPattern events) : events_{events} {
   std::vector<midi_event> notes_off;
@@ -303,7 +369,9 @@ MidiArray::MidiArray(MultiEventMidiPattern events) : events_{events} {
   for (auto &e : control_messages_) e.playback_tick = e.original_tick % PPBAR;
 }
 
-ObjectType MidiArray::Type() { return MIDI_ARRAY; }
+ObjectType MidiArray::Type() {
+  return MIDI_ARRAY;
+}
 
 std::string MidiArray::Inspect() {
   std::stringstream ss;

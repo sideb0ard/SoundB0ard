@@ -181,17 +181,26 @@ void chordie(char *n) {
   int second_note_num = (root_note_num + 4) % 12;
   int third_note_num = (second_note_num + 3) % 12;
   // TODO : cleanup - assuming always middle chord here:
-  char rootnote[4];
-  char sec_note[4];
-  char thr_note[4];
-  strcpy(rootnote, rev_lookup[root_note_num]);
-  strcpy(sec_note, rev_lookup[second_note_num]);
-  strcpy(thr_note, rev_lookup[third_note_num]);
+  char rootnote[8];  // Increased buffer size to prevent overflow
+  char sec_note[8];  // Increased buffer size to prevent overflow
+  char thr_note[8];  // Increased buffer size to prevent overflow
+
+  // Use safe string operations
+  strncpy(rootnote, rev_lookup[root_note_num], sizeof(rootnote) - 1);
+  rootnote[sizeof(rootnote) - 1] = '\0';
+  strncpy(sec_note, rev_lookup[second_note_num], sizeof(sec_note) - 1);
+  sec_note[sizeof(sec_note) - 1] = '\0';
+  strncpy(thr_note, rev_lookup[third_note_num], sizeof(thr_note) - 1);
+  thr_note[sizeof(thr_note) - 1] = '\0';
+
+  // Use safe concatenation
+  strncat(rootnote, "4", sizeof(rootnote) - strlen(rootnote) - 1);
+  strncat(sec_note, "4", sizeof(sec_note) - strlen(sec_note) - 1);
+  strncat(thr_note, "4", sizeof(thr_note) - strlen(thr_note) - 1);
 
   printf("%s chord is %s(%.2f) %s(%.2f) %s(%.2f)\n", n, rootnote,
-         freqval(strcat(rootnote, "4")), sec_note,
-         freqval(strcat(sec_note, "4")), thr_note,
-         freqval(strcat(thr_note, "4")));
+         freqval(rootnote), sec_note, freqval(sec_note), thr_note,
+         freqval(thr_note));
 }
 
 // void related_notes(char note[4], double *second_note, double *third_note) {
@@ -271,51 +280,63 @@ int input_key_to_char_note(int ch, int octave, char *keytext) {
   switch (ch) {
     case 97:                               // C - a
       midi_num = 0 + cur_octave_midi_num;  // C
-      strncpy(keytext, "C", 1);
+      strncpy(keytext, "C", 2);
+      keytext[1] = '\0';
       break;
     case 119:
       midi_num = 1 + cur_octave_midi_num;  // C#
-      strncpy(keytext, "C#", 2);
+      strncpy(keytext, "C#", 3);
+      keytext[2] = '\0';
       break;
     case 115:
       midi_num = 2 + cur_octave_midi_num;  // D
-      strncpy(keytext, "D", 1);
+      strncpy(keytext, "D", 2);
+      keytext[1] = '\0';
       break;
     case 101:
       midi_num = 3 + cur_octave_midi_num;  // D#
-      strncpy(keytext, "D#", 2);
+      strncpy(keytext, "D#", 3);
+      keytext[2] = '\0';
       break;
     case 100:
       midi_num = 4 + cur_octave_midi_num;  // E
-      strncpy(keytext, "E", 1);
+      strncpy(keytext, "E", 2);
+      keytext[1] = '\0';
       break;
     case 102:
       midi_num = 5 + cur_octave_midi_num;  // F
-      strncpy(keytext, "F", 1);
+      strncpy(keytext, "F", 2);
+      keytext[1] = '\0';
       break;
     case 116:
       midi_num = 6 + cur_octave_midi_num;  // F#
-      strncpy(keytext, "F#", 2);
+      strncpy(keytext, "F#", 3);
+      keytext[2] = '\0';
       break;
     case 103:
       midi_num = 7 + cur_octave_midi_num;  // G
-      strncpy(keytext, "G", 1);
+      strncpy(keytext, "G", 2);
+      keytext[1] = '\0';
       break;
     case 121:
       midi_num = 8 + cur_octave_midi_num;  // G#
-      strncpy(keytext, "G#", 2);
+      strncpy(keytext, "G#", 3);
+      keytext[2] = '\0';
       break;
     case 104:
       midi_num = 9 + cur_octave_midi_num;  // A
-      strncpy(keytext, "A", 1);
+      strncpy(keytext, "A", 2);
+      keytext[1] = '\0';
       break;
     case 117:
       midi_num = 10 + cur_octave_midi_num;  // A#
-      strncpy(keytext, "A#", 2);
+      strncpy(keytext, "A#", 3);
+      keytext[2] = '\0';
       break;
     case 106:
       midi_num = 11 + cur_octave_midi_num;  // B
-      strncpy(keytext, "B", 1);
+      strncpy(keytext, "B", 2);
+      keytext[1] = '\0';
       break;
     case 107:
       midi_num = 0 + next_octave;  // C
@@ -531,8 +552,12 @@ double parabolic_sine(double x, bool high_precision) {
   return y;
 }
 
-double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }
-double bipolar_to_unipolar(double value) { return 0.5 * value + 0.5; }
+double unipolar_to_bipolar(double value) {
+  return 2.0 * value - 1.0;
+}
+double bipolar_to_unipolar(double value) {
+  return 0.5 * value + 0.5;
+}
 
 double convex_transform(double value) {
   if (value <= CONVEX_LIMIT) return 0.0;
@@ -706,7 +731,9 @@ float fasttan(float x) {
   return sin(x) / sin(x + halfpi);
 }
 
-float fasttanh(float p) { return p / (fabs(2 * p) + 3 / (2 + 2 * p * 2 * p)); }
+float fasttanh(float p) {
+  return p / (fabs(2 * p) + 3 / (2 + 2 * p * 2 * p));
+}
 
 // no idea! taken from Will Pirkle books
 float fastlog2(float x) {
@@ -876,7 +903,9 @@ uint16_t mask_from_string(char *stringey_mask) {
   return bin_mask;
 }
 
-bool IsDigit(char c) { return '0' <= c && c <= '9'; }
+bool IsDigit(char c) {
+  return '0' <= c && c <= '9';
+}
 
 bool IsValidIdentifier(char c) {
   return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_' ||

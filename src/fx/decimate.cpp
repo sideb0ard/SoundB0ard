@@ -84,7 +84,6 @@ void Decimate::SetParam(std::string name, double val) {
   Update();
 }
 
-
 void Decimate::Update() {}
 
 void Decimate::SetBitRes(float val) {

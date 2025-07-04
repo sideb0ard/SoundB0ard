@@ -26,7 +26,9 @@ void Filter::SetQControlGUI(double val) {
   }
 }
 
-void Filter::SetFcMod(double val) { m_fc_mod = val; }
+void Filter::SetFcMod(double val) {
+  m_fc_mod = val;
+}
 
 void Filter::SetType(unsigned int type) {
   if (type < NUM_FILTER_TYPES) {

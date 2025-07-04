@@ -347,8 +347,12 @@ int GetNthDegree(int note, int degree, char key) {
   return return_midi_num;
 }
 
-int GetThird(int note, char key) { return GetNthDegree(note, 2, key); }
-int GetFifth(int note, char key) { return GetNthDegree(note, 4, key); }
+int GetThird(int note, char key) {
+  return GetNthDegree(note, 2, key);
+}
+int GetFifth(int note, char key) {
+  return GetNthDegree(note, 4, key);
+}
 
 bool IsMidiNoteInKeyChar(int note, char key) {
   int key_midi_num = GetMidiNumForKey(key);

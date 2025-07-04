@@ -213,7 +213,9 @@ bool Voice::IsVoiceDone() {
   return false;
 }
 
-bool Voice::InLegatoMode() { return m_eg1.m_legato_mode; }
+bool Voice::InLegatoMode() {
+  return m_eg1.m_legato_mode;
+}
 
 void Voice::Update() {
   m_voice_mode = m_global_voice_params->voice_mode;

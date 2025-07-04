@@ -202,4 +202,6 @@ std::string FFTProcessor::GetPitch() {
   return kNoteStrings[NoteFromPitch(estimated_pitch_) % 12];
 }
 
-std::string FFTProcessor::GetKey() { return GuestimateKey(TallyNotesSeen()); }
+std::string FFTProcessor::GetKey() {
+  return GuestimateKey(TallyNotesSeen());
+}

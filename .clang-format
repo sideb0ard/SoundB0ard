@@ -1,1 +1,21 @@
-BasedOnStyle:  Google
+---
+Language: Cpp
+BasedOnStyle: Google
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+ColumnLimit: 80
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+BreakBeforeBraces: Attach
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInContainerLiterals: false
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Standard: c++20
+SortIncludes: true

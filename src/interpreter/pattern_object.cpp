@@ -29,7 +29,9 @@ void Pattern::ParseStringPattern() {
   pattern_root = new_pattern_root;
 }
 
-ObjectType Pattern::Type() { return PATTERN_OBJ; }
+ObjectType Pattern::Type() {
+  return PATTERN_OBJ;
+}
 
 std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> Pattern::Eval() {
   for (int i = 0; i < PPBAR; i++) pattern_events[i].clear();

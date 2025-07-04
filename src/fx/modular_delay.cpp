@@ -143,7 +143,9 @@ std::string ModDelay::Status() {
   return ss.str();
 }
 
-StereoVal ModDelay::Process(StereoVal input) { return ProcessAudio(input); }
+StereoVal ModDelay::Process(StereoVal input) {
+  return ProcessAudio(input);
+}
 
 void ModDelay::SetDepth(double val) {
   if (val >= 0 && val <= 100)

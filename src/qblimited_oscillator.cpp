@@ -87,7 +87,9 @@ void QBLimitedOscillator::StartOscillator() {
   m_note_on = true;
 }
 
-void QBLimitedOscillator::StopOscillator() { m_note_on = false; }
+void QBLimitedOscillator::StopOscillator() {
+  m_note_on = false;
+}
 
 double QBLimitedOscillator::DoSawtooth(double modulo, double inc) {
   double trivial_saw = 0.0;

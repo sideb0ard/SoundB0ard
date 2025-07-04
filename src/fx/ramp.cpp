@@ -23,9 +23,13 @@ double scale(double cur_val, double cur_min, double cur_max, double new_min,
 }
 }  // namespace
 
-Ramp::Ramp() { Reset(SAMPLE_RATE); }
+Ramp::Ramp() {
+  Reset(SAMPLE_RATE);
+}
 
-Ramp::Ramp(double rate) { Reset(rate); }
+Ramp::Ramp(double rate) {
+  Reset(rate);
+}
 
 void Ramp::Reset(double frame_rate_per_second) {
   frames_per_second_ = frame_rate_per_second;

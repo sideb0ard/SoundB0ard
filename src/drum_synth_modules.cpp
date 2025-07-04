@@ -403,7 +403,9 @@ HiHat::HiHat() {
   delay_ = std::make_unique<StereoDelay>();
 }
 
-void HiHat::SetAmplitude(double val) { osc_bank_.SetAmplitude(val); }
+void HiHat::SetAmplitude(double val) {
+  osc_bank_.SetAmplitude(val);
+}
 
 void HiHat::NoteOn(double vel) {
   velocity_ = vel;
@@ -449,7 +451,9 @@ StereoVal HiHat::Generate() {
   return out;
 }
 
-void PulseTrigger::Trigger() { pulse_counter_ = 0; }
+void PulseTrigger::Trigger() {
+  pulse_counter_ = 0;
+}
 
 double PulseTrigger::GenNext() {
   if (pulse_counter_ < pulse_length_) {

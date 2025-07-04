@@ -22,7 +22,9 @@ namespace SBAudio {
 
 SoundGenerator::SoundGenerator(){};
 
-double SoundGenerator::GetVolume() { return volume; }
+double SoundGenerator::GetVolume() {
+  return volume;
+}
 
 void SoundGenerator::SetVolume(double val) {
   if (val >= 0.0 && val <= 1.0) volume = val;
@@ -34,14 +36,20 @@ void SoundGenerator::SetFxSend(int fx_num, double intensity) {
   }
 }
 
-void SoundGenerator::Start() { active = true; }
-void SoundGenerator::Stop() { active = false; }
+void SoundGenerator::Start() {
+  active = true;
+}
+void SoundGenerator::Stop() {
+  active = false;
+}
 
 void SoundGenerator::Save(std::string preset_name) {
   std::cout << "BASE CLASS SAVE " << preset_name << " - NO OP!" << std::endl;
 }
 
-std::string SoundGenerator::Status() { return std::string{"BASE CLASS, YO"}; }
+std::string SoundGenerator::Status() {
+  return std::string{"BASE CLASS, YO"};
+}
 
 void SoundGenerator::ParseMidiEvent(midi_event ev, mixer_timing_info tinfo) {
   (void)tinfo;
@@ -79,7 +87,9 @@ void SoundGenerator::EventNotify(broadcast_event event,
   (void)tinfo;
 }
 
-double SoundGenerator::GetPan() { return pan; }
+double SoundGenerator::GetPan() {
+  return pan;
+}
 
 void SoundGenerator::SetPan(double val) {
   if (val >= -1.0 && val <= 1.0) pan = val;
@@ -95,7 +105,15 @@ void SoundGenerator::AddFx(std::shared_ptr<Fx> f) {
 
 StereoVal SoundGenerator::Effector(StereoVal val) {
   int num_fx = effects_num.load();
-  for (int i = 0; i < num_fx; i++) {
+  // Ensure we don't exceed the actual array size to prevent race conditions
+  int safe_fx_count = (num_fx < static_cast<int>(effects_.size()))
+                          ? num_fx
+                          : static_cast<int>(effects_.size());
+
+  for (int i = 0; i < safe_fx_count; i++) {
+    // Additional bounds check in case array was resized
+    if (i >= effects_.size()) break;
+
     auto f = effects_[i];
     if (f && f->enabled_) {
       val = f->Process(val);

@@ -85,7 +85,9 @@ void XFader::SetXFaderPosition(double pos) {
   }
 }
 
-void XFader::SetFadeTimeMidiTicks(double tics) { xfade_time_midi_tics_ = tics; }
+void XFader::SetFadeTimeMidiTicks(double tics) {
+  xfade_time_midi_tics_ = tics;
+}
 
 std::string XFader::Status() {
   std::stringstream ss;

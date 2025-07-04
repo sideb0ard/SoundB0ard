@@ -83,7 +83,9 @@ void Process::Update() {
   active_ = true;
 }
 
-Process::~Process() { std::cout << "Mixer Process deid!\n"; }
+Process::~Process() {
+  std::cout << "Mixer Process deid!\n";
+}
 
 void Process::EventNotify(mixer_timing_info tinfo) {
   if (!active_) return;
@@ -167,7 +169,9 @@ void Process::EventNotify(mixer_timing_info tinfo) {
           }
         }
 
-        if (pattern_events_[i].size() > 0 && !pattern_events_played_[i]) {
+        // Add bounds check to prevent array access out of bounds
+        if (i >= 0 && i < PPBAR && pattern_events_[i].size() > 0 &&
+            !pattern_events_played_[i]) {
           pattern_events_played_[i] = true;
 
           std::vector<std::shared_ptr<MusicalEvent>> &events =
@@ -434,11 +438,19 @@ std::string Process::Status() {
   return ss.str();
 }
 
-void Process::Start() { active_ = true; }
-void Process::Stop() { active_ = false; }
+void Process::Start() {
+  active_ = true;
+}
+void Process::Stop() {
+  active_ = false;
+}
 
-void Process::SetDebug(bool b) { debug_ = b; }
-void Process::SetSpeed(float val) { event_incr_speed_ = val; }
+void Process::SetDebug(bool b) {
+  debug_ = b;
+}
+void Process::SetSpeed(float val) {
+  event_incr_speed_ = val;
+}
 
 void Process::AppendPatternFunction(std::shared_ptr<PatternFunction> func) {
   pattern_functions_.push_back(func);

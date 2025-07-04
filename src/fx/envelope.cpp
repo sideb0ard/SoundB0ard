@@ -112,7 +112,9 @@ void Envelope::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   }
 }
 
-void Envelope::SetType(unsigned int type) { eg_.SetEgMode(type); }
+void Envelope::SetType(unsigned int type) {
+  eg_.SetEgMode(type);
+}
 
 void Envelope::SetMode(unsigned int mode) {
   if (mode < 2) env_mode_ = mode;
@@ -128,12 +130,16 @@ void Envelope::SetDecayMs(double val) {
   CalculateTimings();
 }
 
-void Envelope::SetSustainLvl(double val) { eg_.SetSustainLevel(val); }
+void Envelope::SetSustainLvl(double val) {
+  eg_.SetSustainLevel(val);
+}
 
 void Envelope::SetReleaseMs(double val) {
   eg_.SetReleaseTimeMsec(val);
   CalculateTimings();
 }
 
-void Envelope::SetDebug(bool b) { debug_ = b; }
+void Envelope::SetDebug(bool b) {
+  debug_ = b;
+}
 void Envelope::SetParam(std::string name, double val) {}

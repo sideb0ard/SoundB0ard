@@ -59,8 +59,12 @@ class HashKey {
  public:
   HashKey() = default;
   HashKey(ObjectType type, uint64_t value) : type_{type}, value_{value} {};
-  uint64_t Value() const { return value_; }
-  std::string Type() const { return type_; }
+  uint64_t Value() const {
+    return value_;
+  }
+  std::string Type() const {
+    return type_;
+  }
   bool operator==(const HashKey &hk) const {
     return hk.type_ == type_ && hk.value_ == value_;
   }
@@ -144,7 +148,9 @@ class Array : public Object {
  public:
   explicit Array(std::vector<std::shared_ptr<Object>> elements)
       : elements_{elements} {};
-  ObjectType Type() override { return ARRAY_OBJ; }
+  ObjectType Type() override {
+    return ARRAY_OBJ;
+  }
   std::string Inspect() override;
 
  public:
@@ -165,8 +171,12 @@ class Boolean : public Object {
 class String : public Object {
  public:
   explicit String(std::string val) : value_{val} {};
-  ObjectType Type() override { return STRING_OBJ; }
-  std::string Inspect() override { return value_; }
+  ObjectType Type() override {
+    return STRING_OBJ;
+  }
+  std::string Inspect() override {
+    return value_;
+  }
   HashKey HashKey();
 
  public:
@@ -354,8 +364,12 @@ class BuiltIn : public Object {
  public:
   explicit BuiltIn(BuiltInFunc fn) : func_{fn} {}
   ~BuiltIn() = default;
-  ObjectType Type() override { return BUILTIN_OBJ; }
-  std::string Inspect() override { return "builtin function"; }
+  ObjectType Type() override {
+    return BUILTIN_OBJ;
+  }
+  std::string Inspect() override {
+    return "builtin function";
+  }
 
  public:
   BuiltInFunc func_;
@@ -452,7 +466,9 @@ class Hash : public Object {
   Hash() = default;
   explicit Hash(std::map<HashKey, HashPair> pairs) : pairs_{pairs} {}
   ~Hash() = default;
-  ObjectType Type() override { return HASH_OBJ; }
+  ObjectType Type() override {
+    return HASH_OBJ;
+  }
   std::string Inspect() override;
 
  public:

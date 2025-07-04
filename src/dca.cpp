@@ -11,9 +11,13 @@
 
 extern const char *s_dest_enum_to_name[];
 
-void DCA::SetMidiVelocity(unsigned int vel) { m_midi_velocity = vel; }
+void DCA::SetMidiVelocity(unsigned int vel) {
+  m_midi_velocity = vel;
+}
 
-void DCA::SetPanControl(double pan) { m_pan_control = pan; }
+void DCA::SetPanControl(double pan) {
+  m_pan_control = pan;
+}
 
 void DCA::Reset() {
   m_eg_mod = 1.0;
@@ -25,11 +29,17 @@ void DCA::SetAmplitudeDb(double amp) {
   m_amplitude_control = pow((double)10.0, amp / (double)20.0);
 }
 
-void DCA::SetAmpModDb(double mod) { m_amp_mod_db = mod; }
+void DCA::SetAmpModDb(double mod) {
+  m_amp_mod_db = mod;
+}
 
-void DCA::SetEgMod(double mod) { m_eg_mod = mod; }
+void DCA::SetEgMod(double mod) {
+  m_eg_mod = mod;
+}
 
-void DCA::SetPanMod(double mod) { m_pan_mod = mod; }
+void DCA::SetPanMod(double mod) {
+  m_pan_mod = mod;
+}
 
 void DCA::Update() {
   if (global_dca_params) {

@@ -329,9 +329,13 @@ std::string PatternExpression::String() const {
   return ss.str();
 }
 
-std::string SampleExpression::String() const { return "SAMPLE"; }
+std::string SampleExpression::String() const {
+  return "SAMPLE";
+}
 
-std::string GranularExpression::String() const { return "GRANULAR"; }
+std::string GranularExpression::String() const {
+  return "GRANULAR";
+}
 
 std::string PatternFunctionExpression::String() const {
   std::stringstream ss;
@@ -446,8 +450,14 @@ std::string InfixExpression::String() const {
   return ss.str();
 }
 
-std::string Identifier::String() const { return value_; }
-std::string NumberLiteral::String() const { return token_.literal_; }
-std::string BooleanExpression::String() const { return token_.literal_; }
+std::string Identifier::String() const {
+  return value_;
+}
+std::string NumberLiteral::String() const {
+  return token_.literal_;
+}
+std::string BooleanExpression::String() const {
+  return token_.literal_;
+}
 
 }  // namespace ast

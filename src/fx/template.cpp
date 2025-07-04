@@ -34,4 +34,6 @@ void Template::Init() {
   Update();
 }
 
-void Template::Update() { some_setting_ = 0; }
+void Template::Update() {
+  some_setting_ = 0;
+}

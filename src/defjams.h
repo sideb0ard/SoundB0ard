@@ -328,7 +328,7 @@ class midi_event {
 };
 
 struct MusicalEvent {
-  MusicalEvent() = default;
+  MusicalEvent() : velocity_{127.0f}, duration_{300.0f}, target_type_{ENV} {}
   MusicalEvent(std::string value)
       : MusicalEvent(value, /* midi velocity */ 127, /* duration in ms */ 300,
                      ENV) {}

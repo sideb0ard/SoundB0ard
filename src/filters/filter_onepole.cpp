@@ -22,7 +22,9 @@ void OnePole::Update() {
   m_alpha = g / (1.0 + g);
 }
 
-void OnePole::SetFeedback(double fb) { m_feedback = fb; }
+void OnePole::SetFeedback(double fb) {
+  m_feedback = fb;
+}
 
 double OnePole::GetFeedbackOutput() {
   return m_beta * (m_z1 + m_feedback * m_delta);

@@ -218,7 +218,9 @@ std::string MiniSynth::Info() {
 
   return ss.str();
 }
-void MiniSynth::Start() { active = true; }
+void MiniSynth::Start() {
+  active = true;
+}
 
 void MiniSynth::Stop() {
   active = false;
@@ -1741,8 +1743,12 @@ void MiniSynth::SetResetToZero(unsigned int val) {
   m_settings.m_reset_to_zero = val;
 }
 
-void MiniSynth::SetMonophonic(bool b) { m_settings.m_monophonic = b; }
-void MiniSynth::SetGenerate(bool b) { m_settings.m_generate_active = b; }
+void MiniSynth::SetMonophonic(bool b) {
+  m_settings.m_monophonic = b;
+}
+void MiniSynth::SetGenerate(bool b) {
+  m_settings.m_generate_active = b;
+}
 
 void MiniSynth::SetOscSemitones(unsigned int osc, int semitones) {
   if (osc > 0 && osc < 4 && semitones > -100 && semitones < 100) {

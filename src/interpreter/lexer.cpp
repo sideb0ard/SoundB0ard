@@ -6,7 +6,9 @@
 
 namespace lexer {
 
-Lexer::Lexer(std::string input) : input_{input} { ReadChar(); }
+Lexer::Lexer(std::string input) : input_{input} {
+  ReadChar();
+}
 
 bool Lexer::ReadInput(std::string input) {
   input_ += input;
@@ -269,6 +271,8 @@ void Lexer::SkipWhiteSpace() {
     ReadChar();
 }
 
-std::string Lexer::GetInput() { return input_; }
+std::string Lexer::GetInput() {
+  return input_;
+}
 
 }  // namespace lexer

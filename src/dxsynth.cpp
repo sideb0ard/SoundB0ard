@@ -26,7 +26,9 @@ static const float dx_ratios[] = {
 static const int NUM_RATIOS = 64;
 
 namespace {
-float GetRandRatio() { return dx_ratios[rand() % NUM_RATIOS]; }
+float GetRandRatio() {
+  return dx_ratios[rand() % NUM_RATIOS];
+}
 }  // namespace
 
 DXSynth::DXSynth() {
@@ -55,7 +57,9 @@ DXSynth::DXSynth() {
   active = true;
 }
 
-void DXSynth::Start() { active = true; }
+void DXSynth::Start() {
+  active = true;
+}
 
 void DXSynth::Stop() {
   active = false;
@@ -266,7 +270,9 @@ void DXSynth::NoteOff(midi_event ev) {
   for (auto v : voices_) v->NoteOff(ev.data1);
 }
 
-void DXSynth::Control(midi_event ev) { (void)ev; }
+void DXSynth::Control(midi_event ev) {
+  (void)ev;
+}
 
 void DXSynth::PitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
@@ -418,7 +424,9 @@ const std::map<std::string, double> default_preset = {
     {"m_op4_feedback", 0},
 };
 
-void DXSynth::Reset() { LoadPreset("default", wuurp_preset); }
+void DXSynth::Reset() {
+  LoadPreset("default", wuurp_preset);
+}
 
 bool DXSynth::PrepareForPlay() {
   for (auto v : voices_) v->PrepareForPlay();
@@ -1216,9 +1224,13 @@ void DXSynth::SetNoteNumberToDecayScaling(bool b) {
   m_settings.m_note_number_to_decay_scaling = b;
 }
 
-void DXSynth::SetResetToZero(bool b) { m_settings.m_reset_to_zero = b; }
+void DXSynth::SetResetToZero(bool b) {
+  m_settings.m_reset_to_zero = b;
+}
 
-void DXSynth::SetLegatoMode(bool b) { m_settings.m_legato_mode = b; }
+void DXSynth::SetLegatoMode(bool b) {
+  m_settings.m_legato_mode = b;
+}
 
 void DXSynth::SetOp4Feedback(double val) {
   if (val >= 0 && val <= 70) m_settings.m_op4_feedback = val;

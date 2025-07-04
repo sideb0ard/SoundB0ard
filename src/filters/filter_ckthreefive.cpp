@@ -9,7 +9,9 @@
 #include "filter.h"
 #include "filter_onepole.h"
 
-CKThreeFive::CKThreeFive() { m_filter_type = LPF2; }
+CKThreeFive::CKThreeFive() {
+  m_filter_type = LPF2;
+}
 
 void CKThreeFive::SetQControl(double qcontrol) {
   m_k = (2.0 - 0.01) * (qcontrol - 1.0) / (10.0 - 1.0) + 0.01;
