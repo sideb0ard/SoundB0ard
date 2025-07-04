@@ -20,7 +20,7 @@
 
 namespace SBAudio {
 
-SoundGenerator::SoundGenerator(){};
+SoundGenerator::SoundGenerator() {};
 
 double SoundGenerator::GetVolume() {
   return volume;

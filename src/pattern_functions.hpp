@@ -116,7 +116,7 @@ class PatternMask : public PatternFunction {
 
 class PatternArp : public PatternFunction {
  public:
-  PatternArp(){};
+  PatternArp() {};
   void TransformPattern(
       std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
       int loop_num, mixer_timing_info tinfo) override;
@@ -130,7 +130,7 @@ class PatternArp : public PatternFunction {
 
 class PatternBrak : public PatternFunction {
  public:
-  PatternBrak(){};
+  PatternBrak() {};
   void TransformPattern(
       std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
       int loop_num, mixer_timing_info tinfo) override;
@@ -141,7 +141,7 @@ class PatternBrak : public PatternFunction {
 
 class PatternChord : public PatternFunction {
  public:
-  PatternChord(){};
+  PatternChord() {};
   void TransformPattern(
       std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
       int loop_num, mixer_timing_info tinfo) override;
@@ -152,7 +152,7 @@ class PatternChord : public PatternFunction {
 
 class PatternPowerChord : public PatternFunction {
  public:
-  PatternPowerChord(){};
+  PatternPowerChord() {};
   void TransformPattern(
       std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
       int loop_num, mixer_timing_info tinfo) override;
@@ -163,7 +163,7 @@ class PatternPowerChord : public PatternFunction {
 
 class PatternScramble : public PatternFunction {
  public:
-  PatternScramble(){};
+  PatternScramble() {};
   void TransformPattern(
       std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
       int loop_num, mixer_timing_info tinfo) override;
@@ -174,7 +174,7 @@ class PatternScramble : public PatternFunction {
 
 class PatternBump : public PatternFunction {
  public:
-  PatternBump(){};
+  PatternBump() {};
   void TransformPattern(
       std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
       int loop_num, mixer_timing_info tinfo) override;
