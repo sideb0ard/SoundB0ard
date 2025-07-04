@@ -9,8 +9,8 @@ let onz = [2240, 4480, 1120];
 let offz = [1120, 2240, 1120, 4480];
 
 
-
-let blah_gen = gen()
+# FRAAZZ
+let fellblah_gen = gen()
 {
   setup()
   {
@@ -18,40 +18,66 @@ let blah_gen = gen()
     let offx = 0;
 
     let next_on_at = 0;
+    let chrd = up([25, 28, 32, 35], 24);
   }
   run()
   {
     let max_attempts = 10;
     for (let i = 0; i < max_attempts; i++) {
-      print("I:", i);
-      if (i == 4) {
-        print("BREAK");
+
+      let note_dur = onz[onx];
+      let silence_dur = offz[offx];
+
+      onx = incr(onx, 0, len(onz));
+      offx = incr(offx, 0, len(offz));
+
+      note_on_at(dx, chrd, next_on_at, dur = note_dur);
+
+      next_on_at = next_on_at + note_dur + silence_dur;
+
+      if (next_on_at > 3840) {
+        next_on_at = next_on_at % 3840;
         break;
       }
-      print("UYO");
+
+
     }
 
-    #let next_on_for = onz[onx];
-    #let next_off_for = offz[offx];
-    # onx = incr(onx, 0, len(onz));
-    # offx = incr(offx, 0, len(offz));
-
-    # note_on_at(dx, 37, next_on_at, dur = next_on_for);
-
-    # let full_duration = next_on_for + next_off_for;
-    # let next_on_at = next_on_at + full_duration;
-    # print("NEXT ON AT:", next_on_at);
-
-    # if (next_on_at > 3840) {
-      #   next_on_at = next_on_at % 3840;
-      #   print("BREAK");
-      #   break;
-      # }
-
-    # print("ON AT:", next_on_at, " :", next_off_for, " DUR:", full_duration);
-
   }
-
 }
+
+let offzblah_gen = gen()
+{
+  setup()
+  {
+    let inner = 5;
+    let outer_one = 23;
+    let outer_two = 17;
+
+    let px1 = 0;
+    let px2 = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+
+      if (px1 % inner == 0) {
+        print("PX1!", i);
+      }
+
+      px1++;
+      if (px1 % outer_one == 0) {
+        px1 = 0;
+      }
+
+      if (px2 % inner == 0) {
+        print("  PX2!", i);
+      }
+      px2++;
+      if (px2 % outer_two == 0) {
+        px2 = 0;
+      }
+    }
+  }
 }
 

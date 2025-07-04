@@ -3,29 +3,37 @@ let bd = sample(bd/dm02_909_kickdrum_002_drive.wav);
 let ch = sample(ch/CH_909_15.wav);
 let oh = sample(oh/OH_909_15.wav);
 let loon = sample(noises/loon-bird.aiff);
+let sd = sample(sd/hdSD.wav);
 
 # load_preset(mo, "808"); vol mo 0.5;
-# load_preset(dx, "twklz");
+# load_preset(dx, "twklz"); // Bizzle // simplepiano // MAW1
 # send("delay", loon);
 # bpm 128;
 # let rvs = loop(loops/raveStabsCmon.aiff); set rvs:len 2; vol rvs 0;
 
+# p1 $ chordblah_gen;
+# p2 $ loonblah_gen;
+# p3 $ drblah_gen;
+# p4 $ hhblah_gen
+
+let fmaj7 = [53, 57, 60, 64];
+let gmaj7 = [55, 59, 62, 66];
+let cmaj7 = [48, 52, 55, 59];
+let dmaj7 = [50, 54, 57, 61];
+let prog = [fmaj7, gmaj7, cmaj7, dmaj7];
 let cpx = 0;
+let chord = prog[cpx];
+
 let chordblah_gen = gen()
 {
   setup()
   {
-    let fmaj7 = [53, 57, 60, 64];
-    let gmaj7 = [55, 59, 62, 66];
-    let cmaj7 = [48, 52, 55, 59];
-    let dmaj7 = [50, 54, 57, 61];
-    let prog = [fmaj7, gmaj7, cmaj7, dmaj7];
   }
   run()
   {
-    let chord = prog[cpx];
+    chord = prog[cpx];
     #print(chord);
-    note_on_at(mo, chord, 0, dur = 3800);
+    #note_on_at(mo, chord, 0, dur = 3800);
     cpx = incr(cpx, 0, len(prog));
 
   }
@@ -122,3 +130,85 @@ let bssslah_gen = gen()
   }
 }
 
+# 3840 midi ticks per loop. # bpm 140
+# 60 / 140 = 0.428571 sec per beat, 428.571 ms
+# 4 beats in a loop, so 4 * 428.571 = 1714.28 ms == 3840 ticks
+# 100 / 1714.28 * 1000 = 58.3335 %
+# 58.3335 % of 3840 = 2240.01
+# 1000ms == 2240.01 midi ticks
+let onz = [2240, 4480, 1120];
+let offz = [1120, 2240, 1120, 4480];
+
+
+# FRAAZZ
+let fellblah_gen = gen()
+{
+  setup()
+  {
+    let onx = 0;
+    let offx = 0;
+
+    let next_on_at = 0;
+    #let chrd = up([25, 28, 32, 35], 24);
+  }
+  run()
+  {
+    let max_attempts = 10;
+    for (let i = 0; i < max_attempts; i++) {
+
+      if (next_on_at > 3840) {
+        next_on_at = next_on_at % 3840;
+        break;
+      }
+
+      let note_dur = onz[onx];
+      let silence_dur = offz[offx];
+
+      onx = incr(onx, 0, len(onz));
+      offx = incr(offx, 0, len(offz));
+
+      #print("PLATAT:", next_on_at);
+      note_on_at(dx, chord, next_on_at, dur = note_dur);
+      next_on_at = next_on_at + note_dur + silence_dur;
+
+    }
+  }
+}
+
+let offzblah_gen = gen()
+{
+  setup()
+  {
+    let inner = 4;
+    let outer_one = 23;
+    let outer_two = 17;
+
+    let px1 = 0;
+    let px2 = 0;
+    let durz = [500, 100, 200, 90, 300];
+    let drx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+
+      if (px1 % inner == 0) {
+        note_on_at(mo, chord, i * pp, dur = durz[drx]);
+      }
+
+      px1++;
+      if (px1 % outer_one == 0) {
+        px1 = 0;
+        drx = incr(drx, 0, len(durz));
+      }
+
+      if (px2 % inner == 0) {
+        note_on_at(dx, chord, i * pp, dur = durz[drx]);
+      }
+      px2++;
+      if (px2 % outer_two == 0) {
+        px2 = 0;
+      }
+    }
+  }
+}

@@ -22,7 +22,7 @@ let ch = sample(ch/ralphiHatz2.aiff); vol ch 0.6;
 let cl = sample(perc/808clave.aif); vol cl 0.1;
 let bd = sample(bd/tuffKick.aiff);
 let bd2 = sample(bd/BD_909_48.wav);
-let clp = sample(cp/djkhaledClap.aiff); vol clp 0.6;
+let clp = sample(cp/djkhaledClap.aiff); vol clp 0.4;
 let goodt = sample(voices/goodtimescometomeNOW.aiff);
 
 send("delay", goodt);
