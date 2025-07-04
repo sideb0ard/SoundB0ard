@@ -1167,7 +1167,8 @@ std::shared_ptr<object::Object> EvalBlockStatement(
     result = Eval(s, env);
     if (result != evaluator::NULLL) {
       if (result->Type() == object::RETURN_VALUE_OBJ ||
-          result->Type() == object::ERROR_OBJ || object::BREAK_OBJ)
+          result->Type() == object::ERROR_OBJ ||
+          result->Type() == object::BREAK_OBJ)
         return result;
     }
   }
