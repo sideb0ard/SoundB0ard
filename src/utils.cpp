@@ -142,19 +142,6 @@ std::string GetRandomSampleNameFromDir(std::string sample_dir) {
   return file_names[rand() % file_names.size()].substr(dir_prefix.length());
 }
 
-// static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
-//{
-//    if (lower_idx >= upper_idx)
-//        return;
-//    int middle_idx = lower_idx;
-//    for (int i = lower_idx + 1; i < upper_idx; i++)
-//        if (!first_wurd_before_second(wurds[i], wurds[lower_idx]))
-//            switch_wurds(wurds, ++middle_idx, i);
-//    switch_wurds(wurds, lower_idx, middle_idx);
-//    qsort_char_array(wurds, lower_idx, middle_idx - 1);
-//    qsort_char_array(wurds, middle_idx + 1, upper_idx);
-//}
-
 std::string list_sample_dir(std::string indir) {
   std::stringstream ss;
   std::vector<std::string> listing{};
@@ -176,55 +163,6 @@ std::string list_sample_dir(std::string indir) {
 
   return ss.str();
 }
-
-void chordie(char *n) {
-  int root_note_num = notelookup(n);
-  int second_note_num = (root_note_num + 4) % 12;
-  int third_note_num = (second_note_num + 3) % 12;
-  // TODO : cleanup - assuming always middle chord here:
-  char rootnote[8];  // Increased buffer size to prevent overflow
-  char sec_note[8];  // Increased buffer size to prevent overflow
-  char thr_note[8];  // Increased buffer size to prevent overflow
-
-  // Use safe string operations
-  strncpy(rootnote, rev_lookup[root_note_num], sizeof(rootnote) - 1);
-  rootnote[sizeof(rootnote) - 1] = '\0';
-  strncpy(sec_note, rev_lookup[second_note_num], sizeof(sec_note) - 1);
-  sec_note[sizeof(sec_note) - 1] = '\0';
-  strncpy(thr_note, rev_lookup[third_note_num], sizeof(thr_note) - 1);
-  thr_note[sizeof(thr_note) - 1] = '\0';
-
-  // Use safe concatenation
-  strncat(rootnote, "4", sizeof(rootnote) - strlen(rootnote) - 1);
-  strncat(sec_note, "4", sizeof(sec_note) - strlen(sec_note) - 1);
-  strncat(thr_note, "4", sizeof(thr_note) - strlen(thr_note) - 1);
-
-  printf("%s chord is %s(%.2f) %s(%.2f) %s(%.2f)\n", n, rootnote,
-         freqval(rootnote), sec_note, freqval(sec_note), thr_note,
-         freqval(thr_note));
-}
-
-// void related_notes(char note[4], double *second_note, double *third_note) {
-//   char root_note;
-//   int scale;
-//   sscanf(note, "%[a-z#]%d", &root_note, &scale);
-//
-//   char scale_ch[2];
-//   sprintf(scale_ch, "%d", scale);
-//   int second_note_num = (root_note + 4) % 12;
-//   int third_note_num = (root_note + 3) % 12;
-//
-//   char sec_note[4];
-//   char thr_note[4];
-//
-//   strcpy(sec_note, rev_lookup[second_note_num]);
-//   strcpy(thr_note, rev_lookup[third_note_num]);
-//
-//   strcat(sec_note, scale_ch);
-//   strcat(thr_note, scale_ch);
-//   *second_note = freqval(sec_note);
-//   *third_note = freqval(thr_note);
-// }
 
 int notelookup(char *n) {
   // twelve semitones:
@@ -355,41 +293,6 @@ int input_key_to_char_note(int ch, int octave, char *keytext) {
       //    midi_num = -1;
   }
   return midi_num;
-}
-
-float freqval(char *n) {
-  // algo from http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html
-
-  static float a4 = 440.0;  // fixed note freq to use as baseline
-  static const float twelfth_root_of_two = 1.059463094359;
-
-  regmatch_t nmatch[3];
-  regex_t single_letter_rx;
-  regcomp(&single_letter_rx, "^([[:alpha:]#]{1,2})([[:digit:]])$",
-          REG_EXTENDED | REG_ICASE);
-  if (regexec(&single_letter_rx, n, 3, nmatch, 0) == 0) {
-    int note_str_len = nmatch[1].rm_eo - nmatch[1].rm_so;
-    char note[note_str_len + 1];
-    strncpy(note, n + nmatch[1].rm_so, note_str_len);
-    note[note_str_len] = '\0';
-
-    char str_octave[2];
-    strncpy(str_octave, n + note_str_len, 1);
-    str_octave[1] = '\0';
-
-    // purpose of this is working out how many semitones the given note
-    // is
-    // from A4
-    int n_num = (12 * atoi(str_octave)) + notelookup(note);
-    // fixed note, which we compare against is A4 - '4' is the fourth
-    // octave, so 4 * 12 semitones, plus lookup val of A is '9' - so 57
-    int diff = n_num - 57;
-
-    float freqval = a4 * (pow(twelfth_root_of_two, diff));
-    return freqval;
-  } else {
-    return -1.0;
-  }
 }
 
 void strim(const char *input, char *result) {

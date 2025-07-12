@@ -27,10 +27,8 @@ extern Tsqueue<std::string> repl_queue;
 
 #define READLINE_SAFE_MAGENTA "\001\x1b[35m\002"
 #define READLINE_SAFE_RESET "\001\x1b[0m\002"
-#define MAXLINE 128
 
 char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
-static char last_line[MAXLINE] = {};
 static bool active{true};
 const std::string tick("tick");
 
@@ -80,44 +78,30 @@ void *loopy() {
   read_history(NULL);
   setlocale(LC_ALL, "");
 
-  char *line;
+  std::string last_line;
   rl_event_hook = event_hook;
   rl_set_keyboard_input_timeout(500);
-  while ((line = readline(prompt)) != NULL && active) {
-    if (line && *line) {
-      if (strncmp(last_line, line, MAXLINE - 1) != 0) {
-        add_history(line);
-        strncpy(last_line, line, MAXLINE - 1);
-        last_line[MAXLINE - 1] = '\0';  // Ensure null termination
+  
+  while (true) {
+      std::unique_ptr<char, void(*)(void*)> line(readline(prompt), free);
+      
+      if (!line) break;  // readline returned NULL
+      
+      if (line.get() && *line.get()) {
+          std::string current_line(line.get());
+          
+          if (current_line != last_line) {
+              add_history(line.get());
+              last_line = current_line;
+          }
+          eval_command_queue.push(current_line);
       }
-      eval_command_queue.push(line);
-    }
-    if (line) {
-      free(line);
-    }
   }
   
-  // Show exit message immediately when user exits REPL
-  printf(COOL_COLOR_PINK
-         "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET);
-  fflush(stdout);
-  
-  // Clean exit - return normally to allow main thread cleanup
-  active = false;
-
-  return NULL;
-}
-
-int exxit() {
   printf(COOL_COLOR_PINK
          "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET);  // Thrashin'
                                                          // reference
-  write_history(NULL);
+  write_history(nullptr);
 
-  pa_teardown();
-
-  active = false;
-
-  //      return 0;
-  exit(0);
+  return nullptr;
 }

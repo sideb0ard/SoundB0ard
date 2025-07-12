@@ -75,6 +75,7 @@ template <typename T>
 std::optional<T> Tsqueue<T>::pop() {
   std::unique_lock<std::mutex> lck(mutex_);
   while (queue_.empty() && !end_) cv_empty_.wait(lck);
+  if (queue_.empty()) return std::nullopt;  // Queue was closed while empty
   T t = std::move(queue_.front());
   queue_.pop();
   cv_full_.notify_one();

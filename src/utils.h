@@ -12,14 +12,12 @@ void get_full_filename(char *basename, char *destination_fullname);
 
 AudioBufferDetails ImportFileContents(std::vector<double> &buffer,
                                       std::string filename);
-float freqval(char *n);
 int notelookup(char *n);
 int input_key_to_char_note(int ch, int octave, char *keytext);
 int char_midi_lookup(char *char_midi);
 std::string list_sample_dir(std::string indir = "");
 std::string GetRandomSampleNameFromDir(std::string sample_dir);
 void strim(const char *input, char *result);
-void chordie(char *n);
 int conv_bitz(int num);
 bool IsValidFile(std::string filename);
 // void related_notes(char root_note[4], double *second_note, double

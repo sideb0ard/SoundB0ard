@@ -85,7 +85,7 @@ void Process::Update() {
 }
 
 Process::~Process() {
-  std::cout << "Mixer Process deid!\n";
+  //std::cout << "Mixer Process deid!\n";
 }
 
 void Process::EventNotify(mixer_timing_info tinfo) {

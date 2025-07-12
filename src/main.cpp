@@ -76,7 +76,7 @@ void Eval(char *line, std::shared_ptr<object::Environment> env) {
 
 void *eval_queue() {
   while (auto cmd = eval_command_queue.pop()) {
-    if (cmd) {
+    if (cmd && cmd->data()) {
       Eval(cmd->data(), global_env);
     }
   }
@@ -158,14 +158,14 @@ int main() {
 
   State state(*global_mixr);
 
-  //// REPL
+  // //// REPL
   std::thread repl_thread(loopy);
 
   //// Processes
   std::thread worker_thread(process_worker_thread);
 
-  //// WebSocket Server - Temporarily disabled
-  // std::thread websocket_worker_thread(websocket_worker, std::ref(server));  // Disabled
+  // //// WebSocket Server - Temporarily disabled
+  // // std::thread websocket_worker_thread(websocket_worker, std::ref(server));  // Disabled
 
   //// Eval loop
   std::thread eval_thread(eval_queue);
@@ -174,7 +174,7 @@ int main() {
   /// shutdown
 
   repl_thread.join();
-  
+
   // Signal other threads to shut down
   process_event_queue.close();
   worker_thread.join();
@@ -182,6 +182,4 @@ int main() {
   eval_command_queue.close();
   eval_thread.join();
 
-  // Exit cleanly after all threads are joined
-  exit(0);
 }
