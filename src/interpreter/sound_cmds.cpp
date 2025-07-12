@@ -12,12 +12,13 @@
 #include <fx/reverb.h>
 #include <fx/stereodelay.h>
 #include <fx/waveshaper.h>
+#include <memory>
 #include <mixer.h>
 
 #include <interpreter/sound_cmds.hpp>
 #include <iostream>
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 
 namespace interpreter_sound_cmds {
 
@@ -56,7 +57,7 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
             auto soundgen_sidechain_src =
                 std::dynamic_pointer_cast<object::SoundGenerator>(args[2]);
             if (soundgen_sidechain_src &&
-                mixr->IsValidSoundgenNum(
+                global_mixr->IsValidSoundgenNum(
                     soundgen_sidechain_src->soundgen_id_)) {
               auto dp = std::make_shared<DynamicsProcessor>();
               dp->SetExternalSource(soundgen_sidechain_src->soundgen_id_);
@@ -85,7 +86,7 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args) {
 
   auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
   if (soundgen) {
-    if (mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+    if (global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
       std::shared_ptr<object::String> str_obj =
           std::dynamic_pointer_cast<object::String>(args[1]);
       if (str_obj) {
@@ -93,7 +94,7 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args) {
           std::shared_ptr<object::String> str_cmd =
               std::dynamic_pointer_cast<object::String>(args[2]);
           if (str_cmd->value_ == "save")
-            mixr->sound_generators_[soundgen->soundgen_id_]->Save(
+            global_mixr->sound_generators_[soundgen->soundgen_id_]->Save(
                 str_obj->value_);
         }
       }
@@ -106,8 +107,8 @@ void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
                      const std::map<std::string, double> &preset) {
   auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(obj);
   if (soundgen) {
-    if (mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
-      mixr->sound_generators_[soundgen->soundgen_id_]->LoadPreset(preset_name,
+    if (global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+      global_mixr->sound_generators_[soundgen->soundgen_id_]->LoadPreset(preset_name,
                                                                   preset);
     }
   }

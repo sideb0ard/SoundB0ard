@@ -10,11 +10,16 @@
 #define FLT_MIN_PLUS 1.175494351e-38   /* min positive value */
 #define FLT_MIN_MINUS -1.175494351e-38 /* min negative value */
 
+#ifdef __cplusplus
+#include <algorithm>
+// For any remaining C code that might include this header
+#else
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
 #endif
 
 enum { PEAK, MS, RMS };

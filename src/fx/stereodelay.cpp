@@ -1,4 +1,5 @@
 #include <fx/stereodelay.h>
+#include <memory>
 #include <mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 
 StereoDelay::StereoDelay() {
   enabled_ = true;
@@ -215,7 +216,7 @@ void StereoDelay::SetMode(unsigned mode) {
 }
 
 void StereoDelay::SyncTempo() {
-  double delay_time_quarter_note_ms = 60 / mixr->bpm * 1000;
+  double delay_time_quarter_note_ms = 60 / global_mixr->bpm * 1000;
   if (sync_len_ == DelaySyncLen::QUARTER)
     m_delay_time_ms_ = delay_time_quarter_note_ms;
   else if (sync_len_ == DelaySyncLen::EIGHTH)

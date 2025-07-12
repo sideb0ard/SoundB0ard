@@ -21,11 +21,12 @@
 
 // Make sure to define this before <cmath> is included for Windows
 #define _USE_MATH_DEFINES
-#include <mixer.h>
-
 #include <ableton/Link.hpp>
 #include <atomic>
 #include <mutex>
+
+// Forward declaration
+class Mixer;
 
 namespace ableton {
 namespace linkaudio {

@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <math.h>
+#include <memory>
 #include <regex.h>
 #include <sndfile.h>
 #include <stdio.h>
@@ -22,7 +23,7 @@ namespace fs = std::filesystem;
 #include "utils.h"
 // #include "lookuptables.h"
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 extern char *strategies[NUM_STATEGIES];
 
 static char const *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
@@ -605,7 +606,8 @@ double do_white_noise() {
   float noise = 0.0;
 
   // fNoise is 0 -> ARC4RANDOMMAX
-  noise = (float)arc4random();
+  // Use rand() for cross-platform compatibility (arc4random is BSD-only)
+  noise = (float)((unsigned long)rand() * rand());
 
   // normalize and make bipolar
   noise = 2.0 * (noise / ARC4RANDOMMAX) - 1.0;
@@ -722,7 +724,7 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
 
 void print_midi_event(int midi_num) {
   printf("MIDI ON tick: %d // relative tick: %d midi: %d\n",
-         mixr->timing_info.midi_tick, mixr->timing_info.midi_tick % PPBAR,
+         global_mixr->timing_info.midi_tick, global_mixr->timing_info.midi_tick % PPBAR,
          midi_num);
 }
 

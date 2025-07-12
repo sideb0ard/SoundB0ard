@@ -1,5 +1,6 @@
 #include <cmdloop.h>
 #include <locale.h>
+#include <memory>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <new_item_cmds.h>
@@ -20,7 +21,7 @@
 
 namespace fs = std::filesystem;
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
 
@@ -38,7 +39,7 @@ int event_hook() {
     if (reply) {
       // TODO - this is a bit of a fudged way to signal a midi tick
       if (tick.compare(reply->data()) == 0) {
-        for (auto &f : mixr->file_monitors) {
+        for (auto &f : global_mixr->file_monitors) {
           if (!f.function_file_filepath.empty()) {
             //    // std::cout << "GOT A FILE TO MONITOR!\n";
             fs::path func_path = f.function_file_filepath;
@@ -84,15 +85,25 @@ void *loopy() {
   rl_set_keyboard_input_timeout(500);
   while ((line = readline(prompt)) != NULL && active) {
     if (line && *line) {
-      if (strncmp(last_line, line, MAXLINE) != 0) {
+      if (strncmp(last_line, line, MAXLINE - 1) != 0) {
         add_history(line);
-        strncpy(last_line, line, MAXLINE);
+        strncpy(last_line, line, MAXLINE - 1);
+        last_line[MAXLINE - 1] = '\0';  // Ensure null termination
       }
       eval_command_queue.push(line);
     }
-    free(line);
+    if (line) {
+      free(line);
+    }
   }
-  exxit();
+  
+  // Show exit message immediately when user exits REPL
+  printf(COOL_COLOR_PINK
+         "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET);
+  fflush(stdout);
+  
+  // Clean exit - return normally to allow main thread cleanup
+  active = false;
 
   return NULL;
 }

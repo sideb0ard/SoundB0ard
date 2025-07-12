@@ -1,5 +1,6 @@
 #include <dxsynth.h>
 #include <math.h>
+#include <memory>
 #include <midi_freq_table.h>
 #include <mixer.h>
 #include <stdlib.h>
@@ -9,7 +10,7 @@
 #include <iomanip>
 #include <iostream>
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 
 namespace SBAudio {
 

@@ -2,7 +2,10 @@
 #define _WEBSOCKET_SERVER
 
 // We need to define this when using the Asio library without Boost
-// #define ASIO_STANDALONE
+// Note: ASIO_STANDALONE is already defined by Ableton Link
+#ifndef ASIO_STANDALONE
+#define ASIO_STANDALONE
+#endif
 
 #include <json/json.h>
 
@@ -80,7 +83,7 @@ class WebsocketServer {
   void onClose(ClientConnection conn);
   void onMessage(ClientConnection conn, WebsocketEndpoint::message_ptr msg);
 
-  boost::asio::io_service eventLoop;
+  link_asio_1_30_2::io_context eventLoop;
   WebsocketEndpoint endpoint;
   vector<ClientConnection> openConnections;
   std::mutex connectionListMutex;

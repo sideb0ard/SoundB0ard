@@ -8,13 +8,14 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/event.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <readline/history.h>
 
 #include <AudioPlatform.hpp>
 #include <PerlinNoise.hpp>
-#include <asio/io_service.hpp>
+// #include <asio/io_context.hpp>  // Temporarily disabled for WebSocket
+// #include <asio/executor_work_guard.hpp>  // Temporarily disabled for WebSocket
 #include <interpreter/evaluator.hpp>
 #include <interpreter/lexer.hpp>
 #include <interpreter/object.hpp>
@@ -25,10 +26,11 @@
 #include <process.hpp>
 #include <thread>
 #include <tsqueue.hpp>
+#include <memory>
 
-#include "websocket/web_socket_server.h"
+// #include "websocket/web_socket_server.h"  // Temporarily disabled
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 
 Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 Tsqueue<int> audio_reply_queue;  // for reply from adding SoundGenerator
@@ -88,8 +90,8 @@ void *process_worker_thread() {
       if (event->type == Event::TIMING_EVENT) {
         auto timing_info = event->timing_info;
 
-        if (mixr->proc_initialized_) {
-          for (auto p : mixr->processes_) {
+        if (global_mixr->proc_initialized_) {
+          for (auto p : global_mixr->processes_) {
             if (p->active_) p->EventNotify(timing_info);
           }
         }
@@ -110,7 +112,7 @@ void *process_worker_thread() {
               .funcz = event->funcz,
               .tinfo = event->timing_info};
 
-          mixr->processes_[event->target_process_id]->EnqueueUpdate(config);
+          global_mixr->processes_[event->target_process_id]->EnqueueUpdate(config);
         } else {
           std::cerr << "WAH! INVALID process id: " << event->target_process_id
                     << std::endl;
@@ -118,7 +120,7 @@ void *process_worker_thread() {
       } else if (event->type == Event::PROCESS_SET_PARAM_EVENT) {
         if (event->target_process_id >= 0 &&
             event->target_process_id < MAX_NUM_PROC) {
-          mixr->processes_[event->target_process_id]->UpdateLoopLen(
+          global_mixr->processes_[event->target_process_id]->UpdateLoopLen(
               event->loop_len);
         }
       }
@@ -127,41 +129,34 @@ void *process_worker_thread() {
   return nullptr;
 }
 
+/*
 void *websocket_worker(WebsocketServer &server) {
   std::cout << "AM A WEE WEBSOCKET THREAD!\n";
-  asio::io_service mainEventLoop;
+  auto eventLoop = link_asio_1_30_2::io_context{};
 
-  server.connect([&mainEventLoop, &server](ClientConnection conn) {
-    mainEventLoop.post([conn, &server]() {
-      std::clog << "Connection opened." << std::endl;
-      std::clog << "There are now " << server.numConnections()
-                << " open connections." << std::endl;
-      server.sendMessage(conn, "HELLO", Json::Value());
-    });
-  });
-  server.disconnect([&mainEventLoop, &server](ClientConnection conn) {
-    mainEventLoop.post([conn, &server]() {
-      std::clog << "Connection CLOSEDc!" << std::endl;
-      std::clog << "There are now " << server.numConnections()
-                << " open connections." << std::endl;
-    });
-  });
+  // TODO: Fix WebSocket++ template issues with Link's ASIO
+  // Temporarily disable WebSocket callbacks to test basic compilation
+  // server.connect callback removed
+  // server.disconnect callback removed
+  
   std::thread websocket_server_thread([&server]() { server.run(kPortNumber); });
 
-  asio::io_service::work work(mainEventLoop);
-  mainEventLoop.run();
+  // Keep the event loop alive
+  // auto work = asio::executor_work_guard<asio::io_context::executor_type>(eventLoop.get_executor());
+  eventLoop.run();
 
   return nullptr;
 }
+*/
 
 int main() {
   srand(time(NULL));
   signal(SIGINT, SIG_IGN);
 
-  WebsocketServer server;
-  mixr = new Mixer(server);
+  // WebsocketServer server;  // Temporarily disabled
+  global_mixr = std::make_unique<Mixer>();  // Create as unique_ptr
 
-  State state(*mixr);
+  State state(*global_mixr);
 
   //// REPL
   std::thread repl_thread(loopy);
@@ -169,8 +164,8 @@ int main() {
   //// Processes
   std::thread worker_thread(process_worker_thread);
 
-  //// WebSocket Server
-  std::thread websocket_worker_thread(websocket_worker, std::ref(server));
+  //// WebSocket Server - Temporarily disabled
+  // std::thread websocket_worker_thread(websocket_worker, std::ref(server));  // Disabled
 
   //// Eval loop
   std::thread eval_thread(eval_queue);
@@ -179,14 +174,14 @@ int main() {
   /// shutdown
 
   repl_thread.join();
-
+  
+  // Signal other threads to shut down
   process_event_queue.close();
   worker_thread.join();
 
   eval_command_queue.close();
   eval_thread.join();
 
-  websocket_worker_thread.join();
-
-  return 0;
+  // Exit cleanly after all threads are joined
+  exit(0);
 }

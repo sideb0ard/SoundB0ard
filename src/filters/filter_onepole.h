@@ -20,7 +20,7 @@ struct OnePole : public Filter {
 
   double DoFilter(double xn) override;
   void Update() override;
-  void SetQControl(double d) override {}
+  void SetQControl(double /*d*/) override {}
   void SetFeedback(double fb);
   double GetFeedbackOutput();
   void Reset() override;

@@ -94,7 +94,7 @@ bool operator<(HashKey const &lhs, HashKey const &rhs) {
 ObjectType Number::Type() {
   return NUMBER_OBJ;
 }
-object::HashKey Number::HashKey() {
+object::HashKey Number::GetHashKey() {
   return object::HashKey(Type(), (uint64_t)value_);
 }
 
@@ -113,14 +113,14 @@ std::string Boolean::Inspect() {
 ObjectType Boolean::Type() {
   return BOOLEAN_OBJ;
 }
-object::HashKey Boolean::HashKey() {
+object::HashKey Boolean::GetHashKey() {
   uint64_t val = 0;
   if (value_) val = 1;
 
   return object::HashKey(Type(), (uint64_t)val);
 }
 
-object::HashKey String::HashKey() {
+object::HashKey String::GetHashKey() {
   std::hash<std::string> hasher;
   return object::HashKey(Type(), (uint64_t)hasher(value_));
 }
@@ -170,7 +170,7 @@ ObjectType FMSynth::Type() {
   return SYNTH_OBJ;
 }
 
-object::HashKey SoundGenerator::HashKey() {
+object::HashKey SoundGenerator::GetHashKey() {
   return object::HashKey(Type(), (uint64_t)soundgen_id_);
 }
 

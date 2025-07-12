@@ -14,114 +14,109 @@ add_definitions(-D_WEBSOCKETPP_CPP11_STRICT_)
 # Find required packages
 find_package(PkgConfig REQUIRED)
 
-# Find Ableton Link - try to find it in common locations
-set(ABLETON_LINK_PATHS
-    "/Users/thorstensideboard/Code/link/" "${CMAKE_SOURCE_DIR}/../link/"
-    "${CMAKE_SOURCE_DIR}/third_party/link/" "/usr/local/include/ableton/"
-    "/opt/homebrew/include/ableton/")
+# Use FetchContent for external dependencies
+include(FetchContent)
 
-set(AbletonLinkPath "")
-foreach(PATH ${ABLETON_LINK_PATHS})
-  if(EXISTS "${PATH}/AbletonLinkConfig.cmake")
-    set(AbletonLinkPath ${PATH})
-    break()
+# Fetch Ableton Link with submodules  
+FetchContent_Declare(
+  ableton_link
+  GIT_REPOSITORY https://github.com/Ableton/link.git
+  GIT_TAG        Link-3.1.3
+  GIT_SUBMODULES_RECURSE ON
+)
+FetchContent_MakeAvailable(ableton_link)
+
+# Configure Ableton Link target
+include(${ableton_link_SOURCE_DIR}/cmake_include/ConfigureAbletonLink.cmake)
+ConfigureAbletonLink(${ableton_link_SOURCE_DIR})
+
+# Fetch PerlinNoise
+FetchContent_Declare(
+  perlin_noise
+  GIT_REPOSITORY https://github.com/Reputeless/PerlinNoise.git
+  GIT_TAG        v3.0.0
+)
+FetchContent_MakeAvailable(perlin_noise)
+
+# WebSocket temporarily disabled
+# FetchContent_Declare(
+#   websocketpp
+#   GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
+#   GIT_TAG        develop
+# )
+# FetchContent_MakeAvailable(websocketpp)
+
+# Try to find system libraries using pkg-config first, then fallback to find_library
+pkg_check_modules(PORTAUDIO portaudio-2.0)
+if(NOT PORTAUDIO_FOUND)
+  find_library(PORTAUDIO_LIB portaudio
+    PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/lib64
+    NO_DEFAULT_PATH)
+  if(NOT PORTAUDIO_LIB)
+    # Fallback to default search
+    find_library(PORTAUDIO_LIB portaudio)
   endif()
-endforeach()
-
-if(NOT AbletonLinkPath)
-  message(
-    FATAL_ERROR
-      "Ableton Link not found. Please install it or set AbletonLinkPath manually."
-  )
-endif()
-
-# Find PerlinNoise - try to find it in common locations
-set(PERLIN_NOISE_PATHS
-    "/Users/thorstensideboard/Code/PerlinNoise"
-    "${CMAKE_SOURCE_DIR}/../PerlinNoise/"
-    "${CMAKE_SOURCE_DIR}/third_party/PerlinNoise/"
-    "/usr/local/include/"
-    "/opt/homebrew/include/")
-
-set(PerlinIncDir "")
-foreach(PATH ${PERLIN_NOISE_PATHS})
-  if(EXISTS "${PATH}/PerlinNoise.hpp")
-    set(PerlinIncDir ${PATH})
-    break()
+  if(NOT PORTAUDIO_LIB)
+    message(FATAL_ERROR "PortAudio library not found. Install with: sudo apt install portaudio19-dev (Ubuntu/Debian) or equivalent")
   endif()
-endforeach()
-
-if(NOT PerlinIncDir)
-  message(
-    FATAL_ERROR
-      "PerlinNoise header not found. Please install it or set PerlinIncDir manually."
-  )
 endif()
 
-# Find libraries with proper error checking
-find_library(PORTAUDIO_LIB portaudio)
-if(NOT PORTAUDIO_LIB)
-  message(FATAL_ERROR "PortAudio library not found")
-endif()
-
-find_library(PORTMIDI_LIB portmidi)
+# PortMidi doesn't always provide pkg-config files, so try find_library first
+find_library(PORTMIDI_LIB portmidi 
+  PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/lib64
+  NO_DEFAULT_PATH)
 if(NOT PORTMIDI_LIB)
-  message(FATAL_ERROR "PortMidi library not found")
+  # Fallback to default search
+  find_library(PORTMIDI_LIB portmidi)
+endif()
+if(NOT PORTMIDI_LIB)
+  message(FATAL_ERROR "PortMidi library not found. Install with: sudo apt install libportmidi-dev (Ubuntu/Debian) or equivalent")
 endif()
 
-find_library(SNDFILE_LIB sndfile)
-if(NOT SNDFILE_LIB)
-  message(FATAL_ERROR "libsndfile library not found")
-endif()
-
-# Find readline library - try different approaches
-find_library(READLINE_LIB readline PATHS /opt/homebrew/Cellar/readline/*/lib
-                                         /usr/local/lib /usr/lib)
-
-if(NOT READLINE_LIB)
-  # Try to find it in the homebrew cellar directly
-  file(GLOB READLINE_PATHS
-       "/opt/homebrew/Cellar/readline/*/lib/libreadline.*.dylib")
-  if(READLINE_PATHS)
-    list(GET READLINE_PATHS 0 READLINE_LIB)
+pkg_check_modules(SNDFILE sndfile)
+if(NOT SNDFILE_FOUND)
+  find_library(SNDFILE_LIB sndfile)
+  if(NOT SNDFILE_LIB)
+    message(FATAL_ERROR "libsndfile library not found. Install with: sudo apt install libsndfile1-dev (Ubuntu/Debian) or equivalent")
   endif()
 endif()
 
+# Find readline library (cross-platform)
+find_library(READLINE_LIB readline 
+  PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/lib64
+  NO_DEFAULT_PATH)
 if(NOT READLINE_LIB)
-  message(
-    FATAL_ERROR
-      "Readline library not found. Please install with: brew install readline")
+  # Fallback to default search
+  find_library(READLINE_LIB readline)
+endif()
+if(NOT READLINE_LIB)
+  message(FATAL_ERROR "Readline library not found. Install with: sudo apt install libreadline-dev (Ubuntu/Debian) or brew install readline (macOS)")
 endif()
 
-find_library(HISTORY_LIB history PATHS /opt/homebrew/Cellar/readline/*/lib
-                                       /usr/local/lib /usr/lib)
-
+find_library(HISTORY_LIB history
+  PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/lib64
+  NO_DEFAULT_PATH)
 if(NOT HISTORY_LIB)
-  # Try to find it in the homebrew cellar directly
-  file(GLOB HISTORY_PATHS
-       "/opt/homebrew/Cellar/readline/*/lib/libhistory.*.dylib")
-  if(HISTORY_PATHS)
-    list(GET HISTORY_PATHS 0 HISTORY_LIB)
-  endif()
+  # Fallback to default search
+  find_library(HISTORY_LIB history)
 endif()
-
 if(NOT HISTORY_LIB)
-  message(
-    FATAL_ERROR
-      "History library not found. Please install with: brew install readline")
+  message(FATAL_ERROR "History library not found. Install with: sudo apt install libreadline-dev (Ubuntu/Debian) or brew install readline (macOS)")
 endif()
 
-find_library(FFTW3_LIB fftw3)
-if(NOT FFTW3_LIB)
-  message(FATAL_ERROR "FFTW3 library not found")
-endif()
 
-# Use pkg-config for jsoncpp if available, otherwise find manually
+# Use pkg-config for jsoncpp
 pkg_check_modules(JSONCPP jsoncpp)
 if(NOT JSONCPP_FOUND)
-  find_library(JSONCPP_LIB jsoncpp)
+  find_library(JSONCPP_LIB jsoncpp
+    PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/lib64
+    NO_DEFAULT_PATH)
   if(NOT JSONCPP_LIB)
-    message(FATAL_ERROR "jsoncpp library not found")
+    # Fallback to default search
+    find_library(JSONCPP_LIB jsoncpp)
+  endif()
+  if(NOT JSONCPP_LIB)
+    message(FATAL_ERROR "jsoncpp library not found. Install with: sudo apt install libjsoncpp-dev (Ubuntu/Debian) or equivalent")
   endif()
   find_path(JSONCPP_INCLUDE_DIR json/json.h)
   if(NOT JSONCPP_INCLUDE_DIR)
@@ -138,8 +133,30 @@ project(
 # Find Threads after project declaration
 find_package(Threads REQUIRED)
 
+# Explicitly set platform definitions for Link (now that CMAKE_SYSTEM_NAME is available)
+message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  message(STATUS "Setting LINK_PLATFORM_LINUX=1")
+  set_property(TARGET Ableton::Link APPEND PROPERTY
+    INTERFACE_COMPILE_DEFINITIONS
+    LINK_PLATFORM_LINUX=1
+  )
+elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  message(STATUS "Setting LINK_PLATFORM_MACOSX=1")
+  set_property(TARGET Ableton::Link APPEND PROPERTY
+    INTERFACE_COMPILE_DEFINITIONS
+    LINK_PLATFORM_MACOSX=1
+  )
+else()
+  message(STATUS "System name '${CMAKE_SYSTEM_NAME}' - no additional Link platform definition needed")
+endif()
+
 file(GLOB_RECURSE Sbsh_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB_RECURSE Sbsh_HEADERS CONFIGURE_DEPENDS "src/*.h")
+
+# Temporarily exclude WebSocket files to avoid ASIO conflicts
+list(FILTER Sbsh_SOURCES EXCLUDE REGEX "src/websocket/.*")
+list(FILTER Sbsh_HEADERS EXCLUDE REGEX "src/websocket/.*")
 
 set(Sbsh_INCLUDE_DIRS "")
 foreach(_headerFile ${Sbsh_HEADERS})
@@ -149,26 +166,25 @@ endforeach()
 list(REMOVE_DUPLICATES Sbsh_INCLUDE_DIRS)
 
 add_executable(Sbsh ${Sbsh_SOURCES})
-# add_executable(Sbsh src/main.cpp src/websocket/web_socket_server.cpp)
-
-find_library(PORTAUDIO_LIB portaudio)
-find_library(PORTMIDI_LIB portmidi)
-find_library(SNDFILE_LIB sndfile)
 
 target_include_directories(Sbsh PRIVATE ${Sbsh_INCLUDE_DIRS})
-target_include_directories(Sbsh PRIVATE ${PerlinIncDir})
 
-# Add readline include directories - force homebrew version
-file(GLOB READLINE_INCLUDE_DIRS "/opt/homebrew/Cellar/readline/*/include")
-if(READLINE_INCLUDE_DIRS)
-  list(GET READLINE_INCLUDE_DIRS 0 READLINE_INCLUDE_DIR)
-  message(STATUS "Found readline include dir: ${READLINE_INCLUDE_DIR}")
-  target_include_directories(Sbsh PRIVATE ${READLINE_INCLUDE_DIR})
-else()
-  message(STATUS "Readline include dir not found, using system default")
+# Include FetchContent dependencies
+target_include_directories(Sbsh PRIVATE ${perlin_noise_SOURCE_DIR})
+# target_include_directories(Sbsh PRIVATE ${websocketpp_SOURCE_DIR})  # WebSocket disabled
+
+# Add system library include directories using pkg-config when available
+if(PORTAUDIO_FOUND)
+  target_include_directories(Sbsh PRIVATE ${PORTAUDIO_INCLUDE_DIRS})
 endif()
 
-# Add jsoncpp include directories
+# PortMidi headers are in standard system location (/usr/include/portmidi.h)
+
+if(SNDFILE_FOUND)
+  target_include_directories(Sbsh PRIVATE ${SNDFILE_INCLUDE_DIRS})
+endif()
+
+
 if(JSONCPP_FOUND)
   target_include_directories(Sbsh PRIVATE ${JSONCPP_INCLUDE_DIRS})
 else()
@@ -191,21 +207,36 @@ if(ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_link_options(Sbsh PRIVATE -fsanitize=address -fsanitize=undefined)
 endif()
 
-include(${AbletonLinkPath}/AbletonLinkConfig.cmake)
-target_link_libraries(
-  Sbsh
+# Link libraries - use pkg-config variables when available, fallback to manual finds
+target_link_libraries(Sbsh
   Ableton::Link
-  ${PORTAUDIO_LIB}
-  ${PORTMIDI_LIB}
   ${READLINE_LIB}
   ${HISTORY_LIB}
-  ${SNDFILE_LIB}
-  ${FFTW3_LIB}
-  Threads::Threads)
+  Threads::Threads
+)
 
-# Link jsoncpp
+# Link audio libraries using pkg-config when available
+if(PORTAUDIO_FOUND)
+  target_link_libraries(Sbsh ${PORTAUDIO_LIBRARIES})
+  target_compile_options(Sbsh PRIVATE ${PORTAUDIO_CFLAGS_OTHER})
+else()
+  target_link_libraries(Sbsh ${PORTAUDIO_LIB})
+endif()
+
+# PortMidi doesn't provide pkg-config, so just link directly
+target_link_libraries(Sbsh ${PORTMIDI_LIB})
+
+if(SNDFILE_FOUND)
+  target_link_libraries(Sbsh ${SNDFILE_LIBRARIES})
+  target_compile_options(Sbsh PRIVATE ${SNDFILE_CFLAGS_OTHER})
+else()
+  target_link_libraries(Sbsh ${SNDFILE_LIB})
+endif()
+
+
 if(JSONCPP_FOUND)
   target_link_libraries(Sbsh ${JSONCPP_LIBRARIES})
+  target_compile_options(Sbsh PRIVATE ${JSONCPP_CFLAGS_OTHER})
 else()
   target_link_libraries(Sbsh ${JSONCPP_LIB})
 endif()
@@ -237,7 +268,7 @@ if(BUILD_TESTS)
   # Create a common test library for shared dependencies
   add_library(sbsh_test_common INTERFACE)
   target_include_directories(sbsh_test_common INTERFACE ${Sbsh_INCLUDE_DIRS})
-  target_include_directories(sbsh_test_common INTERFACE ${PerlinIncDir})
+  target_include_directories(sbsh_test_common INTERFACE ${perlin_noise_SOURCE_DIR})
 
   # Add jsoncpp include directories for tests
   if(JSONCPP_FOUND)

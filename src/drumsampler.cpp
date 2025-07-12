@@ -2,6 +2,7 @@
 
 #include <libgen.h>
 #include <math.h>
+#include <memory>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +15,7 @@
 #include "mixer.h"
 #include "utils.h"
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 
 namespace SBAudio {
 

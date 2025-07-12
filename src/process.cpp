@@ -1,6 +1,7 @@
 #include <audioutils.h>
 #include <cmdloop.h>
 #include <granulator.h>
+#include <memory>
 #include <midimaaan.h>
 #include <mixer.h>
 #include <regex.h>
@@ -18,7 +19,7 @@
 #include <sstream>
 #include <tsqueue.hpp>
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 extern Tsqueue<std::string> eval_command_queue;
 extern std::shared_ptr<object::Environment> global_env;
 

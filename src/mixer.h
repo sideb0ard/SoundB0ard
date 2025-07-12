@@ -7,6 +7,12 @@
 
 #include <ableton/Link.hpp>
 #include <array>
+#include <chrono>
+#include <algorithm>
+
+// Forward declarations to avoid namespace issues
+namespace ableton { class Link; }
+class WebsocketServer;
 #include <filesystem>
 #include <process.hpp>
 #include <string>
@@ -19,7 +25,7 @@
 #include "fx/fx.h"
 #include "minisynth.h"
 #include "soundgenerator.h"
-#include "websocket/web_socket_server.h"
+// #include "websocket/web_socket_server.h"  // TODO: Fix websocket compilation issues
 #include "xfader.h"
 
 struct PreviewBuffer {
@@ -71,7 +77,7 @@ struct Action {
 
 struct Mixer {
  public:
-  Mixer(WebsocketServer &server);
+  Mixer();  // WebSocket server temporarily disabled
 
   PreviewBuffer preview;
 
@@ -121,7 +127,7 @@ struct Mixer {
   bool midi_print = {false};
   std::unordered_map<int, std::string> midi_mapped_controls_ = {};
 
-  WebsocketServer &websocket_server_;
+  // WebsocketServer &websocket_server_;  // Temporarily disabled
 
   void AddMidiMapping(int id, std::string param);
   void ResetMidiMappings();
@@ -174,9 +180,115 @@ struct Mixer {
   void PanChange(int sig, float vol);
 
   void UpdateTimingInfo(long long int frame_time);
+  
+  // Template function implementation must be in header
+  static constexpr auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
+  
+  template<typename SessionState>
   int GenNext(float *out, int frames_per_buffer,
-              ableton::Link::SessionState &sessionState, const double quantum,
-              const std::chrono::microseconds beginHostTime);
+              SessionState &sessionState, const double quantum,
+              const std::chrono::microseconds beginHostTime) {
+    using namespace std::chrono;
+    
+    // The number of microseconds that elapse between samples
+    constexpr auto microsPerSample = 1e6 / SAMPLE_RATE;
+
+    int return_bpm = 0;
+    if (bpm_to_be_updated > 0) {
+      return_bpm = bpm_to_be_updated;
+      bpm_to_be_updated = 0;
+    }
+    xfader_.Update(timing_info);
+
+    for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2) {
+      double output_left = 0.0;
+      double output_right = 0.0;
+
+      timing_info.cur_sample++;
+
+      if (preview.enabled) {
+        StereoVal preview_audio = preview.Generate();
+        output_left += preview_audio.left * 0.6;
+        output_right += preview_audio.right * 0.6;
+      }
+
+      const auto hostTime =
+          beginHostTime +
+          microseconds(llround(static_cast<double>(i) * microsPerSample));
+
+      timing_info.is_midi_tick = false;
+      auto beat_time = sessionState.beatAtTime(hostTime, quantum);
+      if (beat_time >= 0.) {
+        if (beat_time >= timing_info.time_of_next_midi_tick) {
+          timing_info.time_of_next_midi_tick =
+              (double)((int)beat_time) +
+              ((timing_info.midi_tick % PPQN) * Mixer::MIDI_TICK_FRAC_OF_BEAT);
+          timing_info.is_midi_tick = true;
+          MidiTick();
+          timing_info.midi_tick++;
+        }
+      }
+
+      StereoVal fx_delay_send{};
+      StereoVal fx_reverb_send{};
+      StereoVal fx_distort_send{};
+      // Cache the size to avoid race conditions with other threads modifying it
+      int safe_generators_count =
+          (sound_generators_idx_ < static_cast<int>(sound_generators_.size()))
+              ? sound_generators_idx_
+              : static_cast<int>(sound_generators_.size());
+
+      for (int k = 0; k < safe_generators_count; k++) {
+        // Additional bounds check
+        if (k >= sound_generators_.size()) break;
+
+        auto &sg = sound_generators_[k];
+        // Null check before dereferencing
+        if (!sg) {
+          soundgen_cur_val_[k] = StereoVal{};
+          continue;
+        }
+        soundgen_cur_val_[k] = sg->GenNext(timing_info);
+
+        bool collect_value = false;
+        // if nothing is soloed, or this sg is in the solo group,
+        // collect its output value
+        if (soloed_sound_generator_idz.empty() ||
+            std::find(soloed_sound_generator_idz.begin(),
+                      soloed_sound_generator_idz.end(),
+                      k) != soloed_sound_generator_idz.end()) {
+          collect_value = true;
+        }
+
+        if (collect_value) {
+          output_left += soundgen_cur_val_[k].left * xfader_.GetValueFor(k);
+          output_right += soundgen_cur_val_[k].right * xfader_.GetValueFor(k);
+
+          fx_delay_send += soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[0];
+          fx_reverb_send +=
+              soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[1];
+          fx_distort_send +=
+              soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[2];
+        }
+      }
+
+      auto delay_val = fx_[0]->Process(fx_delay_send);
+      auto reverb_val = fx_[1]->Process(fx_reverb_send);
+      auto distort_val = fx_[2]->Process(fx_distort_send);
+      output_left += (delay_val.left + reverb_val.left + distort_val.left);
+      output_right += (delay_val.right + reverb_val.right + distort_val.right);
+
+      out[j] = volume * output_left;
+      out[j + 1] = volume * output_right;
+    }
+
+    // WebSocket temporarily disabled
+    // if (websocket_enabled_) {
+    //   websocket_server_.sendData(out, 2 * frames_per_buffer * sizeof(float));
+    // }
+
+    return return_bpm;
+  }
 
   bool IsValidProcess(int proc_num);
   bool IsValidSoundgenNum(int soundgen_num);

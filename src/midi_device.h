@@ -2,4 +2,4 @@
 
 #include "mixer.h"
 
-void MidiInit(Mixer *mixr);
+void MidiInit(Mixer *mixer);

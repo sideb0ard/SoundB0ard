@@ -1,11 +1,13 @@
 #include <fx/dynamics_processor.h>
+#include <memory>
 #include <mixer.h>
 #include <stdlib.h>
 #include <utils.h>
 
+#include <algorithm>
 #include <sstream>
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 
 const char *dynamics_processor_type_to_char[] = {"COMP", "LIMIT", "EXPAND",
                                                  "GATE"};
@@ -59,13 +61,13 @@ double DynamicsProcessor::CalcCompressionGain(double detector_val,
     double y[2];
     x[0] = threshold - kneewidth / 2.0;
     x[1] = threshold + kneewidth / 2.0;
-    x[1] = min(0, x[1]);
+    x[1] = std::min(0.0, x[1]);
     y[0] = 0;
     y[1] = cs;
     cs = lagrpol(&x[0], &y[0], 2, detector_val);
   }
   double yg = cs * (threshold - detector_val);
-  yg = min(0, yg);
+  yg = std::min(0.0, yg);
   return pow(10.0, yg / 20.0);
 }
 
@@ -82,14 +84,14 @@ double DynamicsProcessor::CalcDownwardExpanderGain(double detector_val,
     double y[2];
     x[0] = threshold - kneewidth / 2.0;
     x[1] = threshold + kneewidth / 2.0;
-    x[1] = min(0, x[1]);
+    x[1] = std::min(0.0, x[1]);
     y[0] = es;
     y[1] = 0;
 
     es = lagrpol(&x[0], &y[0], 2, detector_val);
   }
   double yg = es * (threshold - detector_val);
-  yg = min(0, yg);
+  yg = std::min(0.0, yg);
   return pow(10.0, yg / 20.0);
 }
 
@@ -212,7 +214,7 @@ StereoVal DynamicsProcessor::Process(StereoVal input) {
 
   double left_detector_input = input.left;
   if (m_external_source_ >= 0)
-    left_detector_input = mixr->soundgen_cur_val_[m_external_source_].left;
+    left_detector_input = global_mixr->soundgen_cur_val_[m_external_source_].left;
 
   double left_detector =
       envelope_detector_detect(&m_left_detector_, left_detector_input);
@@ -254,7 +256,7 @@ StereoVal DynamicsProcessor::Process(StereoVal input) {
 
 void DynamicsProcessor::SetExternalSource(unsigned int val) {
   if (val < 99) {
-    if (mixr->IsValidSoundgenNum(val)) m_external_source_ = val;
+    if (global_mixr->IsValidSoundgenNum(val)) m_external_source_ = val;
   } else
     m_external_source_ = -99;  // TODO less shitty mechanism!
 }

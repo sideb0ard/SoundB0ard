@@ -87,19 +87,19 @@ void midi_event_clear(midi_event *ev) {
 }
 
 void midi_event_print(midi_event *ev) {
-  char event_type[10] = {};
+  char event_type[12] = {};  // Increased size for "PITCHBEND" + null terminator
   switch (ev->event_type) {
     case (144):
-      strncpy(event_type, "ON", 9);
+      strncpy(event_type, "ON", sizeof(event_type) - 1);
       break;
     case (128):
-      strncpy(event_type, "OFF", 9);
+      strncpy(event_type, "OFF", sizeof(event_type) - 1);
       break;
     case (176):
-      strncpy(event_type, "CONTROL", 9);
+      strncpy(event_type, "CONTROL", sizeof(event_type) - 1);
       break;
     case (224):
-      strncpy(event_type, "PITCHBEND", 9);
+      strncpy(event_type, "PITCHBEND", sizeof(event_type) - 1);
       break;
   }
 }

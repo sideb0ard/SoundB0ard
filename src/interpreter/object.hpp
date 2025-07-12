@@ -108,7 +108,7 @@ class Number : public Object {
   explicit Number(double val) : value_{val} {};
   ObjectType Type() override;
   std::string Inspect() override;
-  HashKey HashKey();
+  HashKey GetHashKey();
 
  public:
   double value_;
@@ -162,7 +162,7 @@ class Boolean : public Object {
   explicit Boolean(bool val) : value_{val} {};
   ObjectType Type() override;
   std::string Inspect() override;
-  HashKey HashKey();
+  HashKey GetHashKey();
 
  public:
   bool value_;
@@ -177,7 +177,7 @@ class String : public Object {
   std::string Inspect() override {
     return value_;
   }
-  HashKey HashKey();
+  HashKey GetHashKey();
 
  public:
   std::string value_;
@@ -393,7 +393,7 @@ class SoundGenerator : public Object {
   ~SoundGenerator() = default;
   virtual ObjectType Type() = 0;
   virtual std::string Inspect() = 0;
-  HashKey HashKey();
+  HashKey GetHashKey();
 
  public:
   int soundgen_id_{-1};

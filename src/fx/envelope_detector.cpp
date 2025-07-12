@@ -64,8 +64,8 @@ double envelope_detector_detect(envelope_detector *ed, double input) {
   if (ed->m_envelope < 0.0 && ed->m_envelope > FLT_MIN_MINUS)
     ed->m_envelope = 0.;
 
-  ed->m_envelope = min(ed->m_envelope, 1.0);
-  ed->m_envelope = max(ed->m_envelope, 0.0);
+  ed->m_envelope = std::min(ed->m_envelope, 1.0);
+  ed->m_envelope = std::max(ed->m_envelope, 0.0);
 
   if (ed->m_logdetector) {
     if (ed->m_envelope <= 0) return -96.0;

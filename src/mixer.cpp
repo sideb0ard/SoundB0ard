@@ -27,6 +27,7 @@
 #include <interpreter/sound_cmds.hpp>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <tsqueue.hpp>
 
@@ -62,7 +63,7 @@ std::pair<double, double> GetBoundaries(const std::string &param) {
 
 }  // namespace
 
-Mixer *mixr;
+std::unique_ptr<Mixer> global_mixr;
 extern std::shared_ptr<object::Environment> global_env;
 extern Tsqueue<event_queue_item> process_event_queue;
 extern Tsqueue<std::string> repl_queue;
@@ -70,7 +71,7 @@ extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
 extern Tsqueue<std::string> eval_command_queue;
 
-const auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
+// MIDI_TICK_FRAC_OF_BEAT moved to header
 
 Action::Action(double start_val, double end_val, int time_taken_ticks,
                std::string action_to_take)
@@ -109,7 +110,7 @@ void Action::Run() {
   }
 }
 
-Mixer::Mixer(WebsocketServer &server) : websocket_server_{server} {
+Mixer::Mixer() {  // WebSocket server temporarily disabled
   UpdateBpm(DEFAULT_BPM);
 
   for (int i = 0; i < MAX_NUM_PROC; i++)
@@ -418,7 +419,7 @@ void Mixer::UpdateBpm(int new_bpm) {
   timing_info.size_of_eighth_note = timing_info.size_of_sixteenth_note * 2;
   timing_info.size_of_quarter_note = timing_info.size_of_eighth_note * 2;
 
-  EmitEvent((broadcast_event){.type = TIME_BPM_CHANGE});
+  EmitEvent((broadcast_event){.type = TIME_BPM_CHANGE, .sequencer_src = 0});
 }
 
 void Mixer::VolChange(float vol) {
@@ -496,119 +497,14 @@ void Mixer::MidiTick() {
   CheckForExternalMidiEvents();
 
   repl_queue.push("tick");
-  EmitEvent((broadcast_event){.type = TIME_MIDI_TICK});
+  EmitEvent((broadcast_event){.type = TIME_MIDI_TICK, .sequencer_src = 0});
   // lo_send(processing_addr, "/bpm", NULL);
   CheckForDelayedEvents();
 
   RunScheduledActions();
 }
 
-// The number of microseconds that elapse between samples
-constexpr auto microsPerSample = 1e6 / SAMPLE_RATE;
-
-int Mixer::GenNext(float *out, int frames_per_buffer,
-                   ableton::Link::SessionState &sessionState,
-                   const double quantum,
-                   const std::chrono::microseconds beginHostTime) {
-  using namespace std::chrono;
-
-  int return_bpm = 0;
-  if (bpm_to_be_updated > 0) {
-    return_bpm = bpm_to_be_updated;
-    bpm_to_be_updated = 0;
-  }
-  xfader_.Update(timing_info);
-
-  for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2) {
-    double output_left = 0.0;
-    double output_right = 0.0;
-
-    timing_info.cur_sample++;
-
-    if (preview.enabled) {
-      StereoVal preview_audio = preview.Generate();
-      output_left += preview_audio.left * 0.6;
-      output_right += preview_audio.right * 0.6;
-    }
-
-    const auto hostTime =
-        beginHostTime +
-        microseconds(llround(static_cast<double>(i) * microsPerSample));
-
-    timing_info.is_midi_tick = false;
-    auto beat_time = sessionState.beatAtTime(hostTime, quantum);
-    if (beat_time >= 0.) {
-      if (beat_time >= timing_info.time_of_next_midi_tick) {
-        timing_info.time_of_next_midi_tick =
-            (double)((int)beat_time) +
-            ((timing_info.midi_tick % PPQN) * MIDI_TICK_FRAC_OF_BEAT);
-        timing_info.is_midi_tick = true;
-        MidiTick();
-        timing_info.midi_tick++;
-      }
-    }
-
-    StereoVal fx_delay_send{};
-    StereoVal fx_reverb_send{};
-    StereoVal fx_distort_send{};
-    // Cache the size to avoid race conditions with other threads modifying it
-    int safe_generators_count =
-        (sound_generators_idx_ < static_cast<int>(sound_generators_.size()))
-            ? sound_generators_idx_
-            : static_cast<int>(sound_generators_.size());
-
-    for (int k = 0; k < safe_generators_count; k++) {
-      // Additional bounds check
-      if (k >= sound_generators_.size()) break;
-
-      auto &sg = sound_generators_[k];
-      // Null check before dereferencing
-      if (!sg) {
-        soundgen_cur_val_[k] = StereoVal{};
-        continue;
-      }
-      soundgen_cur_val_[k] = sg->GenNext(timing_info);
-
-      bool collect_value = false;
-      // if nothing is soloed, or this sg is in the solo group,
-      // collect its output value
-      if (soloed_sound_generator_idz.empty() ||
-          std::find(soloed_sound_generator_idz.begin(),
-                    soloed_sound_generator_idz.end(),
-                    k) != soloed_sound_generator_idz.end()) {
-        collect_value = true;
-      }
-
-      if (collect_value) {
-        output_left += soundgen_cur_val_[k].left * xfader_.GetValueFor(k);
-        output_right += soundgen_cur_val_[k].right * xfader_.GetValueFor(k);
-
-        fx_delay_send += soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[0];
-        fx_reverb_send +=
-            soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[1];
-        fx_distort_send +=
-            soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[2];
-      }
-    }
-
-    auto delay_val = fx_[0]->Process(fx_delay_send);
-    auto reverb_val = fx_[1]->Process(fx_reverb_send);
-    auto distort_val = fx_[2]->Process(fx_distort_send);
-    output_left += (delay_val.left + reverb_val.left + distort_val.left);
-    output_right += (delay_val.right + reverb_val.right + distort_val.right);
-
-    // out[j] = volume * (output_left / 1.53);
-    // out[j + 1] = volume * (output_right / 1.53);
-    out[j] = volume * output_left;
-    out[j + 1] = volume * output_right;
-  }
-
-  if (websocket_enabled_) {
-    websocket_server_.sendData(out, 2 * frames_per_buffer * sizeof(float));
-  }
-
-  return return_bpm;
-}
+// GenNext implementation moved to header as template function
 
 bool Mixer::DelSoundgen(int soundgen_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
@@ -835,7 +731,7 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
   } else if (action->type == AudioAction::MIDI_MAP_SHOW)
     PrintMidiMappings();
   else if (action->type == AudioAction::HELP)
-    mixr->Help();
+    global_mixr->Help();
   else if (action->type == AudioAction::MONITOR) {
     AddFileToMonitor(action->filepath);
   } else if (action->type == AudioAction::ADD) {
@@ -1056,8 +952,8 @@ void Mixer::CheckForExternalMidiEvents() {
   auto tic = timing_info.midi_tick % PPBAR;
 
   PmEvent msg[32];
-  if (Pm_Poll(mixr->midi_stream)) {
-    int cnt = Pm_Read(mixr->midi_stream, msg, 32);
+  if (Pm_Poll(global_mixr->midi_stream)) {
+    int cnt = Pm_Read(global_mixr->midi_stream, msg, 32);
     for (int i = 0; i < cnt; i++) {
       int status = Pm_MessageStatus(msg[i].message);
       int data1 = Pm_MessageData1(msg[i].message);
@@ -1109,7 +1005,7 @@ void Mixer::CheckForAudioActionQueueMessages() {
 }
 
 void Mixer::AddFileToMonitor(std::string filepath) {
-  file_monitors.push_back(file_monitor{.function_file_filepath = filepath});
+  file_monitors.push_back(file_monitor{.function_file_filepath = filepath, .function_file_filepath_last_write_time = {}});
 }
 
 void Mixer::CheckForDelayedEvents() {

@@ -50,17 +50,17 @@ bool IsHashable(std::shared_ptr<object::Object> obj) {
 
 object::HashKey MakeHashKey(std::shared_ptr<object::Object> hashkey) {
   auto hash_key_bool = std::dynamic_pointer_cast<object::Boolean>(hashkey);
-  if (hash_key_bool) return hash_key_bool->HashKey();
+  if (hash_key_bool) return hash_key_bool->GetHashKey();
 
   auto hash_key_int = std::dynamic_pointer_cast<object::Number>(hashkey);
-  if (hash_key_int) return hash_key_int->HashKey();
+  if (hash_key_int) return hash_key_int->GetHashKey();
 
   auto hash_key_string = std::dynamic_pointer_cast<object::String>(hashkey);
-  if (hash_key_string) return hash_key_string->HashKey();
+  if (hash_key_string) return hash_key_string->GetHashKey();
 
   auto hash_key_soundgenerator =
       std::dynamic_pointer_cast<object::SoundGenerator>(hashkey);
-  if (hash_key_soundgenerator) return hash_key_soundgenerator->HashKey();
+  if (hash_key_soundgenerator) return hash_key_soundgenerator->GetHashKey();
 
   return object::HashKey{};
 }
@@ -653,8 +653,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
           midi_event ev{.event_type = MIDI_ON,
                         .data1 = std::stoi(midi_note),
                         .data2 = std::stoi(velo),
-                        .dur = std::stoi(dura),
-                        .playback_tick = std::stoi(midi_tick)};
+                        .playback_tick = std::stoi(midi_tick),
+                        .dur = std::stoi(dura)};
           events.push_back(ev);
         }
       }

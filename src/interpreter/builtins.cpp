@@ -1,5 +1,6 @@
 #include <audio_action_queue.h>
 #include <audioutils.h>
+#include <memory>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <utils.h>
@@ -11,7 +12,6 @@
 #include <interpreter/evaluator.hpp>
 #include <interpreter/sound_cmds.hpp>
 #include <iostream>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <tsqueue.hpp>
@@ -25,7 +25,7 @@
 
 namespace fs = std::filesystem;
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
@@ -715,7 +715,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            if (when && start_val && end_val && time_taken && action_to_take) {
              Action action = Action(start_val->value_, end_val->value_,
                                     time_taken->value_, action_to_take->value_);
-             mixr->ScheduleAction(when->value_, action);
+             global_mixr->ScheduleAction(when->value_, action);
            }
            return evaluator::NULLL;
          })},
@@ -953,7 +953,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
                        (void)args;
-                       mixr->PrintMidiInfo();
+                       global_mixr->PrintMidiInfo();
                        return evaluator::NULLL;
                      })},
     {"now", std::make_shared<object::BuiltIn>(
@@ -971,14 +971,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {
                     (void)args;
-                    mixr->PrintDxAlgos();
+                    global_mixr->PrintDxAlgos();
                     return evaluator::NULLL;
                   })},
     {"ratioz", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object> {
                      (void)args;
-                     mixr->PrintDxRatioz();
+                     global_mixr->PrintDxRatioz();
                      return evaluator::NULLL;
                    })},
     {"push", std::make_shared<object::BuiltIn>(
@@ -1025,14 +1025,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {
                     (void)args;
-                    mixr->PrintFuncAndGenInfo();
+                    global_mixr->PrintFuncAndGenInfo();
                     return evaluator::NULLL;
                   })},
     {"timing_info", std::make_shared<object::BuiltIn>(
                         [](std::vector<std::shared_ptr<object::Object>> args)
                             -> std::shared_ptr<object::Object> {
                           (void)args;
-                          mixr->PrintTimingInfo();
+                          global_mixr->PrintTimingInfo();
                           return evaluator::NULLL;
                         })},
     {"reverse",
@@ -1675,7 +1675,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            if (args_size >= 2) {
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
-             if (soundgen && mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+             if (soundgen && global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
                auto fx = interpreter_sound_cmds::ParseFXCmd(args);
                if (fx.size() > 0) {
                  auto action =
@@ -1697,7 +1697,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              std::cout << "YO ADD BUFFER!\n";
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
-             if (soundgen && mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+             if (soundgen && global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
                if (args[1]->Type() == "STRING") {
                  std::cout << args[1]->Inspect() << " " << args[1]->Type()
                            << std::endl;
@@ -2032,19 +2032,19 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          double val = 0;
                          switch ((int)x->value_) {
                            case 2:
-                             val = mixr->GetHzPerTimingUnit(Quantize::Q2);
+                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q2);
                              break;
                            case 4:
-                             val = mixr->GetHzPerTimingUnit(Quantize::Q4);
+                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q4);
                              break;
                            case 8:
-                             val = mixr->GetHzPerTimingUnit(Quantize::Q8);
+                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q8);
                              break;
                            case 16:
-                             val = mixr->GetHzPerTimingUnit(Quantize::Q16);
+                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q16);
                              break;
                            case 32:
-                             val = mixr->GetHzPerTimingUnit(Quantize::Q32);
+                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q32);
                              break;
                          }
                          auto number_obj =
@@ -2780,7 +2780,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       [](std::vector<std::shared_ptr<object::Object>> args)
                           -> std::shared_ptr<object::Object> {
                         (void)args;
-                        MidiInit(mixr);
+                        MidiInit(global_mixr.get());
                         return evaluator::NULLL;
                       })},
     {"midi_assign",
@@ -2792,7 +2792,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
              if (soundgen) {
-               mixr->AssignSoundGeneratorToMidiController(
+               global_mixr->AssignSoundGeneratorToMidiController(
                    soundgen->soundgen_id_);
              }
            }
@@ -2802,21 +2802,21 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
                        (void)args;
-                       mixr->RecordMidiToggle();
+                       global_mixr->RecordMidiToggle();
                        return evaluator::NULLL;
                      })},
     {"midi_print", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object> {
                          (void)args;
-                         mixr->PrintMidiToggle();
+                         global_mixr->PrintMidiToggle();
                          return evaluator::NULLL;
                        })},
     {"midi_reset", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object> {
                          (void)args;
-                         mixr->ResetMidiRecording();
+                         global_mixr->ResetMidiRecording();
                          return evaluator::NULLL;
                        })},
     {"midi_dump", std::make_shared<object::BuiltIn>(
@@ -2825,7 +2825,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         (void)args;
                         auto return_pattern =
                             std::make_shared<object::MidiArray>(
-                                mixr->RecordingBuffer());
+                                global_mixr->RecordingBuffer());
                         return return_pattern;
                       })},
     {"midi2array",

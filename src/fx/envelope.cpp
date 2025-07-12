@@ -1,12 +1,13 @@
 #include <defjams.h>
 #include <fx/envelope.h>
+#include <memory>
 #include <mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <sstream>
 
-extern Mixer *mixr;
+extern std::unique_ptr<Mixer> global_mixr;
 
 const char *s_eg_state[] = {"OFF",     "ATTACK",  "DECAY",
                             "SUSTAIN", "RELEASE", "SHUTDOWN"};
@@ -61,7 +62,7 @@ void Envelope::SetLengthBars(double length_bars) {
 }
 
 void Envelope::CalculateTimings() {
-  mixer_timing_info info = mixr->timing_info;
+  mixer_timing_info info = global_mixr->timing_info;
   // wtf?! - i've no idea why i need to divide by 2 here -
   // obviously i'm crock at math!
   int release_time_ticks =

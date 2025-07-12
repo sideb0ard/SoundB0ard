@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-void MidiInit(Mixer *mixr) {
+void MidiInit(Mixer *mixer) {
   std::cout << "Initializing MIDI...\n";
   PmError retval = Pm_Initialize();
   if (retval != pmNoError)
@@ -28,15 +28,15 @@ void MidiInit(Mixer *mixr) {
     return;
   }
 
-  retval = Pm_OpenInput(&mixr->midi_stream, dev, NULL, 512L, NULL, NULL);
+  retval = Pm_OpenInput(&mixer->midi_stream, dev, NULL, 512L, NULL, NULL);
   if (retval != pmNoError) {
     std::cerr << "Err opening input for MPKmini2: " << Pm_GetErrorText(retval)
               << std::endl;
     Pm_Terminate();
     return;
   }
-  mixr->midi_controller_name = "MPKmini2";
-  mixr->have_midi_controller = true;
-  std::cout << "Successfully opened " << mixr->midi_controller_name
+  mixer->midi_controller_name = "MPKmini2";
+  mixer->have_midi_controller = true;
+  std::cout << "Successfully opened " << mixer->midi_controller_name
             << std::endl;
 }
