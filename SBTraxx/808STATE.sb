@@ -6,10 +6,12 @@ let loon = sample(noises/loon-bird.aiff);
 let sd = sample(sd/hdSD.wav);
 
 # load_preset(mo, "808"); vol mo 0.5;
-# load_preset(dx, "twklz"); // Bizzle // simplepiano // MAW1
+# load_preset(dx, "ORGAN");
 # send("delay", loon);
 # bpm 128;
+
 # let rvs = loop(loops/raveStabsCmon.aiff); set rvs:len 2; vol rvs 0;
+# load_preset(dx, "twklz"); // Bizzle // simplepiano // MAW1 // ORGAN
 
 # p1 $ chordblah_gen;
 # p2 $ loonblah_gen;
@@ -210,5 +212,40 @@ let offzblah_gen = gen()
         px2 = 0;
       }
     }
+  }
+}
+
+let riffblah_gen = gen()
+{
+  setup()
+  {
+    let beatmain = [1, 0, 1, 1,  0, 0, 1, 1,  1, 1, 0, 1,  0, 0, 0, 0];
+  }
+  run()
+  {
+    let beat = beatmain;
+    if (count % 4 == 3) {
+      beat = rand_array(16, 0, 1);
+    }
+
+    let ix = 0;
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(dx, chord[ix], i * pp, dur = 500);
+        note_on_at(mo, chord[ix], i * pp, dur = 200);
+        ix = incr(ix, 0, len(chord));
+      }
+    }
+  }
+}
+
+let fullchordblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    note_on_at(mo, chord, 0, dur = 3800);
   }
 }
