@@ -698,8 +698,6 @@ std::shared_ptr<object::Object> EvalHashIndexExpressionUpdate(
     if (!IsHashable(key))
       return NewError("unusable as hash key: %s", key->Type());
 
-    object::HashKey hashed = MakeHashKey(key);
-
     auto new_pair = std::make_shared<object::HashPair>(key, new_value);
 
     my_hash->pairs_.insert(std::pair<object::HashKey, object::HashPair>(
@@ -832,7 +830,7 @@ std::shared_ptr<object::Object> EvalHashIndexExpression(
 }
 
 std::shared_ptr<object::Object> EvalPrefixExpression(
-    std::string op, std::shared_ptr<object::Object> right) {
+    const std::string &op, std::shared_ptr<object::Object> right) {
   if (op.compare("!") == 0)
     return EvalBangOperatorExpression(right);
   else if (op.compare("~") == 0)
@@ -848,7 +846,7 @@ std::shared_ptr<object::Object> EvalPrefixExpression(
 }
 
 std::shared_ptr<object::Object> EvalPostfixExpression(
-    std::string op, std::shared_ptr<object::Object> left) {
+    const std::string &op, std::shared_ptr<object::Object> left) {
   if (op.compare("++") == 0)
     return EvalIncrementOperatorExpression(left, false);
   else if (op.compare("--") == 0)
@@ -865,7 +863,7 @@ std::shared_ptr<object::Object> EvalForLoop(
   while (IsTruthy(Eval(for_loop->termination_, for_loop->env_))) {
     result = Eval(for_loop->body_, for_loop->env_);
     if (result->Type() == object::BREAK_OBJ) {
-      break;
+      return NULLL;
     }
     if (result->Type() == object::RETURN_VALUE_OBJ) {
       return result;
@@ -891,7 +889,7 @@ std::shared_ptr<object::Object> EvalIfStatement(
   return evaluator::NULLL;
 }
 std::shared_ptr<object::Object> EvalInfixExpression(
-    std::string op, std::shared_ptr<object::Object> left,
+    const std::string &op, std::shared_ptr<object::Object> left,
     std::shared_ptr<object::Object> right) {
   if (left->Type() == object::NUMBER_OBJ &&
       (op == token::SLANG_INCREMENT || op == token::SLANG_DECREMENT)) {
@@ -968,7 +966,7 @@ std::shared_ptr<object::Object> EvalInfixExpression(
 }
 
 std::shared_ptr<object::Object> EvalNumberInfixExpression(
-    std::string op, std::shared_ptr<object::Number> left,
+    const std::string &op, std::shared_ptr<object::Number> left,
     std::shared_ptr<object::Number> right) {
   if (op.compare("+") == 0)
     return std::make_shared<object::Number>(left->value_ + right->value_);
@@ -1023,7 +1021,7 @@ std::shared_ptr<object::Object> EvalNumberInfixExpression(
 }
 
 std::shared_ptr<object::Object> EvalStringInfixExpression(
-    std::string op, std::shared_ptr<object::String> left,
+    const std::string &op, std::shared_ptr<object::String> left,
     std::shared_ptr<object::String> right) {
   if (op.compare("+") == 0)
     return std::make_shared<object::String>(left->value_ + right->value_);
@@ -1037,7 +1035,7 @@ std::shared_ptr<object::Object> EvalStringInfixExpression(
 }
 
 std::shared_ptr<object::Object> EvalArrayInfixExpression(
-    std::string op, std::shared_ptr<object::Array> left,
+    const std::string &op, std::shared_ptr<object::Array> left,
     std::shared_ptr<object::Array> right) {
   if (op.compare("+") == 0) {
     auto return_vec(left->elements_);
@@ -1050,7 +1048,7 @@ std::shared_ptr<object::Object> EvalArrayInfixExpression(
 }
 
 std::shared_ptr<object::Object> EvalMultiplyArrayExpression(
-    std::string op, std::shared_ptr<object::Array> left,
+    const std::string &op, std::shared_ptr<object::Array> left,
     std::shared_ptr<object::Number> right) {
   if (op.compare("*") == 0) {
     auto return_vec(left->elements_);
@@ -1144,7 +1142,7 @@ std::shared_ptr<object::Object> EvalProgram(
     std::vector<std::shared_ptr<ast::Statement>> const &stmts,
     std::shared_ptr<object::Environment> env) {
   std::shared_ptr<object::Object> result;
-  for (auto &s : stmts) {
+  for (const auto &s : stmts) {
     result = Eval(s, env);
 
     std::shared_ptr<object::ReturnValue> r =
@@ -1163,7 +1161,7 @@ std::shared_ptr<object::Object> EvalBlockStatement(
     std::shared_ptr<ast::BlockStatement> block,
     std::shared_ptr<object::Environment> env) {
   std::shared_ptr<object::Object> result = evaluator::NULLL;
-  for (auto &s : block->statements_) {
+  for (const auto &s : block->statements_) {
     result = Eval(s, env);
     if (result != evaluator::NULLL) {
       if (result->Type() == object::RETURN_VALUE_OBJ ||
@@ -1223,7 +1221,7 @@ std::shared_ptr<object::Object> EvalHashLiteral(
 }
 
 std::vector<std::shared_ptr<object::Object>> EvalExpressions(
-    std::vector<std::shared_ptr<ast::Expression>> exps,
+    const std::vector<std::shared_ptr<ast::Expression>> &exps,
     std::shared_ptr<object::Environment> env) {
   std::vector<std::shared_ptr<object::Object>> result;
 
@@ -1240,7 +1238,7 @@ std::vector<std::shared_ptr<object::Object>> EvalExpressions(
 
 std::shared_ptr<object::Object> ApplyGeneratorRun(
     std::shared_ptr<object::Object> callable,
-    std::vector<std::shared_ptr<object::Object>> args) {
+    const std::vector<std::shared_ptr<object::Object>> &args) {
   std::shared_ptr<object::Generator> gen =
       std::dynamic_pointer_cast<object::Generator>(callable);
   if (gen) {
@@ -1254,7 +1252,7 @@ std::shared_ptr<object::Object> ApplyGeneratorRun(
 
 std::shared_ptr<object::Object> ApplyFunction(
     std::shared_ptr<object::Object> callable,
-    std::vector<std::shared_ptr<object::Object>> args) {
+    const std::vector<std::shared_ptr<object::Object>> &args) {
   std::shared_ptr<object::Function> func =
       std::dynamic_pointer_cast<object::Function>(callable);
   if (func) {
@@ -1380,17 +1378,15 @@ std::shared_ptr<PatternFunction> EvalPatternFunctionExpression(
     auto func_arg_ast = std::make_shared<ast::PatternFunctionExpression>(
         func->arguments_[1]->token_);
 
-    if (func_arg_ast) {
-      int args_size = func->arguments_.size();
-      if (args_size > 2) {
-        for (int i = 2; i < args_size; i++)
-          func_arg_ast->arguments_.push_back(func->arguments_[i]);
-      }
-      auto func_arg = EvalPatternFunctionExpression(func_arg_ast);
-      if (func_arg) {
-        auto p_every = std::make_shared<PatternEvery>(intval->value_, func_arg);
-        return p_every;
-      }
+    int args_size = func->arguments_.size();
+    if (args_size > 2) {
+      for (int i = 2; i < args_size; i++)
+        func_arg_ast->arguments_.push_back(func->arguments_[i]);
+    }
+    auto func_arg = EvalPatternFunctionExpression(func_arg_ast);
+    if (func_arg) {
+      auto p_every = std::make_shared<PatternEvery>(intval->value_, func_arg);
+      return p_every;
     }
   } else if (func->token_.literal_ == "mask") {
     if (func->arguments_.size() == 1) {
@@ -1481,7 +1477,7 @@ std::shared_ptr<object::Object> EvalProcessStatement(
 
   std::vector<std::shared_ptr<PatternFunction>> process_funcz;
 
-  for (auto &f : proc->functions_) {
+  for (const auto &f : proc->functions_) {
     auto funcy = EvalPatternFunctionExpression(f);
     if (funcy) process_funcz.push_back(funcy);
   }
@@ -1519,48 +1515,6 @@ std::shared_ptr<object::Object> EvalProcessSetStatement(
   }
 
   return NULLL;
-}
-
-//////////// Error shizzle below
-
-void SSprintF(std::ostringstream &msg, const char *s);
-void SSprintF(std::ostringstream &msg, const char *s) {
-  while (*s) {
-    if (*s == '%') {
-      if (*(s + 1) == '%')
-        ++s;
-      else
-        msg << "ooft, really fucked up mate. disappointing.";
-    }
-    msg << *s++;
-  }
-}
-
-template <typename T, typename... Args>
-void SSprintF(std::ostringstream &msg, const char *format, T value,
-              Args... args) {
-  while (*format) {
-    if (*format == '%') {
-      if (*(format + 1) != '%') {
-        msg << value;
-
-        format += 2;  // only work on 2 char format strings
-        SSprintF(msg, format, args...);
-        return;
-      }
-      ++format;
-    }
-    msg << *format++;
-  }
-}
-
-template <typename... Args>
-std::shared_ptr<object::Error> NewError(std::string format, Args... args) {
-  std::ostringstream error_msg;
-
-  SSprintF(error_msg, format.c_str(), std::forward<Args>(args)...);
-
-  return std::make_shared<object::Error>(error_msg.str());
 }
 
 }  // namespace evaluator

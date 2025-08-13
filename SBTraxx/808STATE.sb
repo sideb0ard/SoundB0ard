@@ -5,13 +5,15 @@ let oh = sample(oh/OH_909_15.wav);
 let loon = sample(noises/loon-bird.aiff);
 let sd = sample(sd/hdSD.wav);
 
-# load_preset(mo, "808"); vol mo 0.5;
-# load_preset(dx, "ORGAN");
-# send("delay", loon);
-# bpm 128;
+load_preset(mo, "808"); vol mo 0.5;
+load_preset(dx, "ORGAN");
+send("delay", loon);
+bpm 128;
+let itadream = loop(pads/italiandreamhausTOO.aiff); set itadream:len 4; vol itadream 0;
+add_fx(itadream, "reverb"); set itadream:fx0:wetmx 70;
+add_fx(itadream, "sidechain", bd);
+pan ch 0.3; pan oh -0.25;
 
-# let rvs = loop(loops/raveStabsCmon.aiff); set rvs:len 2; vol rvs 0;
-# load_preset(dx, "twklz"); // Bizzle // simplepiano // MAW1 // ORGAN
 
 # p1 $ chordblah_gen;
 # p2 $ loonblah_gen;
@@ -78,19 +80,22 @@ let hhblah_gen = gen()
   }
   run()
   {
+    let hatz = hhz;
+    if (count % 8 == 6) {
+      hatz = rand_array(16, 0, 1);
+    }
     for (let i = 0; i < 16; i++) {
       let off = 20;
       if (i % 2 == 0) {
         off = 0;
       }
-      let v = 60 + rand(50);
-      if (hhz[i] == 1) {
+      let v = 40 + rand(50);
+      if (hatz[i] == 1) {
         note_on_at(ch, 1, i * pp + off, vel = v);
       } else {
         note_on_at(oh, 1, i * pp + off, vel = v);
       }
     }
-
   }
 }
 
@@ -247,5 +252,109 @@ let fullchordblah_gen = gen()
   run()
   {
     note_on_at(mo, chord, 0, dur = 3800);
+  }
+}
+
+let mofxblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      sched(0, 2, 90, 3840 * 4, "set mo:pw %");
+    }
+
+    if (count % 6 == 0) {
+      sched(0, 80, 9000, 3840 * 6, "set mo:fc %");
+    }
+
+    if (count % 8 == 7) {
+      sched(0, 12, 0.5, 3840 * 2, "set mo:l1rate %");
+      let beat = rand_beat();
+      let ix = 0;
+      for (let i = 0; i < 16; i++) {
+        note_on_at(mo, chord[ix], i * pp, dur = 40);
+        # ix = incr(ix, 0, len(chord));
+      }
+    }
+  }
+}
+
+let mxfblah_gen = gen()
+{
+  setup()
+  {
+    let blen = 4;
+    let bx = 0;
+    let breset = 17;
+    let brx = 0;
+
+    let slen = 4;
+    let sx = 0;
+    let sreset = 13;
+    let srx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (bx % blen == 0) {
+        note_on_at(bd, 1, i * pp);
+      }
+      bx = incr(bx, 0, blen);
+      brx = incr(brx, 0, breset);
+      if (brx == 0) {
+        bx = 0;
+      }
+
+      if (sx % slen == 0) {
+        note_on_at(ch, 1, i * pp);
+      }
+      sx = incr(sx, 0, slen);
+      srx = incr(srx, 0, sreset);
+      if (srx == 0) {
+        sx = 0;
+      }
+    }
+  }
+}
+
+let playitblah_gen = gen()
+{
+  setup()
+  {
+    let bar = 0;
+  }
+  run()
+  {
+    print("bar:", bar);
+    if (bar == 0) {
+      p1 $ chordblah_gen;
+      p2 $ fellblah_gen;
+    }
+    if (bar == 4) {
+      p2 $ loonblah_gen;
+      sched(0, 0, 1, 3840, "vol itadream %");
+    }
+    if (bar == 8) {
+      p3 $ hhblah_gen;
+      p4 $ drblah_gen;
+      p2 $ fullchordblah_gen;
+      p5 $ mofxblah_gen;
+    }
+    if (bar == 12) {
+      p3 $ "";
+      p4 $ "";
+    }
+    if (bar == 16) {
+      p3 $ hhblah_gen;
+      p4 $ drblah_gen;
+      p6 $ bssslah_gen;
+    }
+    if (bar == 20) {
+      sched(0, 1, 0, 3840, "vol mo %");
+    }
+    bar++;
   }
 }

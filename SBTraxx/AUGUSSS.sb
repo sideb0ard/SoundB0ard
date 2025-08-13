@@ -1,0 +1,66 @@
+
+let bounceah_gen = gen()
+{
+  setup()
+  {
+    let mass = 20;
+    let massincr = 0.8;
+    let acceleration = 0;
+
+    let gravity = -0.1;
+    let friction_coeff = 0.1;
+    let normal = 1;
+    let friction_mag = friction_coeff * normal;
+
+    #let notez = [34, 36, 38, 39,  41, 43, 45, 46];
+    let notez = [43, 36, 41, 34];
+    let nx = 0;
+
+  }
+  run()
+  {
+    let velocity = -1;
+    let y_position = 10;
+    let last_bounce = 0;
+
+    let pp = 3840 / 490;
+    let note = notez[nx];
+    if (count % 8 == 7) {
+      nx = incr(nx, 0, len(notez));
+    }
+    for (let i = 0; i < 490; i++) {
+
+      # apply gravity force
+      let gf = gravity / mass;
+      acceleration = acceleration + gf;
+
+      # update
+      velocity = velocity + acceleration;
+      y_position = y_position + velocity;
+      acceleration = acceleration * 0;
+
+      if (y_position < 0) {
+        y_position = 0;
+
+        let dampening = -0.5;
+
+        velocity = velocity * dampening;
+        #let friction = velocity * -1 * friction_coeff;
+        # acceleration = acceleration + friction;
+        # print("BOUNCE!", i, " Y:",  y_position, " Last bounce:", last_bounce, " Velocity:", velocity);
+        let last_diff = i - last_bounce;
+        if (last_diff < 7) {
+          break;
+        }
+        last_bounce = i;
+        note_on_at(dx, note, i * pp, dur = 500 * velocity * 10, vel = 2 * velocity * 100) ;
+        note_on_at(dx, note + 12, i * pp, dur = 100);
+      }
+    }
+
+    mass = mass + massincr;
+    if (mass > 15 || mass < 0.5) {
+      massincr = massincr * -1;
+    }
+  }
+}

@@ -39,6 +39,7 @@ repos:
           - --suppress=missingIncludeSystem
           - --suppress=unusedFunction
           - --suppress=unmatchedSuppression
+          - --suppress=normalCheckLevelMaxBranches
           - --error-exitcode=1
           - --inline-suppr
 
