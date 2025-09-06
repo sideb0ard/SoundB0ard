@@ -37,7 +37,7 @@ Reverb::Reverb() {
 
   Init();
 
-  type_ = REVERB;
+  type_ = fx_type::REVERB;
   enabled_ = true;
 }
 

@@ -8,7 +8,7 @@
 #include <sstream>
 
 FilterPass ::FilterPass() {
-  type_ = BASICFILTER;
+  type_ = fx_type::BASICFILTER;
   // m_filter_ = std::make_unique<MoogLadder>();
   // filter_left_ = std::make_unique<FilterSem>();
   filter_left_ = std::make_unique<CKThreeFive>();
@@ -62,8 +62,8 @@ std::string FilterPass::Status() {
 }
 
 StereoVal FilterPass::Process(StereoVal input) {
-  double lfo1_val = 0.0;
-  double lfo2_val = 0.0;
+  // double lfo1_val = 0.0;
+  // double lfo2_val = 0.0;
 
   // if (m_lfo1_active_) {
   //   m_lfo1_.Update();

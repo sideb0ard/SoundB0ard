@@ -8,7 +8,7 @@
 
 BitCrush::BitCrush() {
   Init();
-  type_ = BITCRUSH;
+  type_ = fx_type::BITCRUSH;
   enabled_ = true;
 }
 

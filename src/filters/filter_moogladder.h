@@ -6,7 +6,7 @@
 
 struct MoogLadder : public Filter {
   MoogLadder();
-  ~MoogLadder() = default;
+  ~MoogLadder() override = default;
 
   double m_k{0};
   double m_gamma{0};

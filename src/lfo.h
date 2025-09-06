@@ -4,7 +4,7 @@
 
 struct LFO : public Oscillator {
   LFO();
-  ~LFO() = default;
+  ~LFO() override = default;
 
   virtual void StartOscillator() override;
   virtual void StopOscillator() override;

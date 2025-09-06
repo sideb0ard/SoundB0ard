@@ -1,10 +1,10 @@
 #include <defjams.h>
 #include <fx/envelope.h>
-#include <memory>
 #include <mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <memory>
 #include <sstream>
 
 extern std::unique_ptr<Mixer> global_mixr;
@@ -18,7 +18,7 @@ const char *s_eg_mode[] = {"TRIGGER", "SUSTAIN"};
 Envelope::Envelope() {
   Reset();
 
-  type_ = ENVELOPE;
+  type_ = fx_type::ENVELOPE;
   enabled_ = true;
 }
 

@@ -6,12 +6,14 @@
 #include <pthread.h>
 
 #include <ableton/Link.hpp>
+#include <algorithm>
 #include <array>
 #include <chrono>
-#include <algorithm>
 
 // Forward declarations to avoid namespace issues
-namespace ableton { class Link; }
+namespace ableton {
+class Link;
+}
 class WebsocketServer;
 #include <filesystem>
 #include <process.hpp>
@@ -25,7 +27,8 @@ class WebsocketServer;
 #include "fx/fx.h"
 #include "minisynth.h"
 #include "soundgenerator.h"
-// #include "websocket/web_socket_server.h"  // TODO: Fix websocket compilation issues
+// #include "websocket/web_socket_server.h"  // TODO: Fix websocket compilation
+// issues
 #include "xfader.h"
 
 struct PreviewBuffer {
@@ -154,7 +157,7 @@ struct Mixer {
   std::string StatusSgz(bool all);
 
   void PrintRecordingBuffer();
-  MultiEventMidiPattern RecordingBuffer() {
+  const MultiEventMidiPattern &RecordingBuffer() const {
     return recording_buffer_;
   }
   MultiEventMidiPattern recording_buffer_;
@@ -180,16 +183,16 @@ struct Mixer {
   void PanChange(int sig, float vol);
 
   void UpdateTimingInfo(long long int frame_time);
-  
+
   // Template function implementation must be in header
   static constexpr auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
-  
-  template<typename SessionState>
-  int GenNext(float *out, int frames_per_buffer,
-              SessionState &sessionState, const double quantum,
+
+  template <typename SessionState>
+  int GenNext(float *out, int frames_per_buffer, SessionState &sessionState,
+              const double quantum,
               const std::chrono::microseconds beginHostTime) {
     using namespace std::chrono;
-    
+
     // The number of microseconds that elapse between samples
     constexpr auto microsPerSample = 1e6 / SAMPLE_RATE;
 
@@ -264,7 +267,8 @@ struct Mixer {
           output_left += soundgen_cur_val_[k].left * xfader_.GetValueFor(k);
           output_right += soundgen_cur_val_[k].right * xfader_.GetValueFor(k);
 
-          fx_delay_send += soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[0];
+          fx_delay_send +=
+              soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[0];
           fx_reverb_send +=
               soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[1];
           fx_distort_send +=

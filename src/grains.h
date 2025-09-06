@@ -12,13 +12,13 @@ enum SoundGrainType {
 };
 
 struct SoundGrainParams {
-  SoundGrainType grain_type;
+  SoundGrainType grain_type{SoundGrainType::Sample};
   int dur_frames{0};
   int starting_idx{0};
   bool reverse_mode{0};
   int num_channels{0};
   int degrade_by{0};
-  std::vector<double> *audio_buffer;
+  std::vector<double> *audio_buffer{nullptr};
 };
 
 struct SoundGrain {
@@ -26,12 +26,12 @@ struct SoundGrain {
   virtual void Initialize(SoundGrainParams) = 0;
   virtual void SetReadIdx(int idx) = 0;
   virtual ~SoundGrain() = default;
-  SoundGrainType type;
+  SoundGrainType type{SoundGrainType::Sample};
 };
 
 struct SoundGrainSample : public SoundGrain {
   SoundGrainSample() = default;
-  ~SoundGrainSample() = default;
+  ~SoundGrainSample() override = default;
 
   SoundGrainType grain_type_{SoundGrainType::Sample};
 
@@ -44,7 +44,7 @@ struct SoundGrainSample : public SoundGrain {
 
   int audiobuffer_num_channels{0};
 
-  std::vector<double> *audio_buffer;
+  std::vector<double> *audio_buffer{nullptr};
   double audiobuffer_cur_pos{0};
   double incr{1};
 

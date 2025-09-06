@@ -6,7 +6,7 @@
 
 struct CKThreeFive : public Filter {
   CKThreeFive();
-  ~CKThreeFive() = default;
+  ~CKThreeFive() override = default;
   double m_k{0.01};
   double m_alpha0{0};
 

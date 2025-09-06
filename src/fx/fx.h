@@ -6,7 +6,8 @@
 
 #include <string>
 
-typedef enum {
+enum class fx_type {
+  NONE = -1,
   BASICFILTER,
   BITCRUSH,
   COMPRESSOR,
@@ -22,7 +23,7 @@ typedef enum {
   ENVELOPEFOLLOWER,
   WAVESHAPER,
   GRANULATE,
-} fx_type;
+};
 
 class Fx {
  public:
@@ -35,8 +36,8 @@ class Fx {
   virtual void EventNotify(broadcast_event event, mixer_timing_info tinfo);
 
  public:
-  fx_type type_;
-  bool enabled_;
+  fx_type type_{fx_type::NONE};
+  bool enabled_{false};
 };
 
 #endif

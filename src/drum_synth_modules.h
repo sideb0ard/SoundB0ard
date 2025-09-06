@@ -1,3 +1,5 @@
+#pragma once
+
 #include <qblimited_oscillator.h>
 
 #include <array>
@@ -184,7 +186,6 @@ class Lazer : public DrumModule {
   StereoVal Generate() override;
 
   std::unique_ptr<QBLimitedOscillator> osc1_;
-  EnvelopeGenerator eg_;
 
   double pitch_osc_range_{kDefaultPitchOscRange};
 };

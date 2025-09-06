@@ -3,9 +3,14 @@ let bounceah_gen = gen()
 {
   setup()
   {
-    let mass = 20;
+    let mass = 2;
     let massincr = 0.8;
     let acceleration = 0;
+
+    let dampening = -0.96;
+
+    let bounce_len = 400;
+    let pp = 3840 / bounce_len;
 
     let gravity = -0.1;
     let friction_coeff = 0.1;
@@ -23,15 +28,17 @@ let bounceah_gen = gen()
     let y_position = 10;
     let last_bounce = 0;
 
-    let pp = 3840 / 490;
     let note = notez[nx];
-    if (count % 8 == 7) {
+    if (count % 4 == 3) {
       nx = incr(nx, 0, len(notez));
     }
-    for (let i = 0; i < 490; i++) {
 
-      # apply gravity force
-      let gf = gravity / mass;
+    # gravity force
+    let gf = gravity / mass;
+
+
+    for (let i = 0; i < bounce_len; i++) {
+
       acceleration = acceleration + gf;
 
       # update
@@ -39,28 +46,71 @@ let bounceah_gen = gen()
       y_position = y_position + velocity;
       acceleration = acceleration * 0;
 
+      #let pit = scale(velocity, 0, 1, 0.1, 2);
+      #set ob:pitch pit;
+
       if (y_position < 0) {
         y_position = 0;
-
-        let dampening = -0.5;
 
         velocity = velocity * dampening;
         #let friction = velocity * -1 * friction_coeff;
         # acceleration = acceleration + friction;
-        # print("BOUNCE!", i, " Y:",  y_position, " Last bounce:", last_bounce, " Velocity:", velocity);
+        #print("BOUNCE!", i, " Y:",  y_position, " Last bounce:", last_bounce, " Velocity:", velocity);
         let last_diff = i - last_bounce;
         if (last_diff < 7) {
           break;
         }
         last_bounce = i;
-        note_on_at(dx, note, i * pp, dur = 500 * velocity * 10, vel = 2 * velocity * 100) ;
+        let d = scale(velocity, 0, 1, 10, 300);
+        let v = scale(velocity, 0, 1, 10, 127);
+        note_on_at(dx, note, i * pp, dur = d, vel = v) ;
+        note_on_at(dx, note + 4, i * pp + 10, dur = 200);
         note_on_at(dx, note + 12, i * pp, dur = 100);
+
+        note_on_at(ob, 1, i * pp, dur = 0);
       }
     }
 
     mass = mass + massincr;
-    if (mass > 15 || mass < 0.5) {
+    if (mass > 15 || mass < 1) {
       massincr = massincr * -1;
+    }
+  }
+}
+
+let dblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 == 0) {
+        note_on_at(sbdrum, 0, i * pp);
+      }
+    }
+  }
+}
+
+let loopblah_gen = gen()
+{
+  setup()
+  {
+    let beat = rand_array(16, 0, 16);
+    let durz = [10, 20, 50, 100, 250, 350];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      beat = rand_array(16, 0, 16);
+    }
+    if (count % 7 == 6) {
+      drx = incr(drx, 0, len(durz));
+    }
+    for (let i = 0; i < 16; i++) {
+      note_on_at(drumz, beat[i], i * pp, dur = durz[drx]);
     }
   }
 }

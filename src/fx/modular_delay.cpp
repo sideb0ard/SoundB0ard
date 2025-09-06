@@ -20,7 +20,7 @@ std::string GetAlgorithmName(ModDelayAlgorithm alg) {
 }  // namespace
 
 ModDelay::ModDelay() {
-  type_ = MODDELAY;
+  type_ = fx_type::MODDELAY;
 
   m_min_delay_msec_ = 0.0;
   m_max_delay_msec_ = 0.0;

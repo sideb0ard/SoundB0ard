@@ -8,7 +8,7 @@
 #include <sstream>
 
 Granulate::Granulate() {
-  type_ = GRANULATE;
+  type_ = fx_type::GRANULATE;
   enabled_ = true;
 }
 

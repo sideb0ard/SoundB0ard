@@ -90,7 +90,7 @@ typedef struct dxsynthsettings {
 class DXSynth : public SoundGenerator {
  public:
   DXSynth();
-  ~DXSynth() = default;
+  ~DXSynth() override = default;
   StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Info() override;
   std::string Status() override;

@@ -5,8 +5,8 @@
 
 struct OnePole : public Filter {
   OnePole();
-  OnePole(unsigned int ftype) : Filter{ftype} {};
-  ~OnePole() = default;
+  explicit OnePole(unsigned int ftype) : Filter{ftype} {};
+  ~OnePole() override = default;
 
   double m_alpha{1.0};
   double m_beta{0.0};

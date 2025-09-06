@@ -9,7 +9,7 @@
 ModFilter::ModFilter() {
   Init();
 
-  type_ = MODFILTER;
+  type_ = fx_type::MODFILTER;
   enabled_ = true;
 }
 

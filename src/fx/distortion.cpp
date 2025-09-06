@@ -6,7 +6,7 @@
 #include <sstream>
 
 Distortion::Distortion() {
-  type_ = DISTORTION;
+  type_ = fx_type::DISTORTION;
   enabled_ = true;
   // m_threshold_ = 0.707;
   m_threshold_ = 0.507;

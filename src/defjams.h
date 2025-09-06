@@ -329,16 +329,16 @@ class midi_event {
 
 struct MusicalEvent {
   MusicalEvent() : velocity_{127.0f}, duration_{300.0f}, target_type_{ENV} {}
-  MusicalEvent(std::string value)
+  explicit MusicalEvent(const std::string &value)
       : MusicalEvent(value, /* midi velocity */ 127, /* duration in ms */ 300,
                      ENV) {}
-  MusicalEvent(std::string value, ProcessPatternTarget target_type)
+  MusicalEvent(const std::string &value, ProcessPatternTarget target_type)
       : MusicalEvent(value, /* midi velocity */ 127, /* duration in ms */ 300,
                      target_type) {}
-  MusicalEvent(std::string value, float velocity,
+  MusicalEvent(const std::string &value, float velocity,
                ProcessPatternTarget target_type)
       : MusicalEvent(value, velocity, /* duration in ms */ 300, target_type) {}
-  MusicalEvent(std::string value, float velocity, float duration,
+  MusicalEvent(const std::string &value, float velocity, float duration,
                ProcessPatternTarget target_type)
       : value_{value},
         velocity_{velocity},

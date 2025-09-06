@@ -1,10 +1,10 @@
 #include <fx/dynamics_processor.h>
-#include <memory>
 #include <mixer.h>
 #include <stdlib.h>
 #include <utils.h>
 
 #include <algorithm>
+#include <memory>
 #include <sstream>
 
 extern std::unique_ptr<Mixer> global_mixr;
@@ -13,7 +13,7 @@ const char *dynamics_processor_type_to_char[] = {"COMP", "LIMIT", "EXPAND",
                                                  "GATE"};
 
 DynamicsProcessor::DynamicsProcessor() {
-  type_ = COMPRESSOR;
+  type_ = fx_type::COMPRESSOR;
   enabled_ = true;
 
   m_inputgain_db_ = 0;       // -12 - 20
@@ -214,11 +214,11 @@ StereoVal DynamicsProcessor::Process(StereoVal input) {
 
   double left_detector_input = input.left;
   if (m_external_source_ >= 0)
-    left_detector_input = global_mixr->soundgen_cur_val_[m_external_source_].left;
+    left_detector_input =
+        global_mixr->soundgen_cur_val_[m_external_source_].left;
 
   double left_detector =
       envelope_detector_detect(&m_left_detector_, left_detector_input);
-  double right_detector = left_detector;
 
   // TODO - something useful with stero
 
@@ -226,6 +226,7 @@ StereoVal DynamicsProcessor::Process(StereoVal input) {
   double gn = 1.;
 
   if (m_stereo_link_ == 1) {
+    double right_detector = left_detector;
     link_detector = 0.5 * (pow(10.0, left_detector / 20.0) +
                            pow(10.0, right_detector / 20.0));
     link_detector = 20.0 * log10(link_detector);

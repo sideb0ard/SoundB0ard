@@ -4,7 +4,7 @@
 
 struct QBLimitedOscillator : public Oscillator {
   QBLimitedOscillator() = default;
-  ~QBLimitedOscillator() = default;
+  ~QBLimitedOscillator() override = default;
 
   double DoOscillate(double *quad_phase_output) override;
 

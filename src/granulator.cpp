@@ -58,9 +58,9 @@ void Granulator::Reset() {
   reverse_mode_ = false;
   SetGrainDensity(15);
   eg_.SetAttackTimeMsec(5);
-  eg_.SetDecayTimeMsec(0);
+  eg_.SetDecayTimeMsec(10);
   eg_.SetSustainLevel(1);
-  eg_.SetReleaseTimeMsec(50);
+  eg_.SetReleaseTimeMsec(80);
   eg_.SetRampMode(false);
   eg_.Update();
   eg_.StartEg();
@@ -74,17 +74,20 @@ void Granulator::Reset() {
 
 Granulator::Granulator() {
   grain_type_ = SoundGrainType::Signal;
+  active_grain_ = nullptr;
+  incoming_grain_ = nullptr;
 }
 
-Granulator::Granulator(std::string filename, unsigned int loop_mode) {
+Granulator::Granulator(std::string filename, unsigned int loop_mode)
+    : grain_a_{std::make_unique<SoundGrainSample>()},
+      grain_b_{std::make_unique<SoundGrainSample>()},
+      grain_type_{SoundGrainType::Sample},
+      file_buffer_{std::make_unique<FileBuffer>(filename)},
+      active_grain_{grain_a_.get()},
+      incoming_grain_{grain_b_.get()} {
   type = LOOPER_TYPE;
-  grain_type_ = SoundGrainType::Sample;
-  grain_a_ = std::make_unique<SoundGrainSample>();
-  grain_b_ = std::make_unique<SoundGrainSample>();
-
-  file_buffer_ = std::make_unique<FileBuffer>(filename);
   SetLoopMode(loop_mode);
-  Start();
+  Reset();
 }
 
 Granulator::~Granulator() {
@@ -105,15 +108,14 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
   }
   if (!started_) return;
 
-  std::vector<double> *audio_buffer = file_buffer_->GetAudioBuffer();
+  const std::vector<double> *audio_buffer = file_buffer_->GetAudioBuffer();
 
-  double decimal_percent_of_loop = 0;
   if (tinfo.is_midi_tick) {
     file_buffer_->cur_midi_idx_ =
         fmodf(file_buffer_->cur_midi_idx_ + file_buffer_->incr_speed_,
               PPBAR * file_buffer_->loop_len_);
     if (file_buffer_->loop_mode_ == LoopMode::loop_mode) {
-      decimal_percent_of_loop =
+      double decimal_percent_of_loop =
           file_buffer_->cur_midi_idx_ / (PPBAR * file_buffer_->loop_len_);
       double new_read_idx = decimal_percent_of_loop * audio_buffer->size();
       if (reverse_mode_)
@@ -318,8 +320,8 @@ std::string Granulator::Status() {
 }
 
 std::string Granulator::Info() {
-  char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
-  if (active) INSTRUMENT_COLOR = (char *)ANSI_COLOR_RED;
+  const char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
+  if (active) INSTRUMENT_COLOR = ANSI_COLOR_RED;
 
   std::stringstream ss;
   ss << INSTRUMENT_COLOR << "\nSBPlayer // vol:" << volume << " pan:" << pan
@@ -389,7 +391,7 @@ void Granulator::SetReverseMode(bool b) {
 
 void Granulator::SetLoopMode(unsigned int m) {
   volume = 0.2;
-  std::unique_ptr<FileBuffer> &buffer = file_buffer_;
+  const std::unique_ptr<FileBuffer> &buffer = file_buffer_;
   switch (m) {
     case (0):
       buffer->loop_mode_ = LoopMode::loop_mode;
@@ -446,7 +448,7 @@ void Granulator::NoteOn(midi_event ev) {
   int decimal_percent_of_loop =
       file_buffer_->cur_midi_idx_ / (PPBAR * file_buffer_->loop_len_);
 
-  auto audio_buffer = file_buffer_->GetAudioBuffer();
+  const auto *audio_buffer = file_buffer_->GetAudioBuffer();
   double new_read_idx = decimal_percent_of_loop * audio_buffer->size();
   grain_a_->SetReadIdx(new_read_idx);
   grain_b_->SetReadIdx(new_read_idx);

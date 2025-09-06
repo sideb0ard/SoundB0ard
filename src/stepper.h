@@ -18,7 +18,7 @@ enum class BoundaryBehavior {
 
 class Sequencer {
  public:
-  Sequencer(int len) : count_to_{len} {}
+  explicit Sequencer(int len) : count_to_{len} {}
   ~Sequencer() = default;
 
   void SetParam(std::string param, double value);
@@ -42,16 +42,16 @@ class Sequencer {
 class Stepper {
  public:
   Stepper() = default;
-  Stepper(std::vector<double> sequence)
+  explicit Stepper(std::vector<double> sequence)
       : sequence_{sequence}, sequencer_{(int)sequence.size()} {}
   ~Stepper() = default;
 
-  void SetSequence(std::vector<double> sequence) {
+  void SetSequence(const std::vector<double> &sequence) {
     sequence_ = sequence;
     sequencer_.Reset();
     sequencer_.count_to_ = sequence.size();
   }
-  void SetParam(std::string param, double value) {
+  void SetParam(const std::string &param, double value) {
     sequencer_.SetParam(param, value);
   }
   double GenNext() {

@@ -35,7 +35,7 @@ inline float destroy(float q, float old) {
 }  // namespace
 
 Decimate::Decimate() {
-  type_ = DECIMATE;
+  type_ = fx_type::DECIMATE;
   enabled_ = true;
 }
 

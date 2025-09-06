@@ -4,7 +4,7 @@
 class Ramp {
  public:
   Ramp();
-  Ramp(double rate);
+  explicit Ramp(double rate);
   double Generate();
   void Reset(double frames_rate_per_second);
 

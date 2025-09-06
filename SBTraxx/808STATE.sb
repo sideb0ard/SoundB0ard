@@ -5,20 +5,105 @@ let oh = sample(oh/OH_909_15.wav);
 let loon = sample(noises/loon-bird.aiff);
 let sd = sample(sd/hdSD.wav);
 
-load_preset(mo, "808"); vol mo 0.5;
-load_preset(dx, "ORGAN");
+load_preset(mo, "808-2"); vol mo 0.5;
+load_preset(dx, "WNARR");
+load_preset(dx2, "808zzc");
 send("delay", loon);
-bpm 128;
-let itadream = loop(pads/italiandreamhausTOO.aiff); set itadream:len 4; vol itadream 0;
-add_fx(itadream, "reverb"); set itadream:fx0:wetmx 70;
-add_fx(itadream, "sidechain", bd);
-pan ch 0.3; pan oh -0.25;
+bpm 115;
+let drumz = loop(dloops2/drumzzf.wav); vol drumz 0;
+add_fx(drumz, "distort");
+sched(0, 0, 1, 3840 * 2, "vol drumz %");
+
+p1 $ chordblah_gen;
+p2 $ loonblah_gen;
+p4 $ bbreakblah_gen;
+# p19 $ playitblah_gen;
+
+# sched(0, 0, 1, 3840 * 2, "vol drumz %");
+# p3 $ drrrblah_gen;
+# p4 $ bbreakblah_gen;
+#p5 $ dxstabblah_gen; sched(0, 0, 0.4, 3840, "vol dx %");
+
+# p3 $ fullchordblah_gen; sched(0, 0, 0.5, 3840, "vol mo %");
+# p9 $ driumzblah_gen; p3 $ ""
+
+# p3 $ ""; p5 $ mofxblah_gen
+
+let bbreakblah_gen = gen()
+{
+  setup()
+  {
+    let kick = 0;
+    let snare = 2;
+    let shuf = 4;
+    let pat0 = {0:0, 960:2, 1440:4, 3360:2};
+    let pat1 = {0:0, 960:2};
+    let pat2 = {0:0, 480:4, 960:2, 1440:4, 1920:2, 2880:4, 3360:2};
+    let pat3 = {0:0, 480:2, 960:4, 1920:2, 2880:0, 3360:2};
+    let patz = [pat0, pat1, pat2, pat3];
+    let px = 0;
+    let durxz = [10, 50, 100, 150, 200];
+    let drx = 0;
+  }
+  run()
+  {
+    let pat = patz[px];
+    px = incr(px, 0, len(patz));
+    let kz = keys(pat);
+    #print(kz, "LEN:", len(pat));
+    #print(pat);
+    if (count % 16 < 15) {
+      for (let i = 0; i < len(pat); i++) {
+        let on_at = kz[i];
+        let note = pat[kz[i]];
+        let durrr = 3840 - on_at;
+        if (i < (len(pat) - 1)) {
+          durrr = kz[i+1] - on_at;
+        }
+        note_on_at(drumz, note, on_at, dur = durrr - durxz[drx]);
+        drx = incr(drx, 0, len(durxz));
+      }
+    }
+  }
+}
 
 
-# p1 $ chordblah_gen;
-# p2 $ loonblah_gen;
-# p3 $ drblah_gen;
-# p4 $ hhblah_gen
+# p9 $ ""; note_off(drumz, 0); p4 $ fellblah_gen
+
+# p5 $ ""; p4 $ "" ; p3 $ fullchordblah_gen; p9 $ driumzblah_gen
+# p10 $ riffblah_gen
+
+# p4 $ dxstabblah_gen; p3 $ "";
+
+# p3 $ ""
+# p9 $ ""; note_off(drumz, 0); p10 $ "";
+
+#  p9 $ driumzblah_gen;
+
+
+
+let drrrblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      set drumz:stutter 1;
+    }
+    if (count % 11 == 10) {
+      set drumz:scramble 1;
+    }
+    if (count % 16 == 15) {
+      set drumz:reverse 1;
+      # solo(drumz, at=8*pp);
+    }
+  }
+}
+
+
+
 
 let fmaj7 = [53, 57, 60, 64];
 let gmaj7 = [55, 59, 62, 66];
@@ -35,11 +120,39 @@ let chordblah_gen = gen()
   }
   run()
   {
+    if (count % 2 == 1) {
+      cpx = incr(cpx, 0, len(prog));
+    }
     chord = prog[cpx];
     #print(chord);
     #note_on_at(mo, chord, 0, dur = 3800);
-    cpx = incr(cpx, 0, len(prog));
 
+  }
+}
+
+let dxstabblah_gen = gen()
+{
+  setup()
+  {
+    let rhmz = [5];
+    let rx = 0;
+    # let o2ratz = [4, 7, 10, 1, 0.7];
+    let o2ratz = [0.7, 4, 7];
+    let o2x = 0;
+  }
+  run()
+  {
+    let beat = bjork(5, 16);
+    let pp = 3840 / 16;
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(dx, down(chord, 12), i * pp, dur = 200);
+      }
+    }
+    if (count % 2 == 0) {
+      set dx:o2rat o2ratz[o2x];
+      o2x = incr(o2x, 0, len(o2ratz));
+    }
   }
 }
 
@@ -47,9 +160,13 @@ let loonblah_gen = gen()
 {
   setup()
   {
+    let delfbz = [10, 65, 30, 50, 90];
+    let dlx = 0;
   }
   run()
   {
+    set mixer:delay:fb delfbz[dlx];
+    dlx = incr(dlx, 0, len(delfbz));
     if (count % 2 == 0) {
       note_on(loon, 1, dur = 0);
     }
@@ -85,7 +202,7 @@ let hhblah_gen = gen()
       hatz = rand_array(16, 0, 1);
     }
     for (let i = 0; i < 16; i++) {
-      let off = 20;
+      let off = 10;
       if (i % 2 == 0) {
         off = 0;
       }
@@ -115,7 +232,7 @@ let melblah_gen = gen()
     mel = down(mel, 12);
     for (let i = 0; i < 16; i++) {
       if (mel[i] > 0) {
-        note_on_at(dx, mel[i], i * pp);
+        note_on_at(dx, mel[i], i * pp, dur = 10);
       }
     }
   }
@@ -182,49 +299,13 @@ let fellblah_gen = gen()
   }
 }
 
-let offzblah_gen = gen()
-{
-  setup()
-  {
-    let inner = 4;
-    let outer_one = 23;
-    let outer_two = 17;
-
-    let px1 = 0;
-    let px2 = 0;
-    let durz = [500, 100, 200, 90, 300];
-    let drx = 0;
-  }
-  run()
-  {
-    for (let i = 0; i < 16; i++) {
-
-      if (px1 % inner == 0) {
-        note_on_at(mo, chord, i * pp, dur = durz[drx]);
-      }
-
-      px1++;
-      if (px1 % outer_one == 0) {
-        px1 = 0;
-        drx = incr(drx, 0, len(durz));
-      }
-
-      if (px2 % inner == 0) {
-        note_on_at(dx, chord, i * pp, dur = durz[drx]);
-      }
-      px2++;
-      if (px2 % outer_two == 0) {
-        px2 = 0;
-      }
-    }
-  }
-}
-
 let riffblah_gen = gen()
 {
   setup()
   {
     let beatmain = [1, 0, 1, 1,  0, 0, 1, 1,  1, 1, 0, 1,  0, 0, 0, 0];
+    let durz = [500, 300, 100, 50];
+    let drx = 0;
   }
   run()
   {
@@ -233,14 +314,12 @@ let riffblah_gen = gen()
       beat = rand_array(16, 0, 1);
     }
 
-    let ix = 0;
     for (let i = 0; i < 16; i++) {
       if (beat[i] == 1) {
-        note_on_at(dx, chord[ix], i * pp, dur = 500);
-        note_on_at(mo, chord[ix], i * pp, dur = 200);
-        ix = incr(ix, 0, len(chord));
+        note_on_at(dx2, chord[0]-24, i * pp, dur = druz[drx]);
       }
     }
+    drx = incr(drx, 0, len(durz));
   }
 }
 
@@ -248,10 +327,27 @@ let fullchordblah_gen = gen()
 {
   setup()
   {
+    #let l1ratez = [0.5, 4, 8, 7, 12];
+    # let l1ratez = [0.2, 0.1, 0.7];
+    let l1ratez = [0.1];
+    let l1x = 0;
   }
   run()
   {
-    note_on_at(mo, chord, 0, dur = 3800);
+    if (count % 8 == 0) {
+      set mo:l1_filter_en 0;
+    }
+    if (count % 8 == 6) {
+      set mo:l1_filter_en 1;
+    }
+
+    if (count % 2 == 0) {
+      note_on_at(mo, chord, 0, dur = 7500);
+    }
+    if (count % 3 == 0) {
+      set mo:l1rate l1ratez[l1x];
+      l1x = incr(l1x, 0, len(l1ratez));
+    }
   }
 }
 
@@ -272,12 +368,6 @@ let mofxblah_gen = gen()
 
     if (count % 8 == 7) {
       sched(0, 12, 0.5, 3840 * 2, "set mo:l1rate %");
-      let beat = rand_beat();
-      let ix = 0;
-      for (let i = 0; i < 16; i++) {
-        note_on_at(mo, chord[ix], i * pp, dur = 40);
-        # ix = incr(ix, 0, len(chord));
-      }
     }
   }
 }
@@ -331,30 +421,85 @@ let playitblah_gen = gen()
     print("bar:", bar);
     if (bar == 0) {
       p1 $ chordblah_gen;
-      p2 $ fellblah_gen;
+      p2 $ loonblah_gen;
+      p4 $ bbreakblah_gen;
+      sched(0, 0, 1, 3840 * 2, "vol drumz %");
     }
     if (bar == 4) {
-      p2 $ loonblah_gen;
-      sched(0, 0, 1, 3840, "vol itadream %");
-    }
-    if (bar == 8) {
-      p3 $ hhblah_gen;
-      p4 $ drblah_gen;
-      p2 $ fullchordblah_gen;
-      p5 $ mofxblah_gen;
+      sched(3840, 0, 3840, 1, "vol mo %");
+      p3 $ fullchordblah_gen;
     }
     if (bar == 12) {
       p3 $ "";
-      p4 $ "";
+      sched(3840, 0, 3840, 0.4, "vol dx %");
+      p5 $ dxstabblah_gen;
+      p2 $ "";
+      p10 $ hhblah_gen;
     }
     if (bar == 16) {
-      p3 $ hhblah_gen;
-      p4 $ drblah_gen;
-      p6 $ bssslah_gen;
+      p9 $ driumzblah_gen;
+      p5 $ "";
     }
     if (bar == 20) {
-      sched(0, 1, 0, 3840, "vol mo %");
+      p4 $ "";
+      note_off(drumz, 0);
+      p5 $ fellblah_gen;
+      p10 $ "":
     }
+    if (bar == 24) {
+      p10 $ riffblah_gen;
+    }
+    if (bar == 28) {
+      p4 $ bbreakblah_gen;
+      p3 $ fullchordblah_gen;
+      p5 $ "";
+    }
+    if (bar == 30) {
+      p4 $ ""; note_off(drumz, 0);
+      p10 $ hhblah_gen;
+    }
+    if (bar == 30) {
+      p3 $ "";
+      p4 $ bbreakblah_gen;
+      p5 $ dxstabblah_gen;
+
+    }
+
     bar++;
+  }
+}
+
+let driumzblah_gen = gen()
+{
+  setup()
+  {
+    #let durz = [0, 50, 100, 200, 500];
+    let durz = [0, 0, 0, 0, 0, 50, 200];
+    let drx = 0;
+  }
+  run()
+  {
+    if (rand(100) < 50) {
+      let beat = rand_array(16, 0, 8);
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(drumz, 0, i * pp, dur = durz[drx]);
+        }
+        if (beat[i] == 2) {
+          note_on_at(drumz, 4, i * pp, dur = durz[drx]);
+        }
+        if (beat[i] == 3) {
+          note_on_at(drumz, 12, i * pp, dur = durz[drx]);
+        }
+      }
+      drx = incr(drx, 0, len(durz));
+    } else {
+      note_on_at(drumz, 0, 0, dur = 0);
+      # solo(drumz, at=10*pp);
+    }
+
+    if (count % 16 == 15) {
+      set drumz:reverse 1;
+    }
   }
 }

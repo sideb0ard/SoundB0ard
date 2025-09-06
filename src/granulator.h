@@ -16,7 +16,7 @@ class Granulator : public SoundGenerator {
  public:
   Granulator(std::string filename, unsigned int loop_mode);
   Granulator();
-  ~Granulator();
+  ~Granulator() override;
   StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Status() override;
   std::string Info() override;

@@ -1,10 +1,12 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 
 template <typename T>
 class CircularBuffer {
  public:
-  CircularBuffer(size_t capacity)
+  explicit CircularBuffer(size_t capacity)
       : buffer(capacity), head(0), tail(0), size(0) {}
 
   void push_back(const T& val) {

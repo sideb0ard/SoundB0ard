@@ -8,7 +8,7 @@
 WaveShaper::WaveShaper() {
   Init();
 
-  type_ = WAVESHAPER;
+  type_ = fx_type::WAVESHAPER;
   enabled_ = true;
 }
 

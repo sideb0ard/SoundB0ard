@@ -52,7 +52,7 @@ enum AudioAction {
 };
 
 struct AudioActionItem {
-  AudioActionItem(AudioAction type) : type{type} {}
+  explicit AudioActionItem(AudioAction type) : type{type} {}
   ~AudioActionItem() = default;
   AudioAction type;
   std::unique_ptr<SBAudio::SoundGenerator> sg{nullptr};
@@ -80,11 +80,11 @@ struct AudioActionItem {
   midi_event event;
 
   // MIDI MAP TYPE
-  int mapped_id;
+  int mapped_id{-1};
   std::string mapped_param;
 
   // ADD varz
-  unsigned int soundgenerator_type;
+  unsigned int soundgenerator_type{static_cast<unsigned int>(-1)};
   std::string filepath;  // used for sample and digisynth
 
   // STATUS varz
@@ -103,9 +103,9 @@ struct AudioActionItem {
   std::vector<std::shared_ptr<object::Object>> args;
   int soundgen_num{-1};
   std::vector<int> notes;
-  int velocity;
-  int duration;
-  int note_start_time;
+  int velocity{0};
+  int duration{0};
+  int note_start_time{0};
 
   // PREVIEW varz
   std::string preview_filename;
@@ -114,6 +114,6 @@ struct AudioActionItem {
   // PRESET varz
 
   // BPM varz
-  double new_bpm;
-  double new_volume;
+  double new_bpm{0};
+  double new_volume{0};
 };

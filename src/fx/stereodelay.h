@@ -24,7 +24,7 @@ enum DelaySyncLen {
 class StereoDelay : public Fx {
  public:
   StereoDelay();
-  ~StereoDelay() = default;
+  ~StereoDelay() override = default;
   std::string Status() override;
   StereoVal Process(StereoVal input) override;
   void SetParam(std::string name, double val) override;

@@ -178,7 +178,7 @@ DrumSettings Map2DrumSettings(std::string name,
 class DrumSynth : public SoundGenerator {
  public:
   DrumSynth();
-  ~DrumSynth() = default;
+  ~DrumSynth() override = default;
 
   std::string Info() override;
   std::string Status() override;

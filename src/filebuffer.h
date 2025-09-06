@@ -27,7 +27,7 @@ enum NextAction {
 class FileBuffer {
  public:
   FileBuffer() = default;
-  FileBuffer(std::string filename) : filename_{filename} {
+  explicit FileBuffer(const std::string& filename) : filename_{filename} {
     ImportFile(filename_);
   };
   ~FileBuffer() = default;

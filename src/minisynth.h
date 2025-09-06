@@ -175,7 +175,7 @@ typedef struct synthsettings {
 class MiniSynth : public SoundGenerator {
  public:
   MiniSynth();
-  ~MiniSynth() = default;
+  ~MiniSynth() override = default;
 
   StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Info() override;

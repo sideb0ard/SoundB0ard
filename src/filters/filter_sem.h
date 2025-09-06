@@ -5,7 +5,7 @@
 
 struct FilterSem : public Filter {
   FilterSem();
-  ~FilterSem() = default;
+  ~FilterSem() override = default;
 
   double m_alpha{1.0};
   double m_alpha0{1.0};
