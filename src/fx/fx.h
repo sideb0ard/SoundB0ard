@@ -23,6 +23,7 @@ enum class fx_type {
   ENVELOPEFOLLOWER,
   WAVESHAPER,
   GRANULATE,
+  TRANSVERB,
 };
 
 class Fx {

@@ -11,12 +11,13 @@
 #include <fx/modular_delay.h>
 #include <fx/reverb.h>
 #include <fx/stereodelay.h>
+#include <fx/transverb.h>
 #include <fx/waveshaper.h>
-#include <memory>
 #include <mixer.h>
 
 #include <interpreter/sound_cmds.hpp>
 #include <iostream>
+#include <memory>
 
 extern std::unique_ptr<Mixer> global_mixr;
 
@@ -51,6 +52,8 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
           fx.push_back(std::make_shared<GenZ>());
         } else if (str_obj->value_ == "reverb") {
           fx.push_back(std::make_shared<Reverb>());
+        } else if (str_obj->value_ == "transverb") {
+          fx.push_back(std::make_shared<Transverb>());
         } else if (str_obj->value_ == "sidechain") {
           if (args.size() > 2) {
             std::cout << "Got a source!\n";
@@ -108,8 +111,8 @@ void SynthLoadPreset(std::shared_ptr<object::Object> &obj,
   auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(obj);
   if (soundgen) {
     if (global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
-      global_mixr->sound_generators_[soundgen->soundgen_id_]->LoadPreset(preset_name,
-                                                                  preset);
+      global_mixr->sound_generators_[soundgen->soundgen_id_]->LoadPreset(
+          preset_name, preset);
     }
   }
 }

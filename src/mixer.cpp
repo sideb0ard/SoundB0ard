@@ -37,8 +37,11 @@ std::vector<std::string> env_names = {"att", "dec", "rel"};
 
 std::pair<double, double> GetBoundaries(const std::string &param) {
   if (param.find("pct") != std::string::npos) return std::make_pair(0, 100);
-  for (const auto &p : env_names) {
-    if (param.find(p) != std::string::npos) return std::make_pair(1, 5000);
+  if (std::any_of(env_names.begin(), env_names.end(),
+                  [&param](const std::string &p) {
+                    return param.find(p) != std::string::npos;
+                  })) {
+    return std::make_pair(1, 5000);
   }
   if (param.find("fc") != std::string::npos) return std::make_pair(80, 1800);
   if (param.find("fq") != std::string::npos) return std::make_pair(0.5, 9.7);
@@ -287,90 +290,7 @@ void Mixer::Help() {
     std::stringstream ss;
     ss << ANSI_COLOR_WHITE;
     ss << "###### Haaaalp! ################################\n";
-    ss << COOL_COLOR_MAUVE << "ps" << ANSI_COLOR_RESET
-       << " // show Program Status i.e. vars, bpm, key etc.\n";
-    ss << COOL_COLOR_MAUVE << "ls" << ANSI_COLOR_RESET
-       << " // list sample directory\n";
-    ss << COOL_COLOR_MAUVE << "midi_ref();" << ANSI_COLOR_RESET
-       << " // note -> midi reference\n";
-    ss << COOL_COLOR_MAUVE << "let x = 4;" << ANSI_COLOR_RESET
-       << " // create a var named 'x' with val 1\n";
-    ss << COOL_COLOR_MAUVE << "let add1 = fn(val) { return val + 1; };";
-    ss << ANSI_COLOR_RESET << " // create function and assign to a var\n";
-    ss << COOL_COLOR_MAUVE << "strategy;";
-    ss << ANSI_COLOR_RESET << " // get a random Brian Eno Oblique Strategy!\n";
-    ss << ANSI_COLOR_WHITE;
-    ss << "######## Add Sound Generators ########################\n";
     ss << ANSI_COLOR_RESET;
-    ss << COOL_COLOR_MAUVE << "let dx100 = fm();" << ANSI_COLOR_RESET
-       << " // create an instance of FM Synth assigned to var dx100\n";
-    ss << COOL_COLOR_MAUVE << "let mo = moog();" << ANSI_COLOR_RESET
-       << " // create an instance of a MiniMoog Synth assigned to var mo\n";
-    ss << COOL_COLOR_MAUVE << "let bd = sample(kicks/808kick.aif);"
-       << ANSI_COLOR_RESET
-       << " // create an instance of an 808 kick sample assigned to var "
-          "bd\n";
-    ss << COOL_COLOR_MAUVE << "note_on(dx100, 45);" << ANSI_COLOR_RESET
-       << " // play an 'A2' on the 'dx100'\n";
-    ss << COOL_COLOR_MAUVE << "note_on_at(dx100, 45, 104);" << ANSI_COLOR_RESET
-       << " // play 'A2' at 104 midi ticks from now()\n";
-    ss << ANSI_COLOR_WHITE;
-    ss << "######## Arrays, value generators and modifiers "
-          "###################\n";
-    ss << COOL_COLOR_MAUVE << "notes_in_key(root);" << ANSI_COLOR_RESET
-       << " // returns array of midi notes in scale of root\n";
-    ss << COOL_COLOR_MAUVE << "play_array(soundgen, array_of_midi_nums);"
-       << ANSI_COLOR_RESET << " // plays the array\n";
-    ss << "                                          // spaced evenly\n";
-    ss << "                                          // over one loop on\n";
-    ss << "                                          // 'soundgen'\n";
-    ss << "   // e.g. play_array(dx100, notes_in_key());\n";
-    ss << COOL_COLOR_MAUVE << "rand_array(array_len, low, high);"
-       << ANSI_COLOR_RESET << " // returns array of\n";
-    ss << "                                  // array_len, with\n";
-    ss << "                                  // rand numbers between\n";
-    ss << "                                  //low and high inclusive\n";
-    ss << COOL_COLOR_MAUVE << "notes_in_chord(midi_num_root, chord_type);"
-       << ANSI_COLOR_RESET << " // chord_type is\n";
-    ss << "                                           //0:MAJOR\n";
-    ss << "                                           //1:MINOR\n";
-    ss << "                                           //2:DIM\n";
-    ss << COOL_COLOR_MAUVE << "bjork(n, m);" << ANSI_COLOR_RESET
-       << " // return array of bjorklund rhythm with n hits over m slots\n";
-    ss << COOL_COLOR_MAUVE << "rand_beat();" << ANSI_COLOR_RESET
-       << " // random 16 hit beat, one of shiko, son, rumba,\n";
-    ss << "             // soukous, gahu, or bossa-nova\n";
-    ss << COOL_COLOR_MAUVE << "riff();" << ANSI_COLOR_RESET
-       << " // returns array of 16 hits with random riff taken\n";
-    ss << "        // from notes_in_key()\n";
-    ss << COOL_COLOR_MAUVE << "map(array_name, func);" << ANSI_COLOR_RESET
-       << " // returns array containing each element from array_name after "
-          "applying func to their value\n";
-    ss << COOL_COLOR_MAUVE << "incr(starting_val, min_val, max_val);"
-       << ANSI_COLOR_RESET
-       << " // returns number one more than starting_val, modulo max_val "
-          "plus min_val\n";
-    ss << COOL_COLOR_MAUVE << "push(src_array, val));" << ANSI_COLOR_RESET
-       << " // returns a new array, with val appended to copy of "
-          "src_array\n";
-    ss << COOL_COLOR_MAUVE << "reverse(src);" << ANSI_COLOR_RESET
-       << " // returns a (copy of) reversed string or array\n";
-    ss << COOL_COLOR_MAUVE << "rotate(src_array, num_pos);" << ANSI_COLOR_RESET
-       << " // returns a (copy of) src_array, rotated left by num_pos\n";
-    ss << ANSI_COLOR_WHITE;
-    ss << "######## Pattern Evaluation ###################\n";
-    ss << COOL_COLOR_MAUVE << "let mel = pattern(\"[60 <63 70>] 67(3,8)\");"
-       << ANSI_COLOR_RESET;
-    ss << " // Creates a TidalCycles style pattern.\n";
-    ss << "                                           // Pattern can be "
-          "either passed to a function as is\n";
-    ss << "                                           // (e.g. reverse, "
-          "rotate or play_array)\n";
-    ss << "                                           // Or you can take a "
-          "copy through `eval_pattern(mel)`;\n";
-    ss << "                                           // Similarly, you "
-          "view it more concisely with "
-          "print_pattern(mel)\n";
 
     reply = ss.str();
   }
@@ -525,7 +445,7 @@ bool Mixer::IsValidSoundgenNum(int sg_num) {
 
 bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
-    auto &sg = sound_generators_[soundgen_num];
+    const auto &sg = sound_generators_[soundgen_num];
     if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects_[fx_num])
       return true;
   }
@@ -596,7 +516,7 @@ void Mixer::PrintMidiInfo() {
 }
 
 void Mixer::PrintTimingInfo() {
-  mixer_timing_info *info = &timing_info;
+  const mixer_timing_info *info = &timing_info;
   printf("TIMING INFO!\n");
   printf("============\n");
   printf("FRAMES per midi tick:%f\n", info->frames_per_midi_tick);
@@ -614,7 +534,6 @@ void Mixer::PrintTimingInfo() {
 // called from Process or Repl thread
 void Mixer::ScheduleAction(int when, Action item) {
   std::lock_guard<std::mutex> lock(scheduled_actions_mutex_);
-  int future_now = timing_info.midi_tick + when;
   scheduled_actions_.insert(std::make_pair(timing_info.midi_tick + when, item));
 }
 
@@ -1005,7 +924,9 @@ void Mixer::CheckForAudioActionQueueMessages() {
 }
 
 void Mixer::AddFileToMonitor(std::string filepath) {
-  file_monitors.push_back(file_monitor{.function_file_filepath = filepath, .function_file_filepath_last_write_time = {}});
+  file_monitors.push_back(
+      file_monitor{.function_file_filepath = filepath,
+                   .function_file_filepath_last_write_time = {}});
 }
 
 void Mixer::CheckForDelayedEvents() {

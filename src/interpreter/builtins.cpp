@@ -1,6 +1,5 @@
 #include <audio_action_queue.h>
 #include <audioutils.h>
-#include <memory>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <utils.h>
@@ -12,6 +11,7 @@
 #include <interpreter/evaluator.hpp>
 #include <interpreter/sound_cmds.hpp>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <tsqueue.hpp>
@@ -55,7 +55,7 @@ std::shared_ptr<object::Array> ExtractArrayFromPattern(
   auto return_array = std::make_shared<object::Array>(
       std::vector<std::shared_ptr<object::Object>>());
 
-  for (auto ep : evaluated_pat) {
+  for (const auto& ep : evaluated_pat) {
     auto midi_tick_array = std::make_shared<object::Array>(
         std::vector<std::shared_ptr<object::Object>>());
     if (!ep.empty()) {
@@ -118,7 +118,7 @@ bool ShouldIgnore(std::string filename) {
   return true;
 }
 
-std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz) {
+std::vector<int> GetMidiNotes(const std::shared_ptr<object::Object>& numz) {
   std::vector<int> midi_nums{};
   auto int_object = std::dynamic_pointer_cast<object::Number>(numz);
   if (int_object) {
@@ -127,10 +127,10 @@ std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz) {
 
   auto array_object = std::dynamic_pointer_cast<object::Array>(numz);
   if (array_object) {
-    for (auto e : array_object->elements_) {
-      auto int_object = std::dynamic_pointer_cast<object::Number>(e);
-      if (int_object) {
-        midi_nums.push_back(int_object->value_);
+    for (const auto& e : array_object->elements_) {
+      auto element_object = std::dynamic_pointer_cast<object::Number>(e);
+      if (element_object) {
+        midi_nums.push_back(element_object->value_);
       }
     }
   }
@@ -152,7 +152,7 @@ void SendMidiMappingShow() {
   audio_queue.push(std::move(action));
 }
 
-void SendMidiMapping(int mapped_id, std::string mapped_param) {
+void SendMidiMapping(int mapped_id, const std::string& mapped_param) {
   std::cout << "sending a midi map\n";
   auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_MAP);
   action->mapped_id = mapped_id;
@@ -160,8 +160,8 @@ void SendMidiMapping(int mapped_id, std::string mapped_param) {
   audio_queue.push(std::move(action));
 }
 
-void note_on_at(int sgid, std::vector<int> midi_nums, int note_start_time,
-                int vel, int dur) {
+void note_on_at(int sgid, const std::vector<int>& midi_nums,
+                int note_start_time, int vel, int dur) {
   auto action =
       std::make_unique<AudioActionItem>(AudioAction::MIDI_NOTE_ON_DELAYED);
   action->soundgen_num = sgid;
@@ -181,7 +181,7 @@ void midi_event_at(int sgid, midi_event ev, int start_time) {
   audio_queue.push(std::move(action));
 }
 
-void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur) {
+void note_on(int sgid, const std::vector<int>& midi_nums, int vel, int dur) {
   auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_NOTE_ON);
   action->soundgen_num = sgid;
   action->notes = midi_nums;
@@ -190,13 +190,14 @@ void note_on(int sgid, std::vector<int> midi_nums, int vel, int dur) {
   audio_queue.push(std::move(action));
 }
 
-void note_off(int sgid, std::vector<int> midi_nums) {
+void note_off(int sgid, const std::vector<int>& midi_nums) {
   auto action = std::make_unique<AudioActionItem>(AudioAction::MIDI_NOTE_OFF);
   action->soundgen_num = sgid;
   action->notes = midi_nums;
   audio_queue.push(std::move(action));
 }
-void note_off_at(int sgid, std::vector<int> midi_nums, int note_stop_time) {
+void note_off_at(int sgid, const std::vector<int>& midi_nums,
+                 int note_stop_time) {
   auto action =
       std::make_unique<AudioActionItem>(AudioAction::MIDI_NOTE_OFF_DELAYED);
   action->soundgen_num = sgid;
@@ -207,7 +208,7 @@ void note_off_at(int sgid, std::vector<int> midi_nums, int note_stop_time) {
 
 template <typename T>
 std::array<T, 16> ShrinkPatternToStepSequence(
-    std::array<std::vector<T>, PPBAR> &pattern) {
+    std::array<std::vector<T>, PPBAR>& pattern) {
   std::array<T, 16> shrunk{};
   for (int i = 0; i < 16; ++i) {
     for (int j = 0; j < 240; ++j) {
@@ -242,7 +243,7 @@ std::array<std::vector<int>, PPBAR> ExtractIntsFromObjectArray(
   return return_pattern;
 }
 
-void RecursiveScaler(std::array<std::vector<int>, PPBAR> &scaled_pattern,
+void RecursiveScaler(std::array<std::vector<int>, PPBAR>& scaled_pattern,
                      std::shared_ptr<object::Array> play_pattern, int midi_len,
                      int offset) {
   int nlen = play_pattern->elements_.size();
@@ -259,7 +260,7 @@ void RecursiveScaler(std::array<std::vector<int>, PPBAR> &scaled_pattern,
 }
 
 template <typename T>
-void PrintPattern(std::array<std::vector<T>, PPBAR> &patternn) {
+void PrintPattern(std::array<std::vector<T>, PPBAR>& patternn) {
   for (int i = 0; i < PPBAR; ++i) {
     if (patternn[i].size() > 0) {
       for (auto item : patternn[i])
@@ -286,7 +287,7 @@ void play_map_on(std::shared_ptr<object::Object> soundgen,
   auto play_map = std::dynamic_pointer_cast<object::Hash>(pattern_map);
 
   if (play_map) {
-    for (const auto &[_, hv] : play_map->pairs_) {
+    for (const auto& [_, hv] : play_map->pairs_) {
       auto k = std::dynamic_pointer_cast<object::Number>(hv.key_);
       auto v = std::dynamic_pointer_cast<object::Number>(hv.value_);
       if (k && v) {
@@ -324,19 +325,19 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
 
       // PrintPattern(live_pattern);
       for (int i = 0; i < (int)live_pattern.size(); ++i) {
-        float i_offset = i / speed;
-
         auto ppattern = live_pattern[i];
 
         if (ppattern.size() > 0) {
           std::vector<int> midi_nums;
-          for (auto item : ppattern) {
-            if (item > 0) midi_nums.push_back(item);
-          }
+          std::copy_if(ppattern.begin(), ppattern.end(),
+                       std::back_inserter(midi_nums),
+                       [](int item) { return item > 0; });
 
-          if (midi_nums.size() > 0)
+          if (midi_nums.size() > 0) {
+            float i_offset = i / speed;
             note_on_at(sg->soundgen_id_, midi_nums, j_offset + i_offset, vel,
                        dur);
+          }
         }
       }
     }
@@ -344,10 +345,10 @@ void play_array_on(std::shared_ptr<object::Object> soundgen,
   auto multi_midi_pat_obj =
       std::dynamic_pointer_cast<object::MidiArray>(pattern);
   if (multi_midi_pat_obj) {
-    for (auto &e : multi_midi_pat_obj->notes_on_) {
+    for (const auto& e : multi_midi_pat_obj->notes_on_) {
       midi_event_at(sg->soundgen_id_, e, e.playback_tick);
     }
-    for (auto &e : multi_midi_pat_obj->control_messages_) {
+    for (const auto& e : multi_midi_pat_obj->control_messages_) {
       midi_event_at(sg->soundgen_id_, e, e.playback_tick);
     }
   }
@@ -551,7 +552,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      auto return_array = std::make_shared<object::Array>(
                          std::vector<std::shared_ptr<object::Object>>());
 
-                     for (const auto &pair : map_obj->pairs_) {
+                     for (const auto& pair : map_obj->pairs_) {
                        return_array->elements_.push_back(pair.second.key_);
                      }
 
@@ -584,7 +585,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    return evaluator::NULLL;
                  })},
     {"floor", std::make_shared<object::BuiltIn>(
-                  [](std::vector<std::shared_ptr<object::Object>> args)
+                  [](const std::vector<std::shared_ptr<object::Object>>& args)
                       -> std::shared_ptr<object::Object> {
                     if (args.size() != 1)
                       return evaluator::NewError("Need WAN arg for floor!");
@@ -597,7 +598,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     return evaluator::NULLL;
                   })},
     {"log", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
+                [](const std::vector<std::shared_ptr<object::Object>>& args)
                     -> std::shared_ptr<object::Object> {
                   if (args.size() != 1)
                     return evaluator::NewError("Need WAN arg for log!");
@@ -698,7 +699,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   })},
     {"sched",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() != 5)
              return evaluator::NewError(
@@ -735,7 +736,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                std::dynamic_pointer_cast<object::Array>(input[0]);
 
            if (item && array_obj) {
-             for (const auto &e : array_obj->elements_) {
+             for (const auto& e : array_obj->elements_) {
                if (item->Inspect() == e->Inspect()) {
                  return std::make_shared<object::Boolean>(true);
                }
@@ -747,7 +748,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"incr",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() != 3)
              return evaluator::NewError(
@@ -769,7 +770,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"rincr",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() != 3)
              return evaluator::NewError(
@@ -791,7 +792,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"dincr",  // drunk incr
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() != 3)
              return evaluator::NewError(
@@ -949,15 +950,16 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return std::make_shared<object::Number>(
                std::min(first_num->value_, second_num->value_));
          })},
-    {"midi_ref", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object> {
-                       (void)args;
-                       global_mixr->PrintMidiInfo();
-                       return evaluator::NULLL;
-                     })},
+    {"midi_ref",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+           global_mixr->PrintMidiInfo();
+           return evaluator::NULLL;
+         })},
     {"now", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
+                [](const std::vector<std::shared_ptr<object::Object>>& args)
                     -> std::shared_ptr<object::Object> {
                   auto action =
                       std::make_unique<AudioActionItem>(AudioAction::NOW);
@@ -968,14 +970,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   return std::make_shared<object::Number>(val);
                 })},
     {"algoz", std::make_shared<object::BuiltIn>(
-                  [](std::vector<std::shared_ptr<object::Object>> args)
+                  [](const std::vector<std::shared_ptr<object::Object>>& args)
                       -> std::shared_ptr<object::Object> {
                     (void)args;
                     global_mixr->PrintDxAlgos();
                     return evaluator::NULLL;
                   })},
     {"ratioz", std::make_shared<object::BuiltIn>(
-                   [](std::vector<std::shared_ptr<object::Object>> args)
+                   [](const std::vector<std::shared_ptr<object::Object>>& args)
                        -> std::shared_ptr<object::Object> {
                      (void)args;
                      global_mixr->PrintDxRatioz();
@@ -1010,10 +1012,10 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    return array_obj;
                  })},
     {"print", std::make_shared<object::BuiltIn>(
-                  [](std::vector<std::shared_ptr<object::Object>> args)
+                  [](const std::vector<std::shared_ptr<object::Object>>& args)
                       -> std::shared_ptr<object::Object> {
                     std::stringstream out;
-                    for (auto &o : args) {
+                    for (auto& o : args) {
                       out << o->Inspect();
                     }
 
@@ -1021,20 +1023,27 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                     return evaluator::NULLL;
                   })},
+    {"help", std::make_shared<object::BuiltIn>(
+                 [](const std::vector<std::shared_ptr<object::Object>>& args)
+                     -> std::shared_ptr<object::Object> {
+                   std::cout << GetBuiltInHelp() << std::endl;
+                   return evaluator::NULLL;
+                 })},
     {"funcz", std::make_shared<object::BuiltIn>(
-                  [](std::vector<std::shared_ptr<object::Object>> args)
+                  [](const std::vector<std::shared_ptr<object::Object>>& args)
                       -> std::shared_ptr<object::Object> {
                     (void)args;
                     global_mixr->PrintFuncAndGenInfo();
                     return evaluator::NULLL;
                   })},
-    {"timing_info", std::make_shared<object::BuiltIn>(
-                        [](std::vector<std::shared_ptr<object::Object>> args)
-                            -> std::shared_ptr<object::Object> {
-                          (void)args;
-                          global_mixr->PrintTimingInfo();
-                          return evaluator::NULLL;
-                        })},
+    {"timing_info",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+           global_mixr->PrintTimingInfo();
+           return evaluator::NULLL;
+         })},
     {"reverse",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
@@ -1061,7 +1070,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              auto return_array =
                  std::make_shared<object::MidiArray>(midi_array->notes_on_);
 
-             for (auto &e : return_array->notes_on_) {
+             for (auto& e : return_array->notes_on_) {
                e.playback_tick = PPBAR - e.playback_tick;
              }
 
@@ -1139,7 +1148,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              std::cout << "ROTATING MIDI ARRAY BY " << number->value_ << " ("
                        << rotate_by << ")" << std::endl;
 
-             for (auto &e : return_array->notes_on_) {
+             for (auto& e : return_array->notes_on_) {
                e.playback_tick = (int)(e.playback_tick + rotate_by) % PPBAR;
              }
 
@@ -1208,7 +1217,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
        auto sg_array = std::dynamic_pointer_cast<object::Array>(input[1]);
        if (sg_array) {
-         for (auto const &e : sg_array->elements_) {
+         for (auto const& e : sg_array->elements_) {
            auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(e);
            if (sg) {
              action->group_of_soundgens.push_back(sg->soundgen_id_);
@@ -1268,7 +1277,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              auto sg_array = std::dynamic_pointer_cast<object::Array>(input[1]);
              if (sg_array) {
-               for (auto const &e : sg_array->elements_) {
+               for (auto const& e : sg_array->elements_) {
                  auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(e);
                  if (sg) {
                    action->group_of_soundgens.push_back(sg->soundgen_id_);
@@ -1426,7 +1435,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"solo",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            auto at_obj = std::find_if(args.begin(), args.end(),
                                       [](std::shared_ptr<object::Object> o) {
@@ -1458,7 +1467,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NULLL;
          })},
     {"unsolo", std::make_shared<object::BuiltIn>(
-                   [](std::vector<std::shared_ptr<object::Object>> args)
+                   [](const std::vector<std::shared_ptr<object::Object>>& args)
                        -> std::shared_ptr<object::Object> {
                      auto at_obj =
                          std::find_if(args.begin(), args.end(),
@@ -1477,7 +1486,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      return evaluator::NULLL;
                    })},
     {"mvol", std::make_shared<object::BuiltIn>(
-                 [](std::vector<std::shared_ptr<object::Object>> args)
+                 [](const std::vector<std::shared_ptr<object::Object>>& args)
                      -> std::shared_ptr<object::Object> {
                    if (args.size() != 1)
                      return evaluator::NewError(
@@ -1495,7 +1504,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  })},
     {"stop",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() != 1)
              return evaluator::NewError(
@@ -1512,7 +1521,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"note_on",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() < 2)
              return evaluator::NewError(
@@ -1545,7 +1554,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"note_on_at",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() < 3)
              return evaluator::NewError(
@@ -1582,31 +1591,31 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            return evaluator::NULLL;
          })},
-    {"note_off", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object> {
-                       if (args.size() == 0)
-                         return evaluator::NewError(
-                             "`note_off` requires at least one arg - "
-                             "a sound_generator target "
-                             "to stop.");
+    {"note_off",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           if (args.size() == 0)
+             return evaluator::NewError(
+                 "`note_off` requires at least one arg - "
+                 "a sound_generator target "
+                 "to stop.");
 
-                       auto soundgen =
-                           std::dynamic_pointer_cast<object::SoundGenerator>(
-                               args[0]);
-                       if (soundgen) {
-                         int sgid = soundgen->soundgen_id_;
-                         std::vector<int> midi_nums;
-                         if (args.size() > 1) {
-                           midi_nums = GetMidiNotes(args[1]);
-                         }
-                         note_off(sgid, midi_nums);
-                       }
-                       return evaluator::NULLL;
-                     })},
+           auto soundgen =
+               std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+           if (soundgen) {
+             int sgid = soundgen->soundgen_id_;
+             std::vector<int> midi_nums;
+             if (args.size() > 1) {
+               midi_nums = GetMidiNotes(args[1]);
+             }
+             note_off(sgid, midi_nums);
+           }
+           return evaluator::NULLL;
+         })},
     {"note_off_at",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() < 3)
              return evaluator::NewError(
@@ -1632,7 +1641,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"set_pitch",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size >= 2) {
@@ -1661,7 +1670,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NULLL;
          })},
     {"speed", std::make_shared<object::BuiltIn>(
-                  [](std::vector<std::shared_ptr<object::Object>> args)
+                  [](const std::vector<std::shared_ptr<object::Object>>& args)
                       -> std::shared_ptr<object::Object> {
                     std::cout << "INBUILT SPEED CALLED!" << std::endl;
                     (void)args;
@@ -1675,8 +1684,10 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            if (args_size >= 2) {
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
-             if (soundgen && global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
-               auto fx = interpreter_sound_cmds::ParseFXCmd(args);
+             if (soundgen &&
+                 global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+               auto mutable_args = args;
+               auto fx = interpreter_sound_cmds::ParseFXCmd(mutable_args);
                if (fx.size() > 0) {
                  auto action =
                      std::make_unique<AudioActionItem>(AudioAction::ADD_FX);
@@ -1690,14 +1701,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"add_buf",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size >= 2) {
              std::cout << "YO ADD BUFFER!\n";
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
-             if (soundgen && global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
+             if (soundgen &&
+                 global_mixr->IsValidSoundgenNum(soundgen->soundgen_id_)) {
                if (args[1]->Type() == "STRING") {
                  std::cout << args[1]->Inspect() << " " << args[1]->Type()
                            << std::endl;
@@ -1714,7 +1726,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NULLL;
          })},
     {"monitor", std::make_shared<object::BuiltIn>(
-                    [](std::vector<std::shared_ptr<object::Object>> args)
+                    [](const std::vector<std::shared_ptr<object::Object>>& args)
                         -> std::shared_ptr<object::Object> {
                       int args_size = args.size();
                       if (args_size == 1) {
@@ -1736,7 +1748,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     })},
     {"list_presets",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
 
@@ -1747,14 +1759,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              if (HasPresets(sg_type)) {
                auto preset_names = GetSynthPresets(sg_type);
 
-               for (const auto &p : preset_names) std::cout << p << std::endl;
+               for (const auto& p : preset_names) std::cout << p << std::endl;
              }
            }
            return evaluator::NULLL;
          })},
     {"load_preset",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 2) {
@@ -1829,7 +1841,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         })},
     {"rand",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() == 0) {
              auto rand_number =
@@ -1870,7 +1882,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"rand_sixteenthz",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size > 0) {
@@ -1898,7 +1910,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NULLL;
          })},
     {"perlin", std::make_shared<object::BuiltIn>(
-                   [](std::vector<std::shared_ptr<object::Object>> args)
+                   [](const std::vector<std::shared_ptr<object::Object>>& args)
                        -> std::shared_ptr<object::Object> {
                      int args_size = args.size();
                      if (args_size == 1) {
@@ -1915,7 +1927,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    })},
     {"sort",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            // only implemented for array of Numbers
            if (args.size() == 1) {
@@ -1923,7 +1935,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              if (array_obj) {
                std::vector<double> temp_nums;
-               for (const auto &e : array_obj->elements_) {
+               for (const auto& e : array_obj->elements_) {
                  auto number = std::dynamic_pointer_cast<object::Number>(e);
                  if (number) {
                    temp_nums.push_back(number->value_);
@@ -1947,7 +1959,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"shuffle",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            // only implemented for array of Numbers
            if (args.size() == 1) {
@@ -1955,7 +1967,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              if (array_obj) {
                std::vector<double> temp_nums;
-               for (const auto &e : array_obj->elements_) {
+               for (const auto& e : array_obj->elements_) {
                  auto number = std::dynamic_pointer_cast<object::Number>(e);
                  if (number) {
                    temp_nums.push_back(number->value_);
@@ -1980,7 +1992,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NULLL;
          })},
     {"sin", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
+                [](const std::vector<std::shared_ptr<object::Object>>& args)
                     -> std::shared_ptr<object::Object> {
                   int args_size = args.size();
                   if (args_size == 1) {
@@ -1994,7 +2006,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   return evaluator::NULLL;
                 })},
     {"cos", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
+                [](const std::vector<std::shared_ptr<object::Object>>& args)
                     -> std::shared_ptr<object::Object> {
                   int args_size = args.size();
                   if (args_size == 1) {
@@ -2008,7 +2020,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   return evaluator::NULLL;
                 })},
     {"abs", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
+                [](const std::vector<std::shared_ptr<object::Object>>& args)
                     -> std::shared_ptr<object::Object> {
                   int args_size = args.size();
                   if (args_size == 1) {
@@ -2021,42 +2033,41 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   }
                   return evaluator::NULLL;
                 })},
-    {"synchz", std::make_shared<object::BuiltIn>(
-                   [](std::vector<std::shared_ptr<object::Object>> args)
-                       -> std::shared_ptr<object::Object> {
-                     int args_size = args.size();
-                     if (args_size == 1) {
-                       auto x =
-                           std::dynamic_pointer_cast<object::Number>(args[0]);
-                       if (x) {
-                         double val = 0;
-                         switch ((int)x->value_) {
-                           case 2:
-                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q2);
-                             break;
-                           case 4:
-                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q4);
-                             break;
-                           case 8:
-                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q8);
-                             break;
-                           case 16:
-                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q16);
-                             break;
-                           case 32:
-                             val = global_mixr->GetHzPerTimingUnit(Quantize::Q32);
-                             break;
-                         }
-                         auto number_obj =
-                             std::make_shared<object::Number>(val);
-                         return number_obj;
-                       }
-                     }
-                     return evaluator::NULLL;
-                   })},
+    {"synchz",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 1) {
+             auto x = std::dynamic_pointer_cast<object::Number>(args[0]);
+             if (x) {
+               double val = 0;
+               switch ((int)x->value_) {
+                 case 2:
+                   val = global_mixr->GetHzPerTimingUnit(Quantize::Q2);
+                   break;
+                 case 4:
+                   val = global_mixr->GetHzPerTimingUnit(Quantize::Q4);
+                   break;
+                 case 8:
+                   val = global_mixr->GetHzPerTimingUnit(Quantize::Q8);
+                   break;
+                 case 16:
+                   val = global_mixr->GetHzPerTimingUnit(Quantize::Q16);
+                   break;
+                 case 32:
+                   val = global_mixr->GetHzPerTimingUnit(Quantize::Q32);
+                   break;
+               }
+               auto number_obj = std::make_shared<object::Number>(val);
+               return number_obj;
+             }
+           }
+           return evaluator::NULLL;
+         })},
     {"scale",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 5) {
@@ -2078,7 +2089,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"rand_array",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 3) {
@@ -2109,7 +2120,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NULLL;
          })},
     {"bjork", std::make_shared<object::BuiltIn>(
-                  [](std::vector<std::shared_ptr<object::Object>> args)
+                  [](const std::vector<std::shared_ptr<object::Object>>& args)
                       -> std::shared_ptr<object::Object> {
                     int args_size = args.size();
                     if (args_size == 2) {
@@ -2145,8 +2156,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                   })},
     {"gen_perc",
      std::make_shared<
-         object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)
-                              -> std::shared_ptr<object::Object> {
+         object::BuiltIn>([](const std::vector<std::shared_ptr<object::Object>>&
+                                 args) -> std::shared_ptr<object::Object> {
        (void)args;
        std::string cmd =
            "let prc0 = sample(" + GetRandomSampleNameFromDir("perc") + ")";
@@ -2196,7 +2207,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
      })},
     {"kit",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            (void)args;
            std::string cmd =
@@ -2220,41 +2231,42 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            return evaluator::NULLL;
          })},
-    {"load_dir", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object> {
-                       int args_size = args.size();
-                       if (args_size == 1) {
-                         std::shared_ptr<object::String> str_obj =
-                             std::dynamic_pointer_cast<object::String>(args[0]);
-                         if (str_obj) {
-                           auto dirname = str_obj->value_;
-                           auto fulldirname = "wavs/" + dirname;
-                           for (auto &p : fs::directory_iterator(fulldirname)) {
-                             auto pathname = p.path().string();
-                             pathname.erase(0, 5);
+    {"load_dir",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 1) {
+             std::shared_ptr<object::String> str_obj =
+                 std::dynamic_pointer_cast<object::String>(args[0]);
+             if (str_obj) {
+               auto dirname = str_obj->value_;
+               auto fulldirname = "wavs/" + dirname;
+               for (auto& p : fs::directory_iterator(fulldirname)) {
+                 auto pathname = p.path().string();
+                 pathname.erase(0, 5);
 
-                             std::string base_filename = pathname.substr(
-                                 pathname.find_last_of("/\\") + 1);
+                 std::string base_filename =
+                     pathname.substr(pathname.find_last_of("/\\") + 1);
 
-                             if (ShouldIgnore(base_filename)) continue;
+                 if (ShouldIgnore(base_filename)) continue;
 
-                             std::string::size_type const dot(
-                                 base_filename.find_last_of('.'));
-                             std::string file_without_extension =
-                                 base_filename.substr(0, dot);
+                 std::string::size_type const dot(
+                     base_filename.find_last_of('.'));
+                 std::string file_without_extension =
+                     base_filename.substr(0, dot);
 
-                             std::string cmd = "let " + file_without_extension +
-                                               " = sample(" + pathname + ")";
-                             eval_command_queue.push(cmd);
-                           }
-                         }
-                       }
-                       return evaluator::NULLL;
-                     })},
+                 std::string cmd = "let " + file_without_extension +
+                                   " = sample(" + pathname + ")";
+                 eval_command_queue.push(cmd);
+               }
+             }
+           }
+           return evaluator::NULLL;
+         })},
     {"eval_pattern",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 1) {
@@ -2272,7 +2284,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"print_pattern",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 1) {
@@ -2321,7 +2333,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"notes_in_key",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size > 0) {
@@ -2353,7 +2365,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"notes_in_chord",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size < 2) {
@@ -2402,7 +2414,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"scale_note",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
 
@@ -2440,7 +2452,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"scale_melody",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
 
@@ -2464,7 +2476,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                  std::vector<int> orig_notes = {};
 
-                 for (const auto &n : array_to_tune->elements_) {
+                 for (const auto& n : array_to_tune->elements_) {
                    auto numbj = std::dynamic_pointer_cast<object::Number>(n);
                    if (numbj) {
                      orig_notes.push_back(numbj->value_);
@@ -2489,7 +2501,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"fast",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size < 3) {
@@ -2532,7 +2544,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"play_array",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size < 1) {
@@ -2567,7 +2579,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"play_array_over",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size < 2) {
@@ -2602,7 +2614,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"play_rhythm",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size < 1) {
@@ -2624,7 +2636,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            auto rhythm_map = std::dynamic_pointer_cast<object::Hash>(args[0]);
            if (rhythm_map) {
-             for (const auto &[_, value] : rhythm_map->pairs_) {
+             for (const auto& [_, value] : rhythm_map->pairs_) {
                play_array_on(value.key_, value.value_, 1, dur, vel);
              }
            }
@@ -2633,7 +2645,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"play_map",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size < 1) {
@@ -2664,7 +2676,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NULLL;
          })},
     {"type", std::make_shared<object::BuiltIn>(
-                 [](std::vector<std::shared_ptr<object::Object>> args)
+                 [](const std::vector<std::shared_ptr<object::Object>>& args)
                      -> std::shared_ptr<object::Object> {
                    int args_size = args.size();
                    if (args_size == 1)
@@ -2675,7 +2687,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  })},
     {"scramble",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 1) {
@@ -2715,7 +2727,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"stutter",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 1) {
@@ -2776,16 +2788,17 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
            return evaluator::NULLL;
          })},
-    {"midi_init", std::make_shared<object::BuiltIn>(
-                      [](std::vector<std::shared_ptr<object::Object>> args)
-                          -> std::shared_ptr<object::Object> {
-                        (void)args;
-                        MidiInit(global_mixr.get());
-                        return evaluator::NULLL;
-                      })},
+    {"midi_init",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+           MidiInit(global_mixr.get());
+           return evaluator::NULLL;
+         })},
     {"midi_assign",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 1) {
@@ -2798,39 +2811,42 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            return evaluator::NULLL;
          })},
-    {"midi_rec", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object> {
-                       (void)args;
-                       global_mixr->RecordMidiToggle();
-                       return evaluator::NULLL;
-                     })},
-    {"midi_print", std::make_shared<object::BuiltIn>(
-                       [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object> {
-                         (void)args;
-                         global_mixr->PrintMidiToggle();
-                         return evaluator::NULLL;
-                       })},
-    {"midi_reset", std::make_shared<object::BuiltIn>(
-                       [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object> {
-                         (void)args;
-                         global_mixr->ResetMidiRecording();
-                         return evaluator::NULLL;
-                       })},
-    {"midi_dump", std::make_shared<object::BuiltIn>(
-                      [](std::vector<std::shared_ptr<object::Object>> args)
-                          -> std::shared_ptr<object::Object> {
-                        (void)args;
-                        auto return_pattern =
-                            std::make_shared<object::MidiArray>(
-                                global_mixr->RecordingBuffer());
-                        return return_pattern;
-                      })},
+    {"midi_rec",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+           global_mixr->RecordMidiToggle();
+           return evaluator::NULLL;
+         })},
+    {"midi_print",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+           global_mixr->PrintMidiToggle();
+           return evaluator::NULLL;
+         })},
+    {"midi_reset",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+           global_mixr->ResetMidiRecording();
+           return evaluator::NULLL;
+         })},
+    {"midi_dump",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+           auto return_pattern = std::make_shared<object::MidiArray>(
+               global_mixr->RecordingBuffer());
+           return return_pattern;
+         })},
     {"midi2array",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 1) {
@@ -2845,7 +2861,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  int higher_midi_index = lower_midi_index + 240;  //
 
                  bool found = false;
-                 for (auto &e : midi_array->notes_on_) {
+                 for (auto& e : midi_array->notes_on_) {
                    if (e.playback_tick > lower_midi_index &&
                        e.playback_tick < higher_midi_index) {
                      return_array->elements_.push_back(
@@ -2868,7 +2884,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            return evaluator::NULLL;
          })},
     {"websock", std::make_shared<object::BuiltIn>(
-                    [](std::vector<std::shared_ptr<object::Object>> args)
+                    [](const std::vector<std::shared_ptr<object::Object>>& args)
                         -> std::shared_ptr<object::Object> {
                       std::cout << "Websocket enable yo!\n";
                       int args_size = args.size();
@@ -2884,7 +2900,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     })},
     {"midi_at",
      std::make_shared<object::BuiltIn>(  // TODO - better name!
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            int args_size = args.size();
            if (args_size == 2) {
@@ -2896,7 +2912,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                int lower_midi_index = 240 * index_at_val;
                int higher_midi_index = lower_midi_index + 240;
 
-               for (auto &e : midi_array->notes_on_) {
+               for (auto& e : midi_array->notes_on_) {
                  if (e.playback_tick > lower_midi_index &&
                      e.playback_tick < higher_midi_index) {
                    return std::make_shared<object::Number>(e.data1);
@@ -2907,50 +2923,49 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            return evaluator::NULLL;
          })},
-    {"midi_fix", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object> {
-                       int args_size = args.size();
-                       if (args_size == 1) {
-                         auto midi_array =
-                             std::dynamic_pointer_cast<object::MidiArray>(
-                                 args[0]);
-                         if (midi_array) {
-                           for (auto &e : midi_array->notes_on_) {
-                             int new_pos_div = e.playback_tick / 120;
-                             e.playback_tick = new_pos_div * 120;
-                           }
-                           for (auto &e : midi_array->control_messages_) {
-                             int new_pos_div = e.playback_tick / 120;
-                             e.playback_tick = new_pos_div * 120;
-                           }
-                         }
-                       }
-                       return evaluator::NULLL;
-                     })},
-    {"midi_map", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object> {
-                       int args_size = args.size();
-                       if (args_size == 2) {
-                         auto id =
-                             std::dynamic_pointer_cast<object::Number>(args[0]);
-                         auto param =
-                             std::dynamic_pointer_cast<object::String>(args[1]);
-                         if (id && param) {
-                           std::cout << "GOT ID AND PARAM:" << id->value_ << " "
-                                     << param->value_ << std::endl;
-                           SendMidiMapping(id->value_, param->value_);
-                         }
-                       } else {
-                         std::cout << "DUMP MIXER MAP\n";
-                         SendMidiMappingShow();
-                       }
-                       return evaluator::NULLL;
-                     })},
+    {"midi_fix",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 1) {
+             auto midi_array =
+                 std::dynamic_pointer_cast<object::MidiArray>(args[0]);
+             if (midi_array) {
+               for (auto& e : midi_array->notes_on_) {
+                 int new_pos_div = e.playback_tick / 120;
+                 e.playback_tick = new_pos_div * 120;
+               }
+               for (auto& e : midi_array->control_messages_) {
+                 int new_pos_div = e.playback_tick / 120;
+                 e.playback_tick = new_pos_div * 120;
+               }
+             }
+           }
+           return evaluator::NULLL;
+         })},
+    {"midi_map",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 2) {
+             auto id = std::dynamic_pointer_cast<object::Number>(args[0]);
+             auto param = std::dynamic_pointer_cast<object::String>(args[1]);
+             if (id && param) {
+               std::cout << "GOT ID AND PARAM:" << id->value_ << " "
+                         << param->value_ << std::endl;
+               SendMidiMapping(id->value_, param->value_);
+             }
+           } else {
+             std::cout << "DUMP MIXER MAP\n";
+             SendMidiMappingShow();
+           }
+           return evaluator::NULLL;
+         })},
     {"midi2note",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() == 1) {
              auto midi_val = std::dynamic_pointer_cast<object::Number>(args[0]);
@@ -2963,7 +2978,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"midi2freq",
      std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            if (args.size() == 1) {
              auto midi_val = std::dynamic_pointer_cast<object::Number>(args[0]);
@@ -2974,34 +2989,44 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
            }
            return evaluator::NULLL;
          })},
-    {"freq2midi", std::make_shared<object::BuiltIn>(
-                      [](std::vector<std::shared_ptr<object::Object>> args)
-                          -> std::shared_ptr<object::Object> {
-                        if (args.size() == 1) {
-                          auto freq = std::dynamic_pointer_cast<object::Number>(
-                              args[0]);
-                          if (freq) {
-                            int midi = Freq2Midi(freq->value_);
-                            return std::make_shared<object::Number>(midi);
-                          }
-                        }
-                        return evaluator::NULLL;
-                      })},
-    {"signal_from", std::make_shared<object::BuiltIn>(
-                        [](std::vector<std::shared_ptr<object::Object>> args)
-                            -> std::shared_ptr<object::Object> {
-                          int args_size = args.size();
-                          if (args_size == 1) {
-                            auto signal_generator =
-                                std::dynamic_pointer_cast<object::Phasor>(
-                                    args[0]);
-                            if (signal_generator) {
-                              double sig_val = signal_generator->Generate();
-                              return std::make_shared<object::Number>(sig_val);
-                            }
-                          }
-                          return evaluator::NULLL;
-                        })},
+    {"freq2midi",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           if (args.size() == 1) {
+             auto freq = std::dynamic_pointer_cast<object::Number>(args[0]);
+             if (freq) {
+               int midi = Freq2Midi(freq->value_);
+               return std::make_shared<object::Number>(midi);
+             }
+           }
+           return evaluator::NULLL;
+         })},
+    {"signal_from",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           int args_size = args.size();
+           if (args_size == 1) {
+             auto signal_generator =
+                 std::dynamic_pointer_cast<object::Phasor>(args[0]);
+             if (signal_generator) {
+               double sig_val = signal_generator->Generate();
+               return std::make_shared<object::Number>(sig_val);
+             }
+           }
+           return evaluator::NULLL;
+         })},
 };
+
+std::string GetBuiltInHelp() {
+  std::string help_text = "Available built-in functions and variables:\n";
+
+  for (const auto& pair : built_ins) {
+    help_text += "  " + pair.first + "\n";
+  }
+
+  return help_text;
+}
 
 }  // namespace builtin

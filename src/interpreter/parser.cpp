@@ -62,8 +62,6 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement() {
     return ParseLsStatement();
   else if (cur_token_.type_.compare(token::SLANG_PS) == 0)
     return ParsePsStatement();
-  else if (cur_token_.type_.compare(token::SLANG_HELP) == 0)
-    return ParseHelpStatement();
   else if (cur_token_.type_.compare(token::SLANG_STRATEGY) == 0)
     return ParseStrategyStatement();
   else if (cur_token_.type_.compare(token::SLANG_FOR) == 0)
@@ -362,15 +360,6 @@ std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement() {
   return stmt;
 }
 
-std::shared_ptr<ast::HelpStatement> Parser::ParseHelpStatement() {
-  std::shared_ptr<ast::HelpStatement> stmt =
-      std::make_shared<ast::HelpStatement>(cur_token_);
-
-  if (PeekTokenIs(token::SLANG_SEMICOLON)) NextToken();
-
-  return stmt;
-}
-
 std::shared_ptr<ast::PsStatement> Parser::ParsePsStatement() {
   std::shared_ptr<ast::PsStatement> stmt =
       std::make_shared<ast::PsStatement>(cur_token_);
@@ -431,16 +420,16 @@ std::shared_ptr<ast::Statement> Parser::ParseExpressionStatement() {
     if (PeekTokenIs(token::SLANG_ASSIGN)) {
       NextToken();
       Token let_toke(token::SLANG_LET, "let");
-      auto stmt = std::make_shared<ast::LetStatement>(let_toke);
-      stmt->is_new_item = false;
-      stmt->name_ = ident;
+      auto let_stmt = std::make_shared<ast::LetStatement>(let_toke);
+      let_stmt->is_new_item = false;
+      let_stmt->name_ = ident;
 
       NextToken();
-      stmt->value_ = ParseExpression(Precedence::LOWEST);
+      let_stmt->value_ = ParseExpression(Precedence::LOWEST);
 
       if (PeekTokenIs(token::SLANG_SEMICOLON)) NextToken();
 
-      return stmt;
+      return let_stmt;
     }
   }
 
@@ -1021,14 +1010,14 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
     } else {
       auto target =
           std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);
-      if (target) process->targets_.push_back(target->value_);
+      process->targets_.push_back(target->value_);
       while (PeekTokenIs(token::SLANG_COMMA)) {
         NextToken();
         NextToken();
         if (CurTokenIs(token::SLANG_IDENT)) {
-          auto target = std::make_shared<ast::Identifier>(cur_token_,
-                                                          cur_token_.literal_);
-          if (target) process->targets_.push_back(target->value_);
+          auto next_target = std::make_shared<ast::Identifier>(
+              cur_token_, cur_token_.literal_);
+          process->targets_.push_back(next_target->value_);
         }
       }
     }
@@ -1167,9 +1156,9 @@ std::vector<std::shared_ptr<ast::Identifier>> Parser::ParseCallParameters() {
   while (PeekTokenIs(token::SLANG_COMMA)) {
     NextToken();
     NextToken();
-    auto ident =
+    auto next_ident =
         std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);
-    identifiers.push_back(ident);
+    identifiers.push_back(next_ident);
   }
 
   if (!ExpectPeek(token::SLANG_RPAREN)) {

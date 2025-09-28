@@ -25,8 +25,6 @@ std::string Program::String() const {
 }
 
 std::string BreakStatement::String() const {
-  std::stringstream ss;
-
   return "BREAK";
 }
 
@@ -118,14 +116,6 @@ std::string PlayStatement::String() const {
 }
 
 std::string PsStatement::String() const {
-  std::stringstream ss;
-  ss << TokenLiteral();
-  ss << ";";
-
-  return ss.str();
-}
-
-std::string HelpStatement::String() const {
   std::stringstream ss;
   ss << TokenLiteral();
   ss << ";";
@@ -366,7 +356,7 @@ std::string ProcessStatement::String() const {
       ss << " # ";
   }
   ss << command_ << " ";
-  for (auto &t : targets_) ss << t << ",";
+  for (const auto &t : targets_) ss << t << ",";
   ss << " ";
   for (auto &f : functions_) ss << f->String();
 

@@ -78,7 +78,6 @@ const TokenType SLANG_BPM = "BPM";
 const TokenType SLANG_BITOP = "BITOP";
 const TokenType SLANG_DURATION = "DURATION";
 const TokenType SLANG_EVERY = "EVERY";
-const TokenType SLANG_HELP = "HELP";
 const TokenType SLANG_INFO = "INFO";
 const TokenType SLANG_LS = "LS";
 const TokenType SLANG_OSC = "OSCILLATE";

@@ -386,13 +386,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     audio_queue.push(std::move(action));
   }
 
-  std::shared_ptr<ast::HelpStatement> help_expr =
-      std::dynamic_pointer_cast<ast::HelpStatement>(node);
-  if (help_expr) {
-    auto action = std::make_unique<AudioActionItem>(AudioAction::HELP);
-    audio_queue.push(std::move(action));
-  }
-
   std::shared_ptr<ast::StrategyStatement> strat_expr =
       std::dynamic_pointer_cast<ast::StrategyStatement>(node);
   if (strat_expr) {
