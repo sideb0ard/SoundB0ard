@@ -1,0 +1,86 @@
+
+let nextoff = fn(pat, pos)
+{
+  let nexto = 1;
+  if (pos >= len(pat)) {
+    print("NAH MATE");
+    return;
+  }
+  for (let i = pos + 1; i < len(pat) - 1; i++) {
+    if (pat[i] == 1) {
+      return nexto;
+    } else {
+      nexto++;
+    }
+  }
+  return nexto;
+}
+
+#load_preset(dx, "DATRZ4");
+
+let dbblah_gen = gen()
+{
+  setup()
+  {
+    let beat = [1, 1, 0, 1,  0, 0, 1, 0,  1, 0, 0, 1,  0, 1, 0, 0];
+    let timez = [3, 4, 7, 5, 1, 1, 13];
+    let swungz = [300, 400, 100, 50, 20];
+    let swx = 0;
+    let tx = 0;
+    # let chrd = [39, 42, 46, 49];
+    let chrd = [55, 59, 62, 53];
+    let cx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        let on_at = i * pp + swungz[swx];
+        swx = incr(swx, 0, len(swungz));
+        note_on_at(sb2, 0, on_at);
+        let nexto = nextoff(beat, i);
+
+        let fulltime = pp * nexto;
+        let timediv = fulltime / timez[tx];
+
+        for (let j = 0; j < timez[tx]; j++) {
+          note_on_at(dx, chrd[cx], on_at + j * timediv, dur = timediv);
+        }
+        cx = incr(cx, 0, len(chrd));
+        tx = incr(tx, 0, len(timez));
+      }
+    }
+  }
+}
+
+let dxfxblah_gen = gen()
+{
+  setup()
+  {
+    let o2beat= [1, 1, 1, 1,  0, 1, 0, 1,  1, 0, 0, 1,  0, 0, 0, 0];
+    let o2ratz = [1, 2, 4, 1, 6, 5, 13, 12];
+    let o2x = 0;
+    let o3beat = [1, 1, 0, 0,  1, 0, 1, 1,  1, 1, 0, 1,  0, 0, 0, 0];
+    let o3ratz = [1, 2.2, 4.4, 1, 6, 5.5, 11.3];
+    let o3x = 0;
+  }
+  run()
+  {
+    if (count % 3 == 2) {
+      for (let i = 0; i < 16; i++) {
+        if (o2beat[i] == 1) {
+          set dx:o2rat o2ratz[o2x] at=i*pp;
+          o2x = incr(o2x, 0, len(o2ratz));
+        }
+      }
+    }
+    if (count % 4 == 2) {
+      for (let i = 0; i < 16; i++) {
+        if (o3beat[i] == 1) {
+          set dx:o3rat o3ratz[o3x] at=i*pp;
+          o3x = incr(o3x, 0, len(o3ratz));
+        }
+      }
+    }
+  }
+}

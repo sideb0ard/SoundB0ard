@@ -1,0 +1,3 @@
+* snare and clap dont work in sbdrum
+* when randomly opening an FM preset, sound explodes
+* granulator - can't change len ? or pitch?

@@ -1,0 +1,257 @@
+
+# progression  I-V-vi-IV
+# [I] - [V] - [I] [V] [vi IV] [IV vi] [vi] [I V] [I V vi]
+
+let key = 45;
+let keymod = 1;
+let notez = notes_in_key(key, keymod);
+# print(notez);
+let I = notes_in_chord(notez[0], key, 0, 1);
+let V = notes_in_chord(notez[4], key, 0, 1);
+let vi = notes_in_chord(notez[5], key, 0, 1);
+let IV = notes_in_chord(notez[3], key, 0, 1);
+let chordz = [I, I, I, I, V, I, vi, IV];
+let cx = 0;
+
+let bd = sample(bd/gaborKick.aiff);
+let rap = sample(voices/RAPMatrix.wav);
+
+# bpm 200;
+# set rap:pitch 0.8;
+# load_preset(dx3, "WNARR"); vol dx3 0.6;
+# load_preset(dx2, "LOWES"); vol dx2 1;
+# load_preset(dx, "LOWES"); vol dx1 ;
+# p9 $ bbblah_gen;
+# p3 $ moddblah_gen;
+
+# p1 $ chordblah_gen;
+
+# p5 $ basesblah_gen;
+# p6 $ modmodblahblah_gen; p5 $ "";
+
+# p3 $ ""; p5 $ basesblah_gen;
+
+# p1 $ "";
+# p3 $ moddblah_gen;
+# p8 $ drumblah_gen;  p4 $ rapblah_gen; p5 $ "";
+
+# p5 $ basesblah_gen;
+
+# p2 $ tecblah_gen; p7 $ rockblah_gen;
+# let tec = loop(dloops/scudBeat2.aiff); set tec:pitch 0.8; p2 $ tecblah_gen;
+# let rocka = loop(dloops/rockafellayall2bar.aiff); p7 $ rockblah_gen;
+
+let chordblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    cx = incr(cx, 0, len(chordz));
+  }
+}
+
+let moddblah_gen = gen()
+{
+  setup()
+  {
+    let durz = [20, 50, 200, 100, 300];
+    let drx = 0;
+    let basebeat = [1, 0, 0, 1,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0];
+  }
+  run()
+  {
+    # print(I);
+    # print(V);
+    # print(vi);
+    # print(IV);
+    let beat = basebeat;
+    if (count % 4 == 3) {
+      beat = rand_beat();
+    }
+    if (count % 15 < 14) {
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(dx3, chordz[cx], i * pp, dur = durz[drx]);
+          drx = incr(drx, 0, len(durz));
+        }
+      }
+    }
+  }
+}
+let modmodblahblah_gen = gen()
+{
+  setup()
+  {
+    let ratz = [7, 7, 1, 2, 7, 3, 7, 7, 7, 4, 1, 5];
+    let rx = 0;
+
+    let relz = [19, 19, 400, 40, 100, 1900, 400,400, 400, 1000];
+    let rlx = 0;
+
+  }
+  run()
+  {
+    set dx3:o2rat ratz[rx];
+    rx = incr(rx, 0, len(ratz));
+
+    set dx3:e1rel relz[rlx];
+    rlx = incr(rlx, 0, len(relz));
+  }
+}
+
+
+#  let tec = loop(dloops/tecnAe.aiff);
+let tecblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 4 < 2) {
+      vol tec 1;
+    }
+    if (count % 4 == 3) {
+      set tec:stutter 1;
+    }
+    if (count % 16 == 13) {
+      set tec:reverse 1;
+      solo(tec, at=8*pp);
+    }
+    if (count % 16 == 15) {
+      vol tec 0;
+    }
+  }
+}
+
+let bbblah_gen = gen()
+{
+  setup()
+  {
+    let beat = [1, 0, 1, 0,  0, 1, 1, 0,  1, 1, 1, 1,  0, 0, 0, 0];
+  }
+  run()
+  {
+    if (count % 8 < 6) {
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(dx2, chordz[cx][0], i * pp, dur = 10);
+        }
+      }
+    }
+  }
+}
+
+let rapblah_gen = gen()
+{
+  setup()
+  {
+    let durz = [50, 80, 200, 50, 0];
+    let drx = 0;
+
+    let delz = [10, 50, 110, 400, 1000];
+    let dlx = 0;
+    let fbz = [5, 40, 65, 50, 30, 93];
+    let fbx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 2) {
+      let beat = rand_beat();
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(rap, 1, i * pp, dur = durz[drx]);
+          drx = incr(drx, 0, len(durz));
+        }
+      }
+      set mixer:delay:fb fbz[fbx];
+      set mixer:delay:ms delz[dlx];
+      fbx = incr(fbx, 0, len(fbz));
+      dlx = incr(dlx, 0, len(delz));
+    }
+  }
+}
+
+let basesblah_gen = gen()
+{
+  setup()
+  {
+    let basebeat = [1, 1, 0, 0,  1, 0, 1, 1,  0, 0, 1, 0,  0, 0, 0, 0];
+    let durz = [80, 100, 120, 150, 180];
+    let drx = 0;
+
+    let op2z = [90, 70, 76, 95, 70, 60];
+    let ox = 0;
+
+    let erlz = [200, 500, 50, 20, 100, 1000];
+    let ex = 0;
+  }
+  run()
+  {
+    let swng = 30;
+
+    let beat = basebeat;
+    if (count % 8 == 6) {
+      beat = rand_beat();
+      set dx:op2out op2z[ox];
+      ox = incr(ox, 0, len(op2z));
+    }
+    for (let i = 0; i < 16; i++) {
+      let offset = swng;
+      if (i % 2 == 0) {
+        offset = 0;
+      }
+      if (beat[i] == 1) {
+        note_on_at(dx, key - 12, i * pp + offset, dur = durz[drx]);
+      }
+    }
+
+    if (count % 2 == 1) {
+      drx = incr(drx, 0, len(durz));
+      set dx:e1rel erlz[ex];
+      ex = incr(ex, 0, len(erlz));
+    }
+  }
+}
+
+let drumblah_gen = gen()
+{
+  setup()
+  {
+    let run_count = 0;
+    let beat = [1, 0, 0, 1,  0, 1, 0, 0,  0, 0, 1, 0,  0, 1, 0, 0];
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (beat[i]  == 1) {
+        note_on_at(bd, 1, i * pp, dur = 300);
+      }
+    }
+  }
+}
+
+let rockblah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      vol rocka 1;
+    }
+    if (count % 4 == 3) {
+      set rocka:stutter 1;
+    }
+    if (count % 16 == 13) {
+      set rocka:reverse 1;
+      solo(rocka, at=8*pp);
+    }
+    if (count % 16 == 15) {
+      vol rocka 0;
+    }
+  }
+}
