@@ -1,7 +1,6 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <math.h>
-#include <memory>
 #include <regex.h>
 #include <sndfile.h>
 #include <stdio.h>
@@ -14,6 +13,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <sstream>
 namespace fs = std::filesystem;
 
@@ -509,8 +509,13 @@ double do_white_noise() {
   float noise = 0.0;
 
   // fNoise is 0 -> ARC4RANDOMMAX
-  // Use rand() for cross-platform compatibility (arc4random is BSD-only)
-  noise = (float)((unsigned long)rand() * rand());
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+  // arc4random is available on BSD-based systems (macOS, FreeBSD, OpenBSD)
+  noise = (float)arc4random();
+#else
+  // For other platforms, use rand() - note this gives lower quality but works
+  noise = (float)rand();
+#endif
 
   // normalize and make bipolar
   noise = 2.0 * (noise / ARC4RANDOMMAX) - 1.0;
@@ -627,8 +632,8 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
 
 void print_midi_event(int midi_num) {
   printf("MIDI ON tick: %d // relative tick: %d midi: %d\n",
-         global_mixr->timing_info.midi_tick, global_mixr->timing_info.midi_tick % PPBAR,
-         midi_num);
+         global_mixr->timing_info.midi_tick,
+         global_mixr->timing_info.midi_tick % PPBAR, midi_num);
 }
 
 float fasttan(float x) {
@@ -742,9 +747,9 @@ int how_many_bits_in_num(unsigned int num) {
   printf("Size of int:%lu len:%d\n", sizeof(num), len);
   int count = 0;
   for (uint32_t i = len; i > 0; --i) {
-    if (num & (1 << i)) {
+    if (num & (1U << (i - 1))) {
       count++;
-      printf("Position %d\n", i);
+      printf("Position %u\n", i);
     }
   }
   return count;

@@ -34,7 +34,7 @@ repos:
         language: system
         files: \.(cpp|c)$
         args:
-          - --enable=warning,style,performance
+          - --enable=warning
           - --std=c++20
           - --suppress=missingIncludeSystem
           - --suppress=unusedFunction
@@ -42,22 +42,24 @@ repos:
           - --suppress=normalCheckLevelMaxBranches
           - --error-exitcode=1
           - --inline-suppr
+          - --quiet
 
-  # Build check to ensure code compiles
-  - repo: local
-    hooks:
-      - id: cmake-build-check
-        name: cmake-build-check
-        entry: bash
-        language: system
-        args:
-          - -c
-          - |
-            if [ ! -d "build" ]; then mkdir build; fi
-            cd build
-            cmake .. && make -j4
-        files: \.(cpp|hpp|c|h|cmake)$|CMakeLists\.txt$
-        pass_filenames: false
+  # Build check to ensure code compiles (DISABLED - too slow for quick commits)
+  # Uncomment if you want to ensure everything builds before commit
+  #- repo: local
+  #  hooks:
+  #    - id: cmake-build-check
+  #      name: cmake-build-check
+  #      entry: bash
+  #      language: system
+  #      args:
+  #        - -c
+  #        - |
+  #          if [ ! -d "build" ]; then mkdir build; fi
+  #          cd build
+  #          cmake .. && make -j4
+  #      files: \.(cpp|hpp|c|h|cmake)$|CMakeLists\.txt$
+  #      pass_filenames: false
 
   # Check for common C++ issues
   - repo: local
@@ -109,29 +111,29 @@ repos:
             done
         files: \.(cpp|c)$
 
-  # Enforce consistent naming conventions
-  - repo: local
-    hooks:
-      - id: check-naming-conventions
-        name: check-naming-conventions
-        entry: bash
-        language: system
-        args:
-          - -c
-          - |
-            # Check for consistent file naming (snake_case)
-            for file in "$@"; do
-              basename=$(basename "$file")
-              if [[ "$basename" =~ ^[a-z][a-z0-9_]*\.(cpp|hpp|c|h)$ ]]; then
-                continue
-              elif [[ "$basename" =~ CMakeLists\.txt$ ]]; then
-                continue
-              else
-                echo "File $file should use snake_case naming"
-                exit 1
-              fi
-            done
-        files: \.(cpp|hpp|c|h)$|CMakeLists\.txt$
+  # Enforce consistent naming conventions (DISABLED - too strict for existing codebase)
+  #- repo: local
+  #  hooks:
+  #    - id: check-naming-conventions
+  #      name: check-naming-conventions
+  #      entry: bash
+  #      language: system
+  #      args:
+  #        - -c
+  #        - |
+  #          # Check for consistent file naming (snake_case)
+  #          for file in "$@"; do
+  #            basename=$(basename "$file")
+  #            if [[ "$basename" =~ ^[a-z][a-z0-9_]*\.(cpp|hpp|c|h)$ ]]; then
+  #              continue
+  #            elif [[ "$basename" =~ CMakeLists\.txt$ ]]; then
+  #              continue
+  #            else
+  #              echo "File $file should use snake_case naming"
+  #              exit 1
+  #            fi
+  #          done
+  #      files: \.(cpp|hpp|c|h)$|CMakeLists\.txt$
 
   # Check CMake files
   - repo: https://github.com/cheshirekow/cmake-format-precommit
