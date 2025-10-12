@@ -506,19 +506,33 @@ double concave_inverted_transform(double value) {
 }
 
 double do_white_noise() {
-  float noise = 0.0;
+  unsigned long noise_val = 0;
 
-  // fNoise is 0 -> ARC4RANDOMMAX
+  // Generate full 32-bit random value
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
-  // arc4random is available on BSD-based systems (macOS, FreeBSD, OpenBSD)
-  noise = (float)arc4random();
+  // arc4random is available on BSD-based systems and returns full 32 bits
+  noise_val = arc4random();
 #else
-  // For other platforms, use rand() - note this gives lower quality but works
-  noise = (float)rand();
+  // On Linux/other platforms, combine two rand() calls to get 32 bits
+  // rand() typically gives 31 bits, so we use two calls
+  unsigned long r1 = (unsigned long)rand();
+  unsigned long r2 = (unsigned long)rand();
+  // Combine: use r1 for upper bits, r2 for lower bits
+  // Shift r1 left by 16 bits and OR with lower 16 bits of r2
+  noise_val = (r1 << 16) ^ (r2 & 0xFFFF);
 #endif
 
-  // normalize and make bipolar
-  noise = 2.0 * (noise / ARC4RANDOMMAX) - 1.0;
+  // normalize to -1.0 to 1.0 range
+  float noise = 2.0f * ((float)noise_val / (float)ARC4RANDOMMAX) - 1.0f;
+
+  // Safety check: ensure noise is in valid range
+  if (noise < -1.0f || noise > 1.0f) {
+    std::cerr << "ERROR: do_white_noise() generated out-of-range value: "
+              << noise << " (raw=" << noise_val << "). "
+              << "This indicates a bug in random number generation. "
+              << "Returning 0 to prevent audio damage." << std::endl;
+    return 0.0;
+  }
 
   return noise;
 }
