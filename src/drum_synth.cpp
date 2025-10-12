@@ -142,6 +142,8 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.hh_hif_q = val;
   else if (name == "hh_dist")
     settings_.hh_distortion_threshold = val;
+  else if (name == "hh_delay_en")
+    settings_.hh_use_delay = val;
   else if (name == "hh_delay_mode")
     settings_.hh_delay_mode = val;
   else if (name == "hh_delay_ms")
@@ -175,6 +177,8 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.hh2_hif_q = val;
   else if (name == "hh2_dist")
     settings_.hh2_distortion_threshold = val;
+  else if (name == "hh2_delay_en")
+    settings_.hh2_use_delay = val;
   else if (name == "hh2_delay_mode")
     settings_.hh2_delay_mode = val;
   else if (name == "hh2_delay_ms")
@@ -257,6 +261,8 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.cp_lfo_rate = val;
   else if (name == "cp_dist")
     settings_.cp_distortion_threshold = val;
+  else if (name == "cp_delay_en")
+    settings_.cp_use_delay = val;
   else if (name == "cp_delay_mode")
     settings_.cp_delay_mode = val;
   else if (name == "cp_delay_ms")
@@ -648,6 +654,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "hh_hif_q=" << settings_.hh_hif_q << kSEP;
   presetzzz << "hh_distortion_threshold=" << settings_.hh_distortion_threshold
             << kSEP;
+  presetzzz << "hh_use_delay=" << settings_.hh_use_delay << kSEP;
   presetzzz << "hh_delay_mode=" << settings_.hh_delay_mode << kSEP;
   presetzzz << "hh_delay_ms=" << settings_.hh_delay_ms << kSEP;
   presetzzz << "hh_delay_feedback_pct=" << settings_.hh_delay_feedback_pct
@@ -673,6 +680,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "cp_lfo_rate=" << settings_.cp_lfo_rate << kSEP;
   presetzzz << "cp_distortion_threshold=" << settings_.cp_distortion_threshold
             << kSEP;
+  presetzzz << "cp_use_delay=" << settings_.cp_use_delay << kSEP;
   presetzzz << "cp_delay_mode=" << settings_.cp_delay_mode << kSEP;
   presetzzz << "cp_delay_ms=" << settings_.cp_delay_ms << kSEP;
   presetzzz << "cp_delay_feedback_pct=" << settings_.cp_delay_feedback_pct
@@ -693,6 +701,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "hh2_hif_q=" << settings_.hh2_hif_q << kSEP;
   presetzzz << "hh2_distortion_threshold=" << settings_.hh2_distortion_threshold
             << kSEP;
+  presetzzz << "hh2_use_delay=" << settings_.hh2_use_delay << kSEP;
   presetzzz << "hh2_delay_mode=" << settings_.hh2_delay_mode << kSEP;
   presetzzz << "hh2_delay_ms=" << settings_.hh2_delay_ms << kSEP;
   presetzzz << "hh2_delay_feedback_pct=" << settings_.hh2_delay_feedback_pct
@@ -831,6 +840,7 @@ void DrumSynth::Update() {
   hh_->high_filter_->SetFcControl(settings_.hh_hif);
   hh_->high_filter_->SetQControl(settings_.hh_hif_q);
   hh_->distortion_.SetParam("threshold", settings_.hh_distortion_threshold);
+  hh_->use_delay_ = settings_.hh_use_delay;
   hh_->delay_->SetMode(settings_.hh_delay_mode);
   hh_->delay_->SetDelayTimeMs(settings_.hh_delay_ms);
   hh_->delay_->SetFeedbackPercent(settings_.hh_delay_feedback_pct);
@@ -848,6 +858,7 @@ void DrumSynth::Update() {
   hh2_->high_filter_->SetFcControl(settings_.hh2_hif);
   hh2_->high_filter_->SetQControl(settings_.hh2_hif_q);
   hh2_->distortion_.SetParam("threshold", settings_.hh2_distortion_threshold);
+  hh2_->use_delay_ = settings_.hh2_use_delay;
   hh2_->delay_->SetMode(settings_.hh2_delay_mode);
   hh2_->delay_->SetDelayTimeMs(settings_.hh2_delay_ms);
   hh2_->delay_->SetFeedbackPercent(settings_.hh2_delay_feedback_pct);
@@ -870,6 +881,7 @@ void DrumSynth::Update() {
   cp_->lfo_->m_waveform = settings_.cp_lfo_type;
   cp_->lfo_->m_osc_fo = settings_.cp_lfo_type;
   cp_->distortion_.SetParam("threshold", settings_.cp_distortion_threshold);
+  cp_->use_delay_ = settings_.cp_use_delay;
   cp_->delay_->SetMode(settings_.cp_delay_mode);
   cp_->delay_->SetDelayTimeMs(settings_.cp_delay_ms);
   cp_->delay_->SetFeedbackPercent(settings_.cp_delay_feedback_pct);
@@ -1061,6 +1073,8 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.hh_hif_q = dval;
     else if (key == "hh_distortion_threshold")
       preset.hh_distortion_threshold = dval;
+    else if (key == "hh_use_delay")
+      preset.hh_use_delay = dval;
     else if (key == "hh_delay_mode")
       preset.hh_delay_mode = dval;
     else if (key == "hh_delay_ms")
@@ -1105,6 +1119,8 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.cp_lfo_rate = dval;
     else if (key == "cp_distortion_threshold")
       preset.cp_distortion_threshold = dval;
+    else if (key == "cp_use_delay")
+      preset.cp_use_delay = dval;
     else if (key == "cp_delay_mode")
       preset.cp_delay_mode = dval;
     else if (key == "cp_delay_ms")
@@ -1139,6 +1155,8 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.hh2_hif_q = dval;
     else if (key == "hh2_distortion_threshold")
       preset.hh2_distortion_threshold = dval;
+    else if (key == "hh2_use_delay")
+      preset.hh2_use_delay = dval;
     else if (key == "hh2_delay_mode")
       preset.hh2_delay_mode = dval;
     else if (key == "hh2_delay_ms")

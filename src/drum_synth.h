@@ -75,6 +75,7 @@ struct DrumSettings {
   double hh_hif{6000};
   double hh_hif_q{1};
   double hh_distortion_threshold{0.5};
+  bool hh_use_delay{false};
   int hh_delay_mode{0};  // 0 - norm, 1 - tap1, 2 - tap2, 3 - pingpong
   double hh_delay_ms{23};
   double hh_delay_feedback_pct{0};
@@ -98,6 +99,7 @@ struct DrumSettings {
   int cp_lfo_type{usaw};
   double cp_lfo_rate{5};
   double cp_distortion_threshold{0.5};
+  bool cp_use_delay{false};
   int cp_delay_mode{0};  // 0 - norm, 1 - tap1, 2 - tap2, 3 - pingpong
   double cp_delay_ms{23};
   double cp_delay_feedback_pct{0};
@@ -116,6 +118,7 @@ struct DrumSettings {
   double hh2_hif{6000};
   double hh2_hif_q{1};
   double hh2_distortion_threshold{0.5};
+  bool hh2_use_delay{false};
   int hh2_delay_mode{0};  // 0 - norm, 1 - tap1, 2 - tap2, 3 - pingpong
   double hh2_delay_ms{13};
   double hh2_delay_feedback_pct{0};

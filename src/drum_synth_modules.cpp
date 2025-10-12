@@ -328,7 +328,7 @@ StereoVal HandClap::Generate() {
     noise_eg_.StopEg();
   }
 
-  out = delay_->Process(out);
+  if (use_delay_) out = delay_->Process(out);
   return out;
 }
 
@@ -447,7 +447,7 @@ StereoVal HiHat::Generate() {
     eg_.StopEg();
   }
 
-  out = delay_->Process(out);
+  if (use_delay_) out = delay_->Process(out);
   return out;
 }
 
