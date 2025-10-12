@@ -212,6 +212,8 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.sd_hi_osc_waveform = val;
   else if (name == "sd_dist")
     settings_.sd_distortion_threshold = val;
+  else if (name == "sd_delay_en")
+    settings_.sd_use_delay = val;
   else if (name == "sd_delay_mode")
     settings_.sd_delay_mode = val;
   else if (name == "sd_delay_ms")
@@ -397,6 +399,7 @@ std::string DrumSynth::Info() {
      << " sd_hi_osc_wav:" << settings_.sd_hi_osc_waveform
      << " sd_dist:" << settings_.sd_distortion_threshold << std::endl;
   ss << "     sd_delay_mode:" << settings_.sd_delay_mode
+     << " sd_delay_en:" << settings_.sd_use_delay
      << " sd_delay_ms:" << settings_.sd_delay_ms
      << " sd_delay_feedback_pct:" << settings_.sd_delay_feedback_pct
      << " sd_delay_ratio:" << settings_.sd_delay_ratio << std::endl;
@@ -614,6 +617,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   // 1 - SnareDum Settings
   presetzzz << "sd_vol=" << settings_.sd_vol << kSEP;
   presetzzz << "sd_pan=" << settings_.sd_pan << kSEP;
+  presetzzz << "sd_use_delay=" << settings_.sd_use_delay << kSEP;
   presetzzz << "sd_noise_vol=" << settings_.sd_noise_vol << kSEP;
   presetzzz << "sd_noise_decay=" << settings_.sd_noise_decay << kSEP;
   presetzzz << "sd_tone=" << settings_.sd_tone << kSEP;
@@ -809,6 +813,7 @@ void DrumSynth::Update() {
   sd_->hi_osc_->m_waveform = settings_.sd_hi_osc_waveform;
   sd_->hi_osc_->m_osc_fo = sd_->lo_osc_->m_osc_fo * 2;
   sd_->distortion_.SetParam("threshold", settings_.sd_distortion_threshold);
+  sd_->use_delay_ = settings_.sd_use_delay;
   sd_->delay_->SetMode(settings_.sd_delay_mode);
   sd_->delay_->SetDelayTimeMs(settings_.sd_delay_ms);
   sd_->delay_->SetFeedbackPercent(settings_.sd_delay_feedback_pct);
@@ -1020,6 +1025,8 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.sd_lo_osc_waveform = dval;
     else if (key == "sd_distortion_threshold")
       preset.sd_distortion_threshold = dval;
+    else if (key == "sd_use_delay")
+      preset.sd_use_delay = dval;
     else if (key == "sd_delay_mode")
       preset.sd_delay_mode = dval;
     else if (key == "sd_delay_ms")

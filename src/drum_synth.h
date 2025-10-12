@@ -32,7 +32,7 @@ struct DrumSettings {
   int bd_octave{2};
   int bd_key{40};
   double bd_detune_cents{0};
-  bool bd_use_distortion{false};
+  bool bd_use_distortion{true};
   double bd_distortion_threshold{0.5};
   bool bd_hard_sync{false};
   bool bd_use_delay{false};
@@ -56,6 +56,7 @@ struct DrumSettings {
   int sd_hi_osc_waveform{0};
   int sd_lo_osc_waveform{0};
   double sd_distortion_threshold{0.5};
+  bool sd_use_delay{false};
   int sd_delay_mode{0};  // 0 - norm, 1 - tap1, 2 - tap2, 3 - pingpong
   double sd_delay_ms{23};
   double sd_delay_feedback_pct{0};

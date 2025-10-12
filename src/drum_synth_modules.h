@@ -36,7 +36,7 @@ class PulseTrigger {
   void Trigger();
   double GenNext();
 
-  double amplitude_{0.3};
+  double amplitude_{0.6};
   int pulse_counter_{0};
   int pulse_length_{44};  // samples
 };

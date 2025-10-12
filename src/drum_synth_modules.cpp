@@ -30,19 +30,19 @@ BassDrum::BassDrum() {
   osc1_ = std::make_unique<QBLimitedOscillator>();
   osc1_->m_waveform = SINE;
   osc1_->m_osc_fo = frequency_;
-  osc1_->m_amplitude = 0.7;
+  osc1_->m_amplitude = 0.9;
   osc1_->Update();
 
   osc2_ = std::make_unique<QBLimitedOscillator>();
-  osc2_->m_waveform = SINE;
+  osc2_->m_waveform = TRI;
   osc2_->m_osc_fo = frequency_;
-  osc2_->m_amplitude = 0.7;
+  osc2_->m_amplitude = 0.9;
   osc2_->Update();
 
   eg_.SetRampMode(true);
   eg_.m_reset_to_zero = true;
   eg_.SetEgMode(DIGITAL);
-  eg_.SetAttackTimeMsec(5);
+  eg_.SetAttackTimeMsec(1);
   eg_.SetDecayTimeMsec(180);
   eg_.Update();
 
@@ -235,7 +235,7 @@ StereoVal SnareDrum::Generate() {
     noise_eg_.StopEg();
   }
 
-  out = delay_->Process(out);
+  if (use_delay_) out = delay_->Process(out);
   return out;
 }
 

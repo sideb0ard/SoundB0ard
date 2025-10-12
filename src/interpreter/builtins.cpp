@@ -2210,8 +2210,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          [](const std::vector<std::shared_ptr<object::Object>>& args)
              -> std::shared_ptr<object::Object> {
            (void)args;
-           std::string cmd =
-               "let sbdrum = drum(); load_preset(sbdrum,\"FMZ\");";
+           std::string cmd = "let sbdrum = drum();";
            eval_command_queue.push(cmd);
 
            cmd = "let sb2 = drum(); load_preset(sb2,\"FMZ\");";
