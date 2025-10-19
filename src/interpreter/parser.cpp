@@ -384,18 +384,30 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement() {
   }
   NextToken();
 
-  stmt->initialization_ = ParseStatement();
-  NextToken();
+  if (CurTokenIs(token::SLANG_SEMICOLON) &&
+      PeekTokenIs(token::SLANG_SEMICOLON)) {
+    Token empty_token(token::SLANG_SEMICOLON, ";");
+    stmt->initialization_ =
+        std::make_shared<ast::ExpressionStatement>(empty_token);
+    Token true_token(token::SLANG_TRUE, "true");
+    stmt->termination_ =
+        std::make_shared<ast::BooleanExpression>(true_token, true);
+    stmt->increment_ = std::make_shared<ast::ExpressionStatement>(empty_token);
+    NextToken();
+  } else {
+    stmt->initialization_ = ParseStatement();
+    NextToken();
 
-  stmt->termination_ = ParseExpression(Precedence::LOWEST);
+    stmt->termination_ = ParseExpression(Precedence::LOWEST);
 
-  if (!ExpectPeek(token::SLANG_SEMICOLON)) {
-    std::cerr << "NO SEMICOLON! - returning nullptr \n";
-    return nullptr;
+    if (!ExpectPeek(token::SLANG_SEMICOLON)) {
+      std::cerr << "NO SEMICOLON! - returning nullptr \n";
+      return nullptr;
+    }
+    NextToken();
+
+    stmt->increment_ = ParseStatement();
   }
-  NextToken();
-
-  stmt->increment_ = ParseStatement();
 
   // Body
   if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
