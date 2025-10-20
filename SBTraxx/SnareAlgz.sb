@@ -1,0 +1,67 @@
+
+# perc = dloops/notOverPercky.aiff
+let snblah_gen = gen()
+{
+  setup()
+  {
+    let delz = [400, 300, 200, 100, 50, 10, 900];
+    let dlx = 0;
+    let dlfbz = [10, 90, 40, 60];
+    let dlfx = 0;
+    set sbdrum:sd_delay_en 1;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 == 0) {
+        #note_on_at(sbdrum, 0, i * pp);
+      }
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (i == 8) {
+        set sbdrum:sd_delay_ms delz[dlx] at=i*pp;
+        dlx = incr(dlx, 0, len(delz));
+
+        set sbdrum:sd_delay_feedback_pct dlfbz[dlfx] at=i*pp;
+        dlfx = incr(dlfx, 0, len(dlfbz));
+
+        note_on_at(sbdrum, 1, i * pp);
+      }
+    }
+  }
+}
+
+let key = 29;
+let keymod = 1;
+let notez = notes_in_key(key, keymod);
+
+# quazzz
+# scarlet
+let dxxblah_gen = gen()
+{
+  setup()
+  {
+    let prog = [0, 0, 0, 0, 3, 3, 4, 4];
+    let px = 0;
+    let obeat = [1, 1, 1, 1,  0, 1, 0, 0,  1, 0, 1, 1,  0, 0, 0, 0];
+  }
+  run()
+  {
+    let beat = obeat;
+    if (count % 8 == 7) {
+      beat = rand_beat();
+    }
+    let chrd = notes_in_chord(notez[prog[px]], key, 0, keymod);
+    for (let i = 0; i < 16; i++) {
+      let offz = 80;
+      if (i % 2 == 0) {
+        offz = 0;
+      }
+      if (beat[i] == 1) {
+        note_on_at(dx, chrd, i * pp + offz, dur = 150);
+      }
+    }
+    px = incr(px, 0, len(prog));
+  }
+}

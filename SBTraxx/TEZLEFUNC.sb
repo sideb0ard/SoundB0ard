@@ -1,0 +1,53 @@
+
+# D#
+let key = 27;
+let notez = notes_in_key(key);
+
+# load_preset(dx, "CTZZZ2");
+
+# let wmp = loop(dloops2/wumpbristio.wav);
+# set wmp:len 2;
+# add distort and sidehchain
+let bblah_gen = gen()
+{
+  setup()
+  {
+    let rif1 = [39, 0, 38, 0,  0, 0, 29, 0,  34, 0, 34, 0,  0, 0, 29, 0];
+    let rif2 = [36, 0, 0, 36,  0, 27, 0, 32,  0, 0, 0, 0,  34, 0, 32, 0];
+    let rif3 = [32, 0, 0, 0,  0, 0, 0, 0,  34, 0, 0, 0,  0, 0, 0, 0];
+    let rif4 = [36, 0, 0, 0,  0, 27, 0, 0,  0, 0, 36, 0,  0, 0, 0, 0];
+    let rifz = [rif1, rif2, rif3, rif4];
+
+    let durz = [100, 200, 300, 400, 500, 700];
+    let drx = 0;
+  }
+  run(rif_num)
+  {
+    if (rif_num < len(rifz)) {
+      let mel = rifz[rif_num];
+      for (let i = 0; i < 16; i++) {
+        if (mel[i] > 0) {
+          note_on_at(dx, mel[i], i * pp, dur = durz[drx]);
+          set wmp:fx2:active 1 at=i*pp;
+        } else {
+          set wmp:fx2:active 0 at=i*pp;
+        }
+      }
+      drx = incr(drx, 0, len(durz));
+    }
+  }
+}
+
+let melmanblah_gen = gen()
+{
+  setup()
+  {
+    let melprog = [0, 0, 3, 1, 3, 1, 2];
+    let mx = 0;
+  }
+  run()
+  {
+    bblah_gen(melprog[mx]);
+    mx = incr(mx, 0, len(melprog));
+  }
+}

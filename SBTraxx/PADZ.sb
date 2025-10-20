@@ -1,0 +1,111 @@
+
+# dx WAYNWATN
+load_preset(dx, "WAYNWATN");
+load_preset(dx2, "MWAUR");
+let Amin9 = down([69, 72, 76, 79, 83], 12);
+
+let thedur = 50;
+
+let dxblahfn = fn(durlen)
+{
+  note_on(dx, down(Amin9,12), dur = durlen, vel = 50 + rand(70));
+}
+
+let padzblah_gen = gen()
+{
+  setup()
+  {
+    let basebeat = [1, 0, 0, 0,  0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 1, 0];
+    let kickcount = 0;
+    let durz = [50, 100, 200, 400];
+    let drx = 0;
+    let cx = 0;
+
+    let dxlenz = [500, 1000, 300, 3000, 5000];
+    let dxx = 0;
+
+    let lzatkz = [100, 400, 600, 50, 20];
+    let lx = 0;
+
+    let clpattackz = [10, 10, 50, 10, 80, 10, 100, 600];
+    let clpx = 0;
+    let clpdelz = [50, 100, 300, 23, 3];
+    let cpdx = 0;
+
+  }
+  run()
+  {
+    if (count % 8 < 5) {
+      let beat = mask(rand_beat(), "8080");
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(dx2, Amin9[cx] - 24, i * pp + 80, dur = durz[drx]);
+          cx = incr(cx, 0, len(Amin9));
+        }
+      }
+    }
+
+    if (count % 8 == 0) {
+      note_on_at(sbdrum, 0, 0);
+    }
+
+    if (count % 8 < 7) {
+      let beat = basebeat;
+      if (count % 12 == 11) {
+        beat = mask(rand_array(16, 1, 1), "0808")
+      }
+
+      let offs = 60;
+      for (let i = 0; i < 16; i++) {
+
+        if (i % 2 == 0) {
+          offs = 0;
+        }
+
+        if (beat[i] == 1) {
+          #note_on_at(sbdrum, 0, i * pp + offs);
+          kickcount++;
+          if (kickcount % 4 == 0) {
+            note_on_at(dx3, [33, 45, 57], i * pp + offs, dur = durz[drx]);
+            drx = incr(drx, 0, len(durz));
+          }
+
+          if (kickcount % 13 == 7) {
+            dxblahfn(dxlenz[dxx]);
+            dxx = incr(dxx, 0, len(dxlenz));
+          }
+
+          if (kickcount % 4 == 3) {
+            note_on_at(sb2, 8, i * pp + offs, vel = 50);
+            set sb2:lz_attack lzatkz[lx];
+            lx = incr(lx, 0, len(lzatkz));
+          }
+
+          # if (kickcount % 3 == 0) {
+            #   note_on_at(jungl, 1, i * pp + offs, dur = durz[drx]*4);
+            # }
+        }
+
+        if (i % 8 == 4) {
+          note_on_at(sb2, 3, i * pp + offs);
+          set sb2:cp_delay_en 0;
+          set sb2:cp_eg_attack clpattackz[clpx] at=i*pp;
+          clpx = incr(clpx, 0, len(clpattackz));
+          if (count % 6 == 4) {
+            set sb2:cp_delay_en 1;
+            set sb2:cp_delay_ms clpdelz[cpdx];
+            cpdx = incr(cpdx, 0, len(clpdelz));
+          }
+        }
+
+        if (i % 4 == 2) {
+          note_on_at(sb2, 2, i * pp + offs, vel = 50 + rand(50));
+        }
+      }
+    } else {
+      solo(dx, at=8*pp);
+      dxblahfn(dxlenz[dxx]);
+      dxx = incr(dxx, 0, len(dxlenz));
+    }
+  }
+}

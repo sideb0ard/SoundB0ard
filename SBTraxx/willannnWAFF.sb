@@ -1,0 +1,54 @@
+# dx - WAFFLE
+
+let key = 48;
+let notez = notes_in_key(48);
+
+let melblah_gen = gen()
+{
+  setup()
+  {
+    let onz = [300, 600, 1000, 3000, 6000];
+    let onx = 0;
+    let offz = [400, 900, 100, 50, 600, 3000];
+    let ofx = 0;
+
+    let idxz = [7, 7, 1, 3];
+    let ix = 0;
+
+    let next_on = 0;
+
+    let note_count = 0;
+  }
+  run()
+  {
+    if (next_on > 3840) {
+      next_on = next_on - 3480;
+    }
+
+    for (let i = 0; i < 3840; i++) {
+      if (next_on == i) {
+        let on_for = onz[onx];
+        onx = incr(onx, 0, len(onz));
+        let off_for = offz[ofx];
+        ofx = incr(ofx, 0, len(offz));
+        #print("ON! idx", i, "dur:", on_for, " silence:", off_for);
+        # note on - 300, note_off 400 - next_on - 700
+        next_on = next_on + on_for + off_for;
+        let chrd = notes_in_chord(notez[idxz[ix]], key, 2);
+        ix = incr(ix, 0, len(idxz));
+        note_on_at(dx, chrd, i, dur = on_for);
+
+        if (note_count % 4 == 0) {
+          note_on_at(sbdrum, 0, i);
+        }
+        if (note_count % 6 == 3) {
+          note_on_at(sbdrum, 3, i);
+          note_on_at(sbdrum, 1, i);
+        }
+        note_count++;
+      }
+    }
+    #print("WOOP, DONE WITH LOOP: NEXT_ON:", next_on);
+    ##print(chrd);
+  }
+}

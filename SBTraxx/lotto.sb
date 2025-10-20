@@ -1,0 +1,45 @@
+
+let lottoblah_gen = gen()
+{
+  setup()
+  {
+    let answers = rand_array(5, 0, 0);
+    let mega = 0;
+  }
+  run()
+  {
+    let aix = 0;
+
+    for (;;) {
+      let num = rand(47) + 1;
+      if (!is_val_in_list(answers, num)) {
+        answers[aix] = num;
+        aix++;
+      }
+      if (aix == len(answers)) {
+        break;
+      }
+    }
+    print("DRAW:", sort(answers));
+    print("LUCKYNUM:", rand(27) + 1);
+  }
+}
+
+let generatelotto_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    print("");
+    for (let i = 0; i < 3; i++) {
+      lottoblah_gen();
+      print("");
+    }
+  }
+}
+
+
+# +    stmt->termination_ =
+# +        std::make_shared<ast::BooleanExpression>(true_token, true);

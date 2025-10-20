@@ -1,0 +1,18 @@
+
+let bounceblah_gen = gen()
+{
+  setup()
+  {
+    let pos_x = 50;
+    let pos_y = 10;
+    let vel_x = 0.1;
+    let vel_y = 0.1;
+    let acc_x = 0;
+    let acc_y = 0;
+  }
+  run()
+  {
+    print(pos_x, pos_y);
+    pos_x = pos;
+  }
+}
