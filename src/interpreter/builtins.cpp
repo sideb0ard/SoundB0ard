@@ -1252,7 +1252,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              -> std::shared_ptr<object::Object> {
            if (input.size() < 2)
              return evaluator::NewError(
-                 "`send` requires at least two args - channel side and source");
+                 "`xassign` requires at least two args - channel 0(L) or 1(R) "
+                 "and source");
 
            auto at_obj = std::find_if(input.begin(), input.end(),
                                       [](std::shared_ptr<object::Object> o) {
@@ -1321,6 +1322,59 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      audio_queue.push(std::move(action));
                      return evaluator::NULLL;
                    })},
+    {"xremove",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+           if (input.size() < 2)
+             return evaluator::NewError(
+                 "`xremove` requires at least two args - channel 0(L) or 1(R) "
+                 "and source");
+
+           auto at_obj = std::find_if(input.begin(), input.end(),
+                                      [](std::shared_ptr<object::Object> o) {
+                                        return o->Type() == object::AT_OBJ;
+                                      });
+           int delayed_by{0};
+           if (at_obj != input.end()) {
+             auto at = std::dynamic_pointer_cast<object::At>(*at_obj);
+             if (at) {
+               delayed_by = at->value_;
+             }
+           }
+
+           auto xfade_left_or_right =
+               std::dynamic_pointer_cast<object::Number>(input[0]);
+           if (xfade_left_or_right) {
+             auto action = std::make_unique<AudioActionItem>(
+                 AudioAction::MIXER_XFADE_REMOVE);
+             action->delayed_by = delayed_by;
+             action->xfade_channel =
+                 static_cast<unsigned int>(xfade_left_or_right->value_);
+
+             auto sg_array = std::dynamic_pointer_cast<object::Array>(input[1]);
+             if (sg_array) {
+               for (auto const& e : sg_array->elements_) {
+                 auto sg = std::dynamic_pointer_cast<object::SoundGenerator>(e);
+                 if (sg) {
+                   action->group_of_soundgens.push_back(sg->soundgen_id_);
+                 }
+               }
+             } else {
+               auto sg =
+                   std::dynamic_pointer_cast<object::SoundGenerator>(input[1]);
+               if (sg) {
+                 action->group_of_soundgens.push_back(sg->soundgen_id_);
+               }
+             }
+             if (action->group_of_soundgens.size() == 0) {
+               std::cout << "NO SOUNDGENS FOUND, RETURNING..\n";
+               return evaluator::NULLL;
+             }
+             audio_queue.push(std::move(action));
+           }
+           return evaluator::NULLL;
+         })},
     {"xfade",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)

@@ -1,24 +1,29 @@
 
+# garage
+# BELLEAD
+# wuurpr
+# WTOOF ROLF
+# load_preset(dx, "OILY");
 let bounceah_gen = gen()
 {
   setup()
   {
-    let mass = 2;
-    let massincr = 0.8;
-    let acceleration = 0;
+    let mass = 1;
+    let acceleration = 0.1;
 
-    let dampening = -0.96;
+    let dampening = 0.95;
 
-    let bounce_len = 400;
-    let pp = 3840 / bounce_len;
+    let bounce_lenz = [1200, 500, 800, 370];
+    let bx = 0;
 
-    let gravity = -0.1;
+    let gravity = -0.05;
     let friction_coeff = 0.1;
     let normal = 1;
     let friction_mag = friction_coeff * normal;
 
     #let notez = [34, 36, 38, 39,  41, 43, 45, 46];
-    let notez = [43, 36, 41, 34];
+    #let notez = [43, 36, 41, 34];
+    let notez = down([43, 46, 50, 53], 24);
     let nx = 0;
 
   }
@@ -28,16 +33,16 @@ let bounceah_gen = gen()
     let y_position = 10;
     let last_bounce = 0;
 
+    let ppp = 3840 / bounce_lenz[bx];
+    bx = incr(bx, 0, len(bounce_lenz));
+    #let note = notez[nx];
     let note = notez[nx];
-    if (count % 4 == 3) {
-      nx = incr(nx, 0, len(notez));
-    }
 
     # gravity force
     let gf = gravity / mass;
 
 
-    for (let i = 0; i < bounce_len; i++) {
+    for (let i = 0; i < bounce_lenz[bx]; i++) {
 
       acceleration = acceleration + gf;
 
@@ -46,34 +51,24 @@ let bounceah_gen = gen()
       y_position = y_position + velocity;
       acceleration = acceleration * 0;
 
-      #let pit = scale(velocity, 0, 1, 0.1, 2);
-      #set ob:pitch pit;
-
       if (y_position < 0) {
         y_position = 0;
-
+        velocity = velocity * -1;
         velocity = velocity * dampening;
-        #let friction = velocity * -1 * friction_coeff;
-        # acceleration = acceleration + friction;
-        #print("BOUNCE!", i, " Y:",  y_position, " Last bounce:", last_bounce, " Velocity:", velocity);
+        nx = incr(nx, 0, len(notez));
+
+        #   # #let friction = velocity * -1 * friction_coeff;
+        #   # # acceleration = acceleration + friction;
         let last_diff = i - last_bounce;
         if (last_diff < 7) {
           break;
         }
         last_bounce = i;
-        let d = scale(velocity, 0, 1, 10, 300);
+        let d = scale(velocity, 0, 1, 10, 700);
         let v = scale(velocity, 0, 1, 10, 127);
-        note_on_at(dx, note, i * pp, dur = d, vel = v) ;
-        note_on_at(dx, note + 4, i * pp + 10, dur = 200);
-        note_on_at(dx, note + 12, i * pp, dur = 100);
-
-        note_on_at(ob, 1, i * pp, dur = 0);
+        note_on_at(dx, note, i * ppp, dur = d, vel = v) ;
+        note_on_at(dx, up(note ,12), i * ppp, dur = d, vel = v);
       }
-    }
-
-    mass = mass + massincr;
-    if (mass > 15 || mass < 1) {
-      massincr = massincr * -1;
     }
   }
 }
@@ -93,6 +88,41 @@ let dblah_gen = gen()
   }
 }
 
+# let hazeh = loop(dloops2/hazehop.wav) ; set hazeh:len 2;
+# add_fx(hazeh, "distort"); add_fx(hazeh, "transverb");
+let mixerblah_gen = gen()
+{
+  setup()
+  {
+    let dxvolz = [0.1, 0.3, 0.5, 0.6, 0.5, 0.6, 0.4];
+    let dxvx = 0;
+    let hpitzh = [0.8, 1.2, 1, 0.6, 1.5, 2];
+    let hpx = 0;
+  }
+  run()
+  {
+    #vol dx dxvolz[dxvx];
+    #dxvx = incr(dxvx, 0, len(dxvolz));
+    set hazeh:fx1:active 0;
+    set spaceman:fx0:active 0;
+    if (count % 8 == 7) {
+      solo(hazeh, at=8*pp);
+      hpx = incr(hpx, 0, len(hpitzh));
+      set hazeh:pitch hpitzh[hpx];
+      set hazeh:fx1:active 1;
+      set spaceman:fx0:active 1;
+    }
+    if (count % 13 == 12) {
+      set hazeh:stutter 1;
+    }
+    if (count % 16 == 14) {
+      set hazeh:reverse 1;
+    }
+
+  }
+}
+
+
 let loopblah_gen = gen()
 {
   setup()
@@ -111,6 +141,70 @@ let loopblah_gen = gen()
     }
     for (let i = 0; i < 16; i++) {
       note_on_at(drumz, beat[i], i * pp, dur = durz[drx]);
+    }
+  }
+}
+
+let dlblah_gen = gen()
+{
+  setup()
+  {
+    let beat1 = [1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0];
+    let beat2 = [0, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+  }
+  run()
+  {
+    let beat = beat1;
+    if (count % 4 < 3) {
+      beat = beat2;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(sbdrum, 0, i * pp);
+      }
+    }
+
+  }
+}
+
+let key = 34;
+
+# SMMTH2
+let bmel2lah_gen = gen()
+{
+  setup()
+  {
+    let base_beat = [1, 0, 0];
+    let eucz = [3, 5, 7];
+    let ex = 0;
+    let chrdz = [4, 4, 1];
+    let chx = 0;
+    let durz = [70, 150, 300, 700, 100];
+    let drx = 0;
+  }
+  run()
+  {
+
+    if (count % 2 == 1) {
+      let chrd = notes_in_chord(notes_in_key(key)[chrdz[chx]], key);
+      chx = incr(chx, 0, len(chrdz));
+      let beat = base_beat + bjork(eucz[ex], 13);
+      ex = incr(ex, 0, len(eucz));
+      # print(beat);
+      # print(chrd);
+      for (let i = 0; i < 16; i++) {
+        if (beat[i] == 1) {
+          note_on_at(dx3, chrd, i * pp, dur = durz[drx]);
+          drx = incr(drx, 0, len(durz));
+        }
+      }
+
+      if (count % 8 == 7) {
+        solo(dx3, at=4*pp);
+      }
+    } else {
+      bounceah_gen();
     }
   }
 }

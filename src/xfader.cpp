@@ -6,7 +6,7 @@
 
 #include "utils.h"
 
-void XFader::Assign(int idx, unsigned int left_or_right) {
+void XFader::Assign(unsigned int left_or_right, int idx) {
   bool is_in_left = left_channel_.contains(idx);
   bool is_in_right = right_channel_.contains(idx);
 

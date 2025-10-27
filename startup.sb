@@ -115,8 +115,6 @@ let countr = gen()
   run()
   {
     ++count;
-    unsolo();
-    xclear();
   }
 }
 let xfade_gen = gen()
@@ -1053,4 +1051,3 @@ let print_notes = fn(notes)
   }
   return ans;
 }
-

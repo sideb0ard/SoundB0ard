@@ -4,15 +4,25 @@ let bounceblah_gen = gen()
   setup()
   {
     let pos_x = 50;
-    let pos_y = 10;
+    let pos_y = 50;
     let vel_x = 0.1;
-    let vel_y = 0.1;
+    let vel_y = -0.5;
     let acc_x = 0;
-    let acc_y = 0;
+    let acc_y = -0.1;
+    let dampening = 0.1;
   }
   run()
   {
-    print(pos_x, pos_y);
-    pos_x = pos;
+    print(pos_x, " ", pos_y);
+    vel_y = vel_y + acc_y;
+    pos_y = pos_y + vel_y;
+    if (pos_y <= 0) {
+      vel_y = vel_y * -1;
+      pos_y = 0;
+    }
+    if (pos_y > 20) {
+      vel_y = vel_y * -1;
+      pos_y = 20;
+    }
   }
 }

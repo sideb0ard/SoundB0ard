@@ -1,3 +1,5 @@
+#pragma once
+
 #include <set>
 
 #include "defjams.h"
@@ -8,7 +10,7 @@ class XFader {
   XFader() = default;
   ~XFader() = default;
 
-  void Assign(int soundgenerator_idx, unsigned int left_or_right);
+  void Assign(unsigned int left_or_right, int soundgenerator_idx);
   void Clear();
 
   void Update(mixer_timing_info tinfo);

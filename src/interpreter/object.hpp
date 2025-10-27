@@ -372,6 +372,7 @@ class BuiltIn : public Object {
   }
 
  public:
+  std::string description_;
   BuiltInFunc func_;
 };
 

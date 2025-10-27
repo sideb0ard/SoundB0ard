@@ -772,7 +772,8 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
   } else if (action->type == AudioAction::MIXER_XFADE_ASSIGN) {
     for (const auto &soundgen_num : action->group_of_soundgens) {
       if (IsValidSoundgenNum(soundgen_num)) {
-        xfader_.Assign(soundgen_num, action->xfade_channel);
+        std::cout << "Adding soundgen num:" << soundgen_num << std::endl;
+        xfader_.Assign(action->xfade_channel, soundgen_num);
       }
     }
   } else if (action->type == AudioAction::MIXER_XFADE_CLEAR) {
