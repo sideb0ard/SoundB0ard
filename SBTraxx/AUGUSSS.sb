@@ -4,6 +4,7 @@
 # wuurpr
 # WTOOF ROLF
 # load_preset(dx, "OILY");
+# load_preset(dx, "lTail");
 let bounceah_gen = gen()
 {
   setup()
@@ -88,8 +89,9 @@ let dblah_gen = gen()
   }
 }
 
-# let hazeh = loop(dloops2/hazehop.wav) ; set hazeh:len 2;
+# let hazeh = loop(dloops2/hazehop.wav) ; set hazeh:len 4; vol hazeh 0;
 # add_fx(hazeh, "distort"); add_fx(hazeh, "transverb");
+# sched(0, 0, 0.6, 3840 * 2, "vol hazeh %")
 let mixerblah_gen = gen()
 {
   setup()
@@ -104,13 +106,13 @@ let mixerblah_gen = gen()
     #vol dx dxvolz[dxvx];
     #dxvx = incr(dxvx, 0, len(dxvolz));
     set hazeh:fx1:active 0;
-    set spaceman:fx0:active 0;
+    # set spaceman:fx0:active 0;
     if (count % 8 == 7) {
-      solo(hazeh, at=8*pp);
+      solo(hazeh, at=4*pp);
       hpx = incr(hpx, 0, len(hpitzh));
       set hazeh:pitch hpitzh[hpx];
       set hazeh:fx1:active 1;
-      set spaceman:fx0:active 1;
+      # set spaceman:fx0:active 1;
     }
     if (count % 13 == 12) {
       set hazeh:stutter 1;

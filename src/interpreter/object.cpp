@@ -410,12 +410,23 @@ std::string Array::Inspect() {
 
 std::string Environment::ListFuncsAndGen() {
   std::stringstream ss;
+
+  // keys
+  std::vector<std::string> keys;
   for (const auto &it : store_) {
-    if (it.second->Type() == "FUNCTION") {
-      ss << ANSI_COLOR_WHITE << it.first << COOL_COLOR_PINK << " = fn()"
+    if (it.second->Type() == "FUNCTION" || it.second->Type() == "GENERATOR")
+      keys.push_back(it.first);
+  }
+
+  std::sort(keys.begin(), keys.end());
+
+  for (const auto &key : keys) {
+    auto funk = store_[key];
+    if (funk->Type() == "FUNCTION") {
+      ss << ANSI_COLOR_WHITE << key << COOL_COLOR_PINK << " = fn()"
          << std::endl;
-    } else if (it.second->Type() == "GENERATOR") {
-      ss << ANSI_COLOR_WHITE << it.first << COOL_COLOR_PINK << " = gen()"
+    } else if (funk->Type() == "GENERATOR") {
+      ss << ANSI_COLOR_WHITE << key << COOL_COLOR_YELLOW << " = gen()"
          << std::endl;
     }
   }
