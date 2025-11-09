@@ -519,7 +519,7 @@ double do_white_noise() {
   unsigned long r2 = (unsigned long)rand();
   // Combine: use r1 for upper bits, r2 for lower bits
   // Shift r1 left by 16 bits and OR with lower 16 bits of r2
-  noise_val = (r1 << 16) ^ (r2 & 0xFFFF);
+  noise_val = ((r1 & 0xFFFF) << 16) ^ (r2 & 0xFFFF);
 #endif
 
   // normalize to -1.0 to 1.0 range
