@@ -2259,6 +2259,31 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
        return evaluator::NULLL;
      })},
+    {"drum_kit",
+     std::make_shared<object::BuiltIn>(
+         [](const std::vector<std::shared_ptr<object::Object>>& args)
+             -> std::shared_ptr<object::Object> {
+           (void)args;
+
+           std::vector<std::pair<std::string, std::string>> drumz = {
+               {"bd", "bd/kick8.aif"},
+               {"bdd", "bd/808kick.aif"},
+               {"sd", "sd/2snare.aif"},
+               {"cp", "cp/clap17.aif"},
+               {"ch", "ch/2hat.aif"},
+               {"oh", "oh/dmx_hh_open.aif"},
+               {"shkr", "perc/chezShaker.aiff"},
+               {"shkr2", "perc/tuffShaker.aiff"}};
+
+           for (const auto& p : drumz) {
+             std::stringstream ss;
+             ss << "let " << p.first << " = sample(" << p.second << ");";
+             std::cout << "command:" << ss.str() << std::endl;
+             eval_command_queue.push(ss.str());
+           }
+
+           return evaluator::NULLL;
+         })},
     {"kit",
      std::make_shared<object::BuiltIn>(
          [](const std::vector<std::shared_ptr<object::Object>>& args)

@@ -842,7 +842,6 @@ let gcmelody = fn(num_steps, notez, loop_len)
   return melody;
 }
 
-kit();
 
 let take_n = fn(an_array, num_to_take) {
   let numz = [];
@@ -1051,3 +1050,5 @@ let print_notes = fn(notes)
   }
   return ans;
 }
+
+kit();
