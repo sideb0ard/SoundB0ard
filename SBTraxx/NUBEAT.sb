@@ -1,0 +1,93 @@
+
+# [1, 0, 1, 1,  0, 1, 1, 0,  1, 0, 0, 0,  0, 0, 0, 0]
+# [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0]
+
+# load_preset(sbdrum, "HUT1");
+# load_preset(dx2, "fnc");
+let drblah_gen = gen()
+{
+  setup()
+  {
+    let num_drum_hitz = [2, 4, 3, 3, 0];
+    let ndx = 0;
+
+    let swungz = [30, 40, 60, 50, 20];
+    let swx = 0;
+  }
+  run()
+  {
+    let num_drumz = num_drum_hitz[ndx];
+    ndx = incr(ndx, 0, len(num_drum_hitz));
+    let drum_hitz = rand_array(num_drumz, 0, 0);
+
+    if (num_drumz > 0) {
+      let hitz_found = 0;
+      let max_attempts = 10;
+      for (;;) {
+        let d = rand(16);
+        if (!is_val_in_list(drum_hitz, d)) {
+          if (d != 4 && d != 12) {
+            drum_hitz[hitz_found++] = d;
+          }
+        }
+        if (hitz_found == num_drumz) {
+          break;
+        }
+      }
+      drum_hitz = sort(drum_hitz);
+      if (count % 2 == 0) {
+        if (drum_hitz[0] != 0) {
+          note_on_at(sbdrum, 0, 0);
+        }
+      }
+
+      for (let i = 0; i < num_drumz; i++) {
+        note_on_at(sbdrum, 0, drum_hitz[i] * pp + swungz[swx], vel = 100 + rand(28));
+        swx = incr(swx, 0, len(swungz));
+      }
+    }
+    cmbeat(sbdrum, 3);
+    cmbeat(sbdrum, 1);
+  }
+}
+
+let bsssblah_gen = gen()
+{
+  setup()
+  {
+    let bass1 = [21, 21, 0, 33,  0, 21, 0, 0,  0, 0, 21, 0,  0, 33, 0, 0];
+    let bass2 = [0, 21, 0, 0,  0, 25, 0, 0,  28, 0, 0, 0,  0, 23, 0, 0];
+  }
+  run()
+  {
+    let bass = bass1;
+    if (count % 4 == 3) {
+      bass = bass2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] > 0) {
+        note_on_at(dx2, bass[i], i * pp, dur = 500);
+      }
+    }
+  }
+}
+
+let padblah_gen = gen()
+{
+  setup()
+  {
+    #let lenz = [300, 500, 1000, 1200, 1500];
+    let lenz = [130, 500, 1000, 4000];
+    let lx = 0;
+    let atz = [8, 10, 4, 12, 14];
+    let ax = 0;
+  }
+  run()
+  {
+    if (count % 8 < 6) {
+      note_on_at(dx, notes_in_chord(33, 21, 2), atz[ax] * pp, dur = lenz[lx]);
+      lx = incr(lx, 0, len(lenz));
+      ax = incr(ax, 0, len(atz));
+    }
+  }
+}

@@ -5,7 +5,13 @@ Samplez/
 calcy
 freakynotes
 chordie
-wavs/*
+
+# Ignore everything in wavs
+wavs/**/*
+
+# But track these specific files
+!wavs/
+!wavs/*/
 !wavs/bd/808kick.aif
 !wavs/bd/kick2.aif
 !wavs/bd/kick8.aif
@@ -24,6 +30,7 @@ wavs/*
 !wavs/perc/chezShaker.aiff
 !wavs/perc/808cowbell.aiff
 !wavs/perc/808clave.aif
+
 DrumLoopz/
 oldwavs/
 magenta/
