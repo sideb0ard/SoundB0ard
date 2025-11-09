@@ -11,34 +11,88 @@
 
 ```
 
+SoundB0ard is an interactive music-making environment with a Unix-style shell interface. It's a real-time audio synthesis and sampling system that allows users to create music through command-line interactions.
 
-Soundb0ard is an interactive music making environment, with which you interact via a unix styled shell.
+### Key Features
+- Unix-style shell for music creation and performance
+- SLANG language, javascript like syntax.
+- Live coding support - can track files for changes 
+- Ableton Link integration for tempo synchronization across apps
+- FM and subtractive synth engines, based on DX100 and MiniMoog.
+- Drum synthesis and Sampler
+- Granular synthesis
+- FX processing
+- MIDI support
+- WebSocket integration for remote control
 
-It uses Ableton Link to sync with other running apps on the same local network. Follow install instructions for Link first - https://github.com/Ableton/link
+## Technology Stack
 
-Other libraries needed are PortAudio, PortMidi, Exuberant Ctags, gperf, Cscope, PerlinNoise and libsndfile, Websocketpp, Jsoncpp:
+- **Language**: C++20
+- **Build System**: CMake
+- **Platform**: macOS (primary), Linux (cross-platform capable)
+- **Audio I/O**: PortAudio
+- **MIDI I/O**: PortMidi
+- **File I/O**: libsndfile
+- **CLI**: readline
+- **Sync**: Ableton Link
+- **JSON**: JsonCpp
+- **WebSockets**: websocketpp
 
-http://www.portaudio.com/
-http://portmedia.sourceforge.net/portmidi/
-http://www.mega-nerd.com/libsndfile/
-http://ctags.sourceforge.net/
-https://github.com/Reputeless/PerlinNoise
-https://github.com/zaphoyd/websocketpp
-https://github.com/open-source-parsers/jsoncpp
+## Architecture
 
-I still need to do some more work to make it portable. For the moment I've only been developing on OSX.
-I've recently moved the project to CMake and using c++20. Edit the CMakeLists.txt and adjust any paths required.
-To build:
-`mkdir build`
-`cd build`
-`cmake ..`
-`cmake --build .`
+### Synthesis Engines
 
-then run it from the top level directory (so it can find sample dir):
-`build/Sbsh`
+- **DXSynth** (`dxsynth.cpp/h`): FM-style synthesis engine
+- **MiniSynth** (`minisynth.cpp/h`): Subtractive synthesis engine
+- **SBSynth** (`sbsynth.cpp/h`): Custom synthesis engine
+- **DrumSynth** (`drum_synth.cpp/h`): Drum synthesis
+- **DrumSampler** (`drumsampler.cpp/h`): Sample-based drums
 
+## Build & Development
 
-Demo here --
+### Building
+```bash
+./install_deps.sh    # Install dependencies
+mkdir build && cd build
+cmake ..
+cmake --build . -j$(nproc)
+```
+
+### Running
+```bash
+# Run from project root (so it can find wavs/ directory)
+build/Sbsh
+```
+
+## Code Style & Conventions
+
+- **Standard**: C++20
+- **Formatting**: clang-format (config in `.clang-format`)
+- **Linting**: clang-tidy (config in `.clang-tidy`)
+- **Pre-commit hooks**: Configured in `.pre-commit-config.yaml`
+
+## Project Structure
+
+```
+SoundB0ard/
+├── src/              # Source code
+│   ├── filters/      # Filter implementations
+│   ├── fx/           # Effects processors
+│   ├── interpreter/  # Command interpreter
+│   ├── pattern_parser/ # Pattern language
+│   └── websocket/    # WebSocket server
+├── tests/            # Test suite
+├── wavs/             # Sample library
+├── SBTraxx/          # Track/pattern files
+├── settings/         # Synth presets
+├── build/            # Build output
+└── cmake/            # CMake modules
+```
+
+## Additional Resources
+
+- Build instructions: `BUILD.md`
+- Credits: `CREDITS.md`
 
 [![Alt text](https://img.youtube.com/vi/wNFlijArs2g/0.jpg)](https://www.youtube.com/watch?v=VRMtDkt9qRY)
 
