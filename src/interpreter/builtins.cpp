@@ -2270,15 +2270,16 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                {"bdd", "bd/808kick.aif"},
                {"sd", "sd/2snare.aif"},
                {"cp", "cp/clap17.aif"},
+               {"hh", "ch/Hihat0002.aif"},
                {"ch", "ch/2hat.aif"},
                {"oh", "oh/dmx_hh_open.aif"},
                {"shkr", "perc/chezShaker.aiff"},
-               {"shkr2", "perc/tuffShaker.aiff"}};
+               {"shkr2", "perc/tuffShaker.aiff"},
+               {"rim", "rims/rim1.aif"}};
 
            for (const auto& p : drumz) {
              std::stringstream ss;
              ss << "let " << p.first << " = sample(" << p.second << ");";
-             std::cout << "command:" << ss.str() << std::endl;
              eval_command_queue.push(ss.str());
            }
 
