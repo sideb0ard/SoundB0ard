@@ -221,7 +221,8 @@ class Environment {
                               bool create = true);
   std::string Debug();
   std::string ListFuncsAndGen();
-  std::map<std::string, int> GetSoundGenerators();
+  std::map<std::string, int> GetSoundGeneratorsByName();
+  std::map<int, std::string> GetSoundGeneratorsById();
 
  private:
   std::unordered_map<std::string, std::shared_ptr<Object>> store_;

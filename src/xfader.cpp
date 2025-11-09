@@ -89,13 +89,13 @@ void XFader::SetFadeTimeMidiTicks(double tics) {
   xfade_time_midi_tics_ = tics;
 }
 
-std::string XFader::Status() {
+std::string XFader::Status(const std::map<int, std::string> &sg_names) {
   std::stringstream ss;
   constexpr int xfader_graphic_size = 15;
 
   ss << "[ ";
   for (auto it = left_channel_.begin(); it != left_channel_.end(); ++it) {
-    ss << *it << " ";
+    ss << sg_names.at(*it) << " ";
   }
   ss << "]";
 
@@ -120,7 +120,7 @@ std::string XFader::Status() {
 
   ss << "[ ";
   for (auto it = right_channel_.begin(); it != right_channel_.end(); ++it) {
-    ss << *it << " ";
+    ss << sg_names.at(*it) << " ";
   }
   ss << "]";
   ss << " xpos: " << xfader_position_ << " fade_tics:" << xfade_time_midi_tics_;

@@ -59,18 +59,24 @@ BassDrum::BassDrum() {
 void BassDrum::NoteOn(double vel) {
   velocity_ = vel;
 
-  click_.Trigger();
+  if (!note_on_) {
+    note_on_ = true;
+    click_.Trigger();
 
-  noise_->StartOscillator();
-  noise_eg_.StartEg();
+    noise_->StartOscillator();
+    noise_eg_.StartEg();
 
-  osc1_->m_osc_fo = frequency_;
-  osc1_->StartOscillator();
+    osc1_->m_osc_fo = frequency_;
+    osc1_->StartOscillator();
 
-  osc2_->m_osc_fo = frequency_;
-  osc2_->StartOscillator();
+    osc2_->m_osc_fo = frequency_;
+    osc2_->StartOscillator();
 
-  eg_.StartEg();
+    eg_.StartEg();
+  } else {
+    noise_eg_.StartEg();
+    eg_.StartEg();
+  }
 }
 
 StereoVal BassDrum::Generate() {
@@ -128,6 +134,7 @@ StereoVal BassDrum::Generate() {
     noise_->StopOscillator();
     noise_eg_.StopEg();
   }
+  if (eg_.GetState() == OFFF && noise_eg_.GetState() == OFFF) note_on_ = false;
 
   if (use_delay_) out = delay_->Process(out);
   return out;

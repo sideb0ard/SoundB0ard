@@ -1,10 +1,13 @@
-
+# let sayp = loop(dloops/sayprayer2.aif); set sayp:len 2
 # garage
 # BELLEAD
 # wuurpr
 # WTOOF ROLF
 # load_preset(dx, "OILY");
 # load_preset(dx, "lTail");
+# load_preset(sbdrum, "AUGz");
+# load_preset(sb2, "AUGPER");
+# WIBBLEWOB
 let bounceah_gen = gen()
 {
   setup()
@@ -81,11 +84,8 @@ let dblah_gen = gen()
   }
   run()
   {
-    for (let i = 0; i < 16; i++) {
-      if (i % 4 == 0) {
-        note_on_at(sbdrum, 0, i * pp);
-      }
-    }
+    dmbeat(sbdrum, 0);
+    cmbeat(sbdrum, 3);
   }
 }
 
@@ -98,7 +98,8 @@ let mixerblah_gen = gen()
   {
     let dxvolz = [0.1, 0.3, 0.5, 0.6, 0.5, 0.6, 0.4];
     let dxvx = 0;
-    let hpitzh = [0.8, 1.2, 1, 0.6, 1.5, 2];
+    #let hpitzh = [0.8, 1.2, 1, 0.6, 1.5, 2];
+    let hpitzh = [1, 1.25, 0.75, 0.5, 1.5];
     let hpx = 0;
   }
   run()
@@ -207,6 +208,60 @@ let bmel2lah_gen = gen()
       }
     } else {
       bounceah_gen();
+    }
+  }
+}
+
+let perblah_gen = gen()
+{
+  setup()
+  {
+    let percz = [6, 5, 7, 5, 8];
+    let prx = 0;
+    let pat1 = [0, 0, 0, 0,  0, 0, 1, 0,  0, 1, 0, 1,  0, 1, 0, 0];
+    let durz = [10, 50, 20, 70, 80];
+    let drx =0;
+  }
+  run()
+  {
+    let pat = pat1;
+    if (count % 4 == 3) {
+      pat = rand_array(16, 0, 1);
+    }
+    for (let i = 0; i < 16; i++) {
+      if (pat[i] == 1) {
+        note_on_at(sb2, percz[prx], i * pp, dur = durz[drx]);
+        prx = incr(prx, 0, len(percz));
+      }
+    }
+  }
+}
+
+let hhblah_gen = gen()
+{
+  setup()
+  {
+    let hpat = [0, 0, 1, 1,  0, 0, 1, 0,  0, 0, 1, 1,  0, 1, 0, 1];
+    let hpat2 = [0, 0, 0, 0,  1, 0, 1, 1,  0, 1, 1, 0,  0, 0, 1, 0];
+    let sw = 70;
+  }
+  run()
+  {
+    let hatz = hpat;
+    if (count % 4 == 3) {
+      hatz = hpat2;
+    }
+    if (count % 8 == 7) {
+      note_on_at(sb2, 4, 15 * pp, vel = 60 + rand(30));
+    }
+    for (let i = 0; i < 16; i++) {
+      let offs = sw;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (hatz[i] == 1) {
+        note_on_at(sb2, 2, i * pp + offs, dur = 40, vel = 70 + rand(40));
+      }
     }
   }
 }

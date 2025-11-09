@@ -454,13 +454,25 @@ std::string Environment::Debug() {
   return ss.str();
 }
 
-std::map<std::string, int> Environment::GetSoundGenerators() {
+std::map<std::string, int> Environment::GetSoundGeneratorsByName() {
   std::map<std::string, int> soundgens;
   for (const auto &it : store_) {
     if (IsSoundGenerator(it.second->Type())) {
       auto gen = std::dynamic_pointer_cast<object::SoundGenerator>(it.second);
       if (gen) {
         soundgens.insert({it.first, gen->soundgen_id_});
+      }
+    }
+  }
+  return soundgens;
+}
+std::map<int, std::string> Environment::GetSoundGeneratorsById() {
+  std::map<int, std::string> soundgens;
+  for (const auto &it : store_) {
+    if (IsSoundGenerator(it.second->Type())) {
+      auto gen = std::dynamic_pointer_cast<object::SoundGenerator>(it.second);
+      if (gen) {
+        soundgens.insert({gen->soundgen_id_, it.first});
       }
     }
   }

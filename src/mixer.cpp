@@ -74,8 +74,6 @@ extern Tsqueue<std::unique_ptr<AudioActionItem>> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
 extern Tsqueue<std::string> eval_command_queue;
 
-// MIDI_TICK_FRAC_OF_BEAT moved to header
-
 Action::Action(double start_val, double end_val, int time_taken_ticks,
                std::string action_to_take)
     : start_val_{start_val},
@@ -150,6 +148,7 @@ Mixer::Mixer() {  // WebSocket server temporarily disabled
 std::string Mixer::StatusMixr() {
   //  clang-format off
   std::stringstream ss;
+
   ss << COOL_COLOR_GREEN << ":::::::::::::::: vol:" << ANSI_COLOR_WHITE
      << volume << COOL_COLOR_GREEN << " bpm:" << ANSI_COLOR_WHITE << bpm
      << COOL_COLOR_GREEN << " looplen:" << ANSI_COLOR_WHITE << 3840
@@ -165,7 +164,8 @@ std::string Mixer::StatusMixr() {
   ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
      << "distort: " << fx_[2]->Status() << std::endl;
   ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
-     << "xfader: " << xfader_.Status() << std::endl;
+     << "xfader: " << xfader_.Status(global_env->GetSoundGeneratorsById())
+     << std::endl;
   ss << ANSI_COLOR_WHITE;
   // clang-format on
 
@@ -194,7 +194,7 @@ std::string Mixer::StatusEnv() {
 
   ss << global_env->Debug();
 
-  std::map<std::string, int> soundgens = global_env->GetSoundGenerators();
+  std::map<std::string, int> soundgens = global_env->GetSoundGeneratorsByName();
   for (auto &[var_name, sg_idx] : soundgens) {
     if (IsValidSoundgenNum(sg_idx)) {
       auto &sg = sound_generators_[sg_idx];

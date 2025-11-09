@@ -1,6 +1,8 @@
 #pragma once
 
+#include <map>
 #include <set>
+#include <string>
 
 #include "defjams.h"
 #include "ramp.h"
@@ -16,7 +18,7 @@ class XFader {
   void Update(mixer_timing_info tinfo);
   double GetValueFor(int soundgenerator_idx);
   void Set(std::string var, double val);
-  std::string Status();
+  std::string Status(const std::map<int, std::string> &sg_names);
 
  private:
   void SetXFaderPosition(double pos);  // between -1 and 1;

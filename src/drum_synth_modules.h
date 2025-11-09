@@ -74,6 +74,7 @@ class DrumModule {
   bool use_distortion_{false};
   Distortion distortion_;
   bool use_delay_{false};
+  bool note_on_{false};
   std::unique_ptr<StereoDelay> delay_;
 };
 

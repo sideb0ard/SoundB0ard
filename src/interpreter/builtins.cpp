@@ -3075,8 +3075,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 std::string GetBuiltInHelp() {
   std::string help_text = "Available built-in functions and variables:\n";
 
+  std::vector<std::string> built_in_names;
   for (const auto& pair : built_ins) {
-    help_text += "  " + pair.first + "\n";
+    built_in_names.push_back(pair.first);
+  }
+
+  std::sort(built_in_names.begin(), built_in_names.end());
+
+  for (const auto& n : built_in_names) {
+    help_text += n + "\n";
   }
 
   return help_text;
