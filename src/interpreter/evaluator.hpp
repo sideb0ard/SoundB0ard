@@ -143,9 +143,6 @@ std::shared_ptr<object::Object> ApplyGeneratorRun(
     std::shared_ptr<object::Object> callable,
     const std::vector<std::shared_ptr<object::Object>>& args);
 
-std::shared_ptr<object::Object> ApplyGeneratorSignalGenerator(
-    std::shared_ptr<object::Object> callable);
-
 std::shared_ptr<object::Environment> ExtendEnv(
     std::shared_ptr<object::CallableWithEnv> obj,
     std::vector<std::shared_ptr<object::Object>> const& args);

@@ -5,17 +5,18 @@
 #include <event_queue.h>
 #include <midimaaan.h>
 #include <mixer.h>
+#include <readline/history.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <readline/history.h>
 
 #include <AudioPlatform.hpp>
 #include <PerlinNoise.hpp>
 // #include <asio/io_context.hpp>  // Temporarily disabled for WebSocket
-// #include <asio/executor_work_guard.hpp>  // Temporarily disabled for WebSocket
+// #include <asio/executor_work_guard.hpp>  // Temporarily disabled for
+// WebSocket
 #include <interpreter/evaluator.hpp>
 #include <interpreter/lexer.hpp>
 #include <interpreter/object.hpp>
@@ -23,10 +24,10 @@
 #include <interpreter/token.hpp>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <process.hpp>
 #include <thread>
 #include <tsqueue.hpp>
-#include <memory>
 
 // #include "websocket/web_socket_server.h"  // Temporarily disabled
 
@@ -92,37 +93,41 @@ void *process_worker_thread() {
 
         if (global_mixr->proc_initialized_) {
           for (auto p : global_mixr->processes_) {
-            if (p->active_) p->EventNotify(timing_info);
+            if (p->started_) p->EventNotify(timing_info);
           }
         }
       } else if (event->type == Event::PROCESS_UPDATE_EVENT) {
         if (event->target_process_id >= 0 &&
             event->target_process_id < MAX_NUM_PROC) {
-          ProcessConfig config = {
+          ProcessConfig config = {.type = event->process_type,
+                                  .tidal_target_type = event->tidal_target_type,
+                                  .tidal_pattern = event->tidal_pattern,
+                                  .tidal_targets = event->tidal_targets,
+                                  .tidal_functions = event->tidal_functions,
 
-              .name = event->process_name,
-              .process_type = event->process_type,
-              .timer_type = event->timer_type,
-              .loop_len = event->loop_len,
-              .command = event->command,
-              .target_type = event->target_type,
-              .targets = event->targets,
-              .pattern_expression = event->pattern_expression,
-              .pattern = "",
-              .funcz = event->funcz,
-              .tinfo = event->timing_info};
+                                  .computation_name = event->computation_name,
 
-          global_mixr->processes_[event->target_process_id]->EnqueueUpdate(config);
+                                  .mod_timer_type = event->mod_timer_type,
+                                  .mod_loop_len = event->mod_loop_len,
+                                  .mod_command = event->mod_command,
+                                  .mod_pattern = event->mod_pattern,
+
+                                  .tinfo = event->timing_info};
+
+          global_mixr->processes_[event->target_process_id]->EnqueueUpdate(
+              config);
         } else {
           std::cerr << "WAH! INVALID process id: " << event->target_process_id
                     << std::endl;
         }
       } else if (event->type == Event::PROCESS_SET_PARAM_EVENT) {
-        if (event->target_process_id >= 0 &&
-            event->target_process_id < MAX_NUM_PROC) {
-          global_mixr->processes_[event->target_process_id]->UpdateLoopLen(
-              event->loop_len);
-        }
+        // TODO: Process class doesn't have UpdateLoopLen method
+        // This functionality needs to be implemented or removed
+        // if (event->target_process_id >= 0 &&
+        //     event->target_process_id < MAX_NUM_PROC) {
+        //   global_mixr->processes_[event->target_process_id]->UpdateLoopLen(
+        //       event->mod_loop_len);
+        // }
       }
     }
   }
@@ -138,11 +143,12 @@ void *websocket_worker(WebsocketServer &server) {
   // Temporarily disable WebSocket callbacks to test basic compilation
   // server.connect callback removed
   // server.disconnect callback removed
-  
+
   std::thread websocket_server_thread([&server]() { server.run(kPortNumber); });
 
   // Keep the event loop alive
-  // auto work = asio::executor_work_guard<asio::io_context::executor_type>(eventLoop.get_executor());
+  // auto work =
+asio::executor_work_guard<asio::io_context::executor_type>(eventLoop.get_executor());
   eventLoop.run();
 
   return nullptr;
@@ -165,7 +171,8 @@ int main() {
   std::thread worker_thread(process_worker_thread);
 
   // //// WebSocket Server - Temporarily disabled
-  // // std::thread websocket_worker_thread(websocket_worker, std::ref(server));  // Disabled
+  // // std::thread websocket_worker_thread(websocket_worker, std::ref(server));
+  // // Disabled
 
   //// Eval loop
   std::thread eval_thread(eval_queue);
@@ -181,5 +188,4 @@ int main() {
 
   eval_command_queue.close();
   eval_thread.join();
-
 }

@@ -167,23 +167,6 @@ typedef enum {
 
 typedef enum { MONO, LEGATO } legato_mode;
 
-enum ProcessType { NO_PROCESS_TYPE, FUNCTION_PROCESS, TIMED_PROCESS };
-
-enum ProcessTimerType {
-  NO_PROCESS_TIMER_TYPE,
-  EVERY,
-  OSCILLATE,
-  OVER,
-  RAMP,
-  WHILE,
-};
-
-enum ProcessPatternTarget {
-  NO_PROCESS_PATTERN_TARGET,
-  ENV,     // pattern contains values from environment
-  VALUES,  // values in pattern to be applied to list of targets provided
-};
-
 typedef enum {
   NONE,
   MIDI_CONTROL_SYNTH_TYPE,
@@ -327,19 +310,26 @@ class midi_event {
   int dur{0};
 };
 
+enum class ProcessType { None, Modulator, TidalPattern, Computation };
+enum class TidalPatternTargetType { None, Sample, MidiNote };
+enum class ModulatorTimerType { None, Every, Oscillate, Over, Ramp, While };
+
 struct MusicalEvent {
-  MusicalEvent() : velocity_{127.0f}, duration_{300.0f}, target_type_{ENV} {}
+  MusicalEvent()
+      : velocity_{127.0f},
+        duration_{300.0f},
+        target_type_{TidalPatternTargetType::Sample} {}
   explicit MusicalEvent(const std::string &value)
       : MusicalEvent(value, /* midi velocity */ 127, /* duration in ms */ 300,
-                     ENV) {}
-  MusicalEvent(const std::string &value, ProcessPatternTarget target_type)
+                     TidalPatternTargetType::Sample) {}
+  MusicalEvent(const std::string &value, TidalPatternTargetType target_type)
       : MusicalEvent(value, /* midi velocity */ 127, /* duration in ms */ 300,
                      target_type) {}
   MusicalEvent(const std::string &value, float velocity,
-               ProcessPatternTarget target_type)
+               TidalPatternTargetType target_type)
       : MusicalEvent(value, velocity, /* duration in ms */ 300, target_type) {}
   MusicalEvent(const std::string &value, float velocity, float duration,
-               ProcessPatternTarget target_type)
+               TidalPatternTargetType target_type)
       : value_{value},
         velocity_{velocity},
         duration_{duration},
@@ -347,7 +337,7 @@ struct MusicalEvent {
   std::string value_;
   float velocity_;
   float duration_;
-  ProcessPatternTarget target_type_;
+  TidalPatternTargetType target_type_;
 };
 
 typedef midi_event midi_pattern[PPBAR];

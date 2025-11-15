@@ -68,7 +68,7 @@ let bounceah_gen = gen()
           break;
         }
         last_bounce = i;
-        let d = scale(velocity, 0, 1, 10, 700);
+        let d = scale(velocity, 0, 1, 10, 200);
         let v = scale(velocity, 0, 1, 10, 127);
         note_on_at(dx, note, i * ppp, dur = d, vel = v) ;
         note_on_at(dx, up(note ,12), i * ppp, dur = d, vel = v);
