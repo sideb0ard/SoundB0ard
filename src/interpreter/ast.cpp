@@ -349,16 +349,21 @@ ProcessStatement::ProcessStatement(Token token) : Statement(token) {
 std::string ProcessStatement::String() const {
   std::stringstream ss;
   ss << "p" << token_.literal_;
-  if (process_type_ == FUNCTION_PROCESS) {
-    if (target_type_ == ENV)
-      ss << " $ ";
-    else
-      ss << " # ";
+  switch (type_) {
+    case ProcessType::TidalPattern:
+      ss << " $ " << tidal_pattern_->String() << " ";
+      for (const auto &t : tidal_targets_) ss << t << ",";
+      ss << " ";
+      for (auto &f : tidal_functions_) ss << f->String();
+      break;
+    case ProcessType::Modulator:
+      ss << " < " << mod_command_;
+      break;
+    case ProcessType::Computation:
+      ss << " # " << computation_name_;
+      break;
+    default:
   }
-  ss << command_ << " ";
-  for (const auto &t : targets_) ss << t << ",";
-  ss << " ";
-  for (auto &f : functions_) ss << f->String();
 
   return ss.str();
 }

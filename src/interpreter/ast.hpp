@@ -422,24 +422,24 @@ class ProcessStatement : public Statement {
   std::string String() const override;
 
  public:
-  std::string name;
-
   int mixer_process_id_{-1};
 
-  ProcessType process_type_{ProcessType::NO_PROCESS_TYPE};
+  ProcessType type_;
 
-  // Command Process Vars
-  ProcessTimerType process_timer_type_{ProcessTimerType::NO_PROCESS_TIMER_TYPE};
-  std::shared_ptr<Expression> loop_len_{nullptr};
-  std::string command_;
+  // TidalPattern Params
+  TidalPatternTargetType tidal_target_type_;
+  std::vector<std::string> tidal_targets_;
+  std::shared_ptr<Expression> tidal_pattern_;
+  std::vector<std::shared_ptr<Expression>> tidal_functions_;
 
-  // Pattern Process Vars
-  ProcessPatternTarget target_type_{
-      ProcessPatternTarget::NO_PROCESS_PATTERN_TARGET};
-  std::vector<std::string> targets_;
-  std::vector<std::shared_ptr<Expression>> functions_;
+  // Computation Params
+  std::shared_ptr<Expression> computation_name_;
 
-  std::shared_ptr<Expression> pattern_expression_;
+  // Modulator Params
+  ModulatorTimerType mod_timer_type_;
+  std::shared_ptr<Expression> mod_loop_len_{nullptr};
+  std::shared_ptr<Expression> mod_pattern_{nullptr};
+  std::string mod_command_;
 };
 
 class ExpressionStatement : public Statement {

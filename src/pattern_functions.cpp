@@ -78,7 +78,7 @@ void PatternTranspose::TransformPattern(
     if (events[i].size() > 0) {
       std::vector<std::shared_ptr<MusicalEvent>> &mevents = events[i];
       for (auto &e : mevents) {
-        if (e->target_type_ == ProcessPatternTarget::VALUES) {
+        if (e->target_type_ == TidalPatternTargetType::MidiNote) {
           int str_to_val = 60;
           if (IsNote(e->value_))
             str_to_val = get_midi_note_from_string(&e->value_[0]);
@@ -223,7 +223,7 @@ void PatternArp::TransformPattern(
     if (events[i].size() > 0) {
       if (mevents.size() > 0) {
         auto midi_event = mevents[0];
-        if (midi_event->target_type_ == ProcessPatternTarget::VALUES) {
+        if (midi_event->target_type_ == TidalPatternTargetType::MidiNote) {
           if (IsNote(midi_event->value_))
             last_midi_note_ = get_midi_note_from_string(&midi_event->value_[0]);
           else
@@ -262,7 +262,8 @@ void PatternArp::TransformPattern(
 
           if (new_midi_note) {
             auto new_event = std::make_shared<MusicalEvent>(
-                std::to_string(new_midi_note), ProcessPatternTarget::VALUES);
+                std::to_string(new_midi_note),
+                TidalPatternTargetType::MidiNote);
             mevents.push_back(new_event);
           }
           counter++;
@@ -306,7 +307,7 @@ void PatternChord::TransformPattern(
       std::vector<std::shared_ptr<MusicalEvent>> &mevents = events[i];
       std::vector<std::shared_ptr<MusicalEvent>> new_events;
       for (auto &e : mevents) {
-        if (e->target_type_ == ProcessPatternTarget::VALUES) {
+        if (e->target_type_ == TidalPatternTargetType::MidiNote) {
           new_events.push_back(e);
           std::string midistring = e->value_;
           if (IsNote(e->value_)) {
@@ -348,7 +349,7 @@ void PatternPowerChord::TransformPattern(
       std::vector<std::shared_ptr<MusicalEvent>> &mevents = events[i];
       std::vector<std::shared_ptr<MusicalEvent>> new_events;
       for (auto &e : mevents) {
-        if (e->target_type_ == ProcessPatternTarget::VALUES) {
+        if (e->target_type_ == TidalPatternTargetType::MidiNote) {
           new_events.push_back(e);
           std::string midistring = e->value_;
           if (IsNote(e->value_)) {

@@ -991,51 +991,55 @@ void Parser::ConsumePatternFunctions(
     if (arg) func->arguments_.push_back(arg);
     NextToken();
   }
-  proc->functions_.push_back(func);
+  proc->tidal_functions_.push_back(func);
 }
 
 std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
   auto process = std::make_shared<ast::ProcessStatement>(cur_token_);
 
+  //  TIDAL PATTERN
   if (PeekTokenIs(token::SLANG_DOLLAR)) {
     NextToken();
     NextToken();
 
-    process->process_type_ = FUNCTION_PROCESS;
-    process->target_type_ = ProcessPatternTarget::ENV;
+    process->type_ = ProcessType::TidalPattern;
 
-    process->pattern_expression_ = ParseExpression(Precedence::PREFIX);
-    NextToken();
-  } else if (PeekTokenIs(token::SLANG_HASH)) {
-    NextToken();
-    NextToken();
+    process->tidal_target_type_ = TidalPatternTargetType::Sample;
+    process->tidal_pattern_ = ParseExpression(Precedence::PREFIX);
 
-    process->process_type_ = FUNCTION_PROCESS;
-    process->target_type_ = ProcessPatternTarget::VALUES;
-
-    // process->pattern_ = ParseStringLiteral();
-    process->pattern_expression_ = ParseExpression(Precedence::PREFIX);
-
-    if (!ExpectPeek(token::SLANG_IDENT)) {
-      // std::cerr << "btw - Nae IDENTs!\n";
-      // return nullptr;
-    } else {
+    // i.e soundgenerators, which implies this pattern is midi data
+    if (PeekTokenIs(token::SLANG_IDENT)) {
+      process->tidal_target_type_ = TidalPatternTargetType::MidiNote;
       auto target =
           std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);
-      process->targets_.push_back(target->value_);
+      process->tidal_targets_.push_back(target->value_);
       while (PeekTokenIs(token::SLANG_COMMA)) {
         NextToken();
         NextToken();
         if (CurTokenIs(token::SLANG_IDENT)) {
           auto next_target = std::make_shared<ast::Identifier>(
               cur_token_, cur_token_.literal_);
-          process->targets_.push_back(next_target->value_);
+          process->tidal_targets_.push_back(next_target->value_);
         }
       }
     }
     NextToken();
+
+    // COMPUTATION
+  } else if (PeekTokenIs(token::SLANG_HASH)) {
+    NextToken();
+    NextToken();
+
+    process->type_ = ProcessType::Computation;
+
+    // ident for the computation object
+    process->computation_name_ = ParseExpression(Precedence::PREFIX);
+
+    NextToken();
+
+    // MODULATOR
   } else if (PeekTokenIs(token::SLANG_LT)) {
-    process->process_type_ = TIMED_PROCESS;
+    process->type_ = ProcessType::Modulator;
     NextToken();
     if (!PeekTokenIsPatternCommandTimerType()) {
       std::cerr << "Need a Pattern Command TYpe! Over, Every, Osc, While or "
@@ -1044,35 +1048,34 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
     }
     NextToken();
     if (cur_token_.type_ == token::SLANG_EVERY)
-      process->process_timer_type_ = ProcessTimerType::EVERY;
+      process->mod_timer_type_ = ModulatorTimerType::Every;
     else if (cur_token_.type_ == token::SLANG_OSC)
-      process->process_timer_type_ = ProcessTimerType::OSCILLATE;
+      process->mod_timer_type_ = ModulatorTimerType::Oscillate;
     else if (cur_token_.type_ == token::SLANG_OVER)
-      process->process_timer_type_ = ProcessTimerType::OVER;
+      process->mod_timer_type_ = ModulatorTimerType::Over;
     else if (cur_token_.type_ == token::SLANG_RAMP)
-      process->process_timer_type_ = ProcessTimerType::RAMP;
+      process->mod_timer_type_ = ModulatorTimerType::Ramp;
     // else is checked for above in the PeekTokenIsPatternCommandTimerType()
 
     NextToken();
 
-    process->loop_len_ = ParseExpression(Precedence::PREFIX);
+    process->mod_loop_len_ = ParseExpression(Precedence::PREFIX);
     NextToken();
 
-    process->pattern_expression_ = ParseExpression(Precedence::PREFIX);
+    process->mod_pattern_ = ParseExpression(Precedence::PREFIX);
     NextToken();
 
-    process->command_ = cur_token_.literal_;
+    process->mod_command_ = cur_token_.literal_;
     NextToken();
   }
 
   while (CurTokenIs(token::SLANG_PIPE)) ConsumePatternFunctions(process);
 
-  if (!process->pattern_expression_) {
+  if (!process->tidal_pattern_ && !process->mod_pattern_ &&
+      !process->computation_name_) {
     std::cout << "WUFF< COULDNT WORK OUT EXPRESSSION!" << std::endl;
     return nullptr;
   }
-
-  process->name = process->pattern_expression_->String();
 
   return process;
 }

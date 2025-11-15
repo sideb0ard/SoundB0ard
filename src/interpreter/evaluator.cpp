@@ -1283,21 +1283,6 @@ std::shared_ptr<object::Environment> ExtendEnv(
   return new_env;
 }
 
-// TODO - this is unused - get rid of it!
-std::shared_ptr<object::Object> ApplyGeneratorSignalGenerator(
-    std::shared_ptr<object::Object> callable) {
-  std::shared_ptr<object::Generator> gen =
-      std::dynamic_pointer_cast<object::Generator>(callable);
-  if (gen) {
-    if (gen->signal_generator_) {
-      auto evaluated = Eval(gen->signal_generator_, gen->env_);
-      return UnwrapReturnValue(evaluated);
-    }
-  }
-
-  return NewError("Something stinky wit yer GENERaTOR , mate!");
-}
-
 std::shared_ptr<object::Object> UnwrapReturnValue(
     std::shared_ptr<object::Object> obj) {
   std::shared_ptr<object::ReturnValue> ret =
@@ -1453,37 +1438,44 @@ std::shared_ptr<object::Object> EvalProcessStatement(
     std::shared_ptr<ast::ProcessStatement> proc,
     std::shared_ptr<object::Environment> env) {
   event_queue_item ev;
-
-  ev.pattern_expression = proc->pattern_expression_;
-
-  auto eval_val = Eval(proc->loop_len_, env);
-  if (eval_val->Type() == "ERROR") {
-    std::cerr << "COuldn't EVAL your PROCESS statement value!!\n";
-    return NULLL;
-  }
-  auto loop_len = std::dynamic_pointer_cast<object::Number>(eval_val);
-  if (loop_len) {
-    ev.loop_len = loop_len->value_;
-  } else {
-    ev.loop_len = 1;
-  }
-
-  std::vector<std::shared_ptr<PatternFunction>> process_funcz;
-
-  for (const auto &f : proc->functions_) {
-    auto funcy = EvalPatternFunctionExpression(f);
-    if (funcy) process_funcz.push_back(funcy);
-  }
-
   ev.type = Event::PROCESS_UPDATE_EVENT;
   ev.target_process_id = proc->mixer_process_id_;
-  ev.process_name = proc->name;
-  ev.process_type = proc->process_type_;
-  ev.timer_type = proc->process_timer_type_;
-  ev.command = proc->command_;
-  ev.target_type = proc->target_type_;
-  ev.targets = proc->targets_;
-  ev.funcz = process_funcz;
+  ev.process_type = proc->type_;
+
+  switch (ev.process_type) {
+    case (ProcessType::TidalPattern):
+      ev.tidal_target_type = proc->tidal_target_type_;
+      ev.tidal_pattern = proc->tidal_pattern_;
+      ev.tidal_targets = proc->tidal_targets_;
+      for (const auto &f : proc->tidal_functions_) {
+        auto funcy = EvalPatternFunctionExpression(f);
+        if (funcy) ev.tidal_functions.push_back(funcy);
+      }
+      break;
+    case (ProcessType::Computation):
+      ev.computation_name = proc->computation_name_;
+      break;
+    case (ProcessType::Modulator): {
+      ev.mod_timer_type = proc->mod_timer_type_;
+      ev.mod_command = proc->mod_command_;
+      ev.mod_pattern = proc->mod_pattern_;
+
+      auto eval_val = Eval(proc->mod_loop_len_, env);
+      if (eval_val->Type() == "ERROR") {
+        std::cerr << "COuldn't EVAL your modulator looplen!!\n";
+        return NULLL;
+      }
+      auto mod_loop_len = std::dynamic_pointer_cast<object::Number>(eval_val);
+      if (mod_loop_len) {
+        ev.mod_loop_len = mod_loop_len->value_;
+      } else {
+        ev.mod_loop_len = 1;
+      }
+
+      break;
+    }
+    default:
+  }
 
   process_event_queue.push(ev);
 
@@ -1503,7 +1495,7 @@ std::shared_ptr<object::Object> EvalProcessSetStatement(
   }
   auto num = std::dynamic_pointer_cast<object::Number>(eval_val);
   if (num) {
-    ev.loop_len = num->value_;
+    ev.mod_loop_len = num->value_;
     process_event_queue.push(ev);
   }
 

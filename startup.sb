@@ -137,12 +137,6 @@ let xfade_gen = gen()
 }
 
 
-p0 # countr ;
-#p1 # xfade_gen ;
-
-# i.e. 3840 / 16 == 240 midi Pulses Per 16th
-let pp = 240;
-
 let up = fn(array_val, halfstep)
 {
   return map(array_val, fn(v) { if (v > 0) { return v + halfstep; } else { return v;}  });
@@ -1052,3 +1046,8 @@ let print_notes = fn(notes)
 }
 
 kit();
+
+p0 # countr ;
+
+# i.e. 3840 / 16 == 240 midi Pulses Per 16th
+let pp = 240;
