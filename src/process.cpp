@@ -26,10 +26,15 @@ extern std::shared_ptr<object::Environment> global_env;
 namespace {
 const char *ModTimerToString(ModulatorTimerType t) {
   switch (t) {
-    case ModulatorTimerType::Every return "EVERY";
-        case ModulatorTimerType::Oscillate return "OSC";
-        case ModulatorTimerType::Ramp return "RAMP";
-        case ModulatorTimerType::While return "WHILE"; default:
+    case ModulatorTimerType::Every:
+      return "EVERY";
+    case ModulatorTimerType::Oscillate:
+      return "OSC";
+    case ModulatorTimerType::Ramp:
+      return "RAMP";
+    case ModulatorTimerType::While:
+      return "WHILE";
+    default:
       return "UNKNOWN";
   }
 }
@@ -38,12 +43,12 @@ const char *ModTimerToString(ModulatorTimerType t) {
 Modulator::Modulator(ModulatorTimerType timer_type, float loop_len,
                      std::shared_ptr<ast::Expression> mod_vals_exp,
                      std::string mod_command)
-    : timer_type_{timer_type}, loop_len_{loop_len}, command_{mod_command} {
+    : timer_type_{timer_type}, loop_len_{loop_len}, mod_command_{mod_command} {
   auto new_env = std::make_shared<object::Environment>(global_env);
   auto mod_vals_obj = evaluator::Eval(mod_vals_exp, new_env);
   if (mod_vals_obj->Type() == "STRING") {
     std::shared_ptr<object::String> pattern =
-        std::dynamic_pointer_cast<object::String>(pattern_obj);
+        std::dynamic_pointer_cast<object::String>(mod_vals_obj);
     std::string mod_vals = pattern->value_;
 
     sscanf(mod_vals.c_str(), "%f %f", &start_, &end_);
@@ -64,15 +69,14 @@ TidalPattern::TidalPattern(
     std::shared_ptr<ast::Expression> tidal_pattern,
     std::vector<std::string> targets,
     std::vector<std::shared_ptr<PatternFunction>> tidal_functions)
-    : target_type_{target_type},
-      tidal_pattern_{tidal_pattern},
-      targets_{targets} {
-  for (int j = 0; j < PPBAR; j++) pattern_events_played_[j] = true;
+    : target_type_{target_type}, targets_{targets} {
+  for (int j = 0; j < PPBAR; j++) tidal_events_played_[j] = true;
   auto new_env = std::make_shared<object::Environment>(global_env);
   auto tidal_pattern_obj = evaluator::Eval(tidal_pattern, new_env);
+  original_pattern_ = tidal_pattern_obj->Inspect();
   if (tidal_pattern_obj->Type() == "STRING") {
     std::shared_ptr<object::String> pattern =
-        std::dynamic_pointer_cast<object::String>(pattern_obj);
+        std::dynamic_pointer_cast<object::String>(tidal_pattern_obj);
     auto tokenizer =
         std::make_shared<pattern_parser::Tokenizer>(pattern->value_);
     auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
@@ -80,7 +84,7 @@ TidalPattern::TidalPattern(
   }
 }
 
-void TidalPattern::Run(mixer_timing_info tinfo) {
+void TidalPattern::EventNotify(mixer_timing_info tinfo) {
   if (tinfo.is_start_of_loop) {
     if (!started_) {
       started_ = true;
@@ -88,7 +92,7 @@ void TidalPattern::Run(mixer_timing_info tinfo) {
       event_incr_speed_ = 1;
     }
 
-    for (int i = 0; i < PPBAR; i++) pattern_events_[i].clear();
+    for (int i = 0; i < PPBAR; i++) tidal_events_[i].clear();
     if (tidal_pattern_root_) EvalPattern(tidal_pattern_root_, 0, PPBAR);
   }
 
@@ -103,18 +107,18 @@ void TidalPattern::Run(mixer_timing_info tinfo) {
       int next_idx = (int)cur_event_idx_;
       if (i == 0) {
         if ((next_idx - i) >= 1) {
-          for (int j = 0; j < PPBAR; j++) pattern_events_played_[j] = false;
+          for (int j = 0; j < PPBAR; j++) tidal_events_played_[j] = false;
         }
       }
 
       // Add bounds check to prevent array access out of bounds
-      if (i >= 0 && i < PPBAR && pattern_events_[i].size() > 0 &&
-          !pattern_events_played_[i]) {
-        pattern_events_played_[i] = true;
+      if (i >= 0 && i < PPBAR && tidal_events_[i].size() > 0 &&
+          !tidal_events_played_[i]) {
+        tidal_events_played_[i] = true;
 
-        std::vector<std::shared_ptr<MusicalEvent>> &events = pattern_events_[i];
+        std::vector<std::shared_ptr<MusicalEvent>> &events = tidal_events_[i];
 
-        if (tidal_target_type_ == TidalPatternTargetType::Sample) {
+        if (target_type_ == TidalPatternTargetType::Sample) {
           for (auto e : events) {
             if (e->value_ == "~")  // skip blank markers
               continue;
@@ -124,7 +128,7 @@ void TidalPattern::Run(mixer_timing_info tinfo) {
 
             eval_command_queue.push(ss.str());
           }
-        } else if (tidal_target_type_ == TidalPatternTargetType::MidiNote) {
+        } else if (target_type_ == TidalPatternTargetType::MidiNote) {
           for (auto e : events) {
             if (e->value_ == "~") continue;
             std::string midistring = e->value_;
@@ -132,13 +136,13 @@ void TidalPattern::Run(mixer_timing_info tinfo) {
               for (auto t : targets_) {
                 midistring =
                     std::to_string(get_midi_note_from_string(&e->value_[0]));
+
+                std::stringstream ss;
+                ss << "note_on(" << t << "," << midistring << ","
+                   << e->velocity_ << "," << e->duration_ << ")";
+
+                eval_command_queue.push(ss.str());
               }
-
-              std::stringstream ss;
-              ss << "note_on(" << t << "," << midistring << "," << e->velocity_
-                 << "," << e->duration_ << ")";
-
-              eval_command_queue.push(ss.str());
             }
           }
         }
@@ -147,7 +151,7 @@ void TidalPattern::Run(mixer_timing_info tinfo) {
   }
 }
 
-void Computation::Run(mixer_timing_info tinfo) {
+void Computation::EventNotify(mixer_timing_info tinfo) {
   if (tinfo.is_start_of_loop && computation_name_) {
     auto new_env = std::make_shared<object::Environment>(global_env);
     auto computation_obj = evaluator::Eval(computation_name_, new_env);
@@ -162,10 +166,10 @@ void Computation::Run(mixer_timing_info tinfo) {
   }
 }
 
-void Modulator::Run(mixer_timing_info tinfo) {
+void Modulator::EventNotify(mixer_timing_info tinfo) {
   current_val_ += incr_;
   switch (timer_type_) {
-    case ProcessTimerType::OSCILLATE:
+    case ModulatorTimerType::Oscillate:
       if (current_val_ < start_) {
         current_val_ = start_;
         incr_ *= -1;
@@ -174,22 +178,21 @@ void Modulator::Run(mixer_timing_info tinfo) {
         incr_ *= -1;
       }
       break;
-    case ProcessTimerType::OVER:
+    case ModulatorTimerType::Over:
       if ((incr_ < 0 && current_val_ < end_) ||
           (incr_ > 0 && current_val_ > end_))
         current_val_ = start_;
       break;
-    case ProcessTimerType::RAMP:
+    case ModulatorTimerType::Ramp:
     default:
       if ((incr_ < 0 && current_val_ < end_) ||
           (incr_ > 0 && current_val_ > end_)) {
         current_val_ = end_;
-        if (!update_pending_) active_ = false;
       }
   }
 
   std::string new_cmd =
-      ReplaceString(command_, "%", std::to_string(current_val_));
+      ReplaceString(mod_command_, "%", std::to_string(current_val_));
 
   eval_command_queue.push(new_cmd);
 }
@@ -209,9 +212,8 @@ void Process::Update() {
   switch (process_type_) {
     case ProcessType::Modulator:
       process_runner_ = std::make_unique<Modulator>(
-          ModulatorTimerType mod_timer_type, float mod_loop_len,
-          std::shared_ptr<ast::Expression> mod_pattern,
-          std::string mod_command);
+          pending_config_.mod_timer_type, pending_config_.mod_loop_len,
+          pending_config_.mod_pattern, pending_config_.mod_command);
       break;
     case ProcessType::TidalPattern:
       process_runner_ = std::make_unique<TidalPattern>(
@@ -223,8 +225,8 @@ void Process::Update() {
           std::make_unique<Computation>(pending_config_.computation_name);
       break;
     default:
+      break;
   }
-
   active_ = true;
 }
 
@@ -240,7 +242,9 @@ void Process::EventNotify(mixer_timing_info tinfo) {
     update_pending_ = false;
   }
 
-  process_runner_->EventNotify(tinfo);
+  if (process_runner_) {
+    process_runner_->EventNotify(tinfo);
+  }
 }
 
 void TidalPattern::EvalPattern(
@@ -301,13 +305,13 @@ void TidalPattern::EvalPattern(
     if (value != "~") {
       if (amp) {
         if (dur)
-          pattern_events_[target_start].push_back(
+          tidal_events_[target_start].push_back(
               std::make_shared<MusicalEvent>(value, amp, dur, target_type_));
         else
-          pattern_events_[target_start].push_back(
+          tidal_events_[target_start].push_back(
               std::make_shared<MusicalEvent>(value, amp, target_type_));
       } else
-        pattern_events_[target_start].push_back(
+        tidal_events_[target_start].push_back(
             std::make_shared<MusicalEvent>(value, target_type_));
     }
     return;
@@ -365,7 +369,7 @@ std::string TidalPattern::Status() {
   std::stringstream ss;
   ss << ANSI_COLOR_CYAN;
 
-  ss << "$ \"" << name << "\"";
+  ss << "$ \"" << original_pattern_ << "\"";
   bool firscht = true;
   for (auto &t : targets_) {
     if (!firscht) ss << ",";
@@ -382,7 +386,7 @@ std::string TidalPattern::Status() {
 
 std::string Computation::Status() {
   std::stringstream ss;
-  ss << ANSI_COLOR_GREEN_TOO ss << "# \"" << name << "\"";
+  ss << ANSI_COLOR_GREEN_TOO << "# \"" << computation_name_->String() << "\"";
   ss << ANSI_COLOR_RESET;
   return ss.str();
 }
@@ -392,8 +396,7 @@ std::string Modulator::Status() {
   ss << ANSI_COLOR_GREEN;
 
   ss << "< " << ModTimerToString(timer_type_) << " " << loop_len_ << " \""
-     << pattern_ << "\" "
-     << " \"" << command_ << "\"";
+     << " \"" << mod_command_ << "\"";
   ss << ANSI_COLOR_RESET;
   return ss.str();
 }
@@ -408,13 +411,13 @@ void TidalPattern::AppendPatternFunction(
 }
 
 void TidalPattern::UpdateLoopLen(int val) {
-  loop_len_ = val;
-  float diff = std::abs(start_ - end_);
-  incr_ = diff / (loop_len_ * PPBAR);
-  if (incr_ == 0) {
-    std::cout << "Nah mate, nae zeros allowed!\n";
-    return;
-  }
+  // loop_len_ = val;
+  // float diff = std::abs(start_ - end_);
+  // incr_ = diff / (loop_len_ * PPBAR);
+  // if (incr_ == 0) {
+  //   std::cout << "Nah mate, nae zeros allowed!\n";
+  //   return;
+  // }
 }
 
 std::string Process::Status() {

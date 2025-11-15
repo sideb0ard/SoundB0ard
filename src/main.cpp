@@ -93,13 +93,13 @@ void *process_worker_thread() {
 
         if (global_mixr->proc_initialized_) {
           for (auto p : global_mixr->processes_) {
-            if (p->started_) p->EventNotify(timing_info);
+            if (p->active_) p->EventNotify(timing_info);
           }
         }
       } else if (event->type == Event::PROCESS_UPDATE_EVENT) {
         if (event->target_process_id >= 0 &&
             event->target_process_id < MAX_NUM_PROC) {
-          ProcessConfig config = {.type = event->process_type,
+          ProcessConfig config = {.process_type = event->process_type,
                                   .tidal_target_type = event->tidal_target_type,
                                   .tidal_pattern = event->tidal_pattern,
                                   .tidal_targets = event->tidal_targets,

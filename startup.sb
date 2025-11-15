@@ -1047,7 +1047,7 @@ let print_notes = fn(notes)
 
 kit();
 
-p0 # countr ;
+# p0 # countr ;
 
 # i.e. 3840 / 16 == 240 midi Pulses Per 16th
 let pp = 240;

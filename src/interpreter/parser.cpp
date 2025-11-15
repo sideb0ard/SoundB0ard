@@ -999,7 +999,6 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
 
   //  TIDAL PATTERN
   if (PeekTokenIs(token::SLANG_DOLLAR)) {
-    std::cout << "TIDAL PATTERN YO!" << std::endl;
     NextToken();
     NextToken();
 
@@ -1028,7 +1027,6 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
 
     // COMPUTATION
   } else if (PeekTokenIs(token::SLANG_HASH)) {
-    std::cout << "COMPUTATION YO!" << std::endl;
     NextToken();
     NextToken();
 
@@ -1041,7 +1039,6 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
 
     // MODULATOR
   } else if (PeekTokenIs(token::SLANG_LT)) {
-    std::cout << "MODULATION YO!" << std::endl;
     process->type_ = ProcessType::Modulator;
     NextToken();
     if (!PeekTokenIsPatternCommandTimerType()) {

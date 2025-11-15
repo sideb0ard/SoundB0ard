@@ -11,7 +11,9 @@
 #include <pattern_parser/tokenizer.hpp>
 
 struct ProcessConfig {
-  ProcessType type;
+  ProcessType process_type;
+
+  std::string name;
 
   //// TidalPattern
   TidalPatternTargetType tidal_target_type;
@@ -33,13 +35,13 @@ struct ProcessConfig {
 
 class ProcessRunner {
  public:
-  virtual ~ProcessRunner() = 0;
+  virtual ~ProcessRunner() = default;
   virtual void EventNotify(mixer_timing_info tinfo) = 0;
   virtual std::string Status() = 0;
   bool started_{false};
 };
 
-class Modulator : ProcessRunner {
+class Modulator : public ProcessRunner {
  public:
   Modulator(ModulatorTimerType timer_type, float loop_len,
             std::shared_ptr<ast::Expression> mod_pattern,
@@ -59,7 +61,7 @@ class Modulator : ProcessRunner {
   float current_val_{0};
 };
 
-class TidalPattern : ProcessRunner {
+class TidalPattern : public ProcessRunner {
  public:
   TidalPattern(TidalPatternTargetType target_type,
                std::shared_ptr<ast::Expression> tidal_pattern,
@@ -80,10 +82,12 @@ class TidalPattern : ProcessRunner {
   TidalPatternTargetType target_type_;
   std::vector<std::string> targets_;
 
+  std::string original_pattern_;
+
   std::shared_ptr<pattern_parser::PatternNode> tidal_pattern_root_{nullptr};
   std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> tidal_events_;
 
-  std::array<bool, PPBAR> pattern_events_played_ = {};  // for slow speed
+  std::array<bool, PPBAR> tidal_events_played_ = {};  // for slow speed
   float cur_event_idx_{0};
   float event_incr_speed_{1};
 
@@ -91,7 +95,7 @@ class TidalPattern : ProcessRunner {
   int loop_counter_;
 };
 
-class Computation : ProcessRunner {
+class Computation : public ProcessRunner {
  public:
   Computation(std::shared_ptr<ast::Expression> name)
       : computation_name_{name} {};
@@ -123,6 +127,6 @@ class Process {
 
   ProcessType process_type_;
   std::string name_;
-  std::unique_ptr<ProcessRunner> process_runner_;
+  std::unique_ptr<ProcessRunner> process_runner_{nullptr};
   bool started_{false};
 };
