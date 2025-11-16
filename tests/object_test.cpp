@@ -1,3 +1,4 @@
+// cppcheck-suppress-file syntaxError
 #include "interpreter/object.hpp"
 
 #include <memory>

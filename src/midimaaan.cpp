@@ -58,19 +58,19 @@ void midi_pattern_print(midi_event *loop) {
       char type[20] = {0};
       switch (ev.event_type) {
         case (144):
-          strcpy(type, "note_on");
+          strncpy(type, "note_on", sizeof(type) - 1);
           break;
         case (128):
-          strcpy(type, "note_off");
+          strncpy(type, "note_off", sizeof(type) - 1);
           break;
         case (176):
-          strcpy(type, "midi_control");
+          strncpy(type, "midi_control", sizeof(type) - 1);
           break;
         case (224):
-          strcpy(type, "pitch_bend");
+          strncpy(type, "pitch_bend", sizeof(type) - 1);
           break;
         default:
-          strcpy(type, "no_idea");
+          strncpy(type, "no_idea", sizeof(type) - 1);
           break;
       }
     }
@@ -111,7 +111,7 @@ int get_midi_note_from_string(char *string) {
   }
   char note[3] = {0};
   int octave = 0;  // default if none provided
-  sscanf(string, "%[a-z#]%d", note, &octave);
+  sscanf(string, "%2[a-z#]%d", note, &octave);
   note[2] = 0;  // safety
 
   // convert octave to midi semitones
@@ -168,7 +168,7 @@ void midi_pattern_set_velocity(midi_event *pattern, unsigned int midi_tick,
   if (midi_tick < PPBAR && velocity < 128)
     pattern[midi_tick].data2 = velocity;
   else
-    printf("Nae valid!? Midi_tick:%d // velocity:%d\n", midi_tick, velocity);
+    printf("Nae valid!? Midi_tick:%u // velocity:%u\n", midi_tick, velocity);
 }
 
 void midi_pattern_rand_amp(midi_event *pattern) {

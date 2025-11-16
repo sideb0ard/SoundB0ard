@@ -25,29 +25,30 @@ let bd2 = sample(bd/BD_909_48.wav);
 let clp = sample(cp/djkhaledClap.aiff); vol clp 0.4;
 let goodt = sample(voices/goodtimescometomeNOW.aiff);
 
-send("delay", goodt);
-bpm 120;
-load_preset(dx, "BELTRAMz");
-add_fx(dx, "distort");
-add_fx(dx, "compressor");
-load_preset(sbdrum, "beltram");
-set sbdrum:bd_vol 0.4;
-add_fx(dx, "sidechain", sbdrum);
-let dx4 = fm();
-load_preset(dx4, "pointty");
-load_preset(dx3, "DONK");
-#load_preset(dx2, "BELLEAD");
-load_preset(dx2, "OVLAZ");
-vol dx2 0.4;
-add_fx(cl, "filter");
+#send("delay", goodt);
+#bpm 120;
+#load_preset(dx, "BELTRAMz");
+#add_fx(dx, "distort");
+#add_fx(dx, "compressor");
+#load_preset(sbdrum, "beltram");
+#set sbdrum:bd_vol 0.4;
+#add_fx(dx, "sidechain", sbdrum);
+#let dx4 = fm();
+#load_preset(dx4, "pointty");
+#load_preset(dx3, "DONK");
+##load_preset(dx2, "BELLEAD");
+#load_preset(dx2, "OVLAZ");
+#vol dx2 0.4;
+#add_fx(cl, "filter");
 
-# p1 $ drblah_gen;
-# p2 $ clblah_gen;
-# p3 $ dddblah_gen;
-# p4 $ dxblah_gen;
-# p5 $ dx2blah_gen;
-# p6 $ cppblah_gen
-# p7 $ melz3blah_gen;
+# p1 # drblah_gen;
+# p2 # hhblah_gen;
+# p3 # clblah_gen;
+# p4 # dddblah_gen;
+# p5 # dxblah_gen;
+# p6 # dx2blah_gen;
+# p7 # cppblah_gen
+# p8 # melz3blah_gen;
 
 
 let drblah_gen = gen()
@@ -328,37 +329,37 @@ let playITblah_gen = gen()
   {
     print(countr);
     if (countr == 0) {
-      p1 $ drblah_gen;
-      p4 $ dxlowblah_gen;
+      p1 # drblah_gen;
+      p4 # dxlowblah_gen;
       sched(0, 0, 0.8, 3840 * 16, "vol dx %");
     }
     if (countr == 8) {
       sched(3840, 0, 0.3, 3840 * 4, "vol cl %");
-      p2 $ clblah_gen;
-      p5 $ dxxnblah_gen;
+      p2 # clblah_gen;
+      p5 # dxxnblah_gen;
     }
     if (countr == 16) {
       #solo(dx, at=12*pp);
-      p3 $ dddblah_gen;
+      p3 # dddblah_gen;
     }
     if (countr == 32) {
-      p1 $ "";
-      p2 $ "";
-      p3 $ "";
-      p5 $ "";
-      p6 $ cppblah_gen;
+      p1 # "";
+      p2 # "";
+      p3 # "";
+      p5 # "";
+      p6 # cppblah_gen;
       load_preset(dx2, "BELLEAD");
-      p4 $ dx2blah_gen;
+      p4 # dx2blah_gen;
     }
     if (countr == 36) {
-      p1 $ drblah_gen;
-      p3 $ dddblah_gen;
+      p1 # drblah_gen;
+      p3 # dddblah_gen;
     }
     if (countr == 40) {
       # p11 $ melblah_gen;
       p3 $ "";
       p4 $ "";
-      p5 $ hhblah_gen;
+      p5 # hhblah_gen;
       note_on_at(goodt, 1, 12 * pp, dur = 0);
       p3 $ "";
       sched(3840, 0, 0.6, 3840 * 4, "vol dx4 %");
@@ -368,28 +369,28 @@ let playITblah_gen = gen()
       p4 $ "";
     }
     if (countr == 44) {
-      p4 $ dx2blah_gen;
+      p4 # dx2blah_gen;
     }
     if (countr == 48) {
       send("delay", clp);
-      p2 $ clblah_gen;
+      p2 # clblah_gen;
       sched(3840, 0, 0.6, 3840 * 4, "vol dx %");
-      p4 $ dxlowblah_gen;
+      p4 # dxlowblah_gen;
       p7 $ "";
       p11 $ "";
       p6 $ "";
       p1 $ "";
-      p7 $ dxxnblah_gen;
+      p7 # dxxnblah_gen;
     }
     if (countr == 52) {
       sched(0, 0.5, 0, 3840, "set mixer:delay:mx %");
-      p1 $ drblah_gen;
-      p3 $ dddblah_gen;
-      p5 $ hhblah_gen;
-      p12 $ dx4fxcblah_gen;
+      p1 # drblah_gen;
+      p3 # dddblah_gen;
+      p5 # hhblah_gen;
+      p12 # dx4fxcblah_gen;
     }
     if (countr == 58) {
-      p13 $ dx2blah_gen;
+      p13 # dx2blah_gen;
       p2 $ "";
       p9 $ "";
       p7 $ "";
@@ -400,25 +401,25 @@ let playITblah_gen = gen()
       p3 $ "";
     }
     if (countr == 70) {
-      p5 $ dxxnblah_gen;
+      p5 # dxxnblah_gen;
       #sched(3840, 0, 0.6, 3840 * 4, "vol dx2 %");
     }
     if (countr == 74) {
       send("delay", dx2);
       load_preset(dx2, "OVLAZ");
-      p5 $ dx2blah_gen;
+      p5 # dx2blah_gen;
     }
     if (countr == 78) {
-      p4 $ dxFINblah_gen;
-      p5 $ dxxnblah_gen;
-      p5 $ hhblah_gen;
-      p12 $ dx4fxcblah_gen;
+      p4 # dxFINblah_gen;
+      p5 # dxxnblah_gen;
+      p5 # hhblah_gen;
+      p12 # dx4fxcblah_gen;
     }
     if (countr == 82) {
       sched(0, 0., 0.5, 3840, "set mixer:delay:mx %");
-      p1 $ drblah_gen;
-      p3 $ dddblah_gen;
-      p4 $ dxlowblah_gen;
+      p1 # drblah_gen;
+      p3 # dddblah_gen;
+      p4 # dxlowblah_gen;
     }
     if (countr == 100) {
       p13 $ "";
@@ -637,4 +638,3 @@ let dxxnblah_gen = gen()
     }
   }
 }
-

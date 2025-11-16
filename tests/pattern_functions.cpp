@@ -1,3 +1,4 @@
+// cppcheck-suppress-file syntaxError
 #include <defjams.h>
 
 #include <array>

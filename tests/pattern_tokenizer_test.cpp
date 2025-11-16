@@ -1,3 +1,4 @@
+// cppcheck-suppress-file syntaxError
 #include <iostream>
 #include <memory>
 #include <pattern_parser/parser.hpp>
@@ -14,7 +15,9 @@
 namespace {
 
 struct PatternTokenizerTest : public ::testing::Test {
-  void SetUp(void) { std::cout << "Setup!\n"; }
+  void SetUp(void) {
+    std::cout << "Setup!\n";
+  }
 };
 
 TEST_F(PatternTokenizerTest, TestTokenz) {

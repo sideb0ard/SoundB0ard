@@ -11,7 +11,7 @@
 
 class Voice {
  public:
-  Voice() = default;
+  Voice() : m_global_voice_params(nullptr), m_global_synth_params(nullptr) {}
   virtual ~Voice() = default;
 
   void SetModMatrixCore(std::vector<std::shared_ptr<ModMatrixRow>> &matrix);

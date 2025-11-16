@@ -16,4 +16,3 @@ let blah_gen = gen()
     cbeat(cp);
   }
 }
-

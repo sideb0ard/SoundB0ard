@@ -1,9 +1,9 @@
-tests/ramp_test.cpp
+tests / ramp_test.cpp
 #include "fx/ramp.h"
 
 #include <gtest/gtest.h>
 
-class RampTest : public ::testing::Test {
+        class RampTest : public ::testing::Test {
  protected:
   void SetUp() override {}
   Ramp ramp_;

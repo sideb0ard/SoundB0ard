@@ -16,7 +16,7 @@
 namespace SBAudio {
 
 typedef struct synthsettings {
-  char m_settings_name[256];
+  char m_settings_name[256]{};
 
   unsigned int m_voice_mode{0};
   bool m_monophonic{false};

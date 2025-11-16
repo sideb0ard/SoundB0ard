@@ -18,6 +18,7 @@
  */
 
 #include "AudioEngine.hpp"
+
 #include <mixer.h>
 
 // Make sure to define this before <cmath> is included for Windows

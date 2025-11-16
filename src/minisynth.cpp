@@ -21,6 +21,7 @@ const char *S_VOICES[] = {"SAW3",    "SQR3",    "SAW2SQR",
 
 MiniSynth::MiniSynth() {
   type = MINISYNTH_TYPE;
+  m_midi_rx_channel = 0;
 
   for (int i = 0; i < MAX_VOICES; i++) {
     voices_[i] = std::make_shared<MiniSynthVoice>();
@@ -228,7 +229,9 @@ void MiniSynth::Stop() {
 }
 
 void MiniSynth::LoadDefaults() {
-  strncpy(m_settings.m_settings_name, "default", 7);
+  strncpy(m_settings.m_settings_name, "default",
+          sizeof(m_settings.m_settings_name) - 1);
+  m_settings.m_settings_name[sizeof(m_settings.m_settings_name) - 1] = '\0';
 
   m_settings.m_monophonic = false;
   m_settings.m_voice_mode = Sqr3;
@@ -803,7 +806,9 @@ std::shared_ptr<MiniSynthVoice> MiniSynth::GetOldestVoiceWithNote(
 void MiniSynth::Randomize() {
   // printf("Randomizing SYNTH!\n");
 
-  strncpy(m_settings.m_settings_name, "-- random UNSAVED--", 256);
+  strncpy(m_settings.m_settings_name, "-- random UNSAVED--",
+          sizeof(m_settings.m_settings_name) - 1);
+  m_settings.m_settings_name[sizeof(m_settings.m_settings_name) - 1] = '\0';
   m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
   m_settings.m_monophonic = rand() % 2;
 
@@ -904,23 +909,25 @@ void MiniSynth::Save(std::string new_preset_name) {
   }
 
   int settings_count = 0;
-  strncpy(m_settings.m_settings_name, preset_name, 256);
+  strncpy(m_settings.m_settings_name, preset_name,
+          sizeof(m_settings.m_settings_name) - 1);
+  m_settings.m_settings_name[sizeof(m_settings.m_settings_name) - 1] = '\0';
 
   fprintf(presetzzz, "::name=%s", m_settings.m_settings_name);
   settings_count++;
 
-  fprintf(presetzzz, "::voice_mode=%d", m_settings.m_voice_mode);
+  fprintf(presetzzz, "::voice_mode=%u", m_settings.m_voice_mode);
   settings_count++;
 
   fprintf(presetzzz, "::monophonic=%d", m_settings.m_monophonic);
   settings_count++;
 
   // LFO1
-  fprintf(presetzzz, "::lfo1_waveform=%d", m_settings.m_lfo1_waveform);
+  fprintf(presetzzz, "::lfo1_waveform=%u", m_settings.m_lfo1_waveform);
   settings_count++;
-  fprintf(presetzzz, "::lfo1_dest=%d", m_settings.m_lfo1_dest);
+  fprintf(presetzzz, "::lfo1_dest=%u", m_settings.m_lfo1_dest);
   settings_count++;
-  fprintf(presetzzz, "::lfo1_mode=%d", m_settings.m_lfo1_mode);
+  fprintf(presetzzz, "::lfo1_mode=%u", m_settings.m_lfo1_mode);
   settings_count++;
   fprintf(presetzzz, "::lfo1_rate=%f", m_settings.m_lfo1_rate);
   settings_count++;
@@ -956,11 +963,11 @@ void MiniSynth::Save(std::string new_preset_name) {
   settings_count++;
 
   // LFO2
-  fprintf(presetzzz, "::lfo2_waveform=%d", m_settings.m_lfo2_waveform);
+  fprintf(presetzzz, "::lfo2_waveform=%u", m_settings.m_lfo2_waveform);
   settings_count++;
-  fprintf(presetzzz, "::lfo2_dest=%d", m_settings.m_lfo2_dest);
+  fprintf(presetzzz, "::lfo2_dest=%u", m_settings.m_lfo2_dest);
   settings_count++;
-  fprintf(presetzzz, "::lfo2_mode=%d", m_settings.m_lfo2_mode);
+  fprintf(presetzzz, "::lfo2_mode=%u", m_settings.m_lfo2_mode);
   settings_count++;
   fprintf(presetzzz, "::lfo2_rate=%f", m_settings.m_lfo2_rate);
   settings_count++;
@@ -1048,30 +1055,30 @@ void MiniSynth::Save(std::string new_preset_name) {
   fprintf(presetzzz, "::pitchbend_range=%d", m_settings.m_pitchbend_range);
   settings_count++;
 
-  fprintf(presetzzz, "::legato_mode=%d", m_settings.m_legato_mode);
+  fprintf(presetzzz, "::legato_mode=%u", m_settings.m_legato_mode);
   settings_count++;
-  fprintf(presetzzz, "::reset_to_zero=%d", m_settings.m_reset_to_zero);
+  fprintf(presetzzz, "::reset_to_zero=%u", m_settings.m_reset_to_zero);
   settings_count++;
-  fprintf(presetzzz, "::filter_keytrack=%d", m_settings.m_filter_keytrack);
+  fprintf(presetzzz, "::filter_keytrack=%u", m_settings.m_filter_keytrack);
   settings_count++;
-  fprintf(presetzzz, "::filter_type=%d", m_settings.m_filter_type);
+  fprintf(presetzzz, "::filter_type=%u", m_settings.m_filter_type);
   settings_count++;
   fprintf(presetzzz, "::filter_saturation=%f", m_settings.m_filter_saturation);
   settings_count++;
 
-  fprintf(presetzzz, "::nlp=%d", m_settings.m_nlp);
+  fprintf(presetzzz, "::nlp=%u", m_settings.m_nlp);
   settings_count++;
-  fprintf(presetzzz, "::velocity_to_attack_scaling=%d",
+  fprintf(presetzzz, "::velocity_to_attack_scaling=%u",
           m_settings.m_velocity_to_attack_scaling);
   settings_count++;
-  fprintf(presetzzz, "::note_number_to_decay_scaling=%d",
+  fprintf(presetzzz, "::note_number_to_decay_scaling=%u",
           m_settings.m_note_number_to_decay_scaling);
   settings_count++;
   fprintf(presetzzz, "::portamento_time_msec=%f",
           m_settings.m_portamento_time_msec);
   settings_count++;
 
-  fprintf(presetzzz, "::sustain_override=%d",
+  fprintf(presetzzz, "::sustain_override=%u",
           m_settings.m_eg1_sustain_override);
   settings_count++;
 
@@ -1083,7 +1090,9 @@ void MiniSynth::Save(std::string new_preset_name) {
 
 void MiniSynth::LoadPreset(std::string preset_name,
                            std::map<std::string, double> preset) {
-  strncpy(m_settings.m_settings_name, preset_name.c_str(), 256);
+  strncpy(m_settings.m_settings_name, preset_name.c_str(),
+          sizeof(m_settings.m_settings_name) - 1);
+  m_settings.m_settings_name[sizeof(m_settings.m_settings_name) - 1] = '\0';
   for (const auto &[key, val] : preset) {
     if (key == "voice_mode")
       m_settings.m_voice_mode = val;
@@ -1413,7 +1422,7 @@ void MiniSynth::SetFilterFq(double val) {
 
 void MiniSynth::SetFilterType(unsigned int val) {
   if (val == BSF2 || val == LPF1 || val == HPF1)
-    printf("warning! useless change - %d not possible with moog\n", val);
+    printf("warning! useless change - %u not possible with moog\n", val);
   if (val < NUM_FILTER_TYPES)
     m_settings.m_filter_type = val;
   else

@@ -61,7 +61,7 @@ add_subdirectory(${ableton_link_SOURCE_DIR} ${ableton_link_BINARY_DIR})
 
 # Configure Ableton Link target
 include(${ableton_link_SOURCE_DIR}/cmake_include/ConfigureAbletonLink.cmake)
-ConfigureAbletonLink(${ableton_link_SOURCE_DIR})
+configureabletonlink(${ableton_link_SOURCE_DIR})
 
 # Fetch PerlinNoise
 FetchContent_Declare(
@@ -89,8 +89,8 @@ if(NOT PORTAUDIO_FOUND)
   if(NOT PORTAUDIO_LIB)
     message(
       FATAL_ERROR
-        "PortAudio library not found. Install with: sudo apt install portaudio19-dev (Ubuntu/Debian) or equivalent"
-    )
+        "PortAudio library not found. Install with: "
+        "sudo apt install portaudio19-dev (Ubuntu/Debian) or equivalent")
   endif()
 endif()
 
@@ -105,8 +105,8 @@ if(NOT PORTMIDI_LIB)
 endif()
 if(NOT PORTMIDI_LIB)
   message(
-    FATAL_ERROR
-      "PortMidi library not found. Install with: sudo apt install libportmidi-dev (Ubuntu/Debian) or equivalent"
+    FATAL_ERROR "PortMidi library not found. Install with: "
+                "sudo apt install libportmidi-dev (Ubuntu/Debian) or equivalent"
   )
 endif()
 
@@ -116,8 +116,8 @@ if(NOT SNDFILE_FOUND)
   if(NOT SNDFILE_LIB)
     message(
       FATAL_ERROR
-        "libsndfile library not found. Install with: sudo apt install libsndfile1-dev (Ubuntu/Debian) or equivalent"
-    )
+        "libsndfile library not found. Install with: "
+        "sudo apt install libsndfile1-dev (Ubuntu/Debian) or equivalent")
   endif()
 endif()
 
@@ -135,8 +135,8 @@ if(NOT JSONCPP_FOUND)
   if(NOT JSONCPP_LIB)
     message(
       FATAL_ERROR
-        "jsoncpp library not found. Install with: sudo apt install libjsoncpp-dev (Ubuntu/Debian) or equivalent"
-    )
+        "jsoncpp library not found. Install with: "
+        "sudo apt install libjsoncpp-dev (Ubuntu/Debian) or equivalent")
   endif()
   find_path(JSONCPP_INCLUDE_DIR json/json.h)
   if(NOT JSONCPP_INCLUDE_DIR)
@@ -195,8 +195,9 @@ endif()
 if(NOT READLINE_FOUND AND NOT READLINE_LIB)
   message(
     FATAL_ERROR
-      "Readline library not found. Install with: sudo apt install libreadline-dev (Ubuntu/Debian) or brew install readline (macOS)"
-  )
+      "Readline library not found. Install with: "
+      "sudo apt install libreadline-dev (Ubuntu/Debian) or "
+      "brew install readline (macOS)")
 endif()
 
 # Find history library
@@ -232,8 +233,9 @@ endif()
 if(NOT HISTORY_FOUND AND NOT HISTORY_LIB)
   message(
     FATAL_ERROR
-      "History library not found. Install with: sudo apt install libreadline-dev (Ubuntu/Debian) or brew install readline (macOS)"
-  )
+      "History library not found. Install with: "
+      "sudo apt install libreadline-dev (Ubuntu/Debian) or "
+      "brew install readline (macOS)")
 endif()
 
 # Explicitly set platform definitions for Link (now that CMAKE_SYSTEM_NAME is
@@ -252,10 +254,8 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     APPEND
     PROPERTY INTERFACE_COMPILE_DEFINITIONS LINK_PLATFORM_MACOSX=1)
 else()
-  message(
-    STATUS
-      "System name '${CMAKE_SYSTEM_NAME}' - no additional Link platform definition needed"
-  )
+  message(STATUS "System name '${CMAKE_SYSTEM_NAME}' - "
+                 "no additional Link platform definition needed")
 endif()
 
 file(GLOB_RECURSE Sbsh_SOURCES CONFIGURE_DEPENDS "src/*.cpp")

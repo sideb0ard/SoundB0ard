@@ -1,3 +1,4 @@
+// cppcheck-suppress-file syntaxError
 #include <iostream>
 #include <pattern_parser/euclidean.hpp>
 #include <string>

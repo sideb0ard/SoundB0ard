@@ -1,5 +1,5 @@
-#ifndef _lookupTables_
-#define _lookupTables_
+#ifndef SOUNDBOARD_LOOKUPTABLES_H
+#define SOUNDBOARD_LOOKUPTABLES_H
 
 const float midiFreqTable[128] = {
     8.1757993698120117,     8.6619567871093750,     9.1770238876342773,

@@ -1,3 +1,6 @@
+#ifndef SOUNDBOARD_EVENT_QUEUE_H
+#define SOUNDBOARD_EVENT_QUEUE_H
+
 #include <interpreter/ast.hpp>
 #include <interpreter/object.hpp>
 #include <pattern_functions.hpp>
@@ -34,3 +37,5 @@ struct event_queue_item {
   std::string mod_command;
   std::shared_ptr<ast::Expression> mod_pattern;
 };
+
+#endif  // SOUNDBOARD_EVENT_QUEUE_H

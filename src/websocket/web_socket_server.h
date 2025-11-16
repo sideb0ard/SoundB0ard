@@ -1,5 +1,5 @@
-#ifndef _WEBSOCKET_SERVER
-#define _WEBSOCKET_SERVER
+#ifndef SOUNDBOARD_WEB_SOCKET_SERVER_H
+#define SOUNDBOARD_WEB_SOCKET_SERVER_H
 
 // We need to define this when using the Asio library without Boost
 // Note: ASIO_STANDALONE is already defined by Ableton Link
@@ -94,4 +94,4 @@ class WebsocketServer {
       messageHandlers;
 };
 
-#endif
+#endif  // SOUNDBOARD_WEB_SOCKET_SERVER_H

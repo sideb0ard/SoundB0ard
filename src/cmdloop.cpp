@@ -1,6 +1,5 @@
 #include <cmdloop.h>
 #include <locale.h>
-#include <memory>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <new_item_cmds.h>
@@ -17,6 +16,7 @@
 #include <filereader.hpp>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <tsqueue.hpp>
 
 namespace fs = std::filesystem;
@@ -81,23 +81,23 @@ void *loopy() {
   std::string last_line;
   rl_event_hook = event_hook;
   rl_set_keyboard_input_timeout(500);
-  
+
   while (true) {
-      std::unique_ptr<char, void(*)(void*)> line(readline(prompt), free);
-      
-      if (!line) break;  // readline returned NULL
-      
-      if (line.get() && *line.get()) {
-          std::string current_line(line.get());
-          
-          if (current_line != last_line) {
-              add_history(line.get());
-              last_line = current_line;
-          }
-          eval_command_queue.push(current_line);
+    std::unique_ptr<char, void (*)(void *)> line(readline(prompt), free);
+
+    if (!line) break;  // readline returned NULL
+
+    if (line.get() && *line.get()) {
+      std::string current_line(line.get());
+
+      if (current_line != last_line) {
+        add_history(line.get());
+        last_line = current_line;
       }
+      eval_command_queue.push(current_line);
+    }
   }
-  
+
   printf(COOL_COLOR_PINK
          "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET);  // Thrashin'
                                                          // reference

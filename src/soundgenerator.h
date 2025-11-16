@@ -57,7 +57,7 @@ class SoundGenerator {
 
   virtual void EventNotify(broadcast_event event, mixer_timing_info tinfo);
 
-  virtual void AddBuffer(std::unique_ptr<FileBuffer> /*fb*/) {};
+  virtual void AddBuffer(std::unique_ptr<FileBuffer> /*fb*/){};
 
   void ParseMidiEvent(midi_event ev, mixer_timing_info tinfo);
 

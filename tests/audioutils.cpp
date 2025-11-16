@@ -1,3 +1,4 @@
+// cppcheck-suppress-file syntaxError
 #include <audioutils.h>
 
 #include <iostream>

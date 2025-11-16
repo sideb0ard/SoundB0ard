@@ -14,7 +14,9 @@ TEST_F(StepperTest, StepperInitialSettings) {
   EXPECT_EQ(stepper_.sequence_.size(), 0);
 }
 
-TEST_F(StepperTest, EmptySequence) { EXPECT_EQ(stepper_.GenNext(), 0); }
+TEST_F(StepperTest, EmptySequence) {
+  EXPECT_EQ(stepper_.GenNext(), 0);
+}
 
 TEST_F(StepperTest, SingleItem) {
   stepper_.SetSequence({1});

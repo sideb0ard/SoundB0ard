@@ -6,8 +6,8 @@
 #include <string.h>
 #include <utils.h>
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 #include <limits>
 
 // used by GetNthDegree
@@ -317,7 +317,7 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
       randy_root = root_midi - 12;
     else if (randy > 92)
       randy_fifth = fifth_midi + 12;
-    else if (randy > 90)
+    else  // randy is 91-92
       randy_fifth = fifth_midi - 12;
 
     if (randy_root > 0 && randy_root < 128) root_midi = randy_root;

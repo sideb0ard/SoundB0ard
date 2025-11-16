@@ -14,15 +14,16 @@ set(DANGEROUS_PATTERNS "strcpy\\s*\\(" "strcat\\s*\\(" "sprintf\\s*\\("
 set(FOUND_ISSUES FALSE)
 
 # Check each file for dangerous patterns
-foreach(FILE ${CPP_FILES})
-  foreach(PATTERN ${DANGEROUS_PATTERNS})
-    file(READ ${FILE} FILE_CONTENTS)
+foreach(source_file ${CPP_FILES})
+  foreach(pattern ${DANGEROUS_PATTERNS})
+    file(READ ${source_file} FILE_CONTENTS)
 
     # Use regex to find dangerous patterns
-    string(REGEX MATCH ${PATTERN} MATCH_RESULT ${FILE_CONTENTS})
+    string(REGEX MATCH ${pattern} MATCH_RESULT ${FILE_CONTENTS})
 
     if(MATCH_RESULT)
-      message(WARNING "Dangerous function found in ${FILE}: ${MATCH_RESULT}")
+      message(
+        WARNING "Dangerous function found in ${source_file}: ${MATCH_RESULT}")
       message(WARNING "Consider using safer alternatives:")
       message(WARNING "  strcpy  -> strncpy")
       message(WARNING "  strcat  -> strncat")

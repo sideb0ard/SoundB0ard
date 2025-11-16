@@ -1,10 +1,10 @@
 #include <fx/stereodelay.h>
-#include <memory>
 #include <mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 extern std::unique_ptr<Mixer> global_mixr;

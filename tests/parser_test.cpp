@@ -1,3 +1,4 @@
+// cppcheck-suppress-file syntaxError
 #include "interpreter/parser.hpp"
 
 #include <iostream>

@@ -1,6 +1,5 @@
 #include <dxsynth.h>
 #include <math.h>
-#include <memory>
 #include <midi_freq_table.h>
 #include <mixer.h>
 #include <stdlib.h>
@@ -9,6 +8,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 extern std::unique_ptr<Mixer> global_mixr;
 
@@ -278,10 +278,10 @@ void DXSynth::Control(midi_event ev) {
 void DXSynth::PitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
   unsigned int data2 = ev.data2;
-  printf("Pitch bend, babee: %d %d\n", data1, data2);
+  printf("Pitch bend, babee: %u %u\n", data1, data2);
   m_settings.m_actual_pitch_bent_val =
       (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
-  printf("ACTUALPitch bend, babee: %d %d\n", data1, data2);
+  printf("ACTUALPitch bend, babee: %u %u\n", data1, data2);
 
   if (m_settings.m_actual_pitch_bent_val != 8192) {
     double normalized_pitch_bent_val =

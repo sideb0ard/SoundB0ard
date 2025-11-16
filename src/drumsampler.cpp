@@ -2,7 +2,6 @@
 
 #include <libgen.h>
 #include <math.h>
-#include <memory>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +9,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 #include "defjams.h"
 #include "mixer.h"

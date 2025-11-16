@@ -62,4 +62,3 @@ let arp2blah_gen = gen()
     }
   }
 }
-
