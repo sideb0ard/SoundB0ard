@@ -411,7 +411,7 @@ let playitblah_gen = gen()
   }
   run()
   {
-    print("bar:", bar);
+    # print("bar:", bar);
     if (bar == 0) {
       p1 # chordblah_gen;
       p2 # loonblah_gen;

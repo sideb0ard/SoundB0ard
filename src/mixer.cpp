@@ -157,15 +157,25 @@ std::string Mixer::StatusMixr() {
      << " websock:" << ANSI_COLOR_WHITE
      << (websocket_enabled_ ? "true" : "false") << COOL_COLOR_GREEN
      << " ::::::::::::::::::::::\n";
-  ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
-     << "delay: " << fx_[0]->Status() << std::endl;
-  ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
-     << "reverb: " << fx_[1]->Status() << std::endl;
-  ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
-     << "distort: " << fx_[2]->Status() << std::endl;
-  ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
-     << "xfader: " << xfader_.Status(global_env->GetSoundGeneratorsById())
-     << std::endl;
+
+  if (fx_[0]) {
+    ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
+       << "delay: " << fx_[0]->Status() << std::endl;
+  }
+  if (fx_[1]) {
+    ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
+       << "reverb: " << fx_[1]->Status() << std::endl;
+  }
+  if (fx_[2]) {
+    ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
+       << "distort: " << fx_[2]->Status() << std::endl;
+  }
+
+  if (global_env) {
+    ss << COOL_COLOR_GREEN << ":::::::::::::::: " << COOL_COLOR_ORANGE
+       << "xfader: " << xfader_.Status(global_env->GetSoundGeneratorsById())
+       << std::endl;
+  }
   ss << ANSI_COLOR_WHITE;
   // clang-format on
 
@@ -178,7 +188,11 @@ std::string Mixer::StatusProcz(bool all) {
      << COOL_COLOR_ORANGE << "]\n";
 
   for (int i = 0; i < MAX_NUM_PROC; i++) {
-    auto &p = processes_[i];
+    // Make a copy of the shared_ptr to avoid races
+    auto p = processes_[i];
+    if (!p) continue;  // Skip if null
+
+    // Check if we should display this process
     if (p->active_ || all) {
       ss << ANSI_COLOR_WHITE << "p" << i << ANSI_COLOR_RESET << " "
          << p->Status() << std::endl;
@@ -192,9 +206,17 @@ std::string Mixer::StatusEnv() {
   ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Varz"
      << COOL_COLOR_GREEN << "]" << std::endl;
 
+  if (!global_env) {
+    ss << ANSI_COLOR_RED << "ERROR: global_env is null!" << ANSI_COLOR_RESET
+       << std::endl;
+    return ss.str();
+  }
+
   ss << global_env->Debug();
 
   std::map<std::string, int> soundgens = global_env->GetSoundGeneratorsByName();
+  std::shared_lock<std::shared_mutex> lock(
+      sound_generators_mutex_);  // Shared lock for read
   for (auto &[var_name, sg_idx] : soundgens) {
     if (IsValidSoundgenNum(sg_idx)) {
       auto &sg = sound_generators_[sg_idx];
@@ -209,6 +231,8 @@ std::string Mixer::StatusEnv() {
       }
       margin << "   ";  // for the ' = '
 
+      // Shared lock to safely read effects array
+      std::shared_lock<std::shared_mutex> fx_lock(sg->effects_mutex_);
       for (int i = 0; i < sg->effects_num; i++) {
         ss << margin.str();
         auto f = sg->effects_[i];
@@ -231,6 +255,8 @@ std::string Mixer::StatusSgz(bool all) {
   if (sound_generators_.size() > 0) {
     ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "sound generators"
        << COOL_COLOR_GREEN << "]\n";
+    std::shared_lock<std::shared_mutex> lock(
+        sound_generators_mutex_);  // Shared lock for read
     for (int i = 0; i < sound_generators_idx_; i++) {
       auto &sg = sound_generators_[i];
       if (sg) {
@@ -241,6 +267,8 @@ std::string Mixer::StatusSgz(bool all) {
 
           if (sg->effects_num > 0) {
             ss << "      ";
+            // Shared lock to safely read effects array
+            std::shared_lock<std::shared_mutex> fx_lock(sg->effects_mutex_);
             for (int j = 0; j < sg->effects_num; j++) {
               auto f = sg->effects_[j];
               if (!f) continue;  // Skip if nullptr
@@ -305,11 +333,15 @@ void Mixer::EmitEvent(broadcast_event event) {
   ev.timing_info = timing_info;
   process_event_queue.push(ev);
 
+  std::shared_lock<std::shared_mutex> lock(
+      sound_generators_mutex_);  // Shared lock for read
   for (int i = 0; i < sound_generators_idx_; i++) {
     auto &sg = sound_generators_[i];
     if (sg) {
       sg->EventNotify(event, timing_info);
       if (sg->effects_num > 0) {
+        // Shared lock to safely read effects array
+        std::shared_lock<std::shared_mutex> fx_lock(sg->effects_mutex_);
         for (int j = 0; j < sg->effects_num; j++) {
           if (sg->effects_[j]) {
             auto f = sg->effects_[j];
@@ -367,6 +399,8 @@ void Mixer::PanChange(int sg, float val) {
 }
 
 void Mixer::AddSoundGenerator(std::unique_ptr<SBAudio::SoundGenerator> sg) {
+  std::unique_lock<std::shared_mutex> lock(
+      sound_generators_mutex_);  // Exclusive lock for write
   int soundgen_id = sound_generators_idx_;
   if (soundgen_id < MAX_NUM_SOUND_GENERATORS) {
     sg->soundgen_id_ = soundgen_id;
@@ -429,6 +463,8 @@ void Mixer::MidiTick() {
 // GenNext implementation moved to header as template function
 
 bool Mixer::DelSoundgen(int soundgen_num) {
+  std::unique_lock<std::shared_mutex> lock(
+      sound_generators_mutex_);  // Exclusive lock for write
   if (IsValidSoundgenNum(soundgen_num)) {
     printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
     sound_generators_[soundgen_num] = nullptr;
@@ -448,6 +484,8 @@ bool Mixer::IsValidSoundgenNum(int sg_num) {
 bool Mixer::IsValidFx(int soundgen_num, int fx_num) {
   if (IsValidSoundgenNum(soundgen_num)) {
     const auto &sg = sound_generators_[soundgen_num];
+    // Shared lock to safely read effects array
+    std::shared_lock<std::shared_mutex> lock(sg->effects_mutex_);
     if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects_[fx_num])
       return true;
   }
@@ -798,6 +836,9 @@ void Mixer::ProcessActionMessage(std::unique_ptr<AudioActionItem> action) {
         if (action->fx_id != -1) {
           int fx_num = action->fx_id;
           if (IsValidFx(action->mixer_soundgen_idx, fx_num)) {
+            // Shared lock to safely access effects array (reading to call
+            // SetParam)
+            std::shared_lock<std::shared_mutex> lock(sg->effects_mutex_);
             auto f = sg->effects_[fx_num];
             if (action->param_name == "active")
               f->enabled_ = param_val;

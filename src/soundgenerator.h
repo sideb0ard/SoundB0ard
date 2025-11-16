@@ -8,6 +8,8 @@
 #include <atomic>
 #include <iostream>
 #include <map>
+#include <mutex>
+#include <shared_mutex>
 
 #include "defjams.h"
 #include "filebuffer.h"
@@ -86,6 +88,8 @@ class SoundGenerator {
 
   std::atomic<int16_t> effects_num{0};  // num of effects
   std::array<std::shared_ptr<Fx>, kMaxNumSoundGenFx> effects_;
+  mutable std::shared_mutex
+      effects_mutex_;     // Protects effects_ array (read-write lock)
   bool effects_on{true};  // bool
 
  public:

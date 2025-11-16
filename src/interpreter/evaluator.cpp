@@ -1475,6 +1475,7 @@ std::shared_ptr<object::Object> EvalProcessStatement(
       break;
     }
     default:
+      break;  // C++20 compatibility: labels need at least one statement
   }
 
   process_event_queue.push(ev);

@@ -421,6 +421,9 @@ void TidalPattern::UpdateLoopLen(int val) {
 }
 
 std::string Process::Status() {
+  if (!process_runner_) {
+    return "inactive";
+  }
   return process_runner_->Status();
 }
 

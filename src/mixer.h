@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <shared_mutex>
 
 // Forward declarations to avoid namespace issues
 namespace ableton {
@@ -90,9 +91,12 @@ struct Mixer {
   std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_ = {};
   bool proc_initialized_{false};
 
-  int sound_generators_idx_{0};
+  std::atomic<int> sound_generators_idx_{0};
   std::array<std::unique_ptr<SBAudio::SoundGenerator>, MAX_NUM_SOUND_GENERATORS>
       sound_generators_ = {};
+  mutable std::shared_mutex
+      sound_generators_mutex_;  // Protects sound_generators_ array (read-write
+                                // lock)
   std::array<StereoVal, MAX_NUM_SOUND_GENERATORS> soundgen_cur_val_{};
 
   std::array<std::shared_ptr<Fx>, kMixerNumSendFx> fx_;
@@ -235,24 +239,61 @@ struct Mixer {
       StereoVal fx_delay_send{};
       StereoVal fx_reverb_send{};
       StereoVal fx_distort_send{};
-      // Cache the size to avoid race conditions with other threads modifying it
+
+      // Try shared lock for sound generator access (allows multiple readers).
+      // If we can't get the lock (writer is active), use cached values to avoid
+      // glitches
+      if (sound_generators_mutex_.try_lock_shared()) {
+        // Cache the size to avoid race conditions with other threads modifying
+        // it
+        int safe_generators_count =
+            (sound_generators_idx_.load() <
+             static_cast<int>(sound_generators_.size()))
+                ? sound_generators_idx_.load()
+                : static_cast<int>(sound_generators_.size());
+
+        for (int k = 0; k < safe_generators_count; k++) {
+          // Additional bounds check
+          if (k >= sound_generators_.size()) break;
+
+          auto &sg = sound_generators_[k];
+          // Null check before dereferencing
+          if (!sg) {
+            soundgen_cur_val_[k] = StereoVal{};
+            continue;
+          }
+          soundgen_cur_val_[k] = sg->GenNext(timing_info);
+        }
+        sound_generators_mutex_.unlock_shared();
+      }
+      // If we couldn't lock, soundgen_cur_val_ still has cached values from
+      // last iteration
+
+      // Now collect the FX send values while we still have the lock or can get
+      // it We need to access sound_generators_[k] here, so we need protection
+      std::array<std::array<double, kMixerNumSendFx>, MAX_NUM_SOUND_GENERATORS>
+          fx_send_cache{};
+      if (sound_generators_mutex_.try_lock_shared()) {
+        int safe_count = (sound_generators_idx_.load() <
+                          static_cast<int>(sound_generators_.size()))
+                             ? sound_generators_idx_.load()
+                             : static_cast<int>(sound_generators_.size());
+        for (int k = 0; k < safe_count; k++) {
+          if (sound_generators_[k]) {
+            fx_send_cache[k] = sound_generators_[k]->mixer_fx_send_intensity_;
+          }
+        }
+        sound_generators_mutex_.unlock_shared();
+      }
+
+      // Now process the cached values (outside the lock)
       int safe_generators_count =
-          (sound_generators_idx_ < static_cast<int>(sound_generators_.size()))
-              ? sound_generators_idx_
+          (sound_generators_idx_.load() <
+           static_cast<int>(sound_generators_.size()))
+              ? sound_generators_idx_.load()
               : static_cast<int>(sound_generators_.size());
 
       for (int k = 0; k < safe_generators_count; k++) {
-        // Additional bounds check
-        if (k >= sound_generators_.size()) break;
-
-        auto &sg = sound_generators_[k];
-        // Null check before dereferencing
-        if (!sg) {
-          soundgen_cur_val_[k] = StereoVal{};
-          continue;
-        }
-        soundgen_cur_val_[k] = sg->GenNext(timing_info);
-
         bool collect_value = false;
         // if nothing is soloed, or this sg is in the solo group,
         // collect its output value
@@ -267,12 +308,9 @@ struct Mixer {
           output_left += soundgen_cur_val_[k].left * xfader_.GetValueFor(k);
           output_right += soundgen_cur_val_[k].right * xfader_.GetValueFor(k);
 
-          fx_delay_send +=
-              soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[0];
-          fx_reverb_send +=
-              soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[1];
-          fx_distort_send +=
-              soundgen_cur_val_[k] * sg->mixer_fx_send_intensity_[2];
+          fx_delay_send += soundgen_cur_val_[k] * fx_send_cache[k][0];
+          fx_reverb_send += soundgen_cur_val_[k] * fx_send_cache[k][1];
+          fx_distort_send += soundgen_cur_val_[k] * fx_send_cache[k][2];
         }
       }
 

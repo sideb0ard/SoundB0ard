@@ -97,6 +97,8 @@ void SoundGenerator::SetPan(double val) {
 
 void SoundGenerator::AddFx(std::shared_ptr<Fx> f) {
   std::cout << "YO, ADDING FX TO SG\n";
+  std::unique_lock<std::shared_mutex> lock(
+      effects_mutex_);  // Exclusive lock for write
   if (effects_num < kMaxNumSoundGenFx) {
     effects_[effects_num++] = f;
     printf("done adding effect\n");
@@ -104,6 +106,8 @@ void SoundGenerator::AddFx(std::shared_ptr<Fx> f) {
 }
 
 StereoVal SoundGenerator::Effector(StereoVal val) {
+  std::shared_lock<std::shared_mutex> lock(
+      effects_mutex_);  // Shared lock for read
   int num_fx = effects_num.load();
   // Ensure we don't exceed the actual array size to prevent race conditions
   int safe_fx_count = (num_fx < static_cast<int>(effects_.size()))
