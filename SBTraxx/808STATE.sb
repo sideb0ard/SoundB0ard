@@ -25,7 +25,7 @@ add_fx(drumz, "distort");
 add_fx(drumz2, "distort");
 add_fx(drumz, "filter"); set drumz:fx1:type 1;
 set mo:l1rate 0.1;
-p19 $ playitblah_gen;
+p19 # playitblah_gen;
 
 #sched(0, 0, 1, 3840 * 2, "vol drumz %");
 # p1 $ chordblah_gen;
@@ -413,22 +413,22 @@ let playitblah_gen = gen()
   {
     print("bar:", bar);
     if (bar == 0) {
-      p1 $ chordblah_gen;
-      p2 $ loonblah_gen;
+      p1 # chordblah_gen;
+      p2 # loonblah_gen;
       sched(3840, 0, 3840, 1, "vol mo %");
-      p3 $ fullchordblah_gen;
+      p3 # fullchordblah_gen;
     }
     if (bar == 4) {
       set drumz:reverse 1;
-      p4 $ bbreakblah_gen;
+      p4 # bbreakblah_gen;
       sched(3840, 0.5, 1, 3840 * 2, "vol drumz %");
     }
 
     if (bar == 12) {
       p2 $ "";
-      p6 $ bssslah_gen;
-      p3 $ snrrblah_gen;
-      p7 $ riffblah_gen;
+      p6 # bssslah_gen;
+      p3 # snrrblah_gen;
+      p7 # riffblah_gen;
     }
     if (bar == 24) {
       p3 $ "";
@@ -437,15 +437,15 @@ let playitblah_gen = gen()
       p6 $ "";
       p7 $ "";
       sched(3840, 0, 0.4, 3840, "vol dx %");
-      p5 $ fellblah_gen;
+      p5 # fellblah_gen;
     }
     if (bar == 28) {
-      p10 $ hhblah_gen;
-      p3 $ snrrblah_gen;
+      p10 # hhblah_gen;
+      p3 # snrrblah_gen;
     }
     if (bar == 32) {
-      p5 $ dxstabblah_gen;
-      p4 $ bbreakblah_gen;
+      p5 # dxstabblah_gen;
+      p4 # bbreakblah_gen;
       # note_on(drumz, 1, dur = 0);
     }
     if (bar == 48) {
@@ -453,58 +453,58 @@ let playitblah_gen = gen()
       vol drumz 0;
       p7 $ "";
       p5 $ "";
-      p6 $ dxmelblah_gen;
+      p6 # dxmelblah_gen;
     }
 
     if (bar == 60) {
       # note_on(drumz, 1, dur = 0);
-      p4 $ bbreakblah_gen;
+      p4 # bbreakblah_gen;
     }
     if (bar == 62) {
       p6 $ "";
-      p5 $ dxstabblah_gen;
-      p10 $ hhblah_gen;
+      p5 # dxstabblah_gen;
+      p10 # hhblah_gen;
     }
     if (bar == 72) {
       p4 $ "";
       vol drumz 0;
       # note_off(drumz, 0);
       p5 $ "";
-      p10 $ hhblah_gen;
+      p10 # hhblah_gen;
       p6 $ "";
       p10 $ "";
-      p2 $ loonblah_gen;
+      p2 # loonblah_gen;
       sched(3840, 0, 0.7, 3840, "vol shr %");
     }
     if (bar == 74) {
-      p5 $ drblah_gen;
-      p3 $ fullchordblah_gen;
-      p8 $ snrrblah_gen;
+      p5 # drblah_gen;
+      p3 # fullchordblah_gen;
+      p8 # snrrblah_gen;
     }
     if (bar == 82) {
       p2 $ "";
       vol drumz 1;
-      p4 $ bbreakblah_gen;
-      p6 $ bsss2lah_gen;
+      p4 # bbreakblah_gen;
+      p6 # bsss2lah_gen;
       vol shr 0;
       p8 $ "";
       p10 $ "";
     }
     if (bar == 92) {
-      p13 $ drrrblah_gen;
-      p4 $ bbreakblah_gen;
-      p6 $ bssslah_gen;
-      p5 $ "";
-      p2 $ loonblah_gen;
+      p13 # drrrblah_gen;
+      p4 # bbreakblah_gen;
+      p6 # bssslah_gen;
+      p5 # "";
+      p2 # loonblah_gen;
     }
     if (bar == 100) {
-      p6 $ bsss2lah_gen;
-      p11 $ mofxblah_gen;
-      p7 $ riffblah_gen;
+      p6 # bsss2lah_gen;
+      p11 # mofxblah_gen;
+      p7 # riffblah_gen;
       p3 $ "";
     }
     if (bar == 110) {
-      p6 $ bssslah_gen;
+      p6 # bssslah_gen;
       p4 $ ""; vol drumz 0;
       p13 $ "";
     }

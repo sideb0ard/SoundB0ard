@@ -55,24 +55,9 @@ void midi_pattern_print(midi_event *loop) {
   for (int i = 0; i < PPBAR; i++) {
     midi_event ev = loop[i];
     if (ev.event_type) {
-      char type[20] = {0};
-      switch (ev.event_type) {
-        case (144):
-          strncpy(type, "note_on", sizeof(type) - 1);
-          break;
-        case (128):
-          strncpy(type, "note_off", sizeof(type) - 1);
-          break;
-        case (176):
-          strncpy(type, "midi_control", sizeof(type) - 1);
-          break;
-        case (224):
-          strncpy(type, "pitch_bend", sizeof(type) - 1);
-          break;
-        default:
-          strncpy(type, "no_idea", sizeof(type) - 1);
-          break;
-      }
+      // TODO: This function appears incomplete - event_type is checked but not
+      // used
+      (void)ev;  // Suppress unused variable warning
     }
   }
 }
@@ -87,21 +72,8 @@ void midi_event_clear(midi_event *ev) {
 }
 
 void midi_event_print(midi_event *ev) {
-  char event_type[12] = {};  // Increased size for "PITCHBEND" + null terminator
-  switch (ev->event_type) {
-    case (144):
-      strncpy(event_type, "ON", sizeof(event_type) - 1);
-      break;
-    case (128):
-      strncpy(event_type, "OFF", sizeof(event_type) - 1);
-      break;
-    case (176):
-      strncpy(event_type, "CONTROL", sizeof(event_type) - 1);
-      break;
-    case (224):
-      strncpy(event_type, "PITCHBEND", sizeof(event_type) - 1);
-      break;
-  }
+  // TODO: This function appears incomplete - no printing is performed
+  (void)ev;  // Suppress unused variable warning
 }
 
 int get_midi_note_from_string(char *string) {

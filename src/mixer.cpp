@@ -212,6 +212,7 @@ std::string Mixer::StatusEnv() {
       for (int i = 0; i < sg->effects_num; i++) {
         ss << margin.str();
         auto f = sg->effects_[i];
+        if (!f) continue;  // Skip if nullptr
         if (f->enabled_)
           ss << COOL_COLOR_YELLOW;
         else
@@ -242,6 +243,7 @@ std::string Mixer::StatusSgz(bool all) {
             ss << "      ";
             for (int j = 0; j < sg->effects_num; j++) {
               auto f = sg->effects_[j];
+              if (!f) continue;  // Skip if nullptr
               if (f->enabled_)
                 ss << COOL_COLOR_YELLOW;
               else

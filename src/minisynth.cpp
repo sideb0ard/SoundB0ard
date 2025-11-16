@@ -229,9 +229,8 @@ void MiniSynth::Stop() {
 }
 
 void MiniSynth::LoadDefaults() {
-  strncpy(m_settings.m_settings_name, "default",
-          sizeof(m_settings.m_settings_name) - 1);
-  m_settings.m_settings_name[sizeof(m_settings.m_settings_name) - 1] = '\0';
+  snprintf(m_settings.m_settings_name, sizeof(m_settings.m_settings_name), "%s",
+           "default");
 
   m_settings.m_monophonic = false;
   m_settings.m_voice_mode = Sqr3;
@@ -806,9 +805,8 @@ std::shared_ptr<MiniSynthVoice> MiniSynth::GetOldestVoiceWithNote(
 void MiniSynth::Randomize() {
   // printf("Randomizing SYNTH!\n");
 
-  strncpy(m_settings.m_settings_name, "-- random UNSAVED--",
-          sizeof(m_settings.m_settings_name) - 1);
-  m_settings.m_settings_name[sizeof(m_settings.m_settings_name) - 1] = '\0';
+  snprintf(m_settings.m_settings_name, sizeof(m_settings.m_settings_name), "%s",
+           "-- random UNSAVED--");
   m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
   m_settings.m_monophonic = rand() % 2;
 
@@ -909,9 +907,8 @@ void MiniSynth::Save(std::string new_preset_name) {
   }
 
   int settings_count = 0;
-  strncpy(m_settings.m_settings_name, preset_name,
-          sizeof(m_settings.m_settings_name) - 1);
-  m_settings.m_settings_name[sizeof(m_settings.m_settings_name) - 1] = '\0';
+  snprintf(m_settings.m_settings_name, sizeof(m_settings.m_settings_name), "%s",
+           preset_name);
 
   fprintf(presetzzz, "::name=%s", m_settings.m_settings_name);
   settings_count++;
@@ -1090,9 +1087,8 @@ void MiniSynth::Save(std::string new_preset_name) {
 
 void MiniSynth::LoadPreset(std::string preset_name,
                            std::map<std::string, double> preset) {
-  strncpy(m_settings.m_settings_name, preset_name.c_str(),
-          sizeof(m_settings.m_settings_name) - 1);
-  m_settings.m_settings_name[sizeof(m_settings.m_settings_name) - 1] = '\0';
+  snprintf(m_settings.m_settings_name, sizeof(m_settings.m_settings_name), "%s",
+           preset_name.c_str());
   for (const auto &[key, val] : preset) {
     if (key == "voice_mode")
       m_settings.m_voice_mode = val;

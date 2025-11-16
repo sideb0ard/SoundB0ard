@@ -25,21 +25,23 @@ let bd2 = sample(bd/BD_909_48.wav);
 let clp = sample(cp/djkhaledClap.aiff); vol clp 0.4;
 let goodt = sample(voices/goodtimescometomeNOW.aiff);
 
-#send("delay", goodt);
-#bpm 120;
-#load_preset(dx, "BELTRAMz");
-#add_fx(dx, "distort");
-#add_fx(dx, "compressor");
-#load_preset(sbdrum, "beltram");
-#set sbdrum:bd_vol 0.4;
-#add_fx(dx, "sidechain", sbdrum);
-#let dx4 = fm();
-#load_preset(dx4, "pointty");
-#load_preset(dx3, "DONK");
-##load_preset(dx2, "BELLEAD");
-#load_preset(dx2, "OVLAZ");
-#vol dx2 0.4;
-#add_fx(cl, "filter");
+# p99 # playITblah_gen;
+
+# send("delay", goodt);
+# bpm 120;
+# load_preset(dx, "BELTRAMz");
+# add_fx(dx, "distort");
+# add_fx(dx, "compressor");
+# load_preset(sbdrum, "beltram");
+# set sbdrum:bd_vol 0.4;
+# add_fx(dx, "sidechain", sbdrum);
+# let dx4 = fm();
+# load_preset(dx4, "pointty");
+# load_preset(dx3, "DONK");
+# #load_preset(dx2, "BELLEAD");
+# # load_preset(dx2, "OVLAZ");
+# vol dx2 0.4;
+# add_fx(cl, "filter");
 
 # p1 # drblah_gen;
 # p2 # hhblah_gen;
@@ -327,7 +329,7 @@ let playITblah_gen = gen()
   }
   run()
   {
-    print(countr);
+    #print(countr);
     if (countr == 0) {
       p1 # drblah_gen;
       p4 # dxlowblah_gen;
@@ -363,7 +365,7 @@ let playITblah_gen = gen()
       note_on_at(goodt, 1, 12 * pp, dur = 0);
       p3 $ "";
       sched(3840, 0, 0.6, 3840 * 4, "vol dx4 %");
-      p9 $ medlblah_gen;
+      p9 # medlblah_gen;
     }
     if (countr == 41) {
       p4 $ "";

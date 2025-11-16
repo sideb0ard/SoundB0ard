@@ -39,8 +39,8 @@ double scale(double cur_val, double cur_min, double cur_max, double new_min,
 double wrap(double cur_val, double min_val, double max_val);
 double fold(double cur_val, double min_val, double max_val);
 
-void itoa(int n, char s[]);
-void reverse_string(char s[]);
+void itoa(int n, char s[], size_t size);
+void reverse_string(char s[], size_t size);
 void str_upper(std::string &input);
 void str_lower(std::string &input);
 
