@@ -1,4 +1,3 @@
-
 # Key A flat
 let key = 8;
 
@@ -25,8 +24,6 @@ let bd2 = sample(bd/BD_909_48.wav);
 let clp = sample(cp/djkhaledClap.aiff); vol clp 0.4;
 let goodt = sample(voices/goodtimescometomeNOW.aiff);
 
-# p99 # playITblah_gen;
-
 # send("delay", goodt);
 # bpm 120;
 # load_preset(dx, "BELTRAMz");
@@ -43,14 +40,7 @@ let goodt = sample(voices/goodtimescometomeNOW.aiff);
 # vol dx2 0.4;
 # add_fx(cl, "filter");
 
-# p1 # drblah_gen;
-# p2 # hhblah_gen;
-# p3 # clblah_gen;
-# p4 # dddblah_gen;
-# p5 # dxblah_gen;
-# p6 # dx2blah_gen;
-# p7 # cppblah_gen
-# p8 # melz3blah_gen;
+# p99 # playITblah_gen;
 
 
 let drblah_gen = gen()

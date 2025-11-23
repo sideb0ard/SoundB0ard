@@ -12,18 +12,18 @@ let oh = sample(oh/mawopenhh2.aiff);
 
 let rockn = sample(voices/theerwasaTIME.wav);
 
-bpm 128;
-load_preset(dx, "LOUIS");
-load_preset(dx2, "UNDg");
-load_preset(dx3, "ORGAN");
-let dx4 = fm();
-load_preset(dx4, "SMMTH");
-load_preset(mo, "FRENCH");
-vol ch 0;
-vol oh 0;
-
+# bpm 128;
+# load_preset(dx, "LOUIS");
+# load_preset(dx2, "UNDg");
+# load_preset(dx3, "ORGAN");
+# let dx4 = fm();
+# load_preset(dx4, "SMMTH");
+# load_preset(mo, "FRENCH");
+# vol ch 0;
+# vol oh 0;
+#
 # set dx:op3out 95
-
+#
 # p1 $ melblah_gen;
 # p2 $ hhblah_gen;
 # p3 $ snblah_gen
@@ -125,15 +125,15 @@ let playyyablah_gen = gen()
       p9 $ "";
     }
     if (bar == 104) {
-      p5 $ kicks2blah_gen;
+      p5 # kicks2blah_gen;
       set dx:op3out 35 at=3840;
-      p2 $ hh2blah_gen;
+      p2 # hh2blah_gen;
     }
     if (bar == 108) {
       send("delay", dx);
       p5 $ "";
       p2 $ "";
-      p1 $ mel3blah_gen;
+      p1 # mel3blah_gen;
     }
     if (bar == 132) {
       dx4riserblah_gen();
@@ -153,7 +153,7 @@ let playyyablah_gen = gen()
       p5 $ "";
       p2 $ "";
       p9 $ "";
-      sched(0, 128, 0, 3840 * 4, "bpm %");
+      #sched(0, 128, 0, 3840 * 4, "bpm %");
     }
 
     print(bar);

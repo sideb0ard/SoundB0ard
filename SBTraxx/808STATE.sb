@@ -1,4 +1,4 @@
-
+#
 let bd = sample(bd/dm02_909_kickdrum_002_drive.wav);
 let ch = sample(ch/CH_909_15.wav);
 let oh = sample(oh/OH_909_15.wav);
@@ -8,7 +8,7 @@ let sd = sample(sd/hdSD.wav);
 let sd1 = sample(sd/weekendSnare.aiff);
 let sd2 = sample(sd/mawhsnare2.aiff);
 let sd3 = sample(sd/suburbanBase.aiff);
-
+#
 
 load_preset(mo, "808-2"); vol mo 0.5;
 load_preset(dx, "WNARR"); vol dx 0.5;
