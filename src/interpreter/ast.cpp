@@ -363,6 +363,7 @@ std::string ProcessStatement::String() const {
       ss << " # " << computation_name_;
       break;
     default:
+      break;
   }
 
   return ss.str();

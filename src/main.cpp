@@ -100,18 +100,16 @@ void *process_worker_thread() {
         if (event->target_process_id >= 0 &&
             event->target_process_id < MAX_NUM_PROC) {
           ProcessConfig config = {.process_type = event->process_type,
+                                  .name = "",
                                   .tidal_target_type = event->tidal_target_type,
                                   .tidal_pattern = event->tidal_pattern,
                                   .tidal_targets = event->tidal_targets,
                                   .tidal_functions = event->tidal_functions,
-
                                   .computation_name = event->computation_name,
-
                                   .mod_timer_type = event->mod_timer_type,
                                   .mod_loop_len = event->mod_loop_len,
-                                  .mod_command = event->mod_command,
                                   .mod_pattern = event->mod_pattern,
-
+                                  .mod_command = event->mod_command,
                                   .tinfo = event->timing_info};
 
           global_mixr->processes_[event->target_process_id]->EnqueueUpdate(
