@@ -99,6 +99,24 @@ struct Mixer {
                                 // lock)
   std::array<StereoVal, MAX_NUM_SOUND_GENERATORS> soundgen_cur_val_{};
 
+  // Cached status info - updated by audio thread, read by UI thread
+  struct CachedFxStatus {
+    std::string status;
+    bool enabled{false};
+  };
+  struct CachedSgStatus {
+    std::string info;    // from sg->Info()
+    std::string status;  // from sg->Status()
+    bool active{false};
+    double volume{0};
+    int effects_num{0};
+    std::array<CachedFxStatus, kMaxNumSoundGenFx> fx;
+  };
+  std::array<CachedSgStatus, MAX_NUM_SOUND_GENERATORS> cached_sg_status_{};
+  std::atomic<int> cached_sg_count_{0};
+  mutable std::mutex cached_status_mutex_;  // Light lock for string copies
+  void UpdateCachedStatus();                // Called from audio thread
+
   std::array<std::shared_ptr<Fx>, kMixerNumSendFx> fx_;
 
   std::vector<DelayedMidiEvent> _action_items =

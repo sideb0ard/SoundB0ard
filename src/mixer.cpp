@@ -214,15 +214,17 @@ std::string Mixer::StatusEnv() {
 
   ss << global_env->Debug();
 
+  // Get the name->index mapping (this doesn't need the sg mutex)
   std::map<std::string, int> soundgens = global_env->GetSoundGeneratorsByName();
-  std::shared_lock<std::shared_mutex> lock(
-      sound_generators_mutex_);  // Shared lock for read
+
+  // Read from cached status - no need to lock sound_generators_mutex_
+  std::lock_guard<std::mutex> lock(cached_status_mutex_);
+
   for (auto &[var_name, sg_idx] : soundgens) {
-    if (IsValidSoundgenNum(sg_idx)) {
-      auto &sg = sound_generators_[sg_idx];
-      // if (!sg->active) continue;
+    if (sg_idx >= 0 && sg_idx < cached_sg_count_.load()) {
+      auto &cached = cached_sg_status_[sg_idx];
       ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
-         << sg->Status() << ANSI_COLOR_RESET << std::endl;
+         << cached.status << ANSI_COLOR_RESET << std::endl;
 
       std::stringstream margin;
       size_t len_var = var_name.size();
@@ -231,18 +233,15 @@ std::string Mixer::StatusEnv() {
       }
       margin << "   ";  // for the ' = '
 
-      // Shared lock to safely read effects array
-      std::shared_lock<std::shared_mutex> fx_lock(sg->effects_mutex_);
-      for (int i = 0; i < sg->effects_num; i++) {
+      // Read from cached FX status
+      for (int i = 0; i < cached.effects_num; i++) {
         ss << margin.str();
-        auto f = sg->effects_[i];
-        if (!f) continue;  // Skip if nullptr
-        if (f->enabled_)
+        if (cached.fx[i].enabled)
           ss << COOL_COLOR_YELLOW;
         else
           ss << ANSI_COLOR_RESET;
 
-        ss << "fx" << i << " " << f->Status() << std::endl;
+        ss << "fx" << i << " " << cached.fx[i].status << std::endl;
       }
       ss << ANSI_COLOR_RESET;
     }
@@ -252,36 +251,34 @@ std::string Mixer::StatusEnv() {
 
 std::string Mixer::StatusSgz(bool all) {
   std::stringstream ss;
-  if (sound_generators_.size() > 0) {
+
+  // Read from cached status - no need to lock sound_generators_mutex_
+  std::lock_guard<std::mutex> lock(cached_status_mutex_);
+
+  int count = cached_sg_count_.load();
+  if (count > 0) {
     ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "sound generators"
        << COOL_COLOR_GREEN << "]\n";
-    std::shared_lock<std::shared_mutex> lock(
-        sound_generators_mutex_);  // Shared lock for read
-    for (int i = 0; i < sound_generators_idx_; i++) {
-      auto &sg = sound_generators_[i];
-      if (sg) {
-        if ((sg->active && sg->GetVolume() > 0.0) || all) {
-          ss << COOL_COLOR_GREEN << "[" << ANSI_COLOR_WHITE << "s" << i
-             << COOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
-          ss << sg->Info() << ANSI_COLOR_RESET << "\n";
 
-          if (sg->effects_num > 0) {
-            ss << "      ";
-            // Shared lock to safely read effects array
-            std::shared_lock<std::shared_mutex> fx_lock(sg->effects_mutex_);
-            for (int j = 0; j < sg->effects_num; j++) {
-              auto f = sg->effects_[j];
-              if (!f) continue;  // Skip if nullptr
-              if (f->enabled_)
-                ss << COOL_COLOR_YELLOW;
-              else
-                ss << ANSI_COLOR_RESET;
-              ss << "\n[fx " << i << ":" << j << f->Status() << "]";
-            }
-            ss << ANSI_COLOR_RESET;
+    for (int i = 0; i < count; i++) {
+      auto &cached = cached_sg_status_[i];
+      if ((cached.active && cached.volume > 0.0) || all) {
+        ss << COOL_COLOR_GREEN << "[" << ANSI_COLOR_WHITE << "s" << i
+           << COOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
+        ss << cached.info << ANSI_COLOR_RESET << "\n";
+
+        if (cached.effects_num > 0) {
+          ss << "      ";
+          for (int j = 0; j < cached.effects_num; j++) {
+            if (cached.fx[j].enabled)
+              ss << COOL_COLOR_YELLOW;
+            else
+              ss << ANSI_COLOR_RESET;
+            ss << "\n[fx " << i << ":" << j << cached.fx[j].status << "]";
           }
-          ss << "\n\n";
+          ss << ANSI_COLOR_RESET;
         }
+        ss << "\n\n";
       }
     }
   }
@@ -458,9 +455,56 @@ void Mixer::MidiTick() {
   CheckForDelayedEvents();
 
   RunScheduledActions();
+
+  // Update cached status on every beat for lock-free status reads
+  if (timing_info.is_quarter) {
+    UpdateCachedStatus();
+  }
 }
 
 // GenNext implementation moved to header as template function
+
+void Mixer::UpdateCachedStatus() {
+  // Called from audio thread on every beat - updates cached status info
+  // Uses try_lock to never block the audio thread
+  if (!cached_status_mutex_.try_lock()) {
+    return;  // Skip this update if UI thread is reading
+  }
+
+  // We have the sound_generators_mutex_ shared lock from GenNext context
+  // but we're in MidiTick which doesn't hold it, so we need to acquire it
+  if (!sound_generators_mutex_.try_lock_shared()) {
+    cached_status_mutex_.unlock();
+    return;  // Skip if we can't get the lock
+  }
+
+  int count = sound_generators_idx_.load();
+  for (int i = 0; i < count; i++) {
+    auto &sg = sound_generators_[i];
+    if (sg) {
+      cached_sg_status_[i].info = sg->Info();
+      cached_sg_status_[i].status = sg->Status();
+      cached_sg_status_[i].active = sg->active;
+      cached_sg_status_[i].volume = sg->GetVolume();
+      cached_sg_status_[i].effects_num = sg->effects_num.load();
+
+      // Cache FX status - try to get the effects lock
+      if (sg->effects_mutex_.try_lock_shared()) {
+        for (int j = 0; j < sg->effects_num; j++) {
+          if (sg->effects_[j]) {
+            cached_sg_status_[i].fx[j].status = sg->effects_[j]->Status();
+            cached_sg_status_[i].fx[j].enabled = sg->effects_[j]->enabled_;
+          }
+        }
+        sg->effects_mutex_.unlock_shared();
+      }
+    }
+  }
+  cached_sg_count_.store(count);
+
+  sound_generators_mutex_.unlock_shared();
+  cached_status_mutex_.unlock();
+}
 
 bool Mixer::DelSoundgen(int soundgen_num) {
   std::unique_lock<std::shared_mutex> lock(
