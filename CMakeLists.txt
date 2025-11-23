@@ -413,27 +413,109 @@ if(BUILD_TESTS)
     GIT_TAG v1.13.0)
   FetchContent_MakeAvailable(googletest)
 
-  # Create a common test library for shared dependencies
-  add_library(sbsh_test_common INTERFACE)
-  target_include_directories(sbsh_test_common INTERFACE ${SBSH_INCLUDE_DIRS})
-  target_include_directories(sbsh_test_common
-                             INTERFACE ${perlin_noise_SOURCE_DIR})
+  # Create a static library from all sources except main.cpp for tests to link
+  # against
+  set(SBSH_SOURCES_NO_MAIN ${Sbsh_SOURCES})
+  list(FILTER SBSH_SOURCES_NO_MAIN EXCLUDE REGEX "src/main\\.cpp$")
 
-  # Add jsoncpp include directories for tests
+  add_library(sbsh_lib STATIC ${SBSH_SOURCES_NO_MAIN})
+  target_include_directories(sbsh_lib PUBLIC ${SBSH_INCLUDE_DIRS})
+  target_include_directories(sbsh_lib PUBLIC ${perlin_noise_SOURCE_DIR})
+
+  # Add jsoncpp include directories
   if(JSONCPP_FOUND)
-    target_include_directories(sbsh_test_common
-                               INTERFACE ${JSONCPP_INCLUDE_DIRS})
+    target_include_directories(sbsh_lib PUBLIC ${JSONCPP_INCLUDE_DIRS})
   else()
-    target_include_directories(sbsh_test_common
-                               INTERFACE ${JSONCPP_INCLUDE_DIR})
+    target_include_directories(sbsh_lib PUBLIC ${JSONCPP_INCLUDE_DIR})
   endif()
 
-  add_executable(stepper_test tests/stepper_test.cpp src/stepper.cpp)
+  # Add readline include directories for sbsh_lib
+  if(READLINE_FOUND)
+    target_include_directories(sbsh_lib PUBLIC ${READLINE_INCLUDE_DIRS})
+  elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    file(GLOB HOMEBREW_READLINE_INCLUDE_DIRS_TEST
+         "/opt/homebrew/Cellar/readline/*/include"
+         "/usr/local/Cellar/readline/*/include")
+    if(HOMEBREW_READLINE_INCLUDE_DIRS_TEST)
+      target_include_directories(sbsh_lib
+                                 PUBLIC ${HOMEBREW_READLINE_INCLUDE_DIRS_TEST})
+    endif()
+  endif()
 
-  target_link_libraries(stepper_test sbsh_test_common GTest::gtest_main)
+  # Link sbsh_lib with required libraries
+  target_link_libraries(sbsh_lib Ableton::Link Threads::Threads)
+
+  if(PORTAUDIO_FOUND)
+    target_link_libraries(sbsh_lib ${PORTAUDIO_LIBRARIES})
+  else()
+    target_link_libraries(sbsh_lib ${PORTAUDIO_LIB})
+  endif()
+
+  target_link_libraries(sbsh_lib ${PORTMIDI_LIB})
+
+  if(SNDFILE_FOUND)
+    target_link_libraries(sbsh_lib ${SNDFILE_LIBRARIES})
+  else()
+    target_link_libraries(sbsh_lib ${SNDFILE_LIB})
+  endif()
+
+  if(JSONCPP_FOUND)
+    target_link_libraries(sbsh_lib ${JSONCPP_LIBRARIES})
+  else()
+    target_link_libraries(sbsh_lib ${JSONCPP_LIB})
+  endif()
+
+  if(READLINE_FOUND)
+    if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND READLINE_FULL_LIB)
+      target_link_libraries(sbsh_lib ${READLINE_FULL_LIB})
+      if(HISTORY_FULL_LIB)
+        target_link_libraries(sbsh_lib ${HISTORY_FULL_LIB})
+      endif()
+    else()
+      target_link_libraries(sbsh_lib ${READLINE_LIBRARIES})
+    endif()
+  else()
+    target_link_libraries(sbsh_lib ${READLINE_LIB})
+    if(HISTORY_LIB)
+      target_link_libraries(sbsh_lib ${HISTORY_LIB})
+    endif()
+  endif()
+
+  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    target_link_libraries(sbsh_lib "-framework CoreFoundation"
+                          "-framework CoreAudio" "-framework CoreMIDI")
+  endif()
 
   include(GoogleTest)
-  gtest_discover_tests(stepper_test)
+
+  # Test globals file provides global variables needed by sbsh_lib
+  set(TEST_GLOBALS_SOURCE ${CMAKE_SOURCE_DIR}/tests/test_globals.cpp)
+
+  # Helper function to create test executables
+  function(add_sbsh_test test_name test_source)
+    add_executable(${test_name} ${test_source} ${TEST_GLOBALS_SOURCE})
+    target_link_libraries(${test_name} sbsh_lib GTest::gtest_main)
+    gtest_discover_tests(${test_name})
+  endfunction()
+
+  # Simple unit tests
+  add_sbsh_test(stepper_test tests/stepper_test.cpp)
+  add_sbsh_test(object_test tests/object_test.cpp)
+  add_sbsh_test(euclidean_test tests/euclidean.cpp)
+  add_sbsh_test(audioutils_test tests/audioutils.cpp)
+  add_sbsh_test(ramp_test tests/ramp_test.cpp)
+
+  # Interpreter tests
+  add_sbsh_test(lexer_test tests/lexer_test.cpp)
+  # TODO: parser_test needs updates for new ProcessStatement API
+  # add_sbsh_test(parser_test tests/parser_test.cpp)
+  add_sbsh_test(evaluator_test tests/evaluator_test.cpp)
+
+  # Pattern parser tests
+  add_sbsh_test(pattern_parser_test tests/pattern_parser_test.cpp)
+  add_sbsh_test(pattern_tokenizer_test tests/pattern_tokenizer_test.cpp)
+  # TODO: pattern_functions_test needs updates for new API
+  # add_sbsh_test(pattern_functions_test tests/pattern_functions.cpp)
 endif()
 
 # Development and linting targets

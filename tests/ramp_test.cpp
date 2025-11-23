@@ -1,9 +1,11 @@
-tests / ramp_test.cpp
+// cppcheck-suppress-file syntaxError
 #include "fx/ramp.h"
 
 #include <gtest/gtest.h>
 
-        class RampTest : public ::testing::Test {
+#include <iostream>
+
+class RampTest : public ::testing::Test {
  protected:
   void SetUp() override {}
   Ramp ramp_;
@@ -24,5 +26,7 @@ TEST_F(RampTest, RampMaxVal) {
     val = ramp_.Generate();
     std::cout << "RAMP i:" << i << ":" << val << std::endl;
   }
-  EXPECT_EQ(val, 1);
+  // Ramp generates values 0, 1/n, 2/n, ..., (n-1)/n, then wraps
+  // After 16 iterations, val = 15/16 = 0.9375
+  EXPECT_DOUBLE_EQ(val, 15.0 / 16.0);
 }

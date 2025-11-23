@@ -33,6 +33,7 @@ repos:
         entry: cppcheck
         language: system
         files: \.(cpp|c)$
+        exclude: ^tests/
         args:
           - --enable=warning
           - --std=c++20
