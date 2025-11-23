@@ -28,7 +28,7 @@ constexpr char RETURN_VALUE_OBJ[] = "RETURN_VALUE";
 constexpr char BREAK_OBJ[] = "BREAK";
 constexpr char FORLOOP_OBJ[] = "FOR LOOP";
 constexpr char FUNCTION_OBJ[] = "FUNCTION";
-constexpr char GENERATOR_OBJ[] = "GENERATOR";
+constexpr char COMPUTATION_OBJ[] = "COMPUTATION";
 constexpr char PHASOR_OBJ[] = "PHASOR";
 
 constexpr char STRING_OBJ[] = "STRING";
@@ -272,18 +272,18 @@ class Function : public CallableWithEnv {
   std::shared_ptr<ast::BlockStatement> body_;
 };
 
-class Generator : public CallableWithEnv {
+class Computation : public CallableWithEnv {
  public:
-  Generator(std::vector<std::shared_ptr<ast::Identifier>> parameters,
-            std::shared_ptr<Environment> env,
-            std::shared_ptr<ast::BlockStatement> setup,
-            std::shared_ptr<ast::BlockStatement> run,
-            std::shared_ptr<ast::BlockStatement> signal_generator = nullptr)
+  Computation(std::vector<std::shared_ptr<ast::Identifier>> parameters,
+              std::shared_ptr<Environment> env,
+              std::shared_ptr<ast::BlockStatement> setup,
+              std::shared_ptr<ast::BlockStatement> run,
+              std::shared_ptr<ast::BlockStatement> signal_generator = nullptr)
       : CallableWithEnv(parameters, env),
         setup_{setup},
         run_{run},
         signal_generator_{signal_generator} {};
-  ~Generator() = default;
+  ~Computation() = default;
   ObjectType Type() override;
   std::string Inspect() override;
 

@@ -155,12 +155,12 @@ void Computation::EventNotify(mixer_timing_info tinfo) {
   if (tinfo.is_start_of_loop && computation_name_) {
     auto new_env = std::make_shared<object::Environment>(global_env);
     auto computation_obj = evaluator::Eval(computation_name_, new_env);
-    if (computation_obj->Type() == "GENERATOR") {
-      auto gen_obj =
-          std::dynamic_pointer_cast<object::Generator>(computation_obj);
-      if (gen_obj) {
-        evaluator::ApplyGeneratorRun(
-            gen_obj, std::vector<std::shared_ptr<object::Object>>());
+    if (computation_obj->Type() == "COMPUTATION") {
+      auto comp_obj =
+          std::dynamic_pointer_cast<object::Computation>(computation_obj);
+      if (comp_obj) {
+        evaluator::ApplyComputationRun(
+            comp_obj, std::vector<std::shared_ptr<object::Object>>());
       }
     }
   }

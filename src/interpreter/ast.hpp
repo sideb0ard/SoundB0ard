@@ -177,10 +177,10 @@ class PhasorLiteral : public Expression {
   std::shared_ptr<Expression> frequency_{nullptr};
 };
 
-class GeneratorLiteral : public Expression {
+class ComputationLiteral : public Expression {
  public:
-  GeneratorLiteral() {}
-  explicit GeneratorLiteral(Token token) : Expression{token} {}
+  ComputationLiteral() {}
+  explicit ComputationLiteral(Token token) : Expression{token} {}
 
   std::string String() const override;
 

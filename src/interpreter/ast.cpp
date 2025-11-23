@@ -253,7 +253,7 @@ std::string FunctionLiteral::String() const {
   return ss.str();
 }
 
-std::string GeneratorLiteral::String() const {
+std::string ComputationLiteral::String() const {
   std::stringstream ss;
 
   std::vector<std::string> params;

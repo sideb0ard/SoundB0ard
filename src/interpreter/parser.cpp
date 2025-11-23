@@ -574,8 +574,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression() {
     return ParseFunctionLiteral();
   else if (cur_token_.type_ == token::SLANG_PHASOR)
     return ParsePhasorLiteral();
-  else if (cur_token_.type_ == token::SLANG_GENERATOR)
-    return ParseGeneratorLiteral();
+  else if (cur_token_.type_ == token::SLANG_COMPUTATION)
+    return ParseComputationLiteral();
   else if (cur_token_.type_ == token::SLANG_GRANULAR ||
            cur_token_.type_ == token::SLANG_GRAIN ||
            cur_token_.type_ == token::SLANG_LOOP)
@@ -772,15 +772,15 @@ std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral() {
   return lit;
 }
 
-std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral() {
-  auto lit = std::make_shared<ast::GeneratorLiteral>(cur_token_);
+std::shared_ptr<ast::Expression> Parser::ParseComputationLiteral() {
+  auto lit = std::make_shared<ast::ComputationLiteral>(cur_token_);
 
   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
   if (!ExpectPeek(token::SLANG_RPAREN)) return nullptr;
 
   if (!ExpectPeek(token::SLANG_LBRACE)) return nullptr;
 
-  if (!ExpectPeek(token::SLANG_GENERATOR_SETUP)) return nullptr;
+  if (!ExpectPeek(token::SLANG_COMPUTATION_SETUP)) return nullptr;
 
   // Discard (currently) unused parens
   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
@@ -789,7 +789,7 @@ std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral() {
 
   lit->setup_ = ParseBlockStatement();
 
-  if (!ExpectPeek(token::SLANG_GENERATOR_RUN)) return nullptr;
+  if (!ExpectPeek(token::SLANG_COMPUTATION_RUN)) return nullptr;
 
   // Discard (currently) unused parens
   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;
@@ -799,7 +799,7 @@ std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral() {
 
   lit->run_ = ParseBlockStatement();
 
-  // if (PeekTokenIs(token::SLANG_GENERATOR_SIGNAL_GENERATOR)) {
+  // if (PeekTokenIs(token::SLANG_SIGNAL_GENERATOR)) {
   //   std::cout << "WUFF< GOT A SIGNAL GEN!\n";
   //   NextToken();
   //   if (!ExpectPeek(token::SLANG_LPAREN)) return nullptr;

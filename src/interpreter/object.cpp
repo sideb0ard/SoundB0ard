@@ -280,10 +280,10 @@ std::string Function::Inspect() {
   return return_val.str();
 }
 
-ObjectType Generator::Type() {
-  return GENERATOR_OBJ;
+ObjectType Computation::Type() {
+  return COMPUTATION_OBJ;
 }
-std::string Generator::Inspect() {
+std::string Computation::Inspect() {
   std::stringstream params;
   int len = parameters_.size();
   int i = 0;
@@ -293,7 +293,7 @@ std::string Generator::Inspect() {
     i++;
   }
   std::stringstream return_val;
-  return_val << "gn(" << params.str() << ") \n";
+  return_val << "comp(" << params.str() << ") \n";
   return_val << "setup() {\n" << setup_->String() << "}\n";
   return_val << "run() {\n" << run_->String() << "}\n";
 

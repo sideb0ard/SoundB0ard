@@ -139,7 +139,7 @@ std::shared_ptr<object::Object> ApplyFunction(
     std::shared_ptr<object::Object> callable,
     const std::vector<std::shared_ptr<object::Object>>& args);
 
-std::shared_ptr<object::Object> ApplyGeneratorRun(
+std::shared_ptr<object::Object> ApplyComputationRun(
     std::shared_ptr<object::Object> callable,
     const std::vector<std::shared_ptr<object::Object>>& args);
 

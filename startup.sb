@@ -71,7 +71,7 @@ let map = fn(arrray, fooonction)
   return mapduh;
 }
 
-let rand_beat = gen()
+let rand_beat = comp()
 {
   setup() {
     let shiko = [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0];
@@ -109,7 +109,7 @@ let rand_beat = gen()
 
 let count = 0;
 
-let countr = gen()
+let countr = comp()
 {
   setup() {}
   run()
@@ -117,7 +117,7 @@ let countr = gen()
     ++count;
   }
 }
-let xfade_gen = gen()
+let xfade_comp = comp()
 {
   setup()
   {

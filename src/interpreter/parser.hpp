@@ -107,7 +107,7 @@ class Parser {
       std::shared_ptr<ast::Expression> left);
 
   std::shared_ptr<ast::Expression> ParseFunctionLiteral();
-  std::shared_ptr<ast::Expression> ParseGeneratorLiteral();
+  std::shared_ptr<ast::Expression> ParseComputationLiteral();
   std::shared_ptr<ast::Expression> ParsePhasorLiteral();
   std::shared_ptr<ast::Expression> ParseStringLiteral();
   std::shared_ptr<ast::Expression> ParseArrayLiteral();
