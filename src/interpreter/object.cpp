@@ -414,7 +414,7 @@ std::string Environment::ListFuncsAndGen() {
   // keys
   std::vector<std::string> keys;
   for (const auto &it : store_) {
-    if (it.second->Type() == "FUNCTION" || it.second->Type() == "GENERATOR")
+    if (it.second->Type() == "FUNCTION" || it.second->Type() == "COMPUTATION")
       keys.push_back(it.first);
   }
 
@@ -425,8 +425,8 @@ std::string Environment::ListFuncsAndGen() {
     if (funk->Type() == "FUNCTION") {
       ss << ANSI_COLOR_WHITE << key << COOL_COLOR_PINK << " = fn()"
          << std::endl;
-    } else if (funk->Type() == "GENERATOR") {
-      ss << ANSI_COLOR_WHITE << key << COOL_COLOR_YELLOW << " = gen()"
+    } else if (funk->Type() == "COMPUTATION") {
+      ss << ANSI_COLOR_WHITE << key << COOL_COLOR_YELLOW << " = comp()"
          << std::endl;
     }
   }
@@ -439,7 +439,7 @@ std::string Environment::Debug() {
     if (IsSoundGenerator(it.second->Type())) {
       // no-op - sg ps happens in mixer.
     } else if (it.second->Type() == "FUNCTION" ||
-               it.second->Type() == "GENERATOR") {
+               it.second->Type() == "COMPUTATION") {
       // no-op
     } else {
       if (it.first == "rhythms_int") {

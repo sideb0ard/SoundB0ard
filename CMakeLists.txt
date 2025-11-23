@@ -11,6 +11,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 add_definitions(-D_WEBSOCKETPP_CPP11_STRICT_)
 
+# Enable ccache if available for faster rebuilds
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+  set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+  message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
+endif()
+
 # Find required packages
 find_package(PkgConfig REQUIRED)
 
@@ -272,50 +280,49 @@ foreach(header_file ${Sbsh_HEADERS})
 endforeach()
 list(REMOVE_DUPLICATES SBSH_INCLUDE_DIRS)
 
-add_executable(Sbsh ${Sbsh_SOURCES})
+# Create shared library from all sources except main.cpp This is used by both
+# the main executable and tests
+set(SBSH_SOURCES_NO_MAIN ${Sbsh_SOURCES})
+list(FILTER SBSH_SOURCES_NO_MAIN EXCLUDE REGEX "src/main\\.cpp$")
 
-target_include_directories(Sbsh PRIVATE ${SBSH_INCLUDE_DIRS})
+add_library(sbsh_lib STATIC ${SBSH_SOURCES_NO_MAIN})
 
-# Include FetchContent dependencies
-target_include_directories(Sbsh PRIVATE ${perlin_noise_SOURCE_DIR})
-# target_include_directories(Sbsh PRIVATE ${websocketpp_SOURCE_DIR})  #
-# WebSocket disabled
+# Set include directories on sbsh_lib (PUBLIC so they propagate to dependents)
+target_include_directories(sbsh_lib PUBLIC ${SBSH_INCLUDE_DIRS})
+target_include_directories(sbsh_lib PUBLIC ${perlin_noise_SOURCE_DIR})
 
-# Add system library include directories using pkg-config when available
 if(PORTAUDIO_FOUND)
-  target_include_directories(Sbsh PRIVATE ${PORTAUDIO_INCLUDE_DIRS})
+  target_include_directories(sbsh_lib PUBLIC ${PORTAUDIO_INCLUDE_DIRS})
 endif()
 
-# PortMidi headers are in standard system location (/usr/include/portmidi.h)
-
 if(SNDFILE_FOUND)
-  target_include_directories(Sbsh PRIVATE ${SNDFILE_INCLUDE_DIRS})
+  target_include_directories(sbsh_lib PUBLIC ${SNDFILE_INCLUDE_DIRS})
 endif()
 
 # Add readline include directories
 if(READLINE_FOUND)
-  target_include_directories(Sbsh PRIVATE ${READLINE_INCLUDE_DIRS})
+  target_include_directories(sbsh_lib PUBLIC ${READLINE_INCLUDE_DIRS})
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  # Add Homebrew readline include directories manually
   file(GLOB HOMEBREW_READLINE_INCLUDE_DIRS
        "/opt/homebrew/Cellar/readline/*/include"
        "/usr/local/Cellar/readline/*/include")
   if(HOMEBREW_READLINE_INCLUDE_DIRS)
-    target_include_directories(Sbsh PRIVATE ${HOMEBREW_READLINE_INCLUDE_DIRS})
+    target_include_directories(sbsh_lib
+                               PUBLIC ${HOMEBREW_READLINE_INCLUDE_DIRS})
     message(STATUS "Added Homebrew readline include directories")
   endif()
 endif()
 
 if(JSONCPP_FOUND)
-  target_include_directories(Sbsh PRIVATE ${JSONCPP_INCLUDE_DIRS})
+  target_include_directories(sbsh_lib PUBLIC ${JSONCPP_INCLUDE_DIRS})
 else()
-  target_include_directories(Sbsh PRIVATE ${JSONCPP_INCLUDE_DIR})
+  target_include_directories(sbsh_lib PUBLIC ${JSONCPP_INCLUDE_DIR})
 endif()
 
-# Set compiler flags using target properties
+# Set compiler flags on sbsh_lib
 target_compile_options(
-  Sbsh PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
-               $<$<CONFIG:Release>:-O3> $<$<CONFIG:Debug>:-g -O0>)
+  sbsh_lib PUBLIC $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
+                  $<$<CONFIG:Release>:-O3> $<$<CONFIG:Debug>:-g -O0>)
 
 # Add sanitizers for debug builds
 option(ENABLE_SANITIZERS
@@ -323,71 +330,80 @@ option(ENABLE_SANITIZERS
 if(ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Enabling sanitizers for debug build")
   target_compile_options(
-    Sbsh PRIVATE -fsanitize=address -fsanitize=undefined
-                 -fno-omit-frame-pointer -fno-optimize-sibling-calls)
-  target_link_options(Sbsh PRIVATE -fsanitize=address -fsanitize=undefined)
+    sbsh_lib PUBLIC -fsanitize=address -fsanitize=undefined
+                    -fno-omit-frame-pointer -fno-optimize-sibling-calls)
+  target_link_options(sbsh_lib PUBLIC -fsanitize=address -fsanitize=undefined)
 endif()
 
-# Link libraries - use pkg-config variables when available, fallback to manual
-# finds
-target_link_libraries(Sbsh Ableton::Link Threads::Threads)
+# Link libraries to sbsh_lib
+target_link_libraries(sbsh_lib PUBLIC Ableton::Link Threads::Threads)
 
-# Link readline libraries - handle both pkg-config and manual detection
+# Find readline full paths for macOS (needed before linking)
+if(READLINE_FOUND AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  file(GLOB HOMEBREW_READLINE_LIB_DIRS "/opt/homebrew/Cellar/readline/*/lib"
+       "/usr/local/Cellar/readline/*/lib")
+  find_library(
+    READLINE_FULL_LIB readline
+    PATHS ${HOMEBREW_READLINE_LIB_DIRS}
+    NO_DEFAULT_PATH)
+  find_library(
+    HISTORY_FULL_LIB history
+    PATHS ${HOMEBREW_READLINE_LIB_DIRS}
+    NO_DEFAULT_PATH)
+endif()
+
+# Link readline libraries
 if(READLINE_FOUND)
-  # On macOS, pkg-config gives library names but we need full paths for Homebrew
-  # libraries
-  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    file(GLOB HOMEBREW_READLINE_LIB_DIRS "/opt/homebrew/Cellar/readline/*/lib"
-         "/usr/local/Cellar/readline/*/lib")
-    find_library(
-      READLINE_FULL_LIB readline
-      PATHS ${HOMEBREW_READLINE_LIB_DIRS}
-      NO_DEFAULT_PATH)
-    find_library(
-      HISTORY_FULL_LIB history
-      PATHS ${HOMEBREW_READLINE_LIB_DIRS}
-      NO_DEFAULT_PATH)
-    if(READLINE_FULL_LIB)
-      target_link_libraries(Sbsh ${READLINE_FULL_LIB})
-    endif()
+  if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND READLINE_FULL_LIB)
+    target_link_libraries(sbsh_lib PUBLIC ${READLINE_FULL_LIB})
     if(HISTORY_FULL_LIB)
-      target_link_libraries(Sbsh ${HISTORY_FULL_LIB})
+      target_link_libraries(sbsh_lib PUBLIC ${HISTORY_FULL_LIB})
     endif()
   else()
-    target_link_libraries(Sbsh ${READLINE_LIBRARIES})
+    target_link_libraries(sbsh_lib PUBLIC ${READLINE_LIBRARIES})
   endif()
-  target_compile_options(Sbsh PRIVATE ${READLINE_CFLAGS_OTHER})
+  target_compile_options(sbsh_lib PUBLIC ${READLINE_CFLAGS_OTHER})
 else()
-  target_link_libraries(Sbsh ${READLINE_LIB})
+  target_link_libraries(sbsh_lib PUBLIC ${READLINE_LIB})
   if(HISTORY_LIB)
-    target_link_libraries(Sbsh ${HISTORY_LIB})
+    target_link_libraries(sbsh_lib PUBLIC ${HISTORY_LIB})
   endif()
 endif()
 
-# Link audio libraries using pkg-config when available
+# Link audio libraries
 if(PORTAUDIO_FOUND)
-  target_link_libraries(Sbsh ${PORTAUDIO_LIBRARIES})
-  target_compile_options(Sbsh PRIVATE ${PORTAUDIO_CFLAGS_OTHER})
+  target_link_libraries(sbsh_lib PUBLIC ${PORTAUDIO_LIBRARIES})
+  target_compile_options(sbsh_lib PUBLIC ${PORTAUDIO_CFLAGS_OTHER})
 else()
-  target_link_libraries(Sbsh ${PORTAUDIO_LIB})
+  target_link_libraries(sbsh_lib PUBLIC ${PORTAUDIO_LIB})
 endif()
 
-# PortMidi doesn't provide pkg-config, so just link directly
-target_link_libraries(Sbsh ${PORTMIDI_LIB})
+target_link_libraries(sbsh_lib PUBLIC ${PORTMIDI_LIB})
 
 if(SNDFILE_FOUND)
-  target_link_libraries(Sbsh ${SNDFILE_LIBRARIES})
-  target_compile_options(Sbsh PRIVATE ${SNDFILE_CFLAGS_OTHER})
+  target_link_libraries(sbsh_lib PUBLIC ${SNDFILE_LIBRARIES})
+  target_compile_options(sbsh_lib PUBLIC ${SNDFILE_CFLAGS_OTHER})
 else()
-  target_link_libraries(Sbsh ${SNDFILE_LIB})
+  target_link_libraries(sbsh_lib PUBLIC ${SNDFILE_LIB})
 endif()
 
 if(JSONCPP_FOUND)
-  target_link_libraries(Sbsh ${JSONCPP_LIBRARIES})
-  target_compile_options(Sbsh PRIVATE ${JSONCPP_CFLAGS_OTHER})
+  target_link_libraries(sbsh_lib PUBLIC ${JSONCPP_LIBRARIES})
+  target_compile_options(sbsh_lib PUBLIC ${JSONCPP_CFLAGS_OTHER})
 else()
-  target_link_libraries(Sbsh ${JSONCPP_LIB})
+  target_link_libraries(sbsh_lib PUBLIC ${JSONCPP_LIB})
 endif()
+
+# macOS frameworks
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  target_link_libraries(
+    sbsh_lib PUBLIC "-framework CoreFoundation" "-framework CoreAudio"
+                    "-framework CoreMIDI")
+endif()
+
+# Main executable - just main.cpp linking against sbsh_lib
+add_executable(Sbsh src/main.cpp)
+target_link_libraries(Sbsh sbsh_lib)
 
 # Installation rules
 install(TARGETS Sbsh RUNTIME DESTINATION bin)
@@ -413,78 +429,7 @@ if(BUILD_TESTS)
     GIT_TAG v1.13.0)
   FetchContent_MakeAvailable(googletest)
 
-  # Create a static library from all sources except main.cpp for tests to link
-  # against
-  set(SBSH_SOURCES_NO_MAIN ${Sbsh_SOURCES})
-  list(FILTER SBSH_SOURCES_NO_MAIN EXCLUDE REGEX "src/main\\.cpp$")
-
-  add_library(sbsh_lib STATIC ${SBSH_SOURCES_NO_MAIN})
-  target_include_directories(sbsh_lib PUBLIC ${SBSH_INCLUDE_DIRS})
-  target_include_directories(sbsh_lib PUBLIC ${perlin_noise_SOURCE_DIR})
-
-  # Add jsoncpp include directories
-  if(JSONCPP_FOUND)
-    target_include_directories(sbsh_lib PUBLIC ${JSONCPP_INCLUDE_DIRS})
-  else()
-    target_include_directories(sbsh_lib PUBLIC ${JSONCPP_INCLUDE_DIR})
-  endif()
-
-  # Add readline include directories for sbsh_lib
-  if(READLINE_FOUND)
-    target_include_directories(sbsh_lib PUBLIC ${READLINE_INCLUDE_DIRS})
-  elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    file(GLOB HOMEBREW_READLINE_INCLUDE_DIRS_TEST
-         "/opt/homebrew/Cellar/readline/*/include"
-         "/usr/local/Cellar/readline/*/include")
-    if(HOMEBREW_READLINE_INCLUDE_DIRS_TEST)
-      target_include_directories(sbsh_lib
-                                 PUBLIC ${HOMEBREW_READLINE_INCLUDE_DIRS_TEST})
-    endif()
-  endif()
-
-  # Link sbsh_lib with required libraries
-  target_link_libraries(sbsh_lib Ableton::Link Threads::Threads)
-
-  if(PORTAUDIO_FOUND)
-    target_link_libraries(sbsh_lib ${PORTAUDIO_LIBRARIES})
-  else()
-    target_link_libraries(sbsh_lib ${PORTAUDIO_LIB})
-  endif()
-
-  target_link_libraries(sbsh_lib ${PORTMIDI_LIB})
-
-  if(SNDFILE_FOUND)
-    target_link_libraries(sbsh_lib ${SNDFILE_LIBRARIES})
-  else()
-    target_link_libraries(sbsh_lib ${SNDFILE_LIB})
-  endif()
-
-  if(JSONCPP_FOUND)
-    target_link_libraries(sbsh_lib ${JSONCPP_LIBRARIES})
-  else()
-    target_link_libraries(sbsh_lib ${JSONCPP_LIB})
-  endif()
-
-  if(READLINE_FOUND)
-    if(CMAKE_SYSTEM_NAME MATCHES "Darwin" AND READLINE_FULL_LIB)
-      target_link_libraries(sbsh_lib ${READLINE_FULL_LIB})
-      if(HISTORY_FULL_LIB)
-        target_link_libraries(sbsh_lib ${HISTORY_FULL_LIB})
-      endif()
-    else()
-      target_link_libraries(sbsh_lib ${READLINE_LIBRARIES})
-    endif()
-  else()
-    target_link_libraries(sbsh_lib ${READLINE_LIB})
-    if(HISTORY_LIB)
-      target_link_libraries(sbsh_lib ${HISTORY_LIB})
-    endif()
-  endif()
-
-  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    target_link_libraries(sbsh_lib "-framework CoreFoundation"
-                          "-framework CoreAudio" "-framework CoreMIDI")
-  endif()
+  # sbsh_lib is already built above, tests just link against it
 
   include(GoogleTest)
 

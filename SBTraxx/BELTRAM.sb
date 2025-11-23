@@ -24,26 +24,26 @@ let bd2 = sample(bd/BD_909_48.wav);
 let clp = sample(cp/djkhaledClap.aiff); vol clp 0.4;
 let goodt = sample(voices/goodtimescometomeNOW.aiff);
 
-# send("delay", goodt);
-# bpm 120;
-# load_preset(dx, "BELTRAMz");
-# add_fx(dx, "distort");
-# add_fx(dx, "compressor");
-# load_preset(sbdrum, "beltram");
-# set sbdrum:bd_vol 0.4;
-# add_fx(dx, "sidechain", sbdrum);
-# let dx4 = fm();
-# load_preset(dx4, "pointty");
-# load_preset(dx3, "DONK");
-# #load_preset(dx2, "BELLEAD");
-# # load_preset(dx2, "OVLAZ");
-# vol dx2 0.4;
-# add_fx(cl, "filter");
+send("delay", goodt);
+bpm 120;
+load_preset(dx, "BELTRAMz");
+add_fx(dx, "distort");
+add_fx(dx, "compressor");
+load_preset(sbdrum, "beltram");
+set sbdrum:bd_vol 0.4;
+add_fx(dx, "sidechain", sbdrum);
+let dx4 = fm();
+load_preset(dx4, "pointty");
+load_preset(dx3, "DONK");
+#load_preset(dx2, "BELLEAD");
+# load_preset(dx2, "OVLAZ");
+vol dx2 0.4;
+add_fx(cl, "filter");
 
 # p99 # playITblah_gen;
 
 
-let drblah_gen = gen()
+let drblah_gen = comp()
 {
   setup()
   {
@@ -60,7 +60,7 @@ let drblah_gen = gen()
   }
 }
 
-let hhblah_gen = gen()
+let hhblah_gen = comp()
 {
   setup()
   {
@@ -76,7 +76,7 @@ let hhblah_gen = gen()
     drx = incr(drx, 0, len(durz));
   }
 }
-let clblah_gen = gen()
+let clblah_gen = comp()
 {
   setup()
   {
@@ -91,7 +91,7 @@ let clblah_gen = gen()
   }
 }
 
-let dddblah_gen = gen()
+let dddblah_gen = comp()
 {
   setup()
   {
@@ -109,7 +109,7 @@ let dddblah_gen = gen()
   }
 }
 
-let dxlowblah_gen = gen()
+let dxlowblah_gen = comp()
 {
   setup()
   {
@@ -143,7 +143,7 @@ let dxlowblah_gen = gen()
   }
 }
 
-let dxblah_gen = gen()
+let dxblah_gen = comp()
 {
   setup()
   {
@@ -173,7 +173,7 @@ let dxblah_gen = gen()
   }
 }
 
-let dxFINblah_gen = gen()
+let dxFINblah_gen = comp()
 {
   setup()
   {
@@ -202,7 +202,7 @@ let dxFINblah_gen = gen()
 
   }
 }
-let dx2blah_gen = gen()
+let dx2blah_gen = comp()
 {
   setup()
   {
@@ -247,7 +247,7 @@ let dx2blah_gen = gen()
   }
 }
 
-# let dx2blah_gen = gen()
+# let dx2blah_gen = comp()
 # {
 #   setup()
 #   {
@@ -284,7 +284,7 @@ let dx2blah_gen = gen()
 #   }
 # }
 
-let cppblah_gen = gen()
+let cppblah_gen = comp()
 {
   setup()
   {
@@ -311,7 +311,7 @@ let cppblah_gen = gen()
 # p6 $ cppblah_gen
 # p7 $ melz3blah_gen;
 
-let playITblah_gen = gen()
+let playITblah_gen = comp()
 {
   setup()
   {
@@ -427,7 +427,7 @@ let playITblah_gen = gen()
   }
 }
 
-# let pblah_gen = gen()
+# let pblah_gen = comp()
 # {
 #   setup()
 #   {
@@ -447,7 +447,7 @@ let playITblah_gen = gen()
 # }
 
 
-let melblah_gen = gen()
+let melblah_gen = comp()
 {
   setup()
   {
@@ -484,7 +484,7 @@ let melblah_gen = gen()
 }
 
 # dx2 OVLAZ //  notrd // OILY2oo // OILY // kruts // MSLICX
-let smellyblah_gen = gen()
+let smellyblah_gen = comp()
 {
   setup()
   {
@@ -519,7 +519,7 @@ let smellyblah_gen = gen()
   }
 }
 
-let medlblah_gen = gen()
+let medlblah_gen = comp()
 {
   setup()
   {
@@ -551,7 +551,7 @@ let medlblah_gen = gen()
   }
 }
 
-let dx4fxcblah_gen = gen()
+let dx4fxcblah_gen = comp()
 {
   setup()
   {
@@ -574,7 +574,7 @@ let dx4fxcblah_gen = gen()
   }
 }
 
-let mimelblah_gen = gen()
+let mimelblah_gen = comp()
 {
   setup()
   {
@@ -596,7 +596,7 @@ let mimelblah_gen = gen()
   }
 }
 
-let dxxnblah_gen = gen()
+let dxxnblah_gen = comp()
 {
   setup()
   {
