@@ -1,0 +1,59 @@
+
+let snarezzx = comp()
+{
+  setup()
+  {
+    #let countz = [2, 3, 4, 4, 6, 7, 8, 9, 11, 13, 15];
+    #let countz = [15, 19, 25, 35, 45];
+    let countz = [1, 2, 3, 6, 8];
+    let gz = [19, 7, 31, 43, 55];
+    let gx = 0;
+  }
+  run()
+  {
+    #print("PULZE PER", ppb);
+    let cx = 0;
+
+    for ( ; ; ) {
+
+      let itz = countz[cx];
+      let ppb = pplooplen / itz;
+      let on_at = 0;
+      for (let i = 0; i < itz; i++) {
+        on_at = cx * pplooplen + ppb*i + ppb/2;
+        #print(on_at);
+        note_on_at(sbdrum, 1, on_at);
+      }
+
+      cx++;
+      len(countz);
+      if (cx == len(countz)) {
+        note_on_at(dx3, gz[gx], on_at, dur = 3000);
+        note_on_at(dx, gz[gx], on_at, dur = 3000);
+        dbeeat();
+        break;
+      }
+    }
+  }
+}
+let dbeeat = comp()
+{
+  setup()
+  {
+    let main_beat =  [1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+  }
+  run()
+  {
+    let beat = main_beat;
+    if (count % 4 == 3) {
+      beat = rand_beat();
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (beat[i] == 1) {
+        note_on_at(sb2, 0, i * pp);
+      }
+    }
+    snarezzx();
+  }
+}

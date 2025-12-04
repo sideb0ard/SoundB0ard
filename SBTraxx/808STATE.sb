@@ -42,7 +42,7 @@ p19 # playitblah_gen;
 
 # p3 $ ""; p5 $ mofxblah_gen
 
-let bbreakblah_gen = gen()
+let bbreakblah_gen = comp()
 {
   setup()
   {
@@ -88,7 +88,7 @@ let bbreakblah_gen = gen()
 #  p9 $ driumzblah_gen;
 
 
-let drrrblah_gen = gen()
+let drrrblah_gen = comp()
 {
   setup()
   {
@@ -120,7 +120,7 @@ let prog = [fmaj7, gmaj7, cmaj7, dmaj7];
 let cpx = 0;
 let chord = prog[cpx];
 
-let chordblah_gen = gen()
+let chordblah_gen = comp()
 {
   setup()
   {
@@ -137,7 +137,7 @@ let chordblah_gen = gen()
   }
 }
 
-let dxstabblah_gen = gen()
+let dxstabblah_gen = comp()
 {
   setup()
   {
@@ -178,7 +178,7 @@ let dxstabblah_gen = gen()
   }
 }
 
-let loonblah_gen = gen()
+let loonblah_gen = comp()
 {
   setup()
   {
@@ -202,7 +202,7 @@ let loonblah_gen = gen()
 }
 
 
-let drblah_gen = gen()
+let drblah_gen = comp()
 {
   setup()
   {
@@ -217,7 +217,7 @@ let drblah_gen = gen()
   }
 }
 
-let hhblah_gen = gen()
+let hhblah_gen = comp()
 {
   setup()
   {
@@ -244,7 +244,7 @@ let hhblah_gen = gen()
   }
 }
 
-let melblah_gen = gen()
+let melblah_gen = comp()
 {
   setup()
   {
@@ -269,7 +269,7 @@ let melblah_gen = gen()
   }
 }
 
-let bsss2lah_gen = gen()
+let bsss2lah_gen = comp()
 {
   setup()
   {
@@ -296,7 +296,7 @@ let offz = [1120, 240, 1120, 480];
 
 
 # FRAAZZ
-let fellblah_gen = gen()
+let fellblah_gen = comp()
 {
   setup()
   {
@@ -330,7 +330,7 @@ let fellblah_gen = gen()
   }
 }
 
-let riffblah_gen = gen()
+let riffblah_gen = comp()
 {
   setup()
   {
@@ -354,7 +354,7 @@ let riffblah_gen = gen()
   }
 }
 
-let fullchordblah_gen = gen()
+let fullchordblah_gen = comp()
 {
   setup()
   {
@@ -382,7 +382,7 @@ let fullchordblah_gen = gen()
   }
 }
 
-let mofxblah_gen = gen()
+let mofxblah_gen = comp()
 {
   setup()
   {
@@ -403,7 +403,7 @@ let mofxblah_gen = gen()
   }
 }
 
-let playitblah_gen = gen()
+let playitblah_gen = comp()
 {
   setup()
   {
@@ -521,7 +521,7 @@ let playitblah_gen = gen()
 }
 
 
-let dxmelblah_gen = gen()
+let dxmelblah_gen = comp()
 {
   setup()
   {
@@ -553,7 +553,7 @@ let dxmelblah_gen = gen()
 }
 
 # dx4 // WURNGGx
-let bssslah_gen = gen()
+let bssslah_gen = comp()
 {
   setup()
   {
@@ -600,7 +600,7 @@ let bssslah_gen = gen()
   }
 }
 
-let snrrblah_gen = gen()
+let snrrblah_gen = comp()
 {
   setup()
   {

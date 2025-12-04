@@ -1,5 +1,5 @@
 
-let lottoblah_gen = gen()
+let lottoblah_gen = comp()
 {
   setup()
   {
@@ -25,7 +25,7 @@ let lottoblah_gen = gen()
   }
 }
 
-let generatelotto_gen = gen()
+let generatelotto_gen = comp()
 {
   setup()
   {

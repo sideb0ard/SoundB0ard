@@ -12,23 +12,22 @@ let oh = sample(oh/mawopenhh2.aiff);
 
 let rockn = sample(voices/theerwasaTIME.wav);
 
-# bpm 128;
-# load_preset(dx, "LOUIS");
-# load_preset(dx2, "UNDg");
-# load_preset(dx3, "ORGAN");
-# let dx4 = fm();
-# load_preset(dx4, "SMMTH");
-# load_preset(mo, "FRENCH");
-# vol ch 0;
-# vol oh 0;
-#
-# set dx:op3out 95
+bpm 128;
+load_preset(dx, "LOUIS");
+load_preset(dx2, "UNDg");
+load_preset(dx3, "ORGAN");
+let dx4 = fm();
+load_preset(dx4, "SMMTH");
+load_preset(mo, "FRENCH");
+vol ch 0;
+vol oh 0;
+set dx:op3out 95
 #
 # p1 $ melblah_gen;
 # p2 $ hhblah_gen;
 # p3 $ snblah_gen
 
-let playyyablah_gen = gen()
+let playyyablah_gen = comp()
 {
   setup()
   {
@@ -161,7 +160,7 @@ let playyyablah_gen = gen()
   }
 }
 
-let mel1blah_gen = gen()
+let mel1blah_gen = comp()
 {
   setup()
   {
@@ -191,7 +190,7 @@ let mel1blah_gen = gen()
   }
 }
 
-let melblah_gen = gen()
+let melblah_gen = comp()
 {
   setup()
   {
@@ -206,7 +205,7 @@ let melblah_gen = gen()
   }
 }
 
-let mel2blah_gen = gen()
+let mel2blah_gen = comp()
 {
   setup()
   {
@@ -236,7 +235,7 @@ let mel2blah_gen = gen()
   }
 }
 
-let hh2blah_gen = gen()
+let hh2blah_gen = comp()
 {
   setup()
   {
@@ -258,7 +257,7 @@ let hh2blah_gen = gen()
   }
 }
 
-let hhblah_gen = gen()
+let hhblah_gen = comp()
 {
   setup()
   {
@@ -287,7 +286,7 @@ let hhblah_gen = gen()
 }
 
 
-let snblah_gen = gen()
+let snblah_gen = comp()
 {
   setup()
   {
@@ -325,7 +324,7 @@ let snblah_gen = gen()
 }
 
 # WURBKl // ORGAN
-let stabblah_gen = gen()
+let stabblah_gen = comp()
 {
   setup()
   {
@@ -346,7 +345,7 @@ let stabblah_gen = gen()
   }
 }
 # send("reverb", dx3);
-let stabfxlah_gen = gen()
+let stabfxlah_gen = comp()
 {
   setup()
   {
@@ -366,7 +365,7 @@ let stabfxlah_gen = gen()
 }
 
 
-let kickblah_gen = gen()
+let kickblah_gen = comp()
 {
   setup()
   {
@@ -394,7 +393,7 @@ let kickblah_gen = gen()
   }
 }
 
-let kicks2blah_gen = gen()
+let kicks2blah_gen = comp()
 {
   setup()
   {
@@ -412,7 +411,7 @@ let kicks2blah_gen = gen()
 }
 
 
-let moblah_gen = gen()
+let moblah_gen = comp()
 {
   setup()
   {
@@ -442,7 +441,7 @@ let moblah_gen = gen()
 }
 
 # SMMTH
-let meldropblah_gen = gen()
+let meldropblah_gen = comp()
 {
   setup()
   {
@@ -472,7 +471,7 @@ let meldropblah_gen = gen()
 }
 
 # dx2 UNDg
-let bsslah_gen = gen()
+let bsslah_gen = comp()
 {
   setup()
   {
@@ -502,7 +501,7 @@ let bsslah_gen = gen()
   }
 }
 
-let mellllblah_gen = gen()
+let mellllblah_gen = comp()
 {
   setup()
   {
@@ -526,7 +525,7 @@ let mellllblah_gen = gen()
   }
 }
 
-let dx4riserblah_gen = gen()
+let dx4riserblah_gen = comp()
 {
   setup()
   {
@@ -545,7 +544,7 @@ let dx4riserblah_gen = gen()
   }
 }
 
-let mel3blah_gen = gen()
+let mel3blah_gen = comp()
 {
   setup()
   {
@@ -584,7 +583,7 @@ let mel3blah_gen = gen()
   }
 }
 let shk = sample(perc/tuffShaker.aiff);
-let shakerblah_gen = gen()
+let shakerblah_gen = comp()
 {
   setup()
   {

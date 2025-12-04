@@ -1049,5 +1049,7 @@ kit();
 
 p0 # countr ;
 
+# 3840 midi pulses per loop
+let pplooplen = 3840;
 # i.e. 3840 / 16 == 240 midi Pulses Per 16th
 let pp = 240;
