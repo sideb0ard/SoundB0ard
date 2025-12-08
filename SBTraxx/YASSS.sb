@@ -1,5 +1,5 @@
-# let ow = loop(loops/oowee.wav); set ow:pitch 0.5;
-# let sad = loop(dloops/sadLIB.aiff); set sad:pitch 1.8;
+let ow = loop(loops/oowee.wav); set ow:pitch 0.5;
+let sad = loop(dloops/sadLIB.aiff); set sad:pitch 1.8;
 
 let ok = sample(voices/ok.wav);
 
