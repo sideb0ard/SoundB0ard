@@ -24,6 +24,7 @@ enum class fx_type {
   WAVESHAPER,
   GRANULATE,
   TRANSVERB,
+  NNIRROR,
 };
 
 class Fx {

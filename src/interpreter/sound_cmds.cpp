@@ -9,6 +9,7 @@
 #include <fx/granulate.h>
 #include <fx/modfilter.h>
 #include <fx/modular_delay.h>
+#include <fx/nnirror.h>
 #include <fx/reverb.h>
 #include <fx/stereodelay.h>
 #include <fx/transverb.h>
@@ -54,6 +55,8 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
           fx.push_back(std::make_shared<Reverb>());
         } else if (str_obj->value_ == "transverb") {
           fx.push_back(std::make_shared<Transverb>());
+        } else if (str_obj->value_ == "nnirror" || str_obj->value_ == "nnrrr") {
+          fx.push_back(std::make_shared<Nnirror>());
         } else if (str_obj->value_ == "sidechain") {
           if (args.size() > 2) {
             std::cout << "Got a source!\n";

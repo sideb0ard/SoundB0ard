@@ -1,0 +1,29 @@
+# let ow = loop(loops/oowee.wav); set ow:pitch 0.5;
+# let sad = loop(dloops/sadLIB.aiff); set sad:pitch 1.8;
+
+let ok = sample(voices/ok.wav);
+
+let okblah_comp = comp()
+{
+  setup()
+  {
+    let pat1 = [0, 1, 0, 0,  0, 0, 0, 1,  1, 1, 0, 0,  0, 1, 0, 1];
+    let pat2 =  [0, 0, 1, 0,  1, 1, 0, 1,  1, 1, 0, 0,  0, 1, 0, 1];
+    let durz = [50, 70, 100, 200, 400, 0];
+    let drx = 0;
+  }
+  run()
+  {
+    let pat = pat1;
+    if (count % 4 == 3) {
+      pat = pat2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (pat[i] == 1) {
+        note_on_at(ok, 1, i * pp, dur = durz[drx]);
+      }
+    }
+    drx = incr(drx, 0, len(durz));
+
+  }
+}
