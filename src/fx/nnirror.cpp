@@ -151,14 +151,15 @@ Nnirror::Nnirror() : max_delay_samples_(SAMPLE_RATE * kMaxDelayMs / 1000) {
 
 std::string Nnirror::Status() {
   std::stringstream ss;
+  ss << "Nnirror! ";
   ss << "wet:" << smooth_wet_.GetCurrent();
   ss << " wet_gain:" << smooth_wet_gain_.GetCurrent();
   ss << " sz:" << smooth_size_.GetCurrent();
   ss << " fb:" << smooth_feedback_.GetCurrent();
-  ss << " uni:" << smooth_unison_.GetCurrent();
-  ss << " dif2:" << target_params_.diffuse[1];
-  ss << " dif3:" << target_params_.diffuse[2];
-  ss << " dif4:" << target_params_.diffuse[3];
+  ss << " uni:" << smooth_unison_.GetCurrent() << "\n";
+  ss << "      dif2:" << smooth_diffuse_[1].GetCurrent();
+  ss << " dif3:" << smooth_diffuse_[2].GetCurrent();
+  ss << " dif4:" << smooth_diffuse_[3].GetCurrent();
   ss << " inert1:" << inertia_processors_[0].GetCurrent();
   ss << " inert2:" << inertia_processors_[1].GetCurrent();
   ss << " inert3:" << inertia_processors_[2].GetCurrent();
@@ -169,10 +170,10 @@ std::string Nnirror::Status() {
 
 StereoVal Nnirror::Process(StereoVal input) {
   // Smooth parameters with inertia
-  double wet = inertia_processors_[0].Process();
+  double wet = smooth_wet_.Process();
   double wet_gain = smooth_wet_gain_.Process();
-  double size = inertia_processors_[1].Process();
-  double feedback = inertia_processors_[2].Process();
+  double size = smooth_size_.Process();
+  double feedback = smooth_feedback_.Process();
 
   // Update size-dependent parameters if changed significantly
   static double last_size = 0.0;
@@ -207,8 +208,17 @@ StereoVal Nnirror::Process(StereoVal input) {
   blurred.right *= wet_gain;
 
   // Final dry/wet mix
-  return {dry.left * (1.0 - wet) + blurred.left * wet,
-          dry.right * (1.0 - wet) + blurred.right * wet};
+  StereoVal output = {dry.left * (1.0 - wet) + blurred.left * wet,
+                      dry.right * (1.0 - wet) + blurred.right * wet};
+  output.left = std::max(-1.0, std::min(1.0, output.left));
+  output.right = std::max(-1.0, std::min(1.0, output.right));
+
+  if (std::abs(output.left) > 0.95 || std::abs(output.right) > 0.95) {
+    feedback_buffer_.left *= 0.5;  // Emergency damping
+    feedback_buffer_.right *= 0.5;
+  }
+
+  return output;
 }
 
 StereoVal Nnirror::ProcessBlur(StereoVal input) {
@@ -316,8 +326,9 @@ StereoVal Nnirror::ProcessDiffusion(StereoVal input) {
 
 StereoVal Nnirror::ApplyFeedback(StereoVal input) {
   double fb = smooth_feedback_.Process();
-  return {std::tanh(input.left + feedback_buffer_.left * fb),
-          std::tanh(input.right + feedback_buffer_.right * fb)};
+  fb = std::min(fb, 0.85);
+  return {std::tanh(input.left + feedback_buffer_.left * fb * 0.7),
+          std::tanh(input.right + feedback_buffer_.right * fb * 0.7)};
 }
 
 void Nnirror::UpdateSize(double size) {
@@ -366,7 +377,7 @@ void Nnirror::UpdateSize(double size) {
     delay_ms *= (1.0 + 0.1 * std::sin(i * 0.618));
 
     delay_taps_.push_back({.delay_samples = MsToSamples(delay_ms),
-                           .feedback = 0.7 / (i + 1),
+                           .feedback = 0.3 / (i + 1),
                            .cross_feed = 0.1 + size * 0.4});
   }
 }
@@ -448,34 +459,58 @@ int Nnirror::WrapIndex(int index, int buffer_size) const {
 
 void Nnirror::SetParam(std::string name, double val) {
   std::cout << "YO SET ME _ " << name << " val:" << val << std::endl;
+
   if (name == "wet") {
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
     smooth_wet_.SetTarget(val);
+
   } else if (name == "wet_gain") {
+    val = std::max(0.0, std::min(2.0, val));  // 0-2 (up to +6dB boost)
     smooth_wet_gain_.SetTarget(val);
+
   } else if (name == "sz") {
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
     smooth_size_.SetTarget(val);
+
   } else if (name == "fb") {
+    val = std::max(0.0, std::min(0.9, val));  // 0-0.9 (NEVER allow >= 1.0!)
     smooth_feedback_.SetTarget(val);
+
   } else if (name == "uni") {
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
     smooth_unison_.SetTarget(val);
-    UpdateUnison(val);
+
+  } else if (name == "dif1") {
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
+    smooth_diffuse_[0].SetTarget(val);
+
   } else if (name == "dif2") {
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
     smooth_diffuse_[1].SetTarget(val);
-    inertia_processors_[1].SetInertia(val);
+
   } else if (name == "dif3") {
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
     smooth_diffuse_[2].SetTarget(val);
-    inertia_processors_[2].SetInertia(val);
+
   } else if (name == "dif4") {
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
     smooth_diffuse_[3].SetTarget(val);
-    inertia_processors_[3].SetInertia(val);
+
   } else if (name == "inert1") {
-    inertia_processors_[0].SetTarget(val);
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
+    inertia_processors_[0].SetInertia(val);
+
   } else if (name == "inert2") {
-    inertia_processors_[0].SetTarget(val);
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
+    inertia_processors_[1].SetInertia(val);
+
   } else if (name == "inert3") {
-    inertia_processors_[0].SetTarget(val);
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
+    inertia_processors_[2].SetInertia(val);
+
   } else if (name == "inert4") {
-    inertia_processors_[0].SetTarget(val);
+    val = std::max(0.0, std::min(1.0, val));  // 0-1
+    inertia_processors_[3].SetInertia(val);
   }
 }
 

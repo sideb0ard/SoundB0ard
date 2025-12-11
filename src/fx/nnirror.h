@@ -15,8 +15,15 @@ class Nnirror : public Fx {
     double size = 0.5f;
     double feedback = 0.3f;
     double unison = 0.0f;
-    double diffuse[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    double diffuse[4] = {0.0f, 0.1f, 0.1f, 0.0f};
     double inertia[4] = {0.1f, 0.1f, 0.1f, 0.1f};
+    // double wet = 1.0;
+    // double wet_gain = 1.5;
+    // double size = 0.8f;
+    // double feedback = 0.7f;
+    // double unison = 0.5f;
+    // double diffuse[4] = {0.6f, 0.4f, 0.0f, 0.0f};
+    // double inertia[4] = {0.1f, 0.1f, 0.1f, 0.1f};
   };
 
   Nnirror();
@@ -35,7 +42,7 @@ class Nnirror : public Fx {
   static constexpr int kMaxDelayMs = 1000;
   static constexpr int kMaxDelayTaps = 72;
   static constexpr int kMaxUnisonVoices = 8;
-  static constexpr double kSmoothingFast = 0.01f;
+  static constexpr double kSmoothingFast = 0.001f;
   static constexpr double kSmoothingSlow = 0.0001f;
 
   // Core delay line

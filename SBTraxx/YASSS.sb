@@ -1,5 +1,5 @@
 let ow = loop(loops/oowee.wav); set ow:pitch 0.5;
-let sad = loop(dloops/sadLIB.aiff); set sad:pitch 1.8;
+let sad = loop(dloops/sadLIB.aiff); set sad:pitch 1.8; vol sad 0;
 
 let ok = sample(voices/ok.wav);
 
@@ -25,5 +25,98 @@ let okblah_comp = comp()
     }
     drx = incr(drx, 0, len(durz));
 
+  }
+}
+
+# dx - SMMTH2 // DRAGxz // LOWESG // skirissh
+let melblah_comp = comp()
+{
+  setup()
+  {
+    let mel1 = [1, 0, 1, 1,  1, 0, 0, 1,  0, 1, 1, 1,  1, 0, 0, 0];
+    let notz = [44, 32, 34, 34, 32];
+    let nx = 0;
+    let durz = [100, 200, 400, 500, 160];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = rand_array(16, 0, 1);
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] == 1) {
+        note_on_at(dx, notz[nx], i * pp, dur = durz[drx]);
+        nx = incr(nx, 0, len(notz));
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+# load_preset(sb2, "craNK");
+let drumblah_comp = comp()
+{
+  setup()
+  {
+    let instz = [3, 5, 6, 7, 8];
+    let ix = 0;
+  }
+  run()
+  {
+    if (count % 8 < 7) {
+      let kickb = rand_beat();
+      let snrs = mask(rand_array(16, 0, 1), kickb);
+      for (let i = 0; i < 16; i++) {
+        if (kickb[i] == 1 && rand() < 70) {
+          note_on_at(sb2, 0, i * pp);
+          note_on_at(bd, 1, i * pp);
+        }
+        if (snrs[i] == 1) {
+          note_on_at(sb2, instz[ix], i * pp, dur = 10, vel = 30 + rand(90));
+          ix = incr(ix, 0, len(instz));
+        }
+      }
+    }
+  }
+}
+
+let hhablah_comp = comp()
+{
+  setup()
+  {
+    let hatz1 = [1, 0, 1, 0,  0, 1, 0, 1,  1, 0, 0, 0,  1, 0, 1, 0];
+  }
+  run()
+  {
+    let hatz = hatz1;
+    if (count % 4 == 2) {
+      hatz = rand_array(16, 0, 1);
+    }
+    for (let i = 0; i < 16; i++) {
+      let offz = 60;
+      if (i % 2 == 0) {
+        offz = 0;
+      }
+      if (hatz[i] == 1) {
+        note_on_at(sbdrum, 2, i * pp  +offz, dur = 10, vel = 30 + rand(50));
+      }
+      if (hatz[i] == 2) {
+        note_on_at(sbdrum, 4, i * pp + offz, dur = 10, vel = 30 + rand(50));
+      }
+    }
+
+  }
+}
+
+
+let mixblah_comp = comp()
+{
+  setup()
+  {
+  }
+  run()
+  {
   }
 }

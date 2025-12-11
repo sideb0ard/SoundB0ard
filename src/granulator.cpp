@@ -314,7 +314,7 @@ std::string Granulator::Status() {
               file_buffer_->audio_buffer_read_idx_)
      << " mode:" << kLoopModeNames[file_buffer_->loop_mode_] << "("
      << file_buffer_->loop_mode_ << ")"
-     << " len:" << file_buffer_->loop_len_ << "\n";
+     << " len:" << file_buffer_->loop_len_;
   ss << ANSI_COLOR_RESET;
   return ss.str();
 }
