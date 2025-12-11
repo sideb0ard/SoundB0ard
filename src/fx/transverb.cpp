@@ -2,11 +2,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <sstream>
 
 Transverb::Transverb() {
   type_ = fx_type::TRANSVERB;
-  enabled_ = false;
 
   // Initialize parameters with defaults
   bsize_param_ = 0.5;  // mid-range buffer size
@@ -21,6 +21,8 @@ Transverb::Transverb() {
   dist2_ = 0.7;        // right-leaning
 
   Init();
+
+  enabled_ = true;
 }
 
 void Transverb::Init() {
@@ -48,12 +50,11 @@ void Transverb::Reset() {
 
 std::string Transverb::Status() {
   std::ostringstream oss;
-  oss << "Transverb: " << (enabled_ ? "ON" : "OFF") << " | BufSize: " << bsize_
-      << " samples"
-      << " | speed1: " << (MIN_SPEED + (MAX_SPEED - MIN_SPEED) * speed1_)
-      << " | speed2: " << (MIN_SPEED + (MAX_SPEED - MIN_SPEED) * speed2_)
-      << " | mix1: " << (mix1_ * 100.0) << "%"
-      << " | mix2: " << (mix2_ * 100.0) << "%";
+  oss << "Transverb!"
+      << " speed1: " << speed1_ << " speed2: " << speed2_ << " mix1: " << mix1_
+      << " mix2: " << mix2_ << "\n";
+  oss << "fb1: " << feed1_ << " fb2: " << feed2_ << " dist1: " << dist1_
+      << " dist2: " << dist2_;
   return oss.str();
 }
 
@@ -66,10 +67,6 @@ StereoVal Transverb::Process(StereoVal input) {
 
   // Convert stereo input to mono for processing
   float mono_input = static_cast<float>((input.left + input.right) * 0.5);
-
-  // Calculate actual speeds
-  double actual_speed1 = MIN_SPEED + (MAX_SPEED - MIN_SPEED) * speed1_;
-  double actual_speed2 = MIN_SPEED + (MAX_SPEED - MIN_SPEED) * speed2_;
 
   // Read from delay buffers with interpolation
   float r1val = InterpolateHermite(buf1_, read1_);
@@ -89,14 +86,13 @@ StereoVal Transverb::Process(StereoVal input) {
   writer_ = (writer_ + 1) % bsize_;
 
   // Advance read positions
-  read1_ += actual_speed1;
-  read2_ += actual_speed2;
+  read1_ += speed1_;
+  read2_ += speed2_;
 
   // Wrap read positions
   if (read1_ >= bsize_) read1_ -= bsize_;
   if (read2_ >= bsize_) read2_ -= bsize_;
   if (read1_ < 0) read1_ += bsize_;
-  if (read2_ < 0) read2_ += bsize_;
 
   // Apply wet/dry mixing and stereo distribution
   float wet1_left = r1val * static_cast<float>(mix1_ * (1.0 - dist1_));
@@ -116,9 +112,15 @@ StereoVal Transverb::Process(StereoVal input) {
 
 void Transverb::SetParam(std::string name, double val) {
   // Clamp value to 0.0 - 1.0 range
-  val = std::max(0.0, std::min(1.0, val));
+  if (name == "speed1" || name == "speed2") {
+    val = std::max(0.25, std::min(4.0, val));
+  } else {
+    val = std::max(0.0, std::min(1.0, val));
+  }
 
-  if (name == "bsize" || name == "buffer_size") {
+  std::cout << "SET PARAM:" << name << "val" << val << std::endl;
+
+  if (name == "buffer_size") {
     if (bsize_param_ != val) {
       bsize_param_ = val;
       Init();  // Reinitialize with new buffer size
@@ -127,19 +129,19 @@ void Transverb::SetParam(std::string name, double val) {
     speed1_ = val;
   } else if (name == "speed2") {
     speed2_ = val;
-  } else if (name == "drymix" || name == "dry") {
+  } else if (name == "dry") {
     drymix_ = val;
-  } else if (name == "mix1" || name == "wet1") {
+  } else if (name == "mix1") {
     mix1_ = val;
-  } else if (name == "mix2" || name == "wet2") {
+  } else if (name == "mix2") {
     mix2_ = val;
-  } else if (name == "feed1" || name == "feedback1") {
+  } else if (name == "fb1") {
     feed1_ = val;
-  } else if (name == "feed2" || name == "feedback2") {
+  } else if (name == "fb2") {
     feed2_ = val;
-  } else if (name == "dist1" || name == "distribution1") {
+  } else if (name == "dist1") {
     dist1_ = val;
-  } else if (name == "dist2" || name == "distribution2") {
+  } else if (name == "dist2") {
     dist2_ = val;
   } else if (name == "enabled") {
     enabled_ = val > 0.5;

@@ -165,7 +165,7 @@ std::string StereoDelay::Status() {
       sync_len = "1/16";
   }
   std::stringstream ss;
-  ss << "ms:" << m_delay_time_ms_;
+  ss << "Delay! ms:" << m_delay_time_ms_;
   ss << " fb:" << m_feedback_percent_;
   ss << " rat:" << m_delay_ratio_;
   ss << " mx:" << m_wet_mix_;

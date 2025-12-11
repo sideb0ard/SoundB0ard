@@ -157,7 +157,7 @@ std::string Nnirror::Status() {
   ss << " sz:" << smooth_size_.GetCurrent();
   ss << " fb:" << smooth_feedback_.GetCurrent();
   ss << " uni:" << smooth_unison_.GetCurrent() << "\n";
-  ss << "      dif2:" << smooth_diffuse_[1].GetCurrent();
+  ss << "dif2:" << smooth_diffuse_[1].GetCurrent();
   ss << " dif3:" << smooth_diffuse_[2].GetCurrent();
   ss << " dif4:" << smooth_diffuse_[3].GetCurrent();
   ss << " inert1:" << inertia_processors_[0].GetCurrent();

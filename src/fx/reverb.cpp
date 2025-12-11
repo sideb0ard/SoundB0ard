@@ -105,7 +105,7 @@ StereoVal Reverb::Process(StereoVal in) {
 
 std::string Reverb::Status() {
   std::stringstream ss;
-  ss << "predelayms:" << m_pre_delay_msec;
+  ss << "Reverb! predelayms:" << m_pre_delay_msec;
   ss << " reverbtime:" << m_rt60;
   ss << " wetmx:" << m_wet_pct;
 

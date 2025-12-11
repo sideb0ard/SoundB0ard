@@ -190,12 +190,12 @@ std::string DynamicsProcessor::Status() {
   ss << " threshold:" << m_threshold_;
   ss << " attackms:" << m_attack_ms_;
   ss << " releasems:" << m_release_ms_ << "\n";
-  ss << "      ratio:" << m_ratio_;
+  ss << "ratio:" << m_ratio_;
   ss << " outputgain:" << m_outputgain_db_;
   ss << " kneewidth:" << m_knee_width_;
   ss << " lookahead:" << m_lookahead_delay_ms_;
   ss << " sterolink:" << (m_stereo_link_ ? "ON" : "OFF") << "\n";
-  ss << "      type:" << dynamics_processor_type_to_char[m_processor_type_];
+  ss << "type:" << dynamics_processor_type_to_char[m_processor_type_];
   ss << " mode:" << (m_time_constant_ ? "DIGITAL" : "ANALOG") << " ("
      << m_time_constant_ << ")";
   ss << " extsource:" << (m_external_source_ < 0 ? "off" : "on") << "("

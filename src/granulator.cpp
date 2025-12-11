@@ -306,10 +306,9 @@ std::string Granulator::Status() {
     ss << ANSI_COLOR_RESET;
   else
     ss << ANSI_COLOR_RED;
-  ss << "SBPlayer // vol:" << volume << " pan:" << pan
-     << " pitch:" << file_buffer_->pitch_ratio_ << "\n";
-  int idx = 0;
-  ss << "      " << idx++ << " " << file_buffer_->filename_ << " idx:"
+  ss << "SBPlayer // " << file_buffer_->filename_ << "\n";
+  ss << "vol:" << volume << " pan:" << pan
+     << " pitch:" << file_buffer_->pitch_ratio_ << " idx:"
      << (int)(100. / file_buffer_->GetAudioBuffer()->size() *
               file_buffer_->audio_buffer_read_idx_)
      << " mode:" << kLoopModeNames[file_buffer_->loop_mode_] << "("

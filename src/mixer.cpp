@@ -222,26 +222,44 @@ std::string Mixer::StatusEnv() {
 
   for (auto &[var_name, sg_idx] : soundgens) {
     if (sg_idx >= 0 && sg_idx < cached_sg_count_.load()) {
-      auto &cached = cached_sg_status_[sg_idx];
-      ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
-         << cached.status << ANSI_COLOR_RESET << std::endl;
+      ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = ";
 
-      std::stringstream margin;
-      size_t len_var = var_name.size();
-      for (size_t i = 0; i < len_var; i++) {
-        margin << " ";
+      size_t margin_size = var_name.length() + 3;  // " = "
+      std::string margin(margin_size, ' ');
+
+      auto &cached = cached_sg_status_[sg_idx];
+
+      std::stringstream sgss(cached.status);
+      std::string sg_status_line;
+      bool first_line = true;
+      while (std::getline(sgss, sg_status_line)) {
+        if (!first_line) {
+          ss << margin;
+        }
+        ss << sg_status_line << std::endl;
+        first_line = false;
       }
-      margin << "   ";  // for the ' = '
 
       // Read from cached FX status
       for (int i = 0; i < cached.effects_num; i++) {
-        ss << margin.str();
+        ss << margin << ANSI_COLOR_WHITE << "fx" << i << " ";
         if (cached.fx[i].enabled)
           ss << COOL_COLOR_YELLOW;
         else
           ss << ANSI_COLOR_RESET;
 
-        ss << "fx" << i << " " << cached.fx[i].status << std::endl;
+        size_t fx_margin_size = margin.length() + 4;
+        std::string fx_margin(fx_margin_size, ' ');
+        std::stringstream fxss(cached.fx[i].status);
+        std::string status_line;
+        bool first_line = true;
+        while (std::getline(fxss, status_line)) {
+          if (!first_line) {
+            ss << fx_margin;
+          }
+          ss << status_line << std::endl;
+          first_line = false;
+        }
       }
       ss << ANSI_COLOR_RESET;
     }
