@@ -163,7 +163,8 @@ StereoVal ModFilter::Process(StereoVal in) {
 
 std::string ModFilter::Status() {
   std::stringstream ss;
-  ss << "depthfc:" << m_mod_depth_fc_;
+  ss << "ModFilter!";
+  ss << " depthfc:" << m_mod_depth_fc_;
   ss << " ratefc:" << m_mod_rate_fc_;
   ss << " depthq:" << m_mod_depth_q_;
   ss << " rateq:" << m_mod_rate_q_;

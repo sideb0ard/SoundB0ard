@@ -170,7 +170,8 @@ StereoVal ModDelay::ProcessAudio(StereoVal input) {
 
 std::string ModDelay::Status() {
   std::stringstream ss;
-  ss << "depth:" << m_mod_depth_pct_;
+  ss << "ModDelay!";
+  ss << " depth:" << m_mod_depth_pct_;
   ss << " rate:" << m_mod_freq_;
   ss << " fb:" << m_feedback_percent_;
   ss << " offset:" << m_chorus_offset_;

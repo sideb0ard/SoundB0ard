@@ -33,12 +33,23 @@ class Transverb : public Fx {
   double feed2_;        // feedback for buffer 2 (0.0 - 1.0)
   double dist1_;        // stereo distribution for buffer 1 (0.0 - 1.0)
   double dist2_;        // stereo distribution for buffer 2 (0.0 - 1.0)
+  bool freeze_;         // freeze mode - stops writing, keeps reading
 
   // Internal state
   int bsize_;     // actual buffer size in samples
   int writer_;    // write position
   double read1_;  // read position for buffer 1
   double read2_;  // read position for buffer 2
+
+  // Crossfade smoothing (prevents clicks when read heads cross write head)
+  int smoothcount1_;
+  int smoothcount2_;
+  int smoothdur1_;
+  int smoothdur2_;
+  float smoothstep1_;
+  float smoothstep2_;
+  float lastr1val_;
+  float lastr2val_;
 
   // Delay buffers
   std::vector<float> buf1_;
@@ -49,4 +60,5 @@ class Transverb : public Fx {
   static constexpr int MAX_BUFFER_SIZE = 88200;  // 2 seconds at 44.1kHz
   static constexpr double MIN_SPEED = 0.25;
   static constexpr double MAX_SPEED = 4.0;
+  static constexpr int AUDIO_SMOOTHING_DUR_SAMPLES = 42;  // crossfade duration
 };

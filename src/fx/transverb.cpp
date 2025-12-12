@@ -12,13 +12,14 @@ Transverb::Transverb() {
   bsize_param_ = 0.5;  // mid-range buffer size
   speed1_ = 0.6;       // slightly slower playback
   speed2_ = 0.4;       // slower playback
-  drymix_ = 0.5;       // 50% dry signal
+  drymix_ = 1.0;       // 100% dry signal (keeps original level)
   mix1_ = 0.4;         // 40% wet from buffer 1
   mix2_ = 0.4;         // 40% wet from buffer 2
   feed1_ = 0.3;        // moderate feedback
   feed2_ = 0.3;        // moderate feedback
   dist1_ = 0.3;        // left-leaning
   dist2_ = 0.7;        // right-leaning
+  freeze_ = false;     // not frozen
 
   Init();
 
@@ -46,15 +47,32 @@ void Transverb::Reset() {
   writer_ = 0;
   read1_ = 0.0;
   read2_ = 0.0;
+
+  // Reset smoothing state
+  smoothcount1_ = 0;
+  smoothcount2_ = 0;
+  smoothdur1_ = 0;
+  smoothdur2_ = 0;
+  smoothstep1_ = 0.0f;
+  smoothstep2_ = 0.0f;
+  lastr1val_ = 0.0f;
+  lastr2val_ = 0.0f;
 }
 
 std::string Transverb::Status() {
   std::ostringstream oss;
-  oss << "Transverb!"
-      << " speed1: " << speed1_ << " speed2: " << speed2_ << " mix1: " << mix1_
-      << " mix2: " << mix2_ << "\n";
-  oss << "fb1: " << feed1_ << " fb2: " << feed2_ << " dist1: " << dist1_
-      << " dist2: " << dist2_;
+  oss << "Transverb!";
+  oss << " bsize:" << bsize_param_;
+  oss << " dry:" << drymix_;
+  oss << " speed1:" << speed1_;
+  oss << " speed2:" << speed2_ << "\n";
+  oss << "mix1:" << mix1_;
+  oss << " mix2:" << mix2_;
+  oss << " fb1:" << feed1_;
+  oss << " fb2:" << feed2_;
+  oss << " dist1:" << dist1_;
+  oss << " dist2:" << dist2_;
+  oss << " freeze:" << (freeze_ ? "ON" : "OFF");
   return oss.str();
 }
 
@@ -72,18 +90,35 @@ StereoVal Transverb::Process(StereoVal input) {
   float r1val = InterpolateHermite(buf1_, read1_);
   float r2val = InterpolateHermite(buf2_, read2_);
 
-  // Calculate feedback values
-  float feedback1 = r1val * static_cast<float>(feed1_);
-  float feedback2 = r2val * static_cast<float>(feed2_);
+  // Apply crossfade smoothing if in progress (prevents clicks)
+  if (smoothcount1_ > 0) {
+    r1val =
+        (r1val * (1.0f - (smoothstep1_ * static_cast<float>(smoothcount1_)))) +
+        (lastr1val_ * smoothstep1_ * static_cast<float>(smoothcount1_));
+    smoothcount1_--;
+  }
+  if (smoothcount2_ > 0) {
+    r2val =
+        (r2val * (1.0f - (smoothstep2_ * static_cast<float>(smoothcount2_)))) +
+        (lastr2val_ * smoothstep2_ * static_cast<float>(smoothcount2_));
+    smoothcount2_--;
+  }
 
-  // Write to buffers with input + cross-feedback
-  buf1_[writer_] =
-      mono_input + feedback2;  // buffer 1 gets feedback from buffer 2
-  buf2_[writer_] =
-      mono_input + feedback1;  // buffer 2 gets feedback from buffer 1
+  // Write to buffers with input + feedback (parallel, not cross)
+  // Original: each buffer feeds back into itself, feedback scaled by mix
+  if (!freeze_) {
+    buf1_[writer_] = mono_input + (r1val * static_cast<float>(feed1_ * mix1_));
+    buf2_[writer_] = mono_input + (r2val * static_cast<float>(feed2_ * mix2_));
+  }
+  // If frozen, don't write - keeps reading same buffer content
 
-  // Advance write position
-  writer_ = (writer_ + 1) % bsize_;
+  // Advance write position (only if not frozen)
+  int writer_increment = freeze_ ? 0 : 1;
+  writer_ = (writer_ + writer_increment) % bsize_;
+
+  // Store read positions before advancing (for crossing detection)
+  int read1int = static_cast<int>(read1_);
+  int read2int = static_cast<int>(read2_);
 
   // Advance read positions
   read1_ += speed1_;
@@ -93,6 +128,52 @@ StereoVal Transverb::Process(StereoVal input) {
   if (read1_ >= bsize_) read1_ -= bsize_;
   if (read2_ >= bsize_) read2_ -= bsize_;
   if (read1_ < 0) read1_ += bsize_;
+
+  // Detect read head crossing write head and trigger smoothing
+  // This prevents clicks when the read position jumps past the write position
+  bool read1_crossing_ahead =
+      (read1int < writer_) &&
+      (static_cast<int>(read1_ + speed1_) >= (writer_ + 1));
+  bool read1_crossing_behind =
+      (read1int >= writer_) &&
+      (static_cast<int>(read1_ + speed1_) <= (writer_ + 1));
+  bool speed1_is_unity = (speed1_ == 1.0);
+
+  if ((read1_crossing_ahead || read1_crossing_behind) && !speed1_is_unity) {
+    if (smoothcount1_ <= 0) {
+      lastr1val_ = r1val;  // store current value for crossfade
+      // truncate smoothing duration if buffer is too small
+      double bsize_float = static_cast<double>(bsize_);
+      smoothdur1_ = (AUDIO_SMOOTHING_DUR_SAMPLES >
+                     static_cast<int>(bsize_float / speed1_))
+                        ? static_cast<int>(bsize_float / speed1_)
+                        : AUDIO_SMOOTHING_DUR_SAMPLES;
+      smoothstep1_ = 1.0f / static_cast<float>(smoothdur1_);
+      smoothcount1_ = smoothdur1_;
+    }
+  }
+
+  // Same for head 2
+  bool read2_crossing_ahead =
+      (read2int < writer_) &&
+      (static_cast<int>(read2_ + speed2_) >= (writer_ + 1));
+  bool read2_crossing_behind =
+      (read2int >= writer_) &&
+      (static_cast<int>(read2_ + speed2_) <= (writer_ + 1));
+  bool speed2_is_unity = (speed2_ == 1.0);
+
+  if ((read2_crossing_ahead || read2_crossing_behind) && !speed2_is_unity) {
+    if (smoothcount2_ <= 0) {
+      lastr2val_ = r2val;
+      double bsize_float = static_cast<double>(bsize_);
+      smoothdur2_ = (AUDIO_SMOOTHING_DUR_SAMPLES >
+                     static_cast<int>(bsize_float / speed2_))
+                        ? static_cast<int>(bsize_float / speed2_)
+                        : AUDIO_SMOOTHING_DUR_SAMPLES;
+      smoothstep2_ = 1.0f / static_cast<float>(smoothdur2_);
+      smoothcount2_ = smoothdur2_;
+    }
+  }
 
   // Apply wet/dry mixing and stereo distribution
   float wet1_left = r1val * static_cast<float>(mix1_ * (1.0 - dist1_));
@@ -143,6 +224,8 @@ void Transverb::SetParam(std::string name, double val) {
     dist1_ = val;
   } else if (name == "dist2") {
     dist2_ = val;
+  } else if (name == "freeze") {
+    freeze_ = val > 0.5;
   } else if (name == "enabled") {
     enabled_ = val > 0.5;
   }
