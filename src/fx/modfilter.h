@@ -24,6 +24,7 @@ class ModFilter : public Fx {
   void SetModRateQ(double val);
   void SetLfoWaveForm(unsigned int val);
   void SetLfoPhase(unsigned int val);
+  void SetWetMix(double val);
 
  private:
   Biquad m_left_lpf_;
@@ -41,6 +42,7 @@ class ModFilter : public Fx {
   double m_mod_rate_fc_;
   double m_mod_depth_q_;
   double m_mod_rate_q_;
+  double m_wet_mix_;  // 0-100%, 0=all dry, 100=all wet
   unsigned int m_lfo_waveform_;
   unsigned int m_lfo_phase_;
 };

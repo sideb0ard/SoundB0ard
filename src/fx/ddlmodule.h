@@ -1,14 +1,15 @@
 #pragma once
 #include <defjams.h>
 
-#include <array>
+#include <vector>
 
 class DDLModule {
  public:
   DDLModule();
+  DDLModule(double max_delay_ms);
   ~DDLModule() = default;
 
-  std::array<double, kMaxDelayLenSecs * SAMPLE_RATE> m_buffer{};
+  std::vector<double> m_buffer;
 
   double m_delay_in_samples{0};
   double m_feedback{0};

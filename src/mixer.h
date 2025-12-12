@@ -338,8 +338,18 @@ struct Mixer {
       output_left += (delay_val.left + reverb_val.left + distort_val.left);
       output_right += (delay_val.right + reverb_val.right + distort_val.right);
 
-      out[j] = volume * output_left;
-      out[j + 1] = volume * output_right;
+      // Apply volume and clamp to safe range to prevent speaker damage
+      double final_left = volume * output_left;
+      double final_right = volume * output_right;
+
+      // Hard clamp to [-1.0, 1.0] to protect speakers/ears
+      if (final_left > 1.0) final_left = 1.0;
+      if (final_left < -1.0) final_left = -1.0;
+      if (final_right > 1.0) final_right = 1.0;
+      if (final_right < -1.0) final_right = -1.0;
+
+      out[j] = final_left;
+      out[j + 1] = final_right;
     }
 
     // WebSocket temporarily disabled

@@ -5,6 +5,16 @@
 #include <utils.h>
 
 DDLModule::DDLModule() {
+  // Default: 10 seconds buffer for backward compatibility
+  int buffer_size = kMaxDelayLenSecs * SAMPLE_RATE;
+  m_buffer.resize(buffer_size, 0.0);
+  ResetDelay();
+}
+
+DDLModule::DDLModule(double max_delay_ms) {
+  // Custom buffer size based on max delay needed
+  int buffer_size = (int)((max_delay_ms / 1000.0) * SAMPLE_RATE) + 1;
+  m_buffer.resize(buffer_size, 0.0);
   ResetDelay();
 }
 
@@ -13,13 +23,20 @@ void DDLModule::Update() {
   m_wet_level = m_wet_level_pct / 100.0;
   m_delay_in_samples = m_delay_ms * (SAMPLE_RATE / 1000.0);
 
+  // Clamp delay to buffer size to prevent overrun
+  if (m_delay_in_samples >= m_buffer.size()) {
+    m_delay_in_samples = m_buffer.size() - 1;
+  }
+
   m_read_index = m_write_index - (int)m_delay_in_samples;
 
-  if (m_read_index < 0) m_read_index += m_buffer.size();
+  while (m_read_index < 0) {
+    m_read_index += m_buffer.size();
+  }
 }
 
 void DDLModule::ResetDelay() {
-  m_buffer.fill(0);
+  std::fill(m_buffer.begin(), m_buffer.end(), 0.0);
   m_write_index = 0;
   m_read_index = 0;
 }

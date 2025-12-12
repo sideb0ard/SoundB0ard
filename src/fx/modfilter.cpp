@@ -8,7 +8,6 @@
 
 ModFilter::ModFilter() {
   Init();
-
   type_ = fx_type::MODFILTER;
   enabled_ = true;
 }
@@ -27,6 +26,7 @@ void ModFilter::Init() {
   m_mod_rate_fc_ = 2.5;
   m_mod_depth_q_ = 50.;
   m_mod_rate_q_ = 2.5;
+  m_wet_mix_ = 100.;  // 100% wet by default
   m_lfo_phase_ = 0;
 
   // m_fc_lfo.polarity = 1; // unipolar
@@ -51,14 +51,32 @@ void ModFilter::Update() {
 }
 
 double ModFilter::CalculateCutoffFreq(double lfo_sample) {
-  return (m_mod_depth_fc_ / 100.0) *
-             (lfo_sample * (m_max_cutoff_freq_ - m_min_cutoff_freq_)) +
-         m_min_cutoff_freq_;
+  // Convert bipolar LFO (-1 to 1) to unipolar (0 to 1)
+  double lfo_unipolar = (lfo_sample + 1.0) / 2.0;
+
+  double fc = (m_mod_depth_fc_ / 100.0) *
+                  (lfo_unipolar * (m_max_cutoff_freq_ - m_min_cutoff_freq_)) +
+              m_min_cutoff_freq_;
+
+  // Clamp to safe range
+  if (fc < 20.0) fc = 20.0;
+  if (fc > 20000.0) fc = 20000.0;
+
+  return fc;
 }
 
 double ModFilter::CalculateQ(double lfo_sample) {
-  return (m_mod_depth_q_ / 100.0) * (lfo_sample * (m_max_q_ - m_min_q_)) +
-         m_min_q_;
+  // Convert bipolar LFO (-1 to 1) to unipolar (0 to 1)
+  double lfo_unipolar = (lfo_sample + 1.0) / 2.0;
+
+  double q = (m_mod_depth_q_ / 100.0) * (lfo_unipolar * (m_max_q_ - m_min_q_)) +
+             m_min_q_;
+
+  // Clamp to safe range to prevent filter instability
+  if (q < 0.5) q = 0.5;
+  if (q > 20.0) q = 20.0;
+
+  return q;
 }
 
 void ModFilter::CalculateLeftLpfCoeffs(double cutoff_freq, double q) {
@@ -128,8 +146,17 @@ StereoVal ModFilter::Process(StereoVal in) {
   else
     CalculateRightLpfCoeffs(fcq, qq);
 
-  out.left = m_left_lpf_.Process(in.left);
-  out.right = m_right_lpf_.Process(in.right);
+  // Process through filters (wet signal)
+  double wet_left = m_left_lpf_.Process(in.left);
+  double wet_right = m_right_lpf_.Process(in.right);
+
+  // Mix dry and wet signals
+  // wet_mix_ = 0% -> all dry, 100% -> all wet
+  double wet_amount = m_wet_mix_ / 100.0;
+  double dry_amount = 1.0 - wet_amount;
+
+  out.left = (in.left * dry_amount) + (wet_left * wet_amount);
+  out.right = (in.right * dry_amount) + (wet_right * wet_amount);
 
   return out;
 }
@@ -140,6 +167,7 @@ std::string ModFilter::Status() {
   ss << " ratefc:" << m_mod_rate_fc_;
   ss << " depthq:" << m_mod_depth_q_;
   ss << " rateq:" << m_mod_rate_q_;
+  ss << " mix:" << m_wet_mix_;
   ss << " lfo:" << m_lfo_waveform_;
   ss << " phase:" << m_lfo_phase_;
 
@@ -199,4 +227,30 @@ void ModFilter::SetLfoPhase(unsigned int val) {
 
   Update();
 }
-void ModFilter::SetParam(std::string name, double val) {}
+
+void ModFilter::SetWetMix(double val) {
+  if (val >= 0 && val <= 100)
+    m_wet_mix_ = val;
+  else
+    printf("Val has to be between 0 and 100\n");
+}
+
+void ModFilter::SetParam(std::string name, double val) {
+  if (name == "depthfc") {
+    SetModDepthFc(val);
+  } else if (name == "ratefc") {
+    SetModRateFc(val);
+  } else if (name == "depthq") {
+    SetModDepthQ(val);
+  } else if (name == "rateq") {
+    SetModRateQ(val);
+  } else if (name == "mix") {
+    SetWetMix(val);
+  } else if (name == "lfo") {
+    SetLfoWaveForm((unsigned int)val);
+  } else if (name == "phase") {
+    SetLfoPhase((unsigned int)val);
+  } else {
+    printf("Unknown parameter '%s' for ModFilter\n", name.c_str());
+  }
+}

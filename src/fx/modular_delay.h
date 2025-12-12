@@ -29,10 +29,12 @@ class ModDelay : public Fx {
   void SetChorusOffset(double val);
   void SetModType(unsigned int val);
   void SetLfoType(unsigned int val);
+  void SetWetMix(double val);
 
  private:
   WTOscillator m_lfo_;
-  DDLModule m_ddl_;
+  DDLModule m_ddl_left_;
+  DDLModule m_ddl_right_;
 
   double m_min_delay_msec_{0};
   double m_max_delay_msec_{0};
@@ -42,6 +44,7 @@ class ModDelay : public Fx {
   double m_feedback_percent_{0};
 
   double m_chorus_offset_{0};
+  double m_wet_mix_{100};  // 0-100%, 0=all dry, 100=all wet
 
   ModDelayAlgorithm m_mod_type_{0};  // FLANGER, VIBRATO, CHORUS
   unsigned int m_lfo_type_{0};       // TRI / SINE
