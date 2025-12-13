@@ -25,6 +25,7 @@ enum class fx_type {
   GRANULATE,
   TRANSVERB,
   NNIRROR,
+  GEOMETER,
 };
 
 class Fx {

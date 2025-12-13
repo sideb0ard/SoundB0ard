@@ -6,6 +6,7 @@
 #include <fx/dynamics_processor.h>
 #include <fx/fx.h>
 #include <fx/genz.h>
+#include <fx/geometer.h>
 #include <fx/granulate.h>
 #include <fx/modfilter.h>
 #include <fx/modular_delay.h>
@@ -80,6 +81,8 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
         } else if (str_obj->value_ == "granulate" ||
                    str_obj->value_ == "gran") {
           fx.push_back(std::make_shared<Granulate>());
+        } else if (str_obj->value_ == "geometer" || str_obj->value_ == "geom") {
+          fx.push_back(std::make_shared<Geometer>());
         }
       }
     }

@@ -1,0 +1,41 @@
+
+let chrd = notes_in_chord(27, 27, 2);
+let mel = [1, 1, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0,  0, 0, 0, 1];
+
+let ddxxblah_comp = comp()
+{
+  setup()
+  {
+    let durz = [100, 200, 350, 50, 0];
+    let drx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] == 1) {
+        note_on_at(dx3, chrd, i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+let melblah_comp = comp()
+{
+  setup()
+  {
+    let mymel = invert(mel);
+    let durz = [10, 50, 100, 60, 70];
+    let drx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (mymel[i] == 1) {
+        note_on_at(dx2, up(chrd, 36), i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+
+  }
+}
