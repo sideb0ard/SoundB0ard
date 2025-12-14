@@ -129,5 +129,22 @@ void AudioPlatform::stop() {
   }
 }
 
+void AudioPlatform::restart() {
+  std::cout << "Restarting audio stream..." << std::endl;
+
+  // Stop and close the current stream
+  stop();
+  uninitialize();
+
+  // Reset sample time
+  mSampleTime = 0.;
+
+  // Reinitialize and restart
+  initialize();
+  start();
+
+  std::cout << "Audio stream restarted successfully!" << std::endl;
+}
+
 }  // namespace linkaudio
 }  // namespace ableton

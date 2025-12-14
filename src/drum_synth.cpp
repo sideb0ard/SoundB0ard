@@ -790,9 +790,9 @@ void DrumSynth::Update() {
   bd_->noise_->m_amplitude = settings_.bd_noise_vol;
   bd_->noise_enabled_ = settings_.bd_noise_enabled;
   bd_->out_filter_->SetFcControl(settings_.bd_tone);
-  bd_->out_filter_->SetQControl(settings_.bd_q);
+  bd_->out_filter_->SetQControlGUI(settings_.bd_q);
   bd_->noise_filter_->SetFcControl(settings_.bd_ntone);
-  bd_->noise_filter_->SetQControl(settings_.bd_nq);
+  bd_->noise_filter_->SetQControlGUI(settings_.bd_nq);
   bd_->eg_.SetDecayTimeMsec(settings_.bd_decay);
   bd_->frequency_ =
       Midi2Freq((settings_.bd_octave + 1) * 12 + (settings_.bd_key % 12));
@@ -838,7 +838,7 @@ void DrumSynth::Update() {
   hh_->SetAmplitude(settings_.hh_sqamp);
   hh_->mid_filter_->SetFcControl(settings_.hh_midf);
   hh_->high_filter_->SetFcControl(settings_.hh_hif);
-  hh_->high_filter_->SetQControl(settings_.hh_hif_q);
+  hh_->high_filter_->SetQControlGUI(settings_.hh_hif_q);
   hh_->distortion_.SetParam("threshold", settings_.hh_distortion_threshold);
   hh_->use_delay_ = settings_.hh_use_delay;
   hh_->delay_->SetMode(settings_.hh_delay_mode);
@@ -856,7 +856,7 @@ void DrumSynth::Update() {
   hh2_->SetAmplitude(settings_.hh2_sqamp);
   hh2_->mid_filter_->SetFcControl(settings_.hh2_midf);
   hh2_->high_filter_->SetFcControl(settings_.hh2_hif);
-  hh2_->high_filter_->SetQControl(settings_.hh2_hif_q);
+  hh2_->high_filter_->SetQControlGUI(settings_.hh2_hif_q);
   hh2_->distortion_.SetParam("threshold", settings_.hh2_distortion_threshold);
   hh2_->use_delay_ = settings_.hh2_use_delay;
   hh2_->delay_->SetMode(settings_.hh2_delay_mode);
@@ -873,7 +873,7 @@ void DrumSynth::Update() {
   cp_->noise_eg_.SetAttackTimeMsec(settings_.cp_nattack);
   cp_->noise_eg_.SetDecayTimeMsec(settings_.cp_ndecay);
   cp_->noise_filter_->SetFcControl(settings_.cp_tone);
-  cp_->noise_filter_->SetQControl(settings_.cp_fq);
+  cp_->noise_filter_->SetQControlGUI(settings_.cp_fq);
   cp_->eg_.SetAttackTimeMsec(settings_.cp_eg_attack);
   cp_->eg_.SetDecayTimeMsec(settings_.cp_eg_decay);
   cp_->eg_.SetSustainLevel(settings_.cp_eg_sustain);

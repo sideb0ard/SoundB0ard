@@ -7,7 +7,7 @@
 struct CKThreeFive : public Filter {
   CKThreeFive();
   ~CKThreeFive() override = default;
-  double m_k{0.01};
+  double m_k{0.5};
   double m_alpha0{0};
 
   OnePole m_LPF1{LPF1};

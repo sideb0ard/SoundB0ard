@@ -47,6 +47,7 @@ class AudioPlatform {
   void uninitialize();
   void start();
   void stop();
+  void restart();  // Restart audio after sleep/wake
 
   link::HostTimeFilter<link::platform::Clock> mHostTimeFilter;
   double mSampleTime;

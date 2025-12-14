@@ -14,7 +14,11 @@ CKThreeFive::CKThreeFive() {
 }
 
 void CKThreeFive::SetQControl(double qcontrol) {
-  m_k = (2.0 - 0.01) * (qcontrol - 1.0) / (10.0 - 1.0) + 0.01;
+  // Map Q control (1-10) to feedback coefficient K (0.5-2.0)
+  // Higher K = more resonance
+  // Starting from 0.5 to keep low-Q bass drum audible while still having good
+  // resonance range
+  m_k = 0.5 + (2.0 - 0.5) * (qcontrol - 1.0) / 9.0;
 }
 
 void CKThreeFive::Update() {
@@ -79,7 +83,13 @@ double CKThreeFive::DoFilter(double xn) {
 
     m_LPF1.DoFilter(m_HPF2.DoFilter(y));
   }
-  if (m_k > 0) y *= 1.0 / m_k;
+
+  // Compensate for output gain, but use sqrt to preserve more resonance
+  // character This keeps the filter stable while allowing resonance to affect
+  // tone
+  if (m_k > 0) {
+    y *= 1.0 / sqrt(m_k);
+  }
 
   return y;
 }
