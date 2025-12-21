@@ -1,0 +1,118 @@
+let key = 21;
+let key_mod = 1;
+
+bpm 120;
+load_preset(mo, "HEARD"); vol mo 0;
+let mo2 = moog();
+load_preset(mo2, "mufflyz");
+send("reverb", mo2);
+add_fx(mo, "nnirror"); set mo:fx0:active 0;
+drum_kit();
+
+let playITblah_comp = comp()
+{
+  setup()
+  {
+    let cnt = 0;
+  }
+  run()
+  {
+    if (cnt == 0) {
+      p1 # melblah_comp;
+      sched(0, 0, 1, 3840, "vol mo %");
+
+    }
+    cnt++;
+  }
+}
+let melblah_comp = comp()
+{
+  setup()
+  {
+    let mel = [0, 0, 33, 0,  0, 0, 40, 0,  0, 45, 0, 33,  40, 45, 0, 0];
+    let velz = [80, 70, 100, 110, 90];
+    let vx = 0;
+    let durz = [100, 500, 300, 120, 400];
+    let drx =   0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if(mel[i] > 0) {
+        note_on_at(mo, mel[i], i * pp, dur = durz[drx], vel = velz[vx]);
+        vx = incr(vx, 0, len(velz));
+        drx = incr(drx, 0, len(durz));
+        #note_on_at(dx2, mel[i], i * pp, dur = 400);
+      }
+    }
+  }
+}
+
+let hhblah_comp = comp()
+{
+  setup()
+  {
+    let hhz = [1, 0, 0, 1,  0, 1, 0, 1,  0, 1, 1, 0,  1, 0, 1, 0];
+    let velz = [80, 70, 100, 110, 90];
+    let vx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (hhz[i] == 1) {
+        note_on_at(oh, 1, i * pp, dur = 50, vel = velz[vx]);
+        vx = incr(vx, 0, len(velz));
+      }
+      if (i % 8 == 4) {
+        note_on_at(cp, 1, i * pp, dur = 100);
+      }
+    }
+  }
+}
+
+# mo2 mufflyz
+let chrdblah_comp = comp()
+{
+  setup()
+  {
+    # Am
+    let chrd1 = [33, 45, 48, 52];
+    let chrd2 = [41, 45, 48, 52];
+    let chrd3 = [40, 43, 47, 50];
+    let chrdz = [chrd1, chrd1, chrd2, chrd3];
+    let cx = 0;
+
+  }
+  run()
+  {
+    let chrd = chrdz[cx];
+    cx = incr(cx, 0, len(chrdz));
+    note_on_at(mo2, chrd, 0, dur = 3000):
+  }
+}
+
+# dx3 SMMTH2
+let compblah_comp = comp()
+{
+  setup()
+  {
+    let mel1 =  [0, 40, 0, 0,  45, 0, 47, 0,  0, 40, 0, 0,  45, 0, 47, 0];
+    let mel2 =  [0, 40, 0, 0,  45, 0, 47, 0,  0, 40, 0, 0,  45, 0, 47, 45];
+
+    let durz = [100, 100, 100, 200, 300];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 2 == 1) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx3, mel[i], i * pp, dur = durz[drx]);
+      }
+    }
+    drx = incr(drx, 0, len(durz));
+  }
+}

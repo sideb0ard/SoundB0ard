@@ -1,0 +1,131 @@
+
+let beatlah_comp = comp()
+{
+  setup()
+  {
+    let bdp = [1, 0, 0, 1,  0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    let sdp = [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let hhp = [1, 0, 1, 0,  1, 0, 0, 1,  0, 1, 0, 0,  1, 0, 0, 0];
+  }
+  run()
+  {
+
+    for (let i = 0; i < 16; i++) {
+      let sw = 30;
+      if (i % 2 == 0) {
+        sw = 0;
+      }
+      if (count % 8 < 6) {
+        if (bdp[i] == 1) {
+          note_on_at(sb2, 0, i * pp);
+        }
+      }
+      if (sdp[i] == 1) {
+        note_on_at(sb2, 3, i * pp);
+      }
+      if (hhp[i] == 1) {
+        note_on_at(sb2, 2, i * pp + sw, vel = 50 + rand(30));
+      }
+    }
+    if (count % 4 == 3) {
+      note_on_at(sb2, 3, 15 * pp, vel = 40);
+    }
+    if (count % 8 == 6) {
+      note_on_at(sb2, 4, 14 * pp, vel = 110);
+    }
+    if (count % 8 == 7) {
+      note_on_at(sb2, 0, 7 * pp, vel = 120);
+    }
+  }
+}
+
+# A
+let key = 9;
+# minor
+let key_mod = 1;
+# [9, 11, 12, 14,  16, 17, 19, 21]
+let notes = notes_in_key(key, key_mod);
+
+# WUFFbbgf // ZApzz // briiight
+let bsslah_comp = comp()
+{
+  setup()
+  {
+    let ntz = [9, 16, 14, 12, 16, 9];
+    let nx = 0;
+    let mel1 = [1, 1, 1, 0,  0, 1, 1, 1,  1, 1, 1, 0,  1, 0, 1, 1];
+    let mel2 = [0, 0, 1, 0,  0, 1, 0, 1,  1, 0, 1, 0,  1, 0, 1, 0];
+    let mel3 = [0, 1, 1, 0,  1, 0, 0, 0,  0, 1, 1, 0,  0, 0, 0, 0];
+    let durz = [50, 100, 200, 300, 500];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+    if (count % 6 == 4) {
+      mel = mel3;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] == 1) {
+        note_on_at(dx, ntz[nx] + 12, i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        nx = incr(nx, 0, len(ntz));
+      }
+    }
+
+  }
+}
+
+let bss2lah_comp = comp()
+{
+  setup()
+  {
+    let ntz = [9, 16, 14, 12, 16, 9];
+    let nx = 0;
+    let mel1 = [1, 1, 1, 0,  1, 1, 1, 0,  1, 1, 1, 0,  1, 1, 1, 0];
+    let mel2 = [1, 1, 0, 0,  1, 1, 0, 0,  1, 1, 0, 0,  1, 1, 0, 0];
+    let mel3 = [1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0];
+    let durz = [150, 100, 300, 30, 500];
+    let drx = 0;
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 2 == 1) {
+      mel = mel2;
+    }
+    if (count % 7 == 6) {
+      mel = mel3;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] == 1) {
+        note_on_at(dx3, ntz[nx], i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
+        nx = incr(nx, 0, len(ntz));
+      }
+    }
+
+  }
+}
+
+# UND
+let stringblah_comp = comp()
+{
+  setup()
+  {
+    let chrdz = [4, 4, 1, 0, 0, 3];
+    let cx = 0;
+    let durz = [3800, 1800, 2000, 1500, 1000, 500];
+    let drx = 0;
+  }
+  run()
+  {
+    let chrd = up(notes_in_chord(notes[chrdz[cx]], key, 2, key_mod), 24);
+    cx = incr(cx, 0, len(chrdz));
+    note_on_at(dx2, chrd, 0, dur = durz[drx]);
+    drx = incr(drx, 0, len(durz));
+  }
+}

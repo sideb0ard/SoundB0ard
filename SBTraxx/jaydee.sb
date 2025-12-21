@@ -1,0 +1,204 @@
+# preset MARX
+# add_fx(sb2, "nnirror");
+# bpm 90
+let kickblah_comp = comp()
+{
+  setup()
+  {
+    let bp1 = [1, 0, 0, 0,  0, 0, 0, 0,  1, 1, 1, 0,  0, 0, 0, 0];
+    let bp2 = [1, 0, 1, 0,  0, 0, 0, 0,  0, 1, 1, 0,  0, 0, 0, 0];
+    let bp3 = [1, 0, 1, 0,  0, 0, 0, 0,  0, 1, 1, 0,  0, 0, 0, 0];
+    let bp4 = [0, 0, 1, 0,  0, 0, 0, 0,  1, 1, 1, 0,  0, 0, 0, 0];
+    let bpz = [bp1, bp2, bp1, bp3, bp4];
+    let bpx = 0;
+    let cpdelz = [20, 50, 100];
+    let cpx = 0;
+  }
+  run()
+  {
+    let bp = bpz[bpx];
+    bpx = incr(bpx, 0, len(bpz));
+    for (let i = 0; i < 16; i++) {
+      if (count % 16 < 15) {
+        if (bp[i] == 1) {
+          note_on_at(sb2, 0, i * pp);
+        }
+      }
+      if (count % 7 < 6) {
+        if (i % 8 == 4) {
+          note_on_at(sb2, 3, i * pp + cpdelz[cpx]);
+          cpx = incr(cpx, 0, len(cpdelz));
+        }
+      }
+    }
+    if (count % 4 == 3) {
+      note_on_at(sb2, 0, 1690);
+    }
+  }
+}
+
+let hhblah_comp = comp()
+{
+  setup()
+  {
+    let hhz1 = [1, 0, 1, 0,  1, 0, 1, 0,  0, 1, 0, 0,  1, 1, 0, 1];
+    let hhz2 = [1, 0, 1, 0,  1, 0, 1, 0,  0, 1, 0, 0,  1, 1, 0, 1];
+    let hhzz = [hhz1, hhz2];
+    let hhx = 0;
+    let v = 110;
+    let lenz = [16, 16, 12, 12, 12, 8, 32];
+    let lx = 0;
+  }
+
+  run()
+  {
+    if (count % 2 == 1)  {
+      let hhz = hhzz[hhx];
+      hhx = incr(hhx, 0, len(hhzz));
+      let sw = 10;
+      let pp = 3840 / lenz[lx];
+      for (let i = 0; i < lenz[lx]; i++) {
+        # print(i * pp);
+        note_on_at(sb2, 2, i * pp, vel = v);
+        v = v + 10;
+        if (v > 120) {
+          v = 10;
+        }
+      }
+    }
+    lx = incr(lx, 0, len(lenz));
+    if (count % 4 == 3) {
+      note_on_at(sb2, 4, 2880, vel = v);
+    }
+  }
+}
+
+
+# p4 < osc 11 "1 4000" "set sb2:fm1_car_eg_release %"
+
+let krp = sample(perc/krushnoisecp.wav);
+let krpp = sample(perc/krushbrk.wav);
+# set krp:pitch 2;
+# set krpp:pitch 2;
+let yo = sample(voices/THORyo.wav);
+# set yo:pitch 0.7;
+let percblah_comp = comp()
+{
+  setup()
+  {
+    let bjz = [1, 3, 5, 7, 9, 11];
+    let bjx = 0;
+    let bjdz = [20, 30, 50, 40, 100, 90, 150, 400];
+    let bdr = 0;
+    let frqz = [33, 43, 47, 42, 13];
+    let frx = 0;
+
+    let percz = [krp, krpp, yo];
+    let prx = 0;
+
+    let percp1 = [1, 0, 0, 1,  0, 1, 0, 1,  0, 1, 0, 1,  1, 0, 1, 1];
+    let percp2 = [0, 0, 1, 0,  0, 0, 0, 1,  0, 0, 0, 1,  1, 0, 1, 1];
+    let velz = [30, 40, 80, 50, 60, 100, 110];
+    let vlx = 0;
+    let percpz = [ percp1, percp1, percp2];
+    let cpzc = 0;
+  }
+  run()
+  {
+    let percp = percpz[cpzc];
+    cpzc = incr(cpzc, 0, len(percpz));
+    frx = incr(frx, 0, len(frqz));
+    let pat = bjork(bjz[bjx], 16);
+    bjx = incr(bjx, 0, len(bjz));
+    for (let i = 0; i < 16; i++) {
+      if (pat[i] == 1) {
+        note_on_at(sb2, 5, i * pp, dur = bjdz[bdr]);
+        bdr = incr(bdr, 0, len(bjdz));
+      }
+
+      if (percp[i] == 1) {
+        note_on_at(percz[prx], 1, i * pp, dur =  bjdz[bdr], vel = velz[vlx]);
+        prx = incr(prx, 0, len(percz));
+        vlx = incr(vlx, 0, len(velz));
+      }
+    }
+    set sb2:fm1_car_freq frqz[frx];
+
+
+
+  }
+}
+
+
+let key = 14;
+let key_mod = 1;
+let notez = notes_in_key(key, key_mod);
+
+# buttz // wispy
+let pacblah_comp = comp()
+{
+  setup()
+  {
+    let ntz = [0, 4];
+    let nx = 0;
+    let velz = [120, 50, 80, 40, 100, 120];
+    let vx = 0;
+    let durz = [40, 50, 70, 100, 150, 200];
+    let drx = 0;
+    let ratz = [4, 4, 6, 2, 4.2, 4];
+    let rx = 0;
+  }
+  run()
+  {
+    if (count % 3 < 2) {
+      let offz = 30;
+      set dx2:o2rat ratz[rx];
+      rx = incr(rx, 0, len(ratz));
+      for (let i = 0; i < 16; i++) {
+        let off = offz;
+        if (i % 2 == 0) {
+          off = 0;
+        }
+        note_on_at(dx2, notez[ntz[nx]], i * pp + off, dur = durz[drx], vel = velz[vx]);
+        nx = incr(nx, 0, len(ntz));
+        vx = incr(vx, 0, len(velz));
+        drx = incr(drx, 0, len(durz));
+      }
+    }
+  }
+}
+
+# newstodat // drm // cscrk
+let riffblah_comp = comp()
+{
+  setup()
+  {
+    let rif1 = [0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 0, 1,  1, 1, 1, 1];
+    let rif2 = [0, 0, 1, 1,  0, 0, 0, 1,  1, 1, 0, 0,  1, 1, 1, 0];
+    let durz = [20, 40, 50, 80, 100];
+    let drx = 0;
+    let velz = [90, 90, 100, 110, 120];
+    let vx = 0;
+  }
+  run()
+  {
+    if (count % 5 < 4) {
+      let rif = rif1;
+      if (count % 2 == 1) {
+        rif = rif2;
+      }
+      let swg = 60;
+      for (let i = 0; i < 16; i++) {
+        let off = swg;
+        if (i % 2 == 0) {
+          off = 0;
+        }
+        if (rif[i] == 1) {
+          note_on_at(dx3, notes_in_chord(key, 0, 1), i * pp + off, dur = durz[drx], vel = velz[vx]);
+          drx = incr(drx, 0, len(durz));
+          vx = incr(vx, 0, len(velz));
+        }
+      }
+    }
+  }
+}
