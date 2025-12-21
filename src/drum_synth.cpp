@@ -75,6 +75,11 @@ StereoVal DrumSynth::GenNext(mixer_timing_info tinfo) {
   out.left += lz_out.left;
   out.right += lz_out.right;
 
+  out.left = out.left * volume;
+  out.right = out.right * volume;
+
+  out = Effector(out);
+
   return out;
 }
 
@@ -85,6 +90,8 @@ void DrumSynth::SetParam(std::string name, double val) {
     settings_.bd_vol = val;
   else if (name == "bd_pan")
     settings_.bd_pan = val;
+  else if (name == "bd_nvol")
+    settings_.bd_noise_vol = val;
   else if (name == "bd_tone")
     settings_.bd_tone = val;
   else if (name == "bd_q")
@@ -781,6 +788,16 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz.close();
 
   std::cout << "DRUMSYNTH -- saving -- DONE" << std::endl;
+}
+
+void DrumSynth::SetVolume(double v) {
+  settings_.volume = v;  // Update settings so Update() doesn't overwrite
+  SoundGenerator::SetVolume(v);  // Call base class
+}
+
+void DrumSynth::SetPan(double p) {
+  // DrumSynth doesn't have a global pan in settings, each drum has its own
+  SoundGenerator::SetPan(p);
 }
 
 void DrumSynth::Update() {

@@ -193,6 +193,8 @@ class DrumSynth : public SoundGenerator {
   void NoteOn(midi_event ev) override;
   void NoteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
+  void SetVolume(double v);
+  void SetPan(double p);
   void PrintSettings(DrumSettings settings);
   void LoadPreset(std::string name,
                   std::map<std::string, double> preset_vals) override;

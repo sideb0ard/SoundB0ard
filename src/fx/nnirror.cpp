@@ -458,6 +458,7 @@ int Nnirror::WrapIndex(int index, int buffer_size) const {
 }
 
 void Nnirror::SetParam(std::string name, double val) {
+  std::cout << "YO THOR - SET P ! " << name << " " << val << std::endl;
   if (name == "wet") {
     val = std::max(0.0, std::min(1.0, val));  // 0-1
     smooth_wet_.SetTarget(val);
