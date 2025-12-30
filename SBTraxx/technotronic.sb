@@ -1,0 +1,39 @@
+
+let melblah_comp = comp()
+{
+  setup()
+  {
+    let c = [36, 0, 0, 0,  0, 0, 36, 0,  0, 0, 36, 0,  0, 0, 0, 0];
+    let fg =  [0, 0, 41, 0,  0, 41, 0, 0,  0, 0, 43, 0,  0, 43, 0, 0];
+  }
+  run()
+  {
+    let pat = c;
+    if (count % 2 == 1) {
+      pat = fg;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (pat[i] > 0) {
+        note_on_at(dx, pat[i], i * pp, dur = 400);
+      }
+    }
+  }
+}
+
+let hhblah_comp = comp()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 == 1 || i % 4 == 2) {
+        note_on_at(ch, 1, i * pp, dur = 60, vel = 20 + rand(60));
+      }
+      if (i % 4 == 3) {
+        note_on_at(oh, 1, i * pp, dur = 100);
+      }
+    }
+  }
+}

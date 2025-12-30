@@ -1046,6 +1046,7 @@ let print_notes = fn(notes)
 }
 
 kit();
+drum_kit();
 
 p0 # countr ;
 

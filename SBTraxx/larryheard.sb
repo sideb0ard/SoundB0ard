@@ -2,12 +2,14 @@ let key = 21;
 let key_mod = 1;
 
 bpm 120;
-load_preset(mo, "HEARD"); vol mo 0;
+load_preset(mo, "HEARD2");
+vol mo 0;
 let mo2 = moog();
 load_preset(mo2, "mufflyz");
 send("reverb", mo2);
-add_fx(mo, "nnirror"); set mo:fx0:active 0;
-drum_kit();
+add_fx(mo2, "sidechain", bd);
+add_fx(mo, "nnirror");
+#set mo:fx0:active 0;
 
 let playITblah_comp = comp()
 {
@@ -19,12 +21,108 @@ let playITblah_comp = comp()
   {
     if (cnt == 0) {
       p1 # melblah_comp;
-      sched(0, 0, 1, 3840, "vol mo %");
+      p3 $  "[~ hh]*4";
+      sched(0, 0, 1, 3840*8, "vol mo %");
+      p8 < osc 8 "0.1 0.6" "vol hh %";
+      p9 < osc 11 "-0.2 0.2" "pan hh %";
+    }
+    if (cnt == 4) {
+      p2 $ "bd*4";
+    }
+    if (cnt == 8) {
+      p2 $ "";
+    }
+    if (cnt == 12) {
+      p2 $ "bd*4";
+      p3 $  "hh*16";
+    }
+    if (cnt == 14) {
+      p4 # chrdblah_comp;
+      p3 $  "hh*8";
+    }
+    if (cnt == 16) {
+      p3 $  "[~ hh]*4";
+    }
+    if (cnt == 20) {
+      p1 $ "";
+      p2 $ "";
+      sched(0, 0.5, 0, 3840, "set mo:fx0:wet %");
+    }
+    if (cnt == 24) {
+      p2 $ "bd*4";
+      p3 $  "hh*16";
+    }
+    if (cnt == 30) {
+      p2 $ "";
+      p3 $ "";
+      p5 # compblah_comp;
+    }
+    if (cnt == 40) {
+      p6 # hhblah_comp;
+      p8 # chordlfoblah_comp;
+    }
+    if (cnt == 48) {
+      p6 # "";
+      p2 $ "";
+      p5 # "";
+    }
+    if (cnt == 52) {
+      p2 $ "bd*4";
+      p3 $  "hh*16";
+      p4 # chrdblah_comp;
+    }
+    if (cnt == 64) {
+      compblah_comp();
+      p6 # hh2blah_comp;
+    }
+    if (cnt == 74) {
+      set mo2:l1_filter_en 1;
+      p2 $ "";
+      p3 # "";
+      p5 # "";
+      p6 # "";
+      p1 # melblah_comp;
+      sched(3840, 0, 0.5, 3840*16, "set mo:fx0:wet %");
+    }
+    if (cnt == 80) {
+      p13 # cbeat(cp);
+    }
+    if (cnt == 94) {
+      sched(0, 1, 0, 3840, "vol mo2 %");
+      set mo2:l1_filter_en 0;
+    }
+    if (cnt == 100) {
+      p1 # "";
+      p2 $ "bd*4";
+      p3 $  "hh*16";
+      p13 # "";
+      p5 # comp2blah_comp;
+      p6 # hhblah_comp;
+    }
+    if (cnt == 104) {
+      vol mo2 1;
+    }
 
+    if (cnt == 115) {
+      p1 # melblah_comp;
+      p3 $ "";
+      p6 $ "";
+      p2 $ "";
+    }
+    if (cnt == 121) {
+      p1 $ "";
+      p5 # "";
+      sched(0, 1, 0, 3840, "vol dx3 %");
+    }
+    if (cnt == 124) {
+      p1 $ "";
+      sched(0, 1, 0, 3840*4, "vol mo2 %");
     }
     cnt++;
+    print("CouNT:", cnt);
   }
 }
+
 let melblah_comp = comp()
 {
   setup()
@@ -70,6 +168,25 @@ let hhblah_comp = comp()
   }
 }
 
+let hh2blah_comp = comp()
+{
+  setup()
+  {
+    let hhz = [0, 0, 1, 0,  0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 1, 0];
+    let velz = [80, 70, 60, 50, 90];
+    let vx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < 16; i++) {
+      if (hhz[i] == 1) {
+        note_on_at(oh, 1, i * pp, dur = 60, vel = velz[vx]);
+        vx = incr(vx, 0, len(velz));
+      }
+    }
+  }
+}
+
 # mo2 mufflyz
 let chrdblah_comp = comp()
 {
@@ -80,16 +197,34 @@ let chrdblah_comp = comp()
     let chrd2 = [41, 45, 48, 52];
     let chrd3 = [40, 43, 47, 50];
     let chrdz = [chrd1, chrd1, chrd2, chrd3];
+    let chrdz2 = [chrd1];
     let cx = 0;
 
   }
   run()
   {
     let chrd = chrdz[cx];
+    if (count % 18 > 15) {
+      chrd = chrd1;
+    }
     cx = incr(cx, 0, len(chrdz));
     note_on_at(mo2, chrd, 0, dur = 3000):
   }
 }
+let chordlfoblah_comp = comp()
+{
+  setup()
+  {
+    let lfz = [3, 1, 7, 11, 3, 16, 3];
+    let lx = 0;
+  }
+  run()
+  {
+    set mo2:l1rate lfz[lx];
+    lx = incr(lx, 0, len(lfz));
+  }
+}
+
 
 # dx3 SMMTH2
 let compblah_comp = comp()
@@ -104,15 +239,68 @@ let compblah_comp = comp()
   }
   run()
   {
-    let mel = mel1;
-    if (count % 2 == 1) {
-      mel = mel2;
+    if (count % 8 < 5) {
+      let mel = mel1;
+      if (count % 2 == 1) {
+        mel = mel2;
+      }
+      for (let i = 0; i < 16; i++) {
+        if (mel[i] > 0) {
+          note_on_at(dx3, mel[i], i * pp, dur = durz[drx]);
+        }
+      }
+      drx = incr(drx, 0, len(durz));
     }
+  }
+}
+
+let comp2blah_comp = comp()
+{
+  setup()
+  {
+    let mel1 =  [47, 40, 0, 0,  0, 0, 47, 0,  0, 40, 45, 0,  45, 0, 40, 0];
+    let mel2 =  [47, 40, 0, 0,  0, 0, 47, 0,  0, 40, 45, 0,  45, 0, 40, 45];
+
+    let durz = [300, 400, 300, 200, 300];
+    let drx = 0;
+  }
+  run()
+  {
+    if (count % 5 < 4) {
+      let mel = mel1;
+      if (count % 2 == 1) {
+        mel = mel2;
+      }
+      for (let i = 0; i < 16; i++) {
+        if (mel[i] > 0) {
+          note_on_at(dx3, mel[i] + 12, i * pp, dur = durz[drx]);
+        }
+      }
+      drx = incr(drx, 0, len(durz));
+    }
+  }
+}
+
+let ddddxblah_comp = comp()
+{
+  setup()
+  {
+    let m1 = [0, 45, 0, 47,  0, 47, 0, 0,  0, 0, 45, 0,  0, 0, 40, 0];
+    let m2 = [0, 0, 40, 0,  40, 0, 0, 40,  0, 0, 45, 0,  0, 0, 0, 0];
+    let m3 = [0, 0, 47, 0,  0, 40, 0, 0,  0, 0, 0, 0,  0, 0, 45, 0];
+    let mz = [m1, m2, m3];
+    #let mz = [m1];
+    let mzx = 0;
+  }
+  run()
+  {
+
+    let mel = mz[mzx];
+    mzx = incr(mzx, 0, len(mz));
     for (let i = 0; i < 16; i++) {
       if (mel[i] > 0) {
-        note_on_at(dx3, mel[i], i * pp, dur = durz[drx]);
+        note_on_at(dx2, mel[i], i * pp, dur = 50);
       }
     }
-    drx = incr(drx, 0, len(durz));
   }
 }

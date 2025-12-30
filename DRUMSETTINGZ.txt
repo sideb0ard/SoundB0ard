@@ -1,0 +1,87 @@
+Roland TR-808 Style
+
+808 Kick (Deep, boomy, sub-heavy)
+
+  bd_vol: 1.0
+  bd_q: 1-2          # Clean, no resonance (808 is pure and deep)
+  bd_tone: 80-150    # Low cutoff for sub-bass warmth
+  bd_octave: 1       # Very low pitch
+  bd_key: 0-7        # C1-G1 range (50-100 Hz)
+  bd_decay: 200-400  # Long, sustaining boom
+  bd_dist_en: 0      # No distortion (808 is clean)
+  bd_nvol: 0.0       # No noise (pure tone)
+
+808 Snare (Tonal with noise)
+
+  sd_vol: 1.0
+  sd_nvol: 0.4       # Moderate noise
+  sd_tone: 300-600   # Mid-range filter
+  sd_noise_decay: 40-60
+  sd_octave: 2-3     # 200-400 Hz range
+  sd_key: 0-7        # Lower pitched
+  sd_decay: 80-150   # Short, tight
+  sd_dist: 0.3       # Light distortion
+
+  808 Hi-hats
+
+  hh_vol: 0.8
+  hh_sqamp: 0.5      # Square wave character
+  hh_midf: 8000-12000
+  hh_hif: 4000-6000
+  hh_hif_q: 1-2      # Clean
+  hh_decay: 30-50    # Very short (closed)
+
+  hh2_decay: 150-300 # Longer (open hat)
+
+  ---
+  Roland TR-909 Style
+
+909 Kick (Punchy, more attack)
+
+  bd_vol: 1.0
+  bd_q: 2-3          # Slight resonance for punch
+  bd_tone: 150-300   # Higher cutoff than 808
+  bd_octave: 1-2
+  bd_key: 7-12       # G1-C2 range (80-130 Hz)
+  bd_decay: 120-200  # Shorter than 808, punchier
+  bd_dist_en: 1
+  bd_dist: 0.5-0.7   # Moderate distortion for attack
+  bd_nvol: 0.1       # Tiny bit of click/noise
+  bd_ntone: 8000     # High for transient
+
+909 Snare (Noise-heavy, snappy)
+
+  sd_vol: 1.0
+  sd_nvol: 0.6-0.8   # More noise than 808
+  sd_tone: 800-1200  # Higher, brighter
+  sd_noise_decay: 30-50  # Short, snappy
+  sd_octave: 3
+  sd_key: 7-12       # Higher pitch
+  sd_decay: 50-100   # Very short
+  sd_dist: 0.5-0.6   # More aggressive
+
+  909 Hi-hats
+
+  hh_vol: 0.9
+  hh_sqamp: 0.4-0.6
+  hh_midf: 10000-14000  # Brighter than 808
+  hh_hif: 5000-7000
+  hh_hif_q: 1-2
+  hh_decay: 20-40    # Closed
+
+  hh2_decay: 100-200 # Open
+
+  ---
+Key Differences (with new Q working!)
+
+  808 = Deep & Clean
+  - Lower frequencies, longer decays
+  - Q: 1-2 (minimal resonance, pure tone)
+  - Minimal distortion
+  - More tonal, less noisy
+
+  909 = Punchy & Bright
+  - Higher frequencies, shorter decays
+  - Q: 2-3 (slight resonance for character)
+  - More distortion for attack
+  - More noise, less tonal
