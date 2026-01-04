@@ -8,6 +8,7 @@ let yo = sample(voices/eskiYO.wav);
 let ye = sample(voices/KRSYEAH.wav);
 let cpr = sample(cp/clapLongReverb.aif);
 
+bpm 150;
 set qeb1:pitch 0.8;
 set qeb2:pitch 0.7;
 set qeb3:pitch 0.5;
@@ -81,36 +82,24 @@ let RUNNUITblah_comp = comp()
   {
     print("C:", c);
     if (c == 0) {
-      p1 # BDPbeat_comp; p2 < osc 16 "3 53" "set sbdrum:cp_delay_ms %";
-      note_on_at(dx4, up([15, 18, 22, 13], 24), 8 * pp, dur = 3640, vel = 90);
-    }
-    if (c == 2) {
       p3 # bassl_comp;
-    }
-    if (c == 4) {
-      solo(dx4, at=8*pp);
-      note_on_at(dx4, up([15, 18, 22, 13], 24), 8 * pp, dur = 3640, vel = 90);
+      yeyeblah_comp();
+      #note_on_at(dx4, up([15, 18, 22, 13], 24), 8 * pp, dur = 3640, vel = 90);
     }
     if (c == 8) {
-      hatzblah_comp();
-    }
-    if (c == 12) {
-      note_on_at(dx2, up([15, 18, 22, 13], 12), 8 * pp, dur = 3640, vel = 100);
-      p1 # "";
       p4 # bAss2lah_comp;
       cbeat(cpr);
     }
     if (c == 16) {
       p5 # qeblah_comp;
+      p6 # riffblah_comp;
       hatzblah_comp();
       cbeat(cpr);
     }
     if (c == 20) {
-      p1 # BDPbeat_comp;
+      p1 # BDPbeat_comp; p2 < osc 16 "3 53" "set sbdrum:cp_delay_ms %";
       deebblah_comp();
-      p3 # "";
       yeblah_comp();
-      p4 # "";
       cbeat(cpr);
     }
     if (c == 21) {
@@ -118,6 +107,7 @@ let RUNNUITblah_comp = comp()
       hatzblah_comp();
     }
     if (c == 22) {
+      p4 # "";
       p3 # dxCHRDblah_comp;
       cbeat(cpr);
     }
@@ -141,9 +131,9 @@ let RUNNUITblah_comp = comp()
       solo(dx2, at=8*pp);
       note_on_at(dx2, up([20, 23, 27, 18], 24), 8 * pp, dur = 3640, vel = 110);
       p1 # "";
-      p6 # riffblah_comp;
       moblah_comp();
       hatzblah_comp();
+      p6 # "";
       p9 # "";
     }
     if (c == 34) {
@@ -151,10 +141,11 @@ let RUNNUITblah_comp = comp()
       riffblah_comp();
       hatzblah_comp();
       p5 # "";
-      basslTWO_comp();
-      p4 # bAss2lah_comp;
+      p4 # basslTWO_comp;
+      # p4 # bAss2lah_comp;
     }
     if (c == 38) {
+      riffblah_comp();
       p4 # "";
       yeblah_comp();
     }
@@ -163,31 +154,28 @@ let RUNNUITblah_comp = comp()
       p1 # BDPbeat_comp;
       eightblah_comp();
       p3 # bassl_comp;
+      p6 # riffblah_comp;
     }
     if (c == 41) {
       yeblah_comp();
       p1 # "";
       p3 # "";
+      p4 # "";
     }
     if (c == 42) {
-      yeblah_comp();
-      p4 # "";
-      p6 # "";
-    }
-    if (c == 43) {
       # note_on_at(dx2, up([15, 18, 22, 13], 24), 4 * pp, dur = 3640, vel = 100);
-      note_on_at(dx2, up([22, 25, 29, 20], 24), 4 * pp, dur = 3640, vel = 100);
+      # note_on_at(dx2, up([22, 25, 29, 20], 24), 4 * pp, dur = 3640, vel = 100);
       p7 # strblah_comp;
       p8 # "";
-      p6 # "";
     }
     if (c == 44) {
       p5 # "";
+      p6 # "";
       p1 # BDPbeat_comp;
       p8 # hatzblah_comp;
       # p4 # bAss2lah_comp;
       p4 # basslTWO_comp;
-      p10 # YOblah_comp;
+      #p10 # YOblah_comp;
     }
     if (c == 52) {
       p1 # "";
@@ -195,7 +183,6 @@ let RUNNUITblah_comp = comp()
       p8 # "";
       p7 # "";
       eightblah_comp();
-      p4 # "";
       moblah_comp();
       p11 # deebblah_comp;
     }
@@ -227,7 +214,6 @@ let RUNNUITblah_comp = comp()
       yeyeblah_comp();
       cbeat(cpr);
       p6 # "";
-      p4 # "";
       p3 # "";
       p8 # "";
       moblah_comp();
@@ -242,6 +228,7 @@ let RUNNUITblah_comp = comp()
       p1 # BDPbeat_comp;
       p8 # hatzblah_comp;
       p11 # "";
+      p4 # "";
       p13 # dxCHRDblah_comp;
     }
     if (c == 76) {
@@ -759,7 +746,7 @@ let yeyeblah_comp = comp()
   {
     let incrz = [64];
     let ix = 0;
-    let looplenz = [1, 2, 3];
+    let looplenz = [2, 1, 2, 3];
     let lx = 0;
   }
   run()

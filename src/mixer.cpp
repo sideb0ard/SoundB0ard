@@ -9,7 +9,6 @@
 #include <fx/fx.h>
 #include <fx/reverb.h>
 #include <granulator.h>
-#include <math.h>
 #include <minisynth.h>
 #include <mixer.h>
 #include <obliquestrategies.h>
@@ -22,6 +21,7 @@
 #include <unistd.h>
 #include <utils.h>
 
+#include <cmath>
 #include <filereader.hpp>
 #include <interpreter/object.hpp>
 #include <interpreter/sound_cmds.hpp>
@@ -81,6 +81,11 @@ Action::Action(double start_val, double end_val, int time_taken_ticks,
       cur_val_{start_val},
       time_taken_ticks_{time_taken_ticks},
       action_to_take_{action_to_take} {
+  // Detect if this is a volume action - use logarithmic interpolation
+  if (action_to_take_.find("vol") != std::string::npos) {
+    interpolation_type_ = InterpolationType::Logarithmic;
+  }
+
   if (time_taken_ticks_ == 0) {
     incr_ = 1;
   } else {
@@ -100,11 +105,38 @@ Action::Action(double start_val, double end_val, int time_taken_ticks,
 
 void Action::Run() {
   if (active_) {
-    cur_val_ += incr_;
-    if ((dir_ && (cur_val_ >= end_val_)) || (!dir_ && (cur_val_ <= end_val_))) {
-      cur_val_ = end_val_;
-      active_ = false;
+    elapsed_ticks_++;
+
+    if (interpolation_type_ == InterpolationType::Logarithmic) {
+      // Exponential interpolation for volume (logarithmic perception)
+      if (elapsed_ticks_ >= time_taken_ticks_) {
+        cur_val_ = end_val_;
+        active_ = false;
+      } else if (start_val_ > 0 && end_val_ > 0) {
+        // Safe to use exponential interpolation
+        double progress =
+            static_cast<double>(elapsed_ticks_) / time_taken_ticks_;
+        double ratio = end_val_ / start_val_;
+        cur_val_ = start_val_ * std::pow(ratio, progress);
+      } else {
+        // Fall back to linear if either value is 0 or negative
+        cur_val_ += incr_;
+        if ((dir_ && (cur_val_ >= end_val_)) ||
+            (!dir_ && (cur_val_ <= end_val_))) {
+          cur_val_ = end_val_;
+          active_ = false;
+        }
+      }
+    } else {
+      // Linear interpolation (default)
+      cur_val_ += incr_;
+      if ((dir_ && (cur_val_ >= end_val_)) ||
+          (!dir_ && (cur_val_ <= end_val_))) {
+        cur_val_ = end_val_;
+        active_ = false;
+      }
     }
+
     std::string new_cmd =
         ReplaceString(action_to_take_, "%", std::to_string(cur_val_));
     eval_command_queue.try_push(new_cmd);

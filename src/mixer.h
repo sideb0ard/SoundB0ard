@@ -68,15 +68,19 @@ struct Action {
     return active_;
   }
 
+  enum class InterpolationType { Linear, Logarithmic };
+
   double start_val_{0};
   double end_val_{0};
   double cur_val_{0};
   double incr_{0};
   int dir_{1};  // 1 going forward, 0, going downard
   int time_taken_ticks_{0};
+  int elapsed_ticks_{0};
   bool has_started_{false};
   bool active_{false};
   std::string action_to_take_{""};
+  InterpolationType interpolation_type_{InterpolationType::Linear};
 };
 
 struct Mixer {
