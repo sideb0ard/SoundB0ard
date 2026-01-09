@@ -4,29 +4,29 @@
 # Load samples
 let kick = sample(bd/808kick.aif);
 let kick2 = sample(bd/wuk77.aiff);
-let snare = sample(cp/distCllap.aiff);
-let clap = sample(cp/compClap.aiff);
-let perc1 = sample(perc/2STEPperc2.aiff);
-let perc2 = sample(perc/triangle.aiff);
+let snare = sample(cp/kNackr.aiff);
+let clap = sample(cp/distCllap.aiff);
+let perc1 = sample(noises/powerup.wav);
+let perc2 = sample(perc/dinkSweep.wav);
 let perc3 = sample(perc/uus.wav);
-let shaker = sample(perc/chezShaker.aiff);
+let shaker = sample(ch/reggaHatz.aiff);
 
 ## Set tempo - classic hip hop range
 #bpm 87;
 #
 ## Add crunchy effects to drums
 
-add_fx(snare, "bitcrush");
-add_fx(snare, "distort");
-set snare:fx0:bitdepth 5;
+# add_fx(snare, "bitcrush");
+# add_fx(snare, "distort");
+#set snare:fx0:bitdepth 5;
 
-add_fx(clap, "geom");
-add_fx(clap, "distort");
+#add_fx(clap, "geom");
+#add_fx(clap, "distort");
 
-add_fx(perc1, "bitcrush");
-set perc1:fx0:bitdepth 4;
-add_fx(perc2, "decimate");
-add_fx(perc3, "distort");
+# add_fx(perc1, "bitcrush");
+# set perc1:fx0:bitdepth 4;
+# add_fx(perc2, "decimate");
+# add_fx(perc3, "distort");
 
 ## Volume and panning for stereo field
 vol kick 0.9;
@@ -177,13 +177,13 @@ let glitch_perc_comp = comp()
     let pidx = 0;
 
     # POLYRHYTHMIC PATTERNS - different lengths cycling against 16-step grid
-    let poly7 = [1, 0, 1, 0, 1, 1, 0];           # 7 steps - creates shifting phase
-      let poly5 = [1, 0, 1, 1, 0];                 # 5 steps - prime number rhythm
-      let poly13 = [1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0];  # 13 steps - long cycle
-      let poly12 = [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1];     # 12 steps - triplet feel
+    let poly7 = [1, 0, 1, 0, 1, 1, 0];
+    let poly5 = [1, 0, 1, 1, 0];
+    let poly13 = [1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0];
+    let poly12 = [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1];
 
-      # Random patterns regenerated frequently
-      let pat = rand_array(16, 0, 1);
+    # Random patterns regenerated frequently
+    let pat = rand_array(16, 0, 1);
 
     let durz = [20, 40, 600, 100, 150, 100];
     let drx = 0;
@@ -203,9 +203,7 @@ let glitch_perc_comp = comp()
       let idx = i % len(poly7);
       if (poly7[idx] == 1) {
         let offset = rand(50) - 25;
-        note_on_at(perc1, 1, i * pp + offset,
-            dur = durz[drx],
-            vel = 40 + rand(60));
+        note_on_at(perc1, 1, i * pp + offset, dur = durz[drx], vel = 40 + rand(60));
         drx = incr(drx, 0, len(durz));
 
         set perc1:pitch pitchz[pz] at = i * pp;
@@ -312,42 +310,42 @@ let main_comp = comp()
   {
     # Build up arrangement
     if (c == 0) {
-      p1 # kick_comp;
+      #p31 # kick_comp;
     }
     if (c == 4) {
-      p2 # snare_comp;
+      p32 # snare_comp;
     }
     if (c == 8) {
-      p3 # glitch_perc_comp;
+      p33 # glitch_perc_comp;
     }
     if (c == 12) {
-      p4 # hats_comp;
+      p34 # hats_comp;
     }
     if (c == 16) {
       # Drop some elements
-      p4 # "";
+      p34 # "";
     }
     if (c == 20) {
-      p4 # hats_comp;
+      p34 # hats_comp;
     }
     if (c == 24) {
       # Breakdown
-      p1 # "";
-      p2 # "";
+      p31 # "";
+      p32 # "";
     }
     if (c == 28) {
       # Build back
-      p1 # kick_comp;
+      #p31 # kick_comp;
     }
     if (c == 30) {
-      p2 # snare_comp;
+      p32 # snare_comp;
     }
     if (c == 32) {
       # Full power with all elements
-      p1 # kick_comp;
-      p2 # snare_comp;
-      p3 # glitch_perc_comp;
-      p4 # hats_comp;
+      #p31 # kick_comp;
+      p32 # snare_comp;
+      p33 # glitch_perc_comp;
+      p34 # hats_comp;
     }
 
     print("Bar:", c);
