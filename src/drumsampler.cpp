@@ -20,6 +20,9 @@ extern std::unique_ptr<Mixer> global_mixr;
 namespace SBAudio {
 
 DrumSampler::DrumSampler(std::string filename) {
+  // Cache filename to avoid reading from file_buffer_ in audio thread
+  cached_filename_ = filename;
+
   if (!ImportFile(filename)) {
     // ugh!
     active = false;
@@ -43,7 +46,6 @@ DrumSampler::DrumSampler(std::string filename) {
 
 StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
   (void)tinfo;
-  file_buffer_->CheckPendingRepitch();
 
   StereoVal out = {0., 0.};
   if (!is_playing) return out;
@@ -60,39 +62,50 @@ StereoVal DrumSampler::GenNext(mixer_timing_info tinfo) {
   }
 
   std::vector<double> *audio_buffer = file_buffer_->GetAudioBuffer();
-
   double amp = scaleybum(0, 127, 0, 1, velocity);
 
-  int read_idx = (int)file_buffer_->audio_buffer_read_idx_;
+  // Variable-rate playback with linear interpolation
+  double pitch_ratio = file_buffer_->pitch_ratio_.load();
+  int num_channels = file_buffer_->num_channels_;
 
-  if (read_idx >= audio_buffer->size()) {
+  // Check bounds
+  if (read_position_ < 0 ||
+      read_position_ >= audio_buffer->size() - num_channels) {
+    is_playing = false;
+    if (read_position_ < 0) {
+      reverse_mode = false;
+    }
+    return out;
+  }
+
+  // Get integer and fractional parts for interpolation
+  int idx1 = (int)read_position_;
+  double frac = read_position_ - idx1;
+  int idx2 = idx1 + num_channels;
+
+  // Bounds check for interpolation
+  if (idx2 >= audio_buffer->size()) {
     is_playing = false;
     return out;
   }
-  if (file_buffer_->num_channels_ > 1) {
-    if (read_idx + 1 >= audio_buffer->size()) {
-      is_playing = false;
-      return out;
-    }
-  }
 
-  out.left = (*audio_buffer)[read_idx] * amp;
-  if (file_buffer_->num_channels_ == 1) {
+  // Linear interpolation
+  if (num_channels == 1) {
+    out.left =
+        (*audio_buffer)[idx1] * (1.0 - frac) + (*audio_buffer)[idx2] * frac;
+    out.left *= amp;
     out.right = out.left;
-  } else if (file_buffer_->num_channels_ == 2) {
-    int read_idx_right = read_idx + 1;
-    out.right = (*audio_buffer)[read_idx_right] * amp;
+  } else if (num_channels == 2) {
+    out.left =
+        (*audio_buffer)[idx1] * (1.0 - frac) + (*audio_buffer)[idx2] * frac;
+    out.right = (*audio_buffer)[idx1 + 1] * (1.0 - frac) +
+                (*audio_buffer)[idx2 + 1] * frac;
+    out.left *= amp;
+    out.right *= amp;
   }
 
-  file_buffer_->audio_buffer_read_idx_ += (incr_ * file_buffer_->num_channels_);
-
-  if (file_buffer_->audio_buffer_read_idx_ >= audio_buffer->size()) {
-    is_playing = false;
-  }
-  if (file_buffer_->audio_buffer_read_idx_ < 0) {
-    is_playing = false;
-    reverse_mode = false;
-  }
+  // Advance read position by pitch ratio
+  read_position_ += (incr_ * pitch_ratio * num_channels);
 
   float out_vol = volume * amp_env;
 
@@ -116,9 +129,10 @@ std::string DrumSampler::Status() {
     ss << ANSI_COLOR_RESET;
   else
     ss << COOL_COLOR_PINK;
-  ss << "Sampler(" << file_buffer_->filename_ << ")"
+  // Use cached_filename_ and atomic load to avoid mutex/race
+  ss << "Sampler(" << cached_filename_ << ")"
      << " vol:" << volume << " pan:" << pan
-     << " pitch:" << file_buffer_->pitch_ratio_ << ANSI_COLOR_RESET;
+     << " pitch:" << file_buffer_->pitch_ratio_.load() << ANSI_COLOR_RESET;
 
   return ss.str();
 }
@@ -127,9 +141,10 @@ std::string DrumSampler::Info() {
   std::stringstream ss;
   ss << std::setprecision(2) << std::fixed;
   ss << ANSI_COLOR_BLUE << "\nSample ";
-  ss << ANSI_COLOR_WHITE << file_buffer_->filename_ << ANSI_COLOR_BLUE;
+  // Use cached_filename_ and atomic load to avoid mutex/race
+  ss << ANSI_COLOR_WHITE << cached_filename_ << ANSI_COLOR_BLUE;
   ss << "\nvol:" << volume << " pan:" << pan
-     << " pitch:" << file_buffer_->pitch_ratio_;
+     << " pitch:" << file_buffer_->pitch_ratio_.load();
   ss << " attack_ms:" << eg.m_attack_time_msec;
   ss << " decay_ms:" << eg.m_decay_time_msec
      << " release_ms:" << eg.m_release_time_msec;
@@ -144,11 +159,12 @@ void DrumSampler::Start() {
 
 void DrumSampler::NoteOn(midi_event ev) {
   is_playing = true;
-  file_buffer_->audio_buffer_read_idx_ = 0;
+  read_position_ = 0;
   if (reverse_mode) {
-    file_buffer_->audio_buffer_read_idx_ =
-        file_buffer_->GetAudioBuffer()->size() - 2;
+    read_position_ = file_buffer_->GetAudioBuffer()->size() - 2;
     incr_ = -1;
+  } else {
+    incr_ = 1;
   }
   velocity = ev.data2;
   eg.StartEg();

@@ -39,17 +39,9 @@ void FileBuffer::SetPidx(int val) {
 }
 
 void FileBuffer::SetPitch(double pitch_ratio) {
-  std::lock_guard<std::mutex> lock(pending_pitch_mutex_);
-  if (pitch_ratio == 1) {
-    pitch_ratio_ = pitch_ratio;
-    size_of_sixteenth_ = audio_buffer_.size() / loop_len_ / 16.;
-    return;
-  }
-
-  pending_pitch_ratio_ = pitch_ratio;
-  pending_pitched_audio_buffer_ =
-      std::async(std::launch::async, audioutils::resample, audio_buffer_,
-                 num_channels_, pending_pitch_ratio_);
+  // Simple: just update the playback rate
+  // Audio thread will read from original buffer at variable rate
+  pitch_ratio_.store(pitch_ratio);
 }
 
 void FileBuffer::SetPOffset(int poffset) {
@@ -70,43 +62,19 @@ void FileBuffer::SetPinc(int p) {
 void FileBuffer::SetLoopLen(double bars) {
   if (bars != 0) {
     loop_len_ = bars;
-    size_of_sixteenth_ = GetAudioBuffer()->size() / loop_len_ / 16.;
+    size_of_sixteenth_ = audio_buffer_.size() / loop_len_ / 16.;
   }
 }
 
 void FileBuffer::SetAudioBufferReadIdx(size_t pos) {
-  if (pos < 0 || pos >= GetAudioBuffer()->size()) {
+  if (pos < 0 || pos >= audio_buffer_.size()) {
     return;
   }
   audio_buffer_read_idx_ = pos;
 }
 
 std::vector<double>* FileBuffer::GetAudioBuffer() {
-  std::lock_guard<std::mutex> lock(pending_pitch_mutex_);
-  // if (pending_pitch_mutex_.try_lock()) {
-  if (pitch_ratio_ != 1) return &pitched_audio_buffer_;
-  //}
   return &audio_buffer_;
-}
-
-void FileBuffer::CheckPendingRepitch() {
-  if (!pending_pitch_ratio_ || !pending_pitched_audio_buffer_.valid()) return;
-
-  if (pending_pitched_audio_buffer_.wait_for(std::chrono::seconds(0)) ==
-      std::future_status::ready) {
-    std::lock_guard<std::mutex> lock(pending_pitch_mutex_);
-    pitched_audio_buffer_ = pending_pitched_audio_buffer_.get();
-    pitch_ratio_ = pending_pitch_ratio_;
-
-    pending_pitch_ratio_ = 0;
-
-    size_of_sixteenth_ = pitched_audio_buffer_.size() / loop_len_ / 16.;
-    double index_percent =
-        100.0 / audio_buffer_.size() * audio_buffer_read_idx_;
-    audio_buffer_read_idx_ =
-        pitched_audio_buffer_.size() / 100.0 * index_percent;
-  }
-  //}
 }
 
 }  // namespace SBAudio

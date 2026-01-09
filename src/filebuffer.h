@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include <array>
-#include <future>
+#include <atomic>
 #include <string>
 #include <vector>
 
@@ -47,7 +47,6 @@ class FileBuffer {
   void SetStutterPending();
 
   std::vector<double>* GetAudioBuffer();
-  void CheckPendingRepitch();
 
   bool scramble_mode_{false};
   bool scramble_pending_{false};
@@ -62,7 +61,8 @@ class FileBuffer {
   int loop_len_{-1};
 
   int size_of_sixteenth_{0};
-  int audio_buffer_read_idx_{0};
+  std::atomic<int> audio_buffer_read_idx_{
+      0};  // Atomic - read by audio thread, written by interpreter
 
   std::array<int, 16> scrambled_pattern_{0};
 
@@ -75,16 +75,10 @@ class FileBuffer {
   double poffset_{0};
   int pinc_{1};
 
-  double pitch_ratio_{1};
-  double pending_pitch_ratio_{0};
-
-  std::mutex pending_pitch_mutex_;
+  std::atomic<double> pitch_ratio_{1};  // Atomic - playback rate multiplier
 
  private:
   std::vector<double> audio_buffer_{};
-  std::vector<double> pitched_audio_buffer_{};
-  // run repitch operation in an async task and switch out
-  std::future<std::vector<double>> pending_pitched_audio_buffer_;
 };
 
 }  // namespace SBAudio

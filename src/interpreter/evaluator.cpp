@@ -270,8 +270,23 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       return NULLL;
     }
     auto target = Eval(set_stmt->target_, env);
+
+    // Validate target exists and is valid
+    if (!target || target->Type() == "NULL") {
+      std::cerr << "Error: set target object '" << set_stmt->target_->String()
+                << "' no longer exists or is invalid\n";
+      return NULLL;
+    }
+
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(target);
     if (soundgen) {
+      // Validate the soundgen has a valid ID before accessing
+      if (soundgen->soundgen_id_ < 0) {
+        std::cerr << "Error: sound generator '" << set_stmt->target_->String()
+                  << "' has invalid ID (may be out of scope or deleted)\n";
+        return NULLL;
+      }
+
       auto action = std::make_unique<AudioActionItem>(AudioAction::UPDATE);
       action->mixer_soundgen_idx = soundgen->soundgen_id_;
       action->fx_id = set_stmt->fx_num_;

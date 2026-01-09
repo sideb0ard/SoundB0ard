@@ -1,0 +1,356 @@
+# Autechre-style Crunchy Hip Hop Beat
+# Glitchy, distorted, complex rhythms
+
+# Load samples
+let kick = sample(bd/808kick.aif);
+let kick2 = sample(bd/wuk77.aiff);
+let snare = sample(cp/distCllap.aiff);
+let clap = sample(cp/compClap.aiff);
+let perc1 = sample(perc/2STEPperc2.aiff);
+let perc2 = sample(perc/triangle.aiff);
+let perc3 = sample(perc/uus.wav);
+let shaker = sample(perc/chezShaker.aiff);
+
+## Set tempo - classic hip hop range
+#bpm 87;
+#
+## Add crunchy effects to drums
+
+add_fx(snare, "bitcrush");
+add_fx(snare, "distort");
+set snare:fx0:bitdepth 5;
+
+add_fx(clap, "geom");
+add_fx(clap, "distort");
+
+add_fx(perc1, "bitcrush");
+set perc1:fx0:bitdepth 4;
+add_fx(perc2, "decimate");
+add_fx(perc3, "distort");
+
+## Volume and panning for stereo field
+vol kick 0.9;
+vol kick2 0.7;
+vol snare 0.6;
+vol clap 0.5;
+vol perc1 0.4;
+vol perc2 0.5;
+vol perc3 0.45;
+
+pan kick 0.0;
+pan kick2 0.1;
+pan snare -0.2;
+pan clap 0.3;
+pan perc1 -0.5;
+pan perc2 0.6;
+pan perc3 -0.4;
+
+send("delay", perc2);
+send("delay", perc3);
+
+# Main kick pattern with variations
+let kick_comp = comp()
+{
+  setup()
+  {
+    # Multiple kick patterns for variation
+    let k1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 1, 0, 0];
+    let k2 = [1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    let k3 = [1, 0, 1, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0];
+    let k4 = [0, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0];
+
+    # Timing offsets for micro-timing (Autechre-style)
+    let offsets = [0, 15, -12, 8, -20, 25, -8, 10];
+    let ox = 0;
+
+    # Velocity variations
+    let vels = [90, 100, 80, 110, 95, 85];
+    let vx = 0;
+
+    # Pitch variations for kick
+    let pitches = [1.0, 0.95, 1.05, 0.9, 1.1];
+    let px = 0;
+  }
+  run()
+  {
+    let kpat = k1;
+
+    # Pattern selection based on count
+    if (count % 4 == 1) {
+      kpat = k2;
+    }
+    if (count % 7 == 5) {
+      kpat = k3;
+    }
+    if (count % 11 == 3) {
+      kpat = k4;
+    }
+    if (count % 16 == 15) {
+      kpat = rand_beat();
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (kpat[i] == 1) {
+        # Add micro-timing offsets for groove
+        let offset = offsets[ox];
+        ox = incr(ox, 0, len(offsets));
+
+        note_on_at(kick, 1, i * pp + offset, vel = vels[vx]);
+        vx = incr(vx, 0, len(vels));
+
+        # Modulate pitch for variation
+        set kick:pitch pitches[px] at = i * pp;
+        px = incr(px, 0, len(pitches));
+
+        # Occasional second layer kick
+        if (i % 5 == 2) {
+          note_on_at(kick2, 1, i * pp + offset + 30, vel = 60);
+        }
+      }
+    }
+  }
+}
+#
+# # Snare/clap pattern with complex rhythm
+let snare_comp = comp()
+{
+  setup()
+  {
+    let s1 = [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let s2 = [0, 0, 0, 0,  1, 0, 0, 1,  0, 0, 0, 0,  1, 0, 1, 0];
+    let s3 = [0, 0, 1, 0,  1, 0, 0, 0,  0, 1, 0, 0,  1, 0, 0, 1];
+
+    let clap_pats = [
+      [0, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1],
+      [0, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 0, 0]
+    ];
+      let cx = 0;
+
+      # Duration variations
+      let durs = [100, 200, 50, 300, 150];
+      let dx = 0;
+
+      # Bit crush modulation
+      let bits = [3, 4, 5, 6, 7, 4, 5];
+      let bx = 0;
+  }
+  run()
+  {
+    let spat = s1;
+    if (count % 3 == 2) {
+      spat = s2;
+    }
+    if (count % 8 == 7) {
+      spat = s3;
+    }
+
+    # Modulate bitcrush amount over time
+    set snare:fx0:bitdepth bits[bx];
+    bx = incr(bx, 0, len(bits));
+
+    for (let i = 0; i < 16; i++) {
+      if (spat[i] == 1) {
+        note_on_at(snare, 1, i * pp, dur = durs[dx], vel = 80 + rand(40));
+        dx = incr(dx, 0, len(durs));
+      }
+    }
+
+    # Clap layer
+    if (count % 2 == 1) {
+      let cpat = clap_pats[cx];
+      for (let i = 0; i < 16; i++) {
+        if (cpat[i] == 1) {
+          note_on_at(clap, 1, i * pp + 20, vel = 50 + rand(30));
+        }
+      }
+      cx = incr(cx, 0, len(clap_pats));
+    }
+  }
+}
+
+# Glitchy percussion layer - NOW WITH POLYRHYTHMS!
+let glitch_perc_comp = comp()
+{
+  setup()
+  {
+    let percs = [perc1, perc2, perc3];
+    let pidx = 0;
+
+    # POLYRHYTHMIC PATTERNS - different lengths cycling against 16-step grid
+    let poly7 = [1, 0, 1, 0, 1, 1, 0];           # 7 steps - creates shifting phase
+      let poly5 = [1, 0, 1, 1, 0];                 # 5 steps - prime number rhythm
+      let poly13 = [1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0];  # 13 steps - long cycle
+      let poly12 = [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1];     # 12 steps - triplet feel
+
+      # Random patterns regenerated frequently
+      let pat = rand_array(16, 0, 1);
+
+    let durz = [20, 40, 600, 100, 150, 100];
+    let drx = 0;
+
+    # Extreme pitch variations for glitchy sound
+    let pitchz = [0.5, 1.5, 2.0, 0.8, 1.2, 0.6, 1.8, 0.3];
+    let pz = 0;
+
+    # Panning modulation
+    let panz = [-0.8, -0.5, 0, 0.5, 0.8, 0.3, -0.3];
+    let px = 0;
+  }
+  run()
+  {
+    # Layer 1: perc1 with 7-step polyrhythm
+    for (let i = 0; i < 16; i++) {
+      let idx = i % len(poly7);
+      if (poly7[idx] == 1) {
+        let offset = rand(50) - 25;
+        note_on_at(perc1, 1, i * pp + offset,
+            dur = durz[drx],
+            vel = 40 + rand(60));
+        drx = incr(drx, 0, len(durz));
+
+        set perc1:pitch pitchz[pz] at = i * pp;
+        pz = incr(pz, 0, len(pitchz));
+      }
+    }
+
+    # Layer 2: perc2 with 5-step polyrhythm (only every other bar for variation)
+    if (count % 2 == 0) {
+      for (let i = 0; i < 16; i++) {
+        let idx = i % len(poly5);
+        if (poly5[idx] == 1) {
+          let offset = rand(40) - 20;
+          note_on_at(perc2, 1, i * pp + offset,
+              dur = durz[drx],
+              vel = 50 + rand(50));
+          drx = incr(drx, 0, len(durz));
+
+          set perc2:pitch pitchz[pz] at = i * pp;
+          pz = incr(pz, 0, len(pitchz));
+        }
+      }
+    }
+
+    # Layer 3: perc3 with 13-step polyrhythm (sparse, for long-form shifting)
+    if (count % 4 < 3) {
+      for (let i = 0; i < 16; i++) {
+        let idx = i % len(poly13);
+        if (poly13[idx] == 1) {
+          let offset = rand(60) - 30;
+          note_on_at(perc3, 1, i * pp + offset,
+              dur = 200 + rand(400),
+              vel = 30 + rand(70));
+
+          set perc3:pitch pitchz[pz] at = i * pp;
+          pz = incr(pz, 0, len(pitchz));
+        }
+      }
+    }
+
+    # Layer 4: Random chaos with 12-step polyrhythm
+    if (count % 3 == 2) {
+      for (let i = 0; i < 16; i++) {
+        let idx = i % len(poly12);
+        if (poly12[idx] == 1) {
+          # Randomly pick a perc
+          let p = percs[rand(len(percs))];
+          note_on_at(p, 1, i * pp + rand(30),
+              dur = 50 + rand(200),
+              vel = 20 + rand(80));
+
+          # Extreme pitch modulation
+          set p:pitch pitchz[rand(len(pitchz))] at = i * pp;
+        }
+      }
+    }
+  }
+}
+#
+# # Shaker/hi-hat layer
+let hats_comp = comp()
+{
+  setup()
+  {
+    let h1 = [1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0];
+    let h2 = [1, 1, 0, 1,  0, 1, 1, 0,  1, 0, 1, 1,  0, 1, 0, 1];
+    let h3 = [1, 0, 0, 1,  1, 1, 0, 0,  1, 0, 1, 0,  0, 1, 1, 1];
+  }
+  run()
+  {
+    if (count % 8 < 6) {
+      let hpat = h1;
+      if (count % 4 == 2) {
+        hpat = h2;
+      }
+      if (count % 6 == 5) {
+        hpat = h3;
+      }
+
+      for (let i = 0; i < 16; i++) {
+        if (hpat[i] == 1) {
+          # Micro timing
+          let offset = 15;
+          if (i % 2 == 0) {
+            offset = 0;
+          }
+          note_on_at(shaker, 1, i * pp + offset,
+              vel = 30 + rand(40),
+              dur = 50 + rand(100));
+        }
+      }
+    }
+  }
+}
+#
+# # Master arrangement
+let main_comp = comp()
+{
+  setup()
+  {
+    let c = 0;
+  }
+  run()
+  {
+    # Build up arrangement
+    if (c == 0) {
+      p1 # kick_comp;
+    }
+    if (c == 4) {
+      p2 # snare_comp;
+    }
+    if (c == 8) {
+      p3 # glitch_perc_comp;
+    }
+    if (c == 12) {
+      p4 # hats_comp;
+    }
+    if (c == 16) {
+      # Drop some elements
+      p4 # "";
+    }
+    if (c == 20) {
+      p4 # hats_comp;
+    }
+    if (c == 24) {
+      # Breakdown
+      p1 # "";
+      p2 # "";
+    }
+    if (c == 28) {
+      # Build back
+      p1 # kick_comp;
+    }
+    if (c == 30) {
+      p2 # snare_comp;
+    }
+    if (c == 32) {
+      # Full power with all elements
+      p1 # kick_comp;
+      p2 # snare_comp;
+      p3 # glitch_perc_comp;
+      p4 # hats_comp;
+    }
+
+    print("Bar:", c);
+    c++;
+  }
+}

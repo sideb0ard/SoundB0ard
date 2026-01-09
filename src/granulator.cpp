@@ -140,16 +140,16 @@ void Granulator::EventNotify(broadcast_event event, mixer_timing_info tinfo) {
 
       file_buffer_->audio_buffer_read_idx_ = new_read_idx;
 
+      int read_idx = file_buffer_->audio_buffer_read_idx_.load();
       int rel_pos_within_a_sixteenth =
-          fmod(file_buffer_->audio_buffer_read_idx_,
-               file_buffer_->size_of_sixteenth_);
+          fmod(static_cast<double>(read_idx), file_buffer_->size_of_sixteenth_);
 
       if (file_buffer_->stutter_mode_ || file_buffer_->scramble_mode_) {
-        file_buffer_->audio_buffer_read_idx_ = fmodf(
+        file_buffer_->audio_buffer_read_idx_ = static_cast<int>(fmodf(
             (file_buffer_->scrambled_pattern_[file_buffer_->cur_sixteenth_] *
              file_buffer_->size_of_sixteenth_) +
                 rel_pos_within_a_sixteenth,
-            audio_buffer->size());
+            audio_buffer->size()));
       }
     }
   }
@@ -251,7 +251,6 @@ StereoVal Granulator::GenNext(mixer_timing_info tinfo) {
   if (!started_ || !active) {
     return val;
   }
-  file_buffer_->CheckPendingRepitch();
 
   if (stop_pending_ && eg_.m_state == OFFF) active = false;
 

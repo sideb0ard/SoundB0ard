@@ -42,8 +42,12 @@ class DrumSampler : public SoundGenerator {
 
   std::unique_ptr<FileBuffer> file_buffer_;
   double incr_{1};
+  double read_position_{0};  // Fractional read position for interpolation
 
  private:
+  std::string cached_filename_;  // Cache to avoid reading
+                                 // file_buffer_->filename_ from audio thread
+
   void SetPitch(double v);
   void SetAttackTime(double val);
   void SetDecayTime(double val);

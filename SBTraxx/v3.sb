@@ -2,11 +2,13 @@ let qeb1 = sample(qebo/QEBO-LOCKDOWNFM-02FMHIGHHAT1.wav);
 let qeb2 = sample(qebo/QEBO-LOCKDOWNFM-32FMPERCUSSION9.wav);
 let qeb3 = sample(qebo/QEBO-LOCKDOWNFM-29FMPERCUSSION6.wav);
 let qeb4 = sample(qebo/QEBO-LOCKDOWNFM-38FMSNARE6.wav);
-let yo = sample(voices/eskiYO.wav);
 let ye = sample(voices/KRSYEAH.wav);
 let cpr = sample(cp/clapLongReverb.aif);
 let thee = sample(perc/thee.wav);
 let ah = sample(ch/acidHat3.aiff);
+let cp = sample(cp/djkhaledClap.aiff);
+let bdg = sample(bd/gaborKick.aiff);
+let japc = sample(nuloopz/japanCROWDwave.wav);
 
 bpm 150;
 set thee:pitch 0.8;
@@ -17,43 +19,46 @@ vol qeb1 0.5;
 vol qeb2 0.5;
 vol qeb3 0.5;
 vol qeb4 0.5;
+pan qeb1 -0.1;
+pan qeb2 -0.2;
+pan qeb3 0.4;
+pan qeb4 0.3;
+vol hh 0.2; vol oh 0.4;
+pan hh -0.3;
+pan oh 0.5;
+pan thee 0.3;
 let str = loop(strings/summit.aiff); note_off(str, 0);
 add_fx(str, "nnirror");
 add_fx(str, "sidechain", sbdrum)
-let gangz = loop(loops2/gangstarr.wav); note_off(gangz, 0)
-let eightloop = loop(loops/perc808loop.wav); note_off(eightloop, 0);
-pan qeb1 -0.3;
-pan qeb2 -0.5;
-pan qeb3 0.5;
-pan qeb4 0.7;
 load_preset(sbdrum, "SINEUCP");
+load_preset(sb2, "fmznitch");
 set sbdrum:bd_key 42;
+let dx4 = fm();
 load_preset(dx, "UPRNT");
-## CHUNKy // zaaazz // OCWAR2
-load_preset(dx3, "briiight");
-add_fx(dx3, "nnirror");
-## load_preset(dx2, "CTZZZ2");
 load_preset(dx2, "WIBBLEWOB");
+load_preset(dx3, "briiight");
+load_preset(dx4, "V3z");
+load_preset(mo, "MODRONZ");
+add_fx(dx3, "nnirror");
 add_fx(dx2, "compressor");
 add_fx(dx, "sidechain", sbdrum);
 add_fx(dx3, "sidechain", sbdrum);
 set dx2:fx0:threshold -20; set dx2:fx0:ratio 1.4; set dx2:fx0:outputgain 10;
-vol hh 0.2; vol oh 0.4;
-pan hh -0.3;
-pan oh 0.5;
 send("delay", hh);
 send("delay", str);
-load_preset(mo, "MODRONZ");
 add_fx(mo, "sidechain", sbdrum);
-let cp = sample(cp/djkhaledClap.aiff);
+add_fx(mo, "geom");
+add_fx(mo, "reverb");
 send("delay", ye);
 add_fx(ye, "filter");
 ### add_fx(dx2, "zyzzup34"); // newstodat // CTZZZ2
-let dx4 = fm();
-load_preset(dx4, "V3z");
 add_fx(dx4, "sidechain", sbdrum);
 add_fx(cpr, "distort");
 set cpr:pitch 0.8;
+add_fx(thee, "distort");
+send("delay", thee);
+send("delay", japc);
+send("reverb", japc);
 
 let bdp = rand_array(16, 0, 0);
 
@@ -86,8 +91,17 @@ let bdp = rand_array(16, 0, 0);
 # yeyeblah_comp
 # dxCHRDblah_comp
 
-# note_on_at(mo, up(chz[chx], 36), 0, vel = 100, dur = 3400);
+# let ch1 = [27, 30, 34];
+# let ch2 = [20, 23, 27];
+# let ch3 = [22, 25, 29];
+# note_on_at(dx, up([27, 30, 34], 36), 0, vel = 100, dur = 3400);
+# note_on_at(dx, up([20, 23, 27], 36), 0, vel = 100, dur = 3400);
+# note_on_at(dx, up([22, 25, 29], 36), 0, vel = 100, dur = 3400);
 
+# note_on_at(dx, up([20, 23, 27], 36), 0, vel = 100, dur = 3400);
+# note_on_at(dx2, up([20, 23, 27], 12), 0, vel = 300, dur = 3400);
+# note_on_at(dx3, up([20, 23, 27], 24), 0, vel = 600, dur = 3400);
+# note_on_at(dx4, up([20, 23, 27], 36), 0, vel = 500, dur = 3400);
 let RUN2blah_comp = comp()
 {
   setup()
@@ -97,20 +111,25 @@ let RUN2blah_comp = comp()
   run()
   {
     if (c == 0) {
-      yeyeblah_comp();
+      note_on_at(dx, up([27, 30, 34], 36), 0, vel = 40, dur = 7400);
+      set mixer:delay:fb 80;
+      set mixer:delay:ms 500;
+      #yeyeblah_comp();
       p2 # bAss2lah_comp;
+      p23 # delayblah_comp;
     }
     if (c == 4) {
       p1 # BDPbeat_comp;
       p3 # bassl_comp;
     }
     if (c == 12) {
+      hatzblah_comp();
       p1 # "";
     }
     if (c == 16) {
       p4 # yeyeblah_comp;
+      note_on_at(dx, up([27, 30, 34], 36), 0, vel = 50, dur = 12400);
       sched(0, 0, 1, 3840 * 8, "vol ye %");
-      sched(0, 0.8, 0, 3840 * 6, "vol dx %");
       sched(0, 0, 0.8, 3840 * 7, "vol dx3 %");
       p6 # riffblah_comp;
     }
@@ -118,71 +137,118 @@ let RUN2blah_comp = comp()
       p3 # "";
       p2 # "";
     }
+    if (c == 27) {
+      note_on_at(dx, up([27, 30, 34], 36), 0, vel = 60, dur = 7400);
+    }
     if (c == 30) {
       sched(0, 1, 0, 3840 * 6, "vol ye %");
       p6 # "";
       p7 # hatzblah_comp;
-      p5 # deebblah_comp;
+      deebblah_comp();
       p1 # BDPbeat_comp;
     }
     if (c == 31) {
-      dxCHRDblah_comp();
+      p8 # dxCHRDblah_comp();
+      note_on_at(dx, up([27, 30, 34], 36), 0, vel = 60, dur = 17400);
+      sched(0, 0, 0.6, 3840 * 2, "vol dx4 %");
+      p16 # OddPercblah_comp;
+    }
+    if (c == 34) {
+      dnblah_comp();
     }
     if (c == 38) {
       p5 # "";
       p1 # "";
-      sched(0, 0, 0.8, 3840 * 2, "vol dx %");
     }
     if (c == 40) {
       OddPercblah_comp();
       p15 # qeblah_comp;
     }
     if (c == 42) {
-      p1 # BDPbeat_comp;
       p8 # moblah_comp;
+      sched(3840, 1, 0, 3840, "set mo:fx1:mix %");
+      dnblah_comp();
     }
     if (c == 44) {
       p8 # "";
       p2 # "";
       deebblah_comp();
+      OddPercblah_comp();
+      yeyeblah_comp();
     }
 
     if (c == 45) {
+      perccblah_comp();
       p1 # "";
       p15 # "";
       deebblah_comp();
       p2 # basslTWO_comp;
     }
     if (c == 50) {
+      perccblah_comp();
       p1 # BDPbeat_comp;
+      note_on_at(dx, up([27, 30, 34], 36), 0, vel = 70, dur = 3400);
       OddPercblah_comp();
+      p16 # "";
+      yeblah_comp();
     }
-    if (c == 64) {
+    if (c == 54) {
+      p18 # perccblah_comp;
+    }
+    if (c == 56) {
+      note_on_at(dx, up([27, 30, 34], 36), 0, vel = 60, dur = 7400);
+      p1 # dnblah_comp;
+    }
+    if (c == 60) {
       p9 # "";
       OddPercblah_comp();
       moblah_comp();
       p1 # "";
     }
-    if (c == 74) {
+
+    if (c == 64) {
+      note_on_at(dx, up([20, 23, 27], 36), 0, vel = 50, dur = 3400);
+      p2 # "";
       p8 # moblah_comp;
-      sched(3840, 1, 0, 3840, "set mo:fx1:mix %");
-      p1 # BDPbeat_comp;
+      sched(3840, 1, 0, 3840 * 4, "set mo:fx1:mix %");
+      p1 # dnblah_comp;
+      p18 # "";
+    }
+    if (c == 70) {
+      note_on(japc, 1, dur = 0);
     }
     if (c == 80) {
       p2 $ "";
       sched(0, 0, 0.8, 3840 * 7, "vol dx3 %");
+      sched(0, 0.8, 0, 3840 * 15, "vol mo %");
       p3 # riffblah_comp;
       p16 # OddPercblah_comp;
+      p18 # perccblah_comp;
+      p11 # deebblah_comp;
+    }
+    if (c == 84) {
+      p11 # "";
     }
     if (c == 96) {
       p16 # "";
+      p7 # "";
       sched(0, 0, 0.8, 3840 * 7, "vol ye %");
-      p8 # dxCHRDblah_comp;
+      sched(0, 0, 0.6, 3840 * 4, "vol dx4 %");
       sched(0, 0.8, 0, 3840 * 7, "vol dx3 %");
-      sched(0, 0.8, 0, 3840 * 15, "vol mo %");
+      note_on_at(dx, up([27, 30, 34], 36), 0, vel = 60, dur = 13400);
+      note_on_at(dx2, up([27, 30, 34], 24), 0, vel = 60, dur = 13400);
+      p1 # "";
     }
     if (c == 107) {
       sched(0, 0.8, 0, 3840 * 6, "vol ye %");
+    }
+    if (c == 115) {
+      sched(0, 0.8, 0, 3840 * 6, "vol sbdrum %");
+      sched(0, 0.8, 0, 3840 * 6, "vol dx4 %");
+      p18 # "";
+    }
+    if (c == 120) {
+      bpm 3;
     }
 
     print("C:", c);
@@ -209,6 +275,8 @@ let BDPbeat_comp = comp()
     let px = 0;
     let btonez = [480, 480, 480, 280, 600, 700];
     let btx = 0;
+    let snlen = [100, 200, 400, 500, 800, 1200, 0];
+    let snx = 0;
   }
   run()
   {
@@ -240,7 +308,8 @@ let BDPbeat_comp = comp()
 
     if (count % 18 < 16) {
       #   note_on_at(sbdrum, 3, 8 * pp + delz[dlx], vel = 100 + rand(20));
-      note_on_at(cpr, 1, 8  * pp + delz[dlx], vel = 70);
+      note_on_at(cpr, 1, 8  * pp + delz[dlx], vel = 70, dur = snlen[snx]);
+      snx = incr(snx, 0, len(snlen));
       #   set sbdrum:cp_delay_feedback_pct pctz[px];
       #   px = incr(px, 0, len(pctz));
       #   dlx = incr(dlx, 0, len(delz));
@@ -256,6 +325,26 @@ let BDPbeat_comp = comp()
           #   }
       }
 
+  }
+}
+
+let delayblah_comp = comp()
+{
+  setup()
+  {
+    let delz = [20, 100, 90, 10, 200];
+    let dlx = 0;
+    let dfbz = [0, 10, 20, 70, 40];
+    let dfx = 0;
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+      set mixer:delay:ms delz[dlx];
+      set mixer:delay:fb dfbz[dfx];
+      dlx = incr(dlx, 0, len(delz));
+      dfx = incr(dfx, 0, len(dfbz));
+    }
   }
 }
 
@@ -507,16 +596,14 @@ let deebblah_comp = comp()
   }
   run()
   {
-    if (count % 4 == 3) {
-      let bass = mask("FF00", invert(bdp));
-      for (let i = 0; i < 16; i++) {
-        if (bass[i] == 1) {
-          note_on_at(dx2, notz[nx] + 12 , i * pp, dur = durz[drx]);
-          drx = incr(drx, 0, len(durz));
-        }
+    let bass = mask(invert(bdp), "ff00");
+    for (let i = 0; i < 16; i++) {
+      if (bass[i] == 1) {
+        note_on_at(dx2, notz[nx] + 12 , i * pp, dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
       }
-      nx = incr(nx, 0, len(notz));
     }
+    nx = incr(nx, 0, len(notz));
   }
 }
 
@@ -547,26 +634,6 @@ let hatzblah_comp = comp()
           }
         }
       }
-    }
-  }
-}
-
-let YOblah_comp = comp()
-{
-  setup()
-  {
-    let pitz = [0.8, 0.7, 0.9];
-    let px = 0;
-    let durz = [420, 100, 0, 250, 600];
-    let drx = 0;
-  }
-  run()
-  {
-    if (count % 4 == 3) {
-      set yo:pitch pitz[px];
-      note_on_at(yo, 1, 12 * pp, dur = durz[drx]);
-      px = incr(px, 0, len(pitz));
-      drx = incr(drx, 0, len(durz));
     }
   }
 }
@@ -770,5 +837,99 @@ let OddPercblah_comp = comp()
         drx = incr(drx, 0, len(durz));
       }
     }
+  }
+}
+
+let perccblah_comp = comp()
+{
+  setup()
+  {
+    let pat = [0, 0, 1, 2,  0, 2, 0, 0,  0, 1, 0, 0,  0, 1, 2, 1];
+  }
+  run()
+  {
+    if (count % 4 == 3) {
+      pat = rand_array(16, 0, 7);
+    }
+    for (let i = 0; i < 16; i++) {
+      let offz = 60;
+      if (i % 2 == 0) {
+        offz = 0;
+      }
+      if (pat[i] == 1) {
+        note_on_at(sb2, 5, i * pp + offz, vel = 40, dur = 20);
+      }
+      if (pat[i] == 2) {
+        note_on_at(sb2, 6, i * pp + offz, vel = 40, dur = 30);
+      }
+    }
+  }
+}
+
+let bd2 = sample(bd/dm02_909_kickdrum_006_drive.wav);
+let dnblah_comp = comp()
+{
+  setup()
+  {
+    let bdrum1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 1, 0, 0];
+    let bdrum2 = [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
+    let bdrum3 = [1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let sdrum = [0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0];
+    let shprdrum = [0, 2, 2, 1,  0, 1, 0, 2,  0, 1, 1, 1,  0, 1, 0, 1];
+    let snlen = [100, 200, 400, 500, 800, 1200, 0];
+    let snx = 0;
+  }
+  run()
+  {
+    let bdrum = bdrum1;
+    if (count % 2 == 1) {
+      bdrum = bdrum2;
+    }
+    if (count % 8 == 7) {
+      bdrum = bdrum3;
+      note_on_at(bdg, 1, 14 * pp, vel = 40);
+    }
+    if (count % 9 == 3) {
+      bdrum = [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0];
+    }
+    if (count % 11 == 7) {
+      bdrum = rand_beat();
+    }
+
+    for (let i = 0; i < 16; i++) {
+      let offs = 30;
+      if (i % 2 == 0) {
+        offs = 0;
+      }
+      if (bdrum[i] == 1) {
+        note_on_at(bdg, 0, i * pp + offs);
+      }
+      if (sdrum[i] == 1) {
+        note_on_at(cpr, 1, i * pp + offs, dur = snlen[snx]);
+        snx = incr(snx, 0, len(snlen));
+      }
+      if (count % 8 < 6) {
+        if (count % 2 == 0) {
+          note_on_at(hh, 1, i * pp + offs, dur = 20);
+        } else {
+          if (shprdrum[i] == 1) {
+            note_on_at(shkr, 1, i * pp + offs, dur = 300, vel = 30 + rand(30));
+          }
+          if (shprdrum[i] == 2) {
+            note_on_at(shkr2, 1, i * pp + offs, dur = 300, vel = 40 + rand(40));
+          }
+        }
+      }
+    }
+  }
+}
+
+let pecsblah_comp = comp()
+{
+  setup()
+  {
+  }
+  run()
+  {
   }
 }
