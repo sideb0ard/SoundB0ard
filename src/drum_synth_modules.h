@@ -90,6 +90,8 @@ class BassDrum : public DrumModule {
 
   bool hard_sync_{false};
   double frequency_{kDefaultKickFrequency};
+  double pitch_osc_range_{2.0};  // Pitch envelope range in semitones (default
+                                 // matches OSC_FO_MOD_RANGE)
 
   PulseTrigger click_;
 

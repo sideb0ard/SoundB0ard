@@ -35,9 +35,10 @@ pan thee 0.3;
 let str = loop(strings/summit.aiff); note_off(str, 0);
 add_fx(str, "nnirror");
 add_fx(str, "sidechain", sbdrum)
-load_preset(sbdrum, "SINEUCP");
+load_preset(sbdrum, "V3");
+set sbdrum:bd_key 15;
+set sbdrum:bd_decay 100;
 load_preset(sb2, "fmznitch");
-set sbdrum:bd_key 42;
 let dx4 = fm();
 load_preset(dx, "UPRNT");
 load_preset(dx2, "WIBBLEWOB");
@@ -140,6 +141,7 @@ let RUN2blah_comp = comp()
       p6 # riffblah_comp;
       hats_comp();
       p30 # "";
+      p3 # "";
     }
     if (c == 20) {
       hats_comp();
@@ -167,22 +169,19 @@ let RUN2blah_comp = comp()
       sched(0, 0, 0.6, 3840 * 2, "vol dx4 %");
       p16 # OddPercblah_comp;
     }
-    if (c == 34) {
-      dnblah_comp();
-    }
     if (c == 38) {
       p5 # "";
       p1 # "";
+      snarezblah_comp();
+      sched(0, 0, 0.7, 3840 * 7, "set sbdrum:sd_vol %");
     }
     if (c == 40) {
       OddPercblah_comp();
       p15 # qeblah_comp;
-      p30 # clssssblah_comp;
     }
     if (c == 42) {
       p8 # moblah_comp;
-      sched(3840, 1, 0, 3840, "set mo:fx1:mix %");
-      dnblah_comp();
+      sched(3840, 0, 1, 3840 * 18, "set mo:fx1:mix %");
       glitch_perc_comp();
     }
     if (c == 44) {
@@ -218,7 +217,7 @@ let RUN2blah_comp = comp()
     }
     if (c == 56) {
       note_on_at(dx, up([27, 30, 34], 36), 0, vel = 60, dur = 7400);
-      p1 # dnblah_comp;
+      p1 # BDPbeat_comp;
     }
     if (c == 60) {
       p9 # "";
@@ -233,16 +232,26 @@ let RUN2blah_comp = comp()
       note_on_at(dx, up([20, 23, 27], 36), 0, vel = 50, dur = 3400);
       p2 # "";
       p8 # moblah_comp;
-      sched(3840, 1, 0, 3840 * 4, "set mo:fx1:mix %");
-      p1 # dnblah_comp;
+      sched(3840, 0, 1, 3840 * 18, "set mo:fx1:mix %");
+      sched(3840, 20, 71, 3840 * 11, "set mo:fx2:wetmix %");
+      sched(3840, 100, 1000, 3840 * 16, "set mo:fx2:reverbtime %");
+      p1 # BDPbeat_comp;
       p18 # "";
       p31 # "";
     }
     if (c == 70) {
+      set mixer:delay:fb 80;
+      set mixer:delay:ms 880;
       note_on(japc, 1, dur = 0);
+      p1 # "";
       p32 # "";
       p33 # "";
       p34 # "";
+    }
+    if (c == 74) {
+      set mixer:delay:fb 90;
+      set mixer:delay:ms 1880;
+      note_on(japc, 1, dur = 0);
     }
     if (c == 80) {
       p2 $ "";
@@ -253,10 +262,18 @@ let RUN2blah_comp = comp()
       p18 # perccblah_comp;
       p11 # deebblah_comp;
       p30 # clssssblah_comp;
+      snarezblah_comp();
+      sched(0, 0, 0.7, 3840 * 7, "set sbdrum:sd_vol %");
     }
     if (c == 84) {
       p11 # "";
       glitch_perc_comp();
+    }
+    if (c == 86) {
+      p1 # BDPbeat_comp;
+    }
+    if (c == 87) {
+      note_on_at(ye, 1, 0, dur = 0);
     }
     if (c == 96) {
       p16 # "";
@@ -294,18 +311,23 @@ let BDPbeat_comp = comp()
 {
   setup()
   {
-    let bdp1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let bdp1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 1, 0, 0];
     let bdp2 = [1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
-    let bdp2 = [0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0];
-    let bdp4 = [0, 0, 1, 0,  0, 0, 0, 0,  0, 1, 0, 0,  0, 0, 0, 0];
+    let bdp2 = [1, 0, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0];
+    let bdp4 = [0, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0];
     let offz = [9, 10, 11, 12, 14];
     let ox = 0;
-    let velz = [70, 80, 70, 90, 110];
-    let vlx = 0;
     let pctz = [0, 10, 30, 20, 20, 40];
     let px = 0;
-    let btonez = [480, 480, 480, 280, 600, 700];
+    let btonez = [1480, 1780, 1880, 1600, 1200, 1500];
     let btx = 0;
+
+    let offsets = [0, 15, -12, 8, -20, 25, -8, 10];
+    let ox = 0;
+
+    # Velocity variations
+    let vels = [90, 100, 80, 110, 95, 85];
+    let vx = 0;
   }
   run()
   {
@@ -320,18 +342,14 @@ let BDPbeat_comp = comp()
     if (count % 18 == 4) {
       bdp = bdp4;
     }
-    set sbdrum:bd_tone btonez[btx];
-    btx = incr(btx, 0, len(btonez));
 
-    if (count % 16 < 15) {
-      for (let i = 0; i < 16; i++) {
-        let offz = 30;
-        if (i % 2 == 0) {
-          offz = 0;
-        }
-        if (bdp[i] == 1) {
-          note_on_at(sbdrum, 0, i * pp + offz);
-        }
+    for (let i = 0; i < 16; i++) {
+      if (bdp[i] == 1) {
+        let offset = offsets[ox];
+        ox = incr(ox, 0, len(offsets));
+
+        note_on_at(sbdrum, 0, i * pp + offset, vel = vels[vx]);
+        vx = incr(vx, 0, len(vels));
       }
     }
   }
@@ -898,64 +916,6 @@ let perccblah_comp = comp()
   }
 }
 
-let bd2 = sample(bd/dm02_909_kickdrum_006_drive.wav);
-let dnblah_comp = comp()
-{
-  setup()
-  {
-    let bdrum1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 1, 0, 0];
-    let bdrum2 = [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
-    let bdrum3 = [1, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
-    let sdrum = [0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0];
-    let shprdrum = [0, 2, 2, 1,  0, 1, 0, 2,  0, 1, 1, 1,  0, 1, 0, 1];
-    let snlen = [100, 200, 400, 500, 800, 1200, 0];
-    let snx = 0;
-  }
-  run()
-  {
-    let bdrum = bdrum1;
-    if (count % 2 == 1) {
-      bdrum = bdrum2;
-    }
-    if (count % 8 == 7) {
-      bdrum = bdrum3;
-      note_on_at(bdg, 1, 14 * pp, vel = 40);
-    }
-    if (count % 9 == 3) {
-      bdrum = [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0];
-    }
-    if (count % 11 == 7) {
-      bdrum = rand_beat();
-    }
-
-    for (let i = 0; i < 16; i++) {
-      let offs = 30;
-      if (i % 2 == 0) {
-        offs = 0;
-      }
-      if (bdrum[i] == 1) {
-        note_on_at(bdg, 0, i * pp + offs);
-      }
-      if (sdrum[i] == 1) {
-        note_on_at(cpr, 1, i * pp + offs, dur = snlen[snx]);
-        snx = incr(snx, 0, len(snlen));
-      }
-      if (count % 8 < 6) {
-        if (count % 2 == 0) {
-          note_on_at(hh, 1, i * pp + offs, dur = 20);
-        } else {
-          if (shprdrum[i] == 1) {
-            note_on_at(shkr, 1, i * pp + offs, dur = 300, vel = 30 + rand(30));
-          }
-          if (shprdrum[i] == 2) {
-            note_on_at(shkr2, 1, i * pp + offs, dur = 300, vel = 40 + rand(40));
-          }
-        }
-      }
-    }
-  }
-}
-
 let snare_comp = comp()
 {
   setup()
@@ -1132,6 +1092,26 @@ let glitch_perc_comp = comp()
           # Extreme pitch modulation
           set p:pitch pitchz[rand(len(pitchz))] at = i * pp;
         }
+      }
+    }
+  }
+}
+
+let snarezblah_comp = comp()
+{
+  setup()
+  {
+    let numz = [2, 4, 6, 8, 12, 16, 24];
+    let nx = 0;
+  }
+  run()
+  {
+    for (let i = 0; i < len(numz); i++) {
+      let start_pp = i * pplooplen;
+      let lpp = pplooplen / numz[i];
+      let offset = lpp / 2;
+      for (let j = 0; j < numz[i]; j++) {
+        note_on_at(sb2, 1, start_pp + offset + j * lpp, dur = lpp);
       }
     }
   }

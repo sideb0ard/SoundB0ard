@@ -123,13 +123,23 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "bd_delay_feedback_pct")
     settings_.bd_delay_feedback_pct = val;
   else if (name == "bd_delay_ratio")
-    settings_.bd_distortion_threshold = val;
+    settings_.bd_delay_ratio = val;
   else if (name == "bd_delay_wetmix")
-    settings_.bd_distortion_threshold = val;
+    settings_.bd_delay_wetmix = val;
   else if (name == "bd_delay_sync_tempo")
     settings_.bd_delay_sync_tempo = val;
   else if (name == "bd_delay_sync_len")
     settings_.bd_delay_sync_len = val;
+  else if (name == "bd_pitch_env_range")
+    settings_.bd_pitch_env_range = val;
+  else if (name == "bd_attack")
+    settings_.bd_attack = val;
+  else if (name == "bd_osc1_wav")
+    settings_.bd_osc1_waveform = val;
+  else if (name == "bd_osc2_wav")
+    settings_.bd_osc2_waveform = val;
+  else if (name == "bd_noise_attack")
+    settings_.bd_noise_attack = val;
 
   else if (name == "hh_vol")
     settings_.hh_vol = val;
@@ -158,9 +168,9 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "hh_delay_feedback_pct")
     settings_.hh_delay_feedback_pct = val;
   else if (name == "hh_delay_ratio")
-    settings_.hh_distortion_threshold = val;
+    settings_.hh_delay_ratio = val;
   else if (name == "hh_delay_wetmix")
-    settings_.hh_distortion_threshold = val;
+    settings_.hh_delay_wetmix = val;
   else if (name == "hh_delay_sync_tempo")
     settings_.hh_delay_sync_tempo = val;
   else if (name == "hh_delay_sync_len")
@@ -193,9 +203,9 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "hh2_delay_feedback_pct")
     settings_.hh2_delay_feedback_pct = val;
   else if (name == "hh2_delay_ratio")
-    settings_.hh2_distortion_threshold = val;
+    settings_.hh2_delay_ratio = val;
   else if (name == "hh2_delay_wetmix")
-    settings_.hh2_distortion_threshold = val;
+    settings_.hh2_delay_wetmix = val;
   else if (name == "hh2_delay_sync_tempo")
     settings_.hh2_delay_sync_tempo = val;
   else if (name == "hh2_delay_sync_len")
@@ -232,13 +242,17 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "sd_delay_feedback_pct")
     settings_.sd_delay_feedback_pct = val;
   else if (name == "sd_delay_ratio")
-    settings_.sd_distortion_threshold = val;
+    settings_.sd_delay_ratio = val;
   else if (name == "sd_delay_wetmix")
-    settings_.sd_distortion_threshold = val;
+    settings_.sd_delay_wetmix = val;
   else if (name == "sd_delay_sync_tempo")
     settings_.sd_delay_sync_tempo = val;
   else if (name == "sd_delay_sync_len")
     settings_.sd_delay_sync_len = val;
+  else if (name == "sd_attack")
+    settings_.sd_attack = val;
+  else if (name == "sd_noise_attack")
+    settings_.sd_noise_attack = val;
 
   else if (name == "cp_vol")
     settings_.cp_vol = val;
@@ -277,9 +291,9 @@ void DrumSynth::SetParam(std::string name, double val) {
   else if (name == "cp_delay_feedback_pct")
     settings_.cp_delay_feedback_pct = val;
   else if (name == "cp_delay_ratio")
-    settings_.cp_distortion_threshold = val;
+    settings_.cp_delay_ratio = val;
   else if (name == "cp_delay_wetmix")
-    settings_.cp_distortion_threshold = val;
+    settings_.cp_delay_wetmix = val;
   else if (name == "cp_delay_sync_tempo")
     settings_.cp_delay_sync_tempo = val;
   else if (name == "cp_delay_sync_len")
@@ -401,6 +415,11 @@ std::string DrumSynth::Info() {
   ss << "     bd_delay_wetmix:" << settings_.bd_delay_wetmix
      << " bd_delay_sync_tempo:" << settings_.bd_delay_sync_tempo
      << " bd_delay_sync_len:" << settings_.bd_delay_sync_len << std::endl;
+  ss << "     bd_pitch_env_range:" << settings_.bd_pitch_env_range
+     << " bd_attack:" << settings_.bd_attack
+     << " bd_osc1_wav:" << GetOscType(settings_.bd_osc1_waveform)
+     << " bd_osc2_wav:" << GetOscType(settings_.bd_osc2_waveform)
+     << " bd_noise_attack:" << settings_.bd_noise_attack << std::endl;
   ss << COOL_COLOR_ORANGE "     sd(1): sd_vol:" << settings_.sd_vol
      << " sd_pan:" << settings_.sd_pan << " sd_nvol:" << settings_.sd_noise_vol
      << " sd_noise_decay:" << settings_.sd_noise_decay
@@ -419,6 +438,8 @@ std::string DrumSynth::Info() {
   ss << "     sd_delay_wetmix:" << settings_.sd_delay_wetmix
      << " sd_delay_sync_tempo:" << settings_.sd_delay_sync_tempo
      << " sd_delay_sync_len:" << settings_.sd_delay_sync_len << std::endl;
+  ss << "     sd_attack:" << settings_.sd_attack
+     << " sd_noise_attack:" << settings_.sd_noise_attack << std::endl;
   ss << COOL_COLOR_YELLOW_MELLOW "     hh(2): hh_vol:" << settings_.bd_vol
      << " hh_pan:" << settings_.hh_pan << " hh_attack:" << settings_.hh_attack
      << " hh_decay:" << settings_.hh_decay << std::endl;
@@ -626,6 +647,11 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "bd_delay_wetmix=" << settings_.bd_delay_wetmix << kSEP;
   presetzzz << "bd_delay_sync_tempo=" << settings_.bd_delay_sync_tempo << kSEP;
   presetzzz << "bd_delay_sync_len=" << settings_.bd_delay_sync_len << kSEP;
+  presetzzz << "bd_pitch_env_range=" << settings_.bd_pitch_env_range << kSEP;
+  presetzzz << "bd_attack=" << settings_.bd_attack << kSEP;
+  presetzzz << "bd_osc1_waveform=" << settings_.bd_osc1_waveform << kSEP;
+  presetzzz << "bd_osc2_waveform=" << settings_.bd_osc2_waveform << kSEP;
+  presetzzz << "bd_noise_attack=" << settings_.bd_noise_attack << kSEP;
 
   // 1 - SnareDum Settings
   presetzzz << "sd_vol=" << settings_.sd_vol << kSEP;
@@ -649,6 +675,8 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "sd_delay_wetmix=" << settings_.sd_delay_wetmix << kSEP;
   presetzzz << "sd_delay_sync_tempo=" << settings_.sd_delay_sync_tempo << kSEP;
   presetzzz << "sd_delay_sync_len=" << settings_.sd_delay_sync_len << kSEP;
+  presetzzz << "sd_attack=" << settings_.sd_attack << kSEP;
+  presetzzz << "sd_noise_attack=" << settings_.sd_noise_attack << kSEP;
 
   // 2 - Closed hat Settings
   presetzzz << "hh_vol=" << settings_.hh_vol << kSEP;
@@ -782,7 +810,7 @@ void DrumSynth::Save(std::string new_preset_name) {
   presetzzz << "lz_freq=" << settings_.lz_freq << kSEP;
   presetzzz << "lz_attack=" << settings_.lz_attack << kSEP;
   presetzzz << "lz_decay=" << settings_.lz_decay << kSEP;
-  presetzzz << "lz_osc_range=" << settings_.lz_decay << kSEP;
+  presetzzz << "lz_osc_range=" << settings_.lz_osc_range << kSEP;
 
   presetzzz << std::endl;
   presetzzz.close();
@@ -826,6 +854,11 @@ void DrumSynth::Update() {
   bd_->delay_->SetWetMix(settings_.bd_delay_wetmix);
   bd_->delay_->SetSync(settings_.bd_delay_sync_tempo);
   bd_->delay_->SetSyncLen(settings_.bd_delay_sync_len);
+  bd_->pitch_osc_range_ = settings_.bd_pitch_env_range;
+  bd_->eg_.SetAttackTimeMsec(settings_.bd_attack);
+  bd_->osc1_->m_waveform = settings_.bd_osc1_waveform;
+  bd_->osc2_->m_waveform = settings_.bd_osc2_waveform;
+  bd_->noise_eg_.SetAttackTimeMsec(settings_.bd_noise_attack);
 
   sd_->dca_.m_amplitude_control = settings_.sd_vol;
   sd_->dca_.m_pan_control = settings_.sd_pan;
@@ -847,10 +880,12 @@ void DrumSynth::Update() {
   sd_->delay_->SetWetMix(settings_.sd_delay_wetmix);
   sd_->delay_->SetSync(settings_.sd_delay_sync_tempo);
   sd_->delay_->SetSyncLen(settings_.sd_delay_sync_len);
+  sd_->eg_.SetAttackTimeMsec(settings_.sd_attack);
+  sd_->noise_eg_.SetAttackTimeMsec(settings_.sd_noise_attack);
 
   hh_->dca_.m_amplitude_control = settings_.hh_vol;
   hh_->dca_.m_pan_control = settings_.hh_pan;
-  hh_->eg_.SetAttackTimeMsec(settings_.hh_decay);
+  hh_->eg_.SetAttackTimeMsec(settings_.hh_attack);
   hh_->eg_.SetDecayTimeMsec(settings_.hh_decay);
   hh_->SetAmplitude(settings_.hh_sqamp);
   hh_->mid_filter_->SetFcControl(settings_.hh_midf);
@@ -868,7 +903,7 @@ void DrumSynth::Update() {
 
   hh2_->dca_.m_amplitude_control = settings_.hh2_vol;
   hh2_->dca_.m_pan_control = settings_.hh2_pan;
-  hh2_->eg_.SetAttackTimeMsec(settings_.hh2_decay);
+  hh2_->eg_.SetAttackTimeMsec(settings_.hh2_attack);
   hh2_->eg_.SetDecayTimeMsec(settings_.hh2_decay);
   hh2_->SetAmplitude(settings_.hh2_sqamp);
   hh2_->mid_filter_->SetFcControl(settings_.hh2_midf);
@@ -896,7 +931,7 @@ void DrumSynth::Update() {
   cp_->eg_.SetSustainLevel(settings_.cp_eg_sustain);
   cp_->eg_.SetReleaseTimeMsec(settings_.cp_eg_release);
   cp_->lfo_->m_waveform = settings_.cp_lfo_type;
-  cp_->lfo_->m_osc_fo = settings_.cp_lfo_type;
+  cp_->lfo_->m_osc_fo = settings_.cp_lfo_rate;
   cp_->distortion_.SetParam("threshold", settings_.cp_distortion_threshold);
   cp_->use_delay_ = settings_.cp_use_delay;
   cp_->delay_->SetMode(settings_.cp_delay_mode);
@@ -1030,6 +1065,16 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.bd_delay_sync_tempo = dval;
     else if (key == "bd_delay_sync_len")
       preset.bd_delay_sync_len = dval;
+    else if (key == "bd_pitch_env_range")
+      preset.bd_pitch_env_range = dval;
+    else if (key == "bd_attack")
+      preset.bd_attack = dval;
+    else if (key == "bd_osc1_waveform")
+      preset.bd_osc1_waveform = dval;
+    else if (key == "bd_osc2_waveform")
+      preset.bd_osc2_waveform = dval;
+    else if (key == "bd_noise_attack")
+      preset.bd_noise_attack = dval;
 
     // // 1 - SnareDum Settings
     else if (key == "sd_vol")
@@ -1070,6 +1115,10 @@ DrumSettings Map2DrumSettings(std::string name,
       preset.sd_delay_sync_tempo = dval;
     else if (key == "sd_delay_sync_len")
       preset.sd_delay_sync_len = dval;
+    else if (key == "sd_attack")
+      preset.sd_attack = dval;
+    else if (key == "sd_noise_attack")
+      preset.sd_noise_attack = dval;
 
     // // 2 - Closed hat Settings
     else if (key == "hh_vol")

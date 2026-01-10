@@ -43,6 +43,12 @@ struct DrumSettings {
   double bd_delay_wetmix{0.5};
   bool bd_delay_sync_tempo{true};
   int bd_delay_sync_len{0};  // 0 none, 1 - 1/4 // 2 - 8th // 3 - 16th
+  // NEW: Bass Drum additional parameters
+  double bd_pitch_env_range{2.0};  // Pitch envelope range in semitones (0-48)
+  double bd_attack{1.0};           // Main envelope attack (0.1-50 ms)
+  int bd_osc1_waveform{0};         // Oscillator 1 waveform (0-7, SINE default)
+  int bd_osc2_waveform{4};         // Oscillator 2 waveform (0-7, TRI default)
+  double bd_noise_attack{5.0};     // Noise envelope attack (0.1-50 ms)
 
   // 1 - SnareDum Settings
   double sd_vol{1};
@@ -64,6 +70,9 @@ struct DrumSettings {
   double sd_delay_wetmix{0.5};
   bool sd_delay_sync_tempo{true};
   int sd_delay_sync_len{0};  // 0 none, 1 - 1/4 // 2 - 8th // 3 - 16th
+  // NEW: Snare Drum additional parameters
+  double sd_attack{1.0};        // Main envelope attack (0.1-50 ms)
+  double sd_noise_attack{1.0};  // Noise envelope attack (0.1-50 ms)
 
   // 2 - Closed hat Settings
   double hh_vol{1};
@@ -193,8 +202,8 @@ class DrumSynth : public SoundGenerator {
   void NoteOn(midi_event ev) override;
   void NoteOff(midi_event ev) override;
   void SetParam(std::string name, double val) override;
-  void SetVolume(double v) override;
-  void SetPan(double p) override;
+  void SetVolume(double v);
+  void SetPan(double p);
   void PrintSettings(DrumSettings settings);
   void LoadPreset(std::string name,
                   std::map<std::string, double> preset_vals) override;

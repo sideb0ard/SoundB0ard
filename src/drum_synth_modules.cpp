@@ -94,7 +94,7 @@ StereoVal BassDrum::Generate() {
     double biased_eg_out = 0;
     double amp_eg_out = eg_.DoEnvelope(&biased_eg_out);
 
-    double eg_osc_mod = OSC_FO_MOD_RANGE * biased_eg_out;
+    double eg_osc_mod = pitch_osc_range_ * biased_eg_out;
     osc1_->SetFoModExp(eg_osc_mod);
     osc1_->Update();
 
