@@ -8,6 +8,7 @@
 #include <interpreter/builtins.hpp>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/object.hpp>
+#include <interpreter/token.hpp>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -45,6 +46,26 @@ bool IsHashable(std::shared_ptr<object::Object> obj) {
       obj->Type() == object::STRING_OBJ ||
       object::IsSoundGenerator(obj->Type()))
     return true;
+  return false;
+}
+
+bool IsReservedVariableName(const std::string &name) {
+  // Check if name is a keyword (let, if, for, etc.)
+  if (token::IsKeyword(name)) {
+    return true;
+  }
+
+  // Check if name starts with 'p' followed by digit(s) - reserved for process
+  // IDs
+  if (name.length() >= 2 && name[0] == 'p' && std::isdigit(name[1])) {
+    // Make sure all characters after 'p' are digits
+    for (size_t i = 1; i < name.length(); i++) {
+      if (!std::isdigit(name[i])) {
+        return false;  // e.g., "pizza" is ok
+      }
+    }
+    return true;  // e.g., "p1", "p31", "p123" are reserved
+  }
   return false;
 }
 
@@ -169,6 +190,22 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
   std::shared_ptr<ast::LetStatement> let_expr =
       std::dynamic_pointer_cast<ast::LetStatement>(node);
   if (let_expr) {
+    // Check if variable name is reserved
+    if (IsReservedVariableName(let_expr->name_->value_)) {
+      std::string error_msg =
+          "Cannot use '" + let_expr->name_->value_ + "' as variable name - ";
+
+      if (token::IsKeyword(let_expr->name_->value_)) {
+        error_msg += "it is a reserved keyword";
+      } else {
+        error_msg +=
+            "names starting with 'p' followed by digits "
+            "(like p1, p31, etc.) are reserved for process IDs";
+      }
+
+      return NewError(error_msg.c_str());
+    }
+
     // first check if its a sample expression with same path and if so, do
     // nothing so we don't keep reloading same sample
     auto sample_expression =

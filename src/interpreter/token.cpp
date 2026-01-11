@@ -62,6 +62,10 @@ TokenType LookupIdent(std::string ident) {
   return SLANG_IDENT;
 }
 
+bool IsKeyword(const std::string &ident) {
+  return keywords.find(ident) != keywords.end();
+}
+
 std::ostream &operator<<(std::ostream &out, const Token &tok) {
   out << "{type:" << tok.type_ << " literal:" << tok.literal_ << "}";
   return out;

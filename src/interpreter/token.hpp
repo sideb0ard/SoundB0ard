@@ -129,5 +129,6 @@ class Token {
 };
 
 TokenType LookupIdent(std::string ident);
+bool IsKeyword(const std::string &ident);
 
 }  // namespace token

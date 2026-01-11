@@ -3099,18 +3099,328 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 };
 
 std::string GetBuiltInHelp() {
-  std::string help_text = "Available built-in functions and variables:\n";
+  std::unordered_map<std::string, std::string> function_help = {
+      // Array/Collection Functions
+      {"len",
+       "len(arr|str|map) - Returns the length/size of an array, string, or "
+       "map"},
+      {"head", "head(arr) - Returns the first element of an array"},
+      {"tail", "tail(arr) - Returns all elements except the first"},
+      {"last", "last(arr) - Returns the last element of an array"},
+      {"push", "push(arr, item) - Appends item to array and returns new array"},
+      {"take_n", "take_n(arr, n) - Returns first n elements from array"},
+      {"take_random_n",
+       "take_random_n(arr, n) - Returns n random unique elements from array"},
+      {"reverse", "reverse(arr) - Reverses the order of array elements"},
+      {"rotate", "rotate(arr, n) - Rotates array elements by n positions"},
+      {"sort", "sort(arr) - Sorts array elements in ascending order"},
+      {"shuffle", "shuffle(arr) - Randomly shuffles array elements"},
+      {"is_array", "is_array(val) - Returns true if value is an array"},
+      {"is_in", "is_in(arr, item) - Returns true if item is found in array"},
+      {"keys", "keys(map) - Returns array of all keys in a map/hash"},
+      {"invert",
+       "invert(arr) - Inverts 0s and 1s in array (for rhythm patterns)"},
 
-  std::vector<std::string> built_in_names;
-  for (const auto& pair : built_ins) {
-    built_in_names.push_back(pair.first);
-  }
+      // String Functions
+      {"lowercase", "lowercase(str) - Converts string to lowercase"},
+      {"uppercase", "uppercase(str) - Converts string to uppercase"},
 
-  std::sort(built_in_names.begin(), built_in_names.end());
+      // Math Functions
+      {"floor", "floor(num) - Returns largest integer <= num"},
+      {"log", "log(num) - Returns base-2 logarithm of num"},
+      {"abs", "abs(num) - Returns absolute value of num"},
+      {"sin", "sin(num) - Returns sine of num (in radians)"},
+      {"cos", "cos(num) - Returns cosine of num (in radians)"},
+      {"max", "max(a, b) - Returns the larger of two numbers"},
+      {"min", "min(a, b) - Returns the smaller of two numbers"},
+      {"incr",
+       "incr(num, min, max) - Increments num, wrapping at max back to min"},
+      {"rincr",
+       "rincr(num, min, max) - Randomly increments, decrements, or keeps num "
+       "within range"},
+      {"dincr",
+       "dincr(num, min, max) - Drunk walk increment within range (randomly +1 "
+       "or -1)"},
+      {"scale",
+       "scale(val, in_min, in_max, out_min, out_max) - Maps value from input "
+       "range to output range"},
 
-  for (const auto& n : built_in_names) {
-    help_text += n + "\n";
-  }
+      // Random/Generative Functions
+      {"rand", "rand(min, max) - Returns random number between min and max"},
+      {"rand_array",
+       "rand_array(size, min, max) - Generates array of random numbers"},
+      {"rand_sixteenthz",
+       "rand_sixteenthz() - Returns random 16th-note timing value"},
+      {"perlin", "perlin(x) - Returns Perlin noise value at x (smooth random)"},
+      {"bjork", "bjork(pulses, steps) - Generates Euclidean rhythm pattern"},
+      {"gen_perc",
+       "gen_perc(len, density) - Generates random percussion pattern"},
+
+      // Conversion Functions
+      {"bits", "bits(num) - Converts number to 16-bit binary array"},
+      {"hex", "hex(num) - Converts number to hexadecimal string"},
+
+      // Sequencer/Timing Functions
+      {"stepn", "stepn(step_seq) - Gets next value from step sequencer"},
+      {"now", "now() - Returns current time in beats"},
+      {"timing_info",
+       "timing_info() - Returns map with tempo, beat, quantum info"},
+      {"synchz",
+       "synchz(beat) - Returns array of timing values synchronized to beat "
+       "divisions"},
+
+      // Music Theory Functions
+      {"midi_ref", "midi_ref() - Returns map of note names to MIDI numbers"},
+      {"notes_in_key",
+       "notes_in_key(root, scale) - Returns MIDI notes in given key/scale"},
+      {"notes_in_chord",
+       "notes_in_chord(root, chord_type) - Returns MIDI notes in chord"},
+      {"scale_note",
+       "scale_note(note, key, scale) - Quantizes MIDI note to scale"},
+      {"scale_melody",
+       "scale_melody(notes, key, scale) - Quantizes array of notes to scale"},
+      {"algoz", "algoz() - Returns array of available scale/mode names"},
+      {"ratioz", "ratioz() - Returns array of available chord types"},
+
+      // Audio Playback Functions
+      {"play_array",
+       "play_array(mixer, times, dur, sample) - Plays sample at specified "
+       "times"},
+      {"play_array_over",
+       "play_array_over(mixer, pattern, dur, sample) - Plays pattern "
+       "subdivisions"},
+      {"play_rhythm",
+       "play_rhythm(mixer, pattern, dur, sample) - Plays rhythm pattern "
+       "(1=hit, 0=rest)"},
+      {"play_map",
+       "play_map(mixer, map, dur) - Plays map of {sample: pattern} "
+       "assignments"},
+      {"fast", "fast(pattern, factor) - Speeds up pattern by time factor"},
+      {"scramble",
+       "scramble(mixer, pattern, factor) - Randomizes pattern timing"},
+      {"stutter",
+       "stutter(mixer, pattern, repeats, subdiv) - Adds stutter repeats to "
+       "pattern"},
+
+      // Sound Generator Control
+      {"note_on", "note_on(gen, note, vel) - Triggers note on sound generator"},
+      {"note_on_at",
+       "note_on_at(gen, note, vel, time) - Schedules note on at time"},
+      {"note_off", "note_off(gen, note) - Stops note on sound generator"},
+      {"note_off_at",
+       "note_off_at(gen, note, time) - Schedules note off at time"},
+      {"set_pitch",
+       "set_pitch(gen, note, cents) - Sets pitch with detune in cents"},
+      {"stop", "stop(gen) - Stops all notes on sound generator"},
+      {"solo", "solo(gen) - Solos a sound generator (mutes all others)"},
+      {"unsolo", "unsolo() - Unmutes all sound generators"},
+
+      // Preset Management
+      {"list_presets",
+       "list_presets(gen) - Lists available presets for generator"},
+      {"load_preset",
+       "load_preset(gen, name) - Loads named preset on generator"},
+      {"rand_preset", "rand_preset(gen) - Loads random preset on generator"},
+      {"save_preset",
+       "save_preset(gen, name) - Saves current settings as preset"},
+
+      // Mixer/Routing Functions
+      {"send",
+       "send(src, dest, amt) - Sends audio from src to dest with amount"},
+      {"xassign", "xassign(mixer, gen) - Assigns generator to mixer channel"},
+      {"xclear", "xclear(mixer) - Clears all assignments from mixer"},
+      {"xremove", "xremove(mixer, gen) - Removes generator from mixer"},
+      {"xfade",
+       "xfade(mixer, gen1, gen2, time) - Crossfades between generators"},
+      {"mvol", "mvol(mixer, vol) - Sets mixer master volume"},
+      {"monitor", "monitor(mixer, on_off) - Enables/disables mixer monitoring"},
+
+      // Effects/Processing
+      {"add_fx", "add_fx(gen, fx_name) - Adds effect to generator"},
+      {"add_buf",
+       "add_buf(mixer, buf_name, start, end) - Adds buffer/sample to mixer"},
+
+      // Sample/Kit Management
+      {"drum_kit", "drum_kit() - Returns default drum sample kit map"},
+      {"kit", "kit(name) - Loads drum kit by name"},
+      {"load_dir", "load_dir(path) - Loads all audio files from directory"},
+
+      // Pattern Functions
+      {"eval_pattern",
+       "eval_pattern(pattern_str) - Evaluates pattern string and returns "
+       "timing array"},
+      {"print_pattern",
+       "print_pattern(pattern) - Prints visual representation of pattern"},
+
+      // MIDI Functions
+      {"midi_init", "midi_init() - Initializes MIDI system"},
+      {"midi_assign",
+       "midi_assign(device, gen) - Assigns MIDI device to generator"},
+      {"midi_rec", "midi_rec(on_off) - Enables/disables MIDI recording"},
+      {"midi_print", "midi_print() - Prints MIDI device information"},
+      {"midi_reset", "midi_reset() - Resets MIDI system"},
+      {"midi_dump", "midi_dump() - Dumps all recorded MIDI events"},
+      {"midi_at",
+       "midi_at(beat, note, vel, dur, gen) - Schedules MIDI note at beat"},
+      {"midi_fix", "midi_fix(gen, note) - Fixes/latches MIDI note on"},
+      {"midi_map",
+       "midi_map(device, cc_num, param_name) - Maps MIDI CC to parameter"},
+
+      // Scheduling
+      {"sched",
+       "sched(when, start, end, time, action) - Schedules parameter "
+       "automation"},
+
+      // WebSocket
+      {"websock", "websock(cmd) - Sends command via WebSocket"},
+      {"signal_from",
+       "signal_from(name) - Gets signal value from named source"},
+
+      // Utility
+      {"print", "print(val) - Prints value to console"},
+      {"help", "help() - Shows this help text"},
+      {"funcz", "funcz() - Lists all available functions"},
+      {"type", "type(val) - Returns the type of value"},
+      {"speed", "speed(factor) - Sets global playback speed multiplier"},
+  };
+
+  std::string help_text = R"(
+╔══════════════════════════════════════════════════════════════════════╗
+║              SoundB0ard Built-In Functions Reference                ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+ARRAY/COLLECTION FUNCTIONS
+──────────────────────────────────────────────────────────────────────
+)";
+
+  auto add_category = [&](const std::vector<std::string>& funcs) {
+    for (const auto& fname : funcs) {
+      if (function_help.count(fname)) {
+        help_text += "  " + function_help[fname] + "\n";
+      }
+    }
+    help_text += "\n";
+  };
+
+  add_category({"len", "head", "tail", "last", "push", "take_n",
+                "take_random_n", "reverse", "rotate", "sort", "shuffle",
+                "is_array", "is_in", "keys", "invert"});
+
+  help_text += "STRING FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"lowercase", "uppercase"});
+
+  help_text += "MATH FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"floor", "log", "abs", "sin", "cos", "max", "min", "incr",
+                "rincr", "dincr", "scale"});
+
+  help_text += "RANDOM/GENERATIVE FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category(
+      {"rand", "rand_array", "rand_sixteenthz", "perlin", "bjork", "gen_perc"});
+
+  help_text += "CONVERSION FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"bits", "hex"});
+
+  help_text += "SEQUENCER/TIMING FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"stepn", "now", "timing_info", "synchz"});
+
+  help_text += "MUSIC THEORY FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"midi_ref", "notes_in_key", "notes_in_chord", "scale_note",
+                "scale_melody", "algoz", "ratioz"});
+
+  help_text += "AUDIO PLAYBACK FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"play_array", "play_array_over", "play_rhythm", "play_map",
+                "fast", "scramble", "stutter"});
+
+  help_text += "SOUND GENERATOR CONTROL\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"note_on", "note_on_at", "note_off", "note_off_at", "set_pitch",
+                "stop", "solo", "unsolo"});
+
+  help_text += "PRESET MANAGEMENT\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"list_presets", "load_preset", "rand_preset", "save_preset"});
+
+  help_text += "MIXER/ROUTING FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category(
+      {"send", "xassign", "xclear", "xremove", "xfade", "mvol", "monitor"});
+
+  help_text += "EFFECTS/PROCESSING\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"add_fx", "add_buf"});
+
+  help_text += "SAMPLE/KIT MANAGEMENT\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"drum_kit", "kit", "load_dir"});
+
+  help_text += "PATTERN FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"eval_pattern", "print_pattern"});
+
+  help_text += "MIDI FUNCTIONS\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"midi_init", "midi_assign", "midi_rec", "midi_print",
+                "midi_reset", "midi_dump", "midi_at", "midi_fix", "midi_map"});
+
+  help_text += "SCHEDULING\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"sched"});
+
+  help_text += "WEBSOCKET\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"websock", "signal_from"});
+
+  help_text += "UTILITY\n";
+  help_text +=
+      "──────────────────────────────────────────────────────────────────────"
+      "\n";
+  add_category({"print", "help", "funcz", "type", "speed"});
+
+  help_text += R"(
+╔══════════════════════════════════════════════════════════════════════╗
+║  Type 'help()' to see this list again                                ║
+║  Type 'funcz()' to see just function names                           ║
+╚══════════════════════════════════════════════════════════════════════╝
+)";
 
   return help_text;
 }
