@@ -1,4 +1,4 @@
-#include "geometer.h"
+#include "waveform_sculptor.h"
 
 #include <algorithm>
 #include <cmath>
@@ -12,7 +12,7 @@ constexpr float kPi = 3.14159265358979323846f;
 constexpr float kTwoPi = 2.0f * kPi;
 }  // namespace
 
-Geometer::Geometer() {
+WaveformSculptor::WaveformSculptor() {
   type_ = fx_type::GEOMETER;
 
   // Default parameters
@@ -36,7 +36,7 @@ Geometer::Geometer() {
   enabled_ = true;
 }
 
-void Geometer::Init() {
+void WaveformSculptor::Init() {
   hop_size_ = window_size_ / 2;  // 50% overlap
 
   // Allocate buffers
@@ -47,7 +47,7 @@ void Geometer::Init() {
   Reset();
 }
 
-void Geometer::Reset() {
+void WaveformSculptor::Reset() {
   std::fill(input_buffer_.begin(), input_buffer_.end(), 0.0f);
   std::fill(output_buffer_.begin(), output_buffer_.end(), 0.0f);
   std::fill(last_window_.begin(), last_window_.end(), 0.0f);
@@ -55,7 +55,7 @@ void Geometer::Reset() {
   output_position_ = 0;
 }
 
-void Geometer::SetInterpDefaults(InterpStyle style) {
+void WaveformSculptor::SetInterpDefaults(InterpStyle style) {
   switch (style) {
     case InterpStyle::kPolygon:
       // Lo-fi geometric sound - regular spacing, some dimming
@@ -101,7 +101,7 @@ void Geometer::SetInterpDefaults(InterpStyle style) {
   }
 }
 
-float Geometer::GetWindowScalar(int position, int window_size) {
+float WaveformSculptor::GetWindowScalar(int position, int window_size) {
   int half = window_size / 2;
 
   switch (window_shape_) {
@@ -125,7 +125,7 @@ float Geometer::GetWindowScalar(int position, int window_size) {
   }
 }
 
-StereoVal Geometer::Process(StereoVal input) {
+StereoVal WaveformSculptor::Process(StereoVal input) {
   if (!enabled_) {
     return input;
   }
@@ -172,7 +172,7 @@ StereoVal Geometer::Process(StereoVal input) {
   return output;
 }
 
-void Geometer::ProcessWindow() {
+void WaveformSculptor::ProcessWindow() {
   // Step 1: Generate landmarks
   int num_points =
       GenerateLandmarks(input_buffer_.data(), window_size_, temp_x_.data(),
@@ -210,8 +210,9 @@ void Geometer::ProcessWindow() {
   std::copy(recreated.begin(), recreated.end(), last_window_.begin());
 }
 
-int Geometer::GenerateLandmarks(const float* input, int size, int* out_x,
-                                float* out_y, int max_points) {
+int WaveformSculptor::GenerateLandmarks(const float* input, int size,
+                                        int* out_x, float* out_y,
+                                        int max_points) {
   switch (landmark_style_) {
     case LandmarkStyle::kExtNCross:
       return GenerateExtNCross(input, size, out_x, out_y, max_points);
@@ -247,8 +248,9 @@ int Geometer::GenerateLandmarks(const float* input, int size, int* out_x,
   }
 }
 
-void Geometer::ApplyOperation(int* x_points, float* y_points, int& num_points,
-                              PointOp op, double param) {
+void WaveformSculptor::ApplyOperation(int* x_points, float* y_points,
+                                      int& num_points, PointOp op,
+                                      double param) {
   if (op == PointOp::kNone || num_points == 0) return;
 
   switch (op) {
@@ -340,9 +342,10 @@ void Geometer::ApplyOperation(int* x_points, float* y_points, int& num_points,
   }
 }
 
-void Geometer::RecreateWaveform(const int* x_points, const float* y_points,
-                                int num_points, const float* input,
-                                float* output, int size) {
+void WaveformSculptor::RecreateWaveform(const int* x_points,
+                                        const float* y_points, int num_points,
+                                        const float* input, float* output,
+                                        int size) {
   if (num_points == 0) {
     // No points, output silence
     std::fill(output, output + size, 0.0f);
@@ -371,8 +374,9 @@ void Geometer::RecreateWaveform(const int* x_points, const float* y_points,
 
 // Landmark generation implementations
 
-int Geometer::GenerateExtNCross(const float* input, int size, int* out_x,
-                                float* out_y, int max_points) {
+int WaveformSculptor::GenerateExtNCross(const float* input, int size,
+                                        int* out_x, float* out_y,
+                                        int max_points) {
   // Detect extremities (peaks/valleys) and zero crossings
   float threshold = landmark_param_ * 0.1f;  // Noise threshold
   int num = 0;
@@ -421,8 +425,8 @@ int Geometer::GenerateExtNCross(const float* input, int size, int* out_x,
   return num;
 }
 
-int Geometer::GenerateSpan(const float* input, int size, int* out_x,
-                           float* out_y, int max_points) {
+int WaveformSculptor::GenerateSpan(const float* input, int size, int* out_x,
+                                   float* out_y, int max_points) {
   // Spacing based on amplitude
   float influence = 10.0f + (landmark_param_ * 100.0f);  // How much amplitude
                                                          // affects spacing
@@ -450,8 +454,8 @@ int Geometer::GenerateSpan(const float* input, int size, int* out_x,
   return num;
 }
 
-int Geometer::GenerateDyDx(const float* input, int size, int* out_x,
-                           float* out_y, int max_points) {
+int WaveformSculptor::GenerateDyDx(const float* input, int size, int* out_x,
+                                   float* out_y, int max_points) {
   // Based on derivative (rate of change)
   float threshold = (landmark_param_ - 0.5f) * 2.0f;  // -1 to 1
   int num = 0;
@@ -482,8 +486,9 @@ int Geometer::GenerateDyDx(const float* input, int size, int* out_x,
 
 // Waveform recreation implementations
 
-void Geometer::RecreatePolygon(const int* x_points, const float* y_points,
-                               int num_points, float* output, int size) {
+void WaveformSculptor::RecreatePolygon(const int* x_points,
+                                       const float* y_points, int num_points,
+                                       float* output, int size) {
   // Linear interpolation with dimming effect - matches original DestroyFX
   for (int i = 1; i < num_points; i++) {
     int x1 = x_points[i - 1];
@@ -506,8 +511,9 @@ void Geometer::RecreatePolygon(const int* x_points, const float* y_points,
   output[size - 1] = y_points[num_points - 1];
 }
 
-void Geometer::RecreateWrongygon(const int* x_points, const float* y_points,
-                                 int num_points, float* output, int size) {
+void WaveformSculptor::RecreateWrongygon(const int* x_points,
+                                         const float* y_points, int num_points,
+                                         float* output, int size) {
   // Backwards linear interpolation - harsh/glitchy effect
   for (int i = 1; i < num_points; i++) {
     int x1 = x_points[i - 1];
@@ -531,9 +537,9 @@ void Geometer::RecreateWrongygon(const int* x_points, const float* y_points,
   output[size - 1] = y_points[num_points - 1];
 }
 
-void Geometer::RecreateSing(const int* x_points, const float* y_points,
-                            int num_points, const float* input, float* output,
-                            int size) {
+void WaveformSculptor::RecreateSing(const int* x_points, const float* y_points,
+                                    int num_points, const float* input,
+                                    float* output, int size) {
   // Sine wave interpolation with amplitude envelope from landmarks
   for (int i = 1; i < num_points; i++) {
     int x1 = x_points[i - 1];
@@ -566,9 +572,10 @@ void Geometer::RecreateSing(const int* x_points, const float* y_points,
   output[size - 1] = input[size - 1];
 }
 
-void Geometer::RecreateReversi(const int* x_points, const float* y_points,
-                               int num_points, const float* input,
-                               float* output, int size) {
+void WaveformSculptor::RecreateReversi(const int* x_points,
+                                       const float* y_points, int num_points,
+                                       const float* input, float* output,
+                                       int size) {
   // Reverse the audio between each pair of landmarks
   std::fill(output, output + size, 0.0f);
 
@@ -599,9 +606,9 @@ void Geometer::RecreateReversi(const int* x_points, const float* y_points,
   }
 }
 
-std::string Geometer::Status() {
+std::string WaveformSculptor::Status() {
   std::ostringstream oss;
-  oss << "Geometer!";
+  oss << "WaveformSculptor!";
   oss << " wsize:" << window_size_;
   oss << " [" << last_num_landmarks_ << " pts]";
 
@@ -678,7 +685,7 @@ std::string Geometer::Status() {
   return oss.str();
 }
 
-void Geometer::SetParam(std::string name, double val) {
+void WaveformSculptor::SetParam(std::string name, double val) {
   if (name == "wsize") {
     int size = static_cast<int>(val);
     if (size >= kMinWindowSize && size <= kMaxWindowSize) {

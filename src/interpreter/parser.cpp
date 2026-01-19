@@ -1009,6 +1009,7 @@ std::shared_ptr<ast::Statement> Parser::ParseProcessStatement() {
 
     // i.e soundgenerators, which implies this pattern is midi data
     if (PeekTokenIs(token::SLANG_IDENT)) {
+      NextToken();
       process->tidal_target_type_ = TidalPatternTargetType::MidiNote;
       auto target =
           std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);

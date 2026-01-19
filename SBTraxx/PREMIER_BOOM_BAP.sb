@@ -1,0 +1,253 @@
+# DJ Premier Style - Classic Boom Bap
+# Hard-hitting kicks, crisp snares on 2 and 4
+# Tight timing, powerful drums, scratch samples
+
+# Create drum synth and load PREMIER preset (punchy, aggressive boom bap)
+let drums = drum();
+load_preset(drums, "PREMIER");  # Hard-hitting 909 style
+
+# Load samples for layering and scratches
+let break_kick = sample(bd/kick8.aif);
+let break_snare = sample(sd/2snare.aif);
+let clap = sample(cp/clap17.aif);
+let scratch1 = sample(perc/dinkSweep.wav);
+let scratch2 = sample(noises/powerup.wav);
+let hh_sample = sample(ch/2hat.aif);
+
+# Volumes - Premier hits HARD
+vol drums 0.9;
+vol break_kick 0.5;
+vol break_snare 0.6;
+vol clap 0.4;
+vol scratch1 0.5;
+vol scratch2 0.4;
+vol hh_sample 0.3;
+
+# Stereo field
+pan break_kick 0.0;
+pan break_snare -0.05;
+pan clap 0.1;
+pan scratch1 -0.6;
+pan scratch2 0.7;
+pan hh_sample -0.2;
+
+# Classic boom bap kick pattern
+let kick_comp = comp()
+{
+  setup()
+  {
+    # Classic patterns with occasional doubles
+    let k1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let k2 = [1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0];
+    let k3 = [1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0];
+
+    # Slight timing offsets for groove (much tighter than Dilla)
+    let swings = [0, -5, 3, -7, 4, -6, 5, -8, 2, -5, 4, -6, 3, -7, 5, -6];
+
+    # Velocity variations
+    let vels = [110, 105, 115, 108, 112];
+    let vx = 0;
+  }
+  run()
+  {
+    let kpat = k1;
+
+    if (count % 8 == 4) {
+      kpat = k2;
+    }
+    if (count % 16 == 14) {
+      kpat = k3;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (kpat[i] == 1) {
+        # 909 kick from synth
+        note_on_at(drums, 0, i * pp + swings[i], vel = vels[vx]);
+
+        # Layer with break sample for punch
+        note_on_at(break_kick, 1, i * pp + swings[i] + 2, vel = 90 + rand(15));
+
+        vx = incr(vx, 0, len(vels));
+      }
+    }
+  }
+}
+
+# The legendary 2 and 4 snare
+let snare_comp = comp()
+{
+  setup()
+  {
+    # Classic 2 and 4, occasionally with doubles
+    let s1 = [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let s2 = [0, 0, 0, 0,  1, 0, 0, 1,  0, 0, 0, 0,  1, 0, 0, 0];
+    let s3 = [0, 0, 0, 0,  1, 0, 1, 0,  0, 0, 0, 0,  1, 0, 1, 1];
+
+    # Clap pattern for layering
+    let claps = [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+
+    # Tight swing
+    let swings = [0, -4, 2, -5, 3, -6, 4, -5, 2, -4, 3, -5, 4, -6, 3, -5];
+  }
+  run()
+  {
+    let spat = s1;
+
+    if (count % 4 == 3) {
+      spat = s2;
+    }
+    if (count % 8 == 7) {
+      spat = s3;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (spat[i] == 1) {
+        # Hard-hitting 909 snare
+        note_on_at(drums, 1, i * pp + swings[i], vel = 110 + rand(15));
+
+        # Layer with break snare sample
+        note_on_at(break_snare, 1, i * pp + swings[i] + 1, vel = 85 + rand(10));
+
+        # Add clap layer for crack
+        if (claps[i] == 1) {
+          note_on_at(clap, 1, i * pp + swings[i] + 3, vel = 70 + rand(15));
+        }
+      }
+    }
+  }
+}
+
+# Tight hi-hat pattern
+let hats_comp = comp()
+{
+  setup()
+  {
+    # Classic 8th and 16th patterns
+    let h1 = [1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0];
+    let h2 = [1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1];
+    let h3 = [1, 0, 1, 1,  1, 0, 1, 0,  1, 1, 1, 0,  1, 0, 1, 1];
+
+    # Open hats for accents
+    let oh = [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 0, 1, 0];
+
+    # Minimal swing
+    let swings = [0, -3, 2, -4, 2, -3, 3, -4, 1, -3, 2, -3, 2, -4, 3, -3];
+  }
+  run()
+  {
+    let hpat = h1;
+
+    if (count % 4 == 2) {
+      hpat = h2;
+    }
+    if (count % 8 == 6) {
+      hpat = h3;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (hpat[i] == 1) {
+        # 909 closed hat
+        note_on_at(drums, 2, i * pp + swings[i], vel = 45 + rand(20));
+
+        # Occasional sample layer
+        if (i % 4 == 0 && count % 2 == 0) {
+          note_on_at(hh_sample, 1, i * pp + swings[i], vel = 35 + rand(15));
+        }
+      }
+
+      if (oh[i] == 1) {
+        # 909 open hat
+        note_on_at(drums, 4, i * pp + swings[i], vel = 55 + rand(15));
+      }
+    }
+  }
+}
+
+# Scratch samples - Premier signature
+let scratch_comp = comp()
+{
+  setup()
+  {
+    let sc1 = [0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1];
+    let sc2 = [0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1,  0, 1, 0, 0];
+
+    # Scratch rhythms
+    let sc3 = [1, 1, 0, 0,  0, 0, 0, 0,  1, 1, 1, 0,  0, 0, 0, 0];
+
+    # Pitch variations for scratches
+    let pitches = [0.8, 1.2, 0.6, 1.5, 0.9, 1.1];
+    let px = 0;
+  }
+  run()
+  {
+    # Scratches come in occasionally
+    if (count % 4 == 3 || count % 8 == 7) {
+      for (let i = 0; i < 16; i++) {
+        if (sc1[i] == 1) {
+          note_on_at(scratch1, 1, i * pp, vel = 60 + rand(30), dur = 80 + rand(50));
+          set scratch1:pitch pitches[px] at = i * pp;
+          px = incr(px, 0, len(pitches));
+        }
+
+        if (sc2[i] == 1 && count % 2 == 1) {
+          note_on_at(scratch2, 1, i * pp + 10, vel = 50 + rand(30), dur = 60 + rand(40));
+          set scratch2:pitch pitches[px] at = i * pp;
+          px = incr(px, 0, len(pitches));
+        }
+      }
+    }
+
+    # Rapid scratches on fill bars
+    if (count % 16 == 15) {
+      for (let i = 0; i < 16; i++) {
+        if (sc3[i] == 1) {
+          note_on_at(scratch1, 1, i * pp, vel = 70 + rand(20), dur = 30 + rand(20));
+          set scratch1:pitch pitches[rand(len(pitches))] at = i * pp;
+        }
+      }
+    }
+  }
+}
+
+# Master arrangement - Premier style is all about the groove
+let main_comp = comp()
+{
+  setup()
+  {
+    let c = 0;
+  }
+  run()
+  {
+    if (c == 0) {
+      p31 # kick_comp;
+      p32 # snare_comp;
+    }
+    if (c == 2) {
+      p33 # hats_comp;
+    }
+    if (c == 4) {
+      p34 # scratch_comp;
+    }
+    if (c == 8) {
+      # Drop for impact
+      p33 # "";
+      p34 # "";
+    }
+    if (c == 10) {
+      # Bring back
+      p33 # hats_comp;
+      p34 # scratch_comp;
+    }
+    if (c == 16) {
+      # Drop kick
+      p31 # "";
+    }
+    if (c == 18) {
+      # Bring it back
+      p31 # kick_comp;
+    }
+
+    print("Premier Bar:", c);
+    c++;
+  }
+}

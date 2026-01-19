@@ -37,9 +37,9 @@ enum class PointOp {
 // Window shapes for crossfading
 enum class WindowShape { kTriangle, kCosine };
 
-class Geometer : public Fx {
+class WaveformSculptor : public Fx {
  public:
-  Geometer();
+  WaveformSculptor();
   std::string Status() override;
   StereoVal Process(StereoVal input) override;
   void SetParam(std::string name, double val) override;

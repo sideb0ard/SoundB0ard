@@ -7,7 +7,7 @@
 
 #include "fx.h"
 
-class Nnirror : public Fx {
+class Diffuser : public Fx {
  public:
   struct Parameters {
     double wet = 0.5f;
@@ -26,8 +26,8 @@ class Nnirror : public Fx {
     // double inertia[4] = {0.1f, 0.1f, 0.1f, 0.1f};
   };
 
-  Nnirror();
-  ~Nnirror() = default;
+  Diffuser();
+  ~Diffuser() = default;
   std::string Status() override;
   StereoVal Process(StereoVal input) override;
   void SetParam(std::string name, double val) override;

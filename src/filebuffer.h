@@ -58,7 +58,7 @@ class FileBuffer {
   int num_channels_{2};
 
   LoopMode loop_mode_{LoopMode::loop_mode};
-  int loop_len_{-1};
+  double loop_len_{-1};
 
   int size_of_sixteenth_{0};
   std::atomic<int> audio_buffer_read_idx_{

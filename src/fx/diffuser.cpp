@@ -1,4 +1,4 @@
-#include <fx/nnirror.h>
+#include <fx/diffuser.h>
 
 #include <algorithm>
 #include <cstring>
@@ -6,20 +6,20 @@
 #include <sstream>
 
 // DelayLine implementation
-Nnirror::DelayLine::DelayLine(int max_samples)
+Diffuser::DelayLine::DelayLine(int max_samples)
     : max_samples_(max_samples), buffer_(max_samples, 0.0f) {}
 
-void Nnirror::DelayLine::Write(double sample) {
+void Diffuser::DelayLine::Write(double sample) {
   buffer_[write_index_] = sample;
   write_index_ = (write_index_ + 1) % max_samples_;
 }
 
-double Nnirror::DelayLine::Read(int delay_samples) const {
+double Diffuser::DelayLine::Read(int delay_samples) const {
   int read_index = (write_index_ - delay_samples + max_samples_) % max_samples_;
   return buffer_[read_index];
 }
 
-double Nnirror::DelayLine::ReadInterpolated(double delay_samples) const {
+double Diffuser::DelayLine::ReadInterpolated(double delay_samples) const {
   int delay_int = static_cast<int>(delay_samples);
   double frac = delay_samples - delay_int;
 
@@ -29,30 +29,30 @@ double Nnirror::DelayLine::ReadInterpolated(double delay_samples) const {
   return sample1 + frac * (sample2 - sample1);
 }
 
-void Nnirror::DelayLine::Clear() {
+void Diffuser::DelayLine::Clear() {
   std::fill(buffer_.begin(), buffer_.end(), 0.0f);
   write_index_ = 0;
 }
 
 // AllPassFilter implementation
-Nnirror::AllPassFilter::AllPassFilter(int delay_samples, double feedback)
+Diffuser::AllPassFilter::AllPassFilter(int delay_samples, double feedback)
     : delay_(delay_samples * 2),
       feedback_(feedback),
       delay_samples_(delay_samples) {}
 
-double Nnirror::AllPassFilter::Process(double input) {
+double Diffuser::AllPassFilter::Process(double input) {
   double delayed = delay_.Read(delay_samples_);
   double output = -input + delayed;
   delay_.Write(input + delayed * feedback_);
   return output;
 }
 
-void Nnirror::AllPassFilter::Clear() {
+void Diffuser::AllPassFilter::Clear() {
   delay_.Clear();
 }
 
 // DiffusionStage implementation
-Nnirror::DiffusionStage::DiffusionStage(int sample_rate) {
+Diffuser::DiffusionStage::DiffusionStage(int sample_rate) {
   // Prime number delay times for decorrelation
   const int prime_delays_ms[kNumAllPasses] = {37, 43, 53, 61};
   const double feedback = 0.5f;
@@ -69,7 +69,7 @@ Nnirror::DiffusionStage::DiffusionStage(int sample_rate) {
   }
 }
 
-StereoVal Nnirror::DiffusionStage::Process(StereoVal input, double amount) {
+StereoVal Diffuser::DiffusionStage::Process(StereoVal input, double amount) {
   if (amount < 0.001) return input;
 
   StereoVal wet = input;
@@ -89,29 +89,29 @@ StereoVal Nnirror::DiffusionStage::Process(StereoVal input, double amount) {
           input.right * (1.0 - amount) + wet.right * amount};
 }
 
-void Nnirror::DiffusionStage::Clear() {
+void Diffuser::DiffusionStage::Clear() {
   for (auto& apf : left_apfs_) apf.Clear();
   for (auto& apf : right_apfs_) apf.Clear();
 }
 
 // SmoothParameter implementation
-void Nnirror::SmoothParameter::SetInertia(double inertia) {
+void Diffuser::SmoothParameter::SetInertia(double inertia) {
   // 0 = instant, 1 = very slow
   double time_constant = 0.001f + inertia * inertia * 2.0f;
   coefficient_ = 1.0f - std::exp(-1.0f / (time_constant * 44100.0f));
 }
 
-double Nnirror::SmoothParameter::Process() {
+double Diffuser::SmoothParameter::Process() {
   current_ += coefficient_ * (target_ - current_);
   return current_;
 }
 
-void Nnirror::SmoothParameter::Reset(double value) {
+void Diffuser::SmoothParameter::Reset(double value) {
   current_ = value;
   target_ = value;
 }
 
-Nnirror::Nnirror() : max_delay_samples_(SAMPLE_RATE * kMaxDelayMs / 1000) {
+Diffuser::Diffuser() : max_delay_samples_(SAMPLE_RATE * kMaxDelayMs / 1000) {
   // Initialize delay lines
   main_delays_[0] = std::make_unique<DelayLine>(max_delay_samples_);
   main_delays_[1] = std::make_unique<DelayLine>(max_delay_samples_);
@@ -149,9 +149,9 @@ Nnirror::Nnirror() : max_delay_samples_(SAMPLE_RATE * kMaxDelayMs / 1000) {
   enabled_ = true;
 }
 
-std::string Nnirror::Status() {
+std::string Diffuser::Status() {
   std::stringstream ss;
-  ss << "Nnirror! ";
+  ss << "Diffuser! ";
   ss << "wet:" << smooth_wet_.GetCurrent();
   ss << " wet_gain:" << smooth_wet_gain_.GetCurrent();
   ss << " sz:" << smooth_size_.GetCurrent();
@@ -168,7 +168,7 @@ std::string Nnirror::Status() {
   return ss.str();
 }
 
-StereoVal Nnirror::Process(StereoVal input) {
+StereoVal Diffuser::Process(StereoVal input) {
   // Smooth parameters with inertia
   double wet = smooth_wet_.Process();
   double wet_gain = smooth_wet_gain_.Process();
@@ -221,7 +221,7 @@ StereoVal Nnirror::Process(StereoVal input) {
   return output;
 }
 
-StereoVal Nnirror::ProcessBlur(StereoVal input) {
+StereoVal Diffuser::ProcessBlur(StereoVal input) {
   // Write to delay lines
   main_delays_[0]->Write(input.left);
   main_delays_[1]->Write(input.right);
@@ -278,7 +278,7 @@ StereoVal Nnirror::ProcessBlur(StereoVal input) {
   return output;
 }
 
-StereoVal Nnirror::ProcessUnison(StereoVal input) {
+StereoVal Diffuser::ProcessUnison(StereoVal input) {
   if (unison_voices_.empty()) return input;
 
   StereoVal unison = {0.0, 0.0};
@@ -314,7 +314,7 @@ StereoVal Nnirror::ProcessUnison(StereoVal input) {
   return output;
 }
 
-StereoVal Nnirror::ProcessDiffusion(StereoVal input) {
+StereoVal Diffuser::ProcessDiffusion(StereoVal input) {
   for (int i = 0; i < 4; ++i) {
     double amount = smooth_diffuse_[i].Process();
     if (amount > 0.001) {
@@ -324,14 +324,14 @@ StereoVal Nnirror::ProcessDiffusion(StereoVal input) {
   return input;
 }
 
-StereoVal Nnirror::ApplyFeedback(StereoVal input) {
+StereoVal Diffuser::ApplyFeedback(StereoVal input) {
   double fb = smooth_feedback_.Process();
   fb = std::min(fb, 0.85);
   return {std::tanh(input.left + feedback_buffer_.left * fb * 0.7),
           std::tanh(input.right + feedback_buffer_.right * fb * 0.7)};
 }
 
-void Nnirror::UpdateSize(double size) {
+void Diffuser::UpdateSize(double size) {
   // Kernel size: 3 to 7
   kernel_size_ = 3 + static_cast<int>(size * 4);
   if (kernel_size_ % 2 == 0) kernel_size_++;
@@ -382,7 +382,7 @@ void Nnirror::UpdateSize(double size) {
   }
 }
 
-void Nnirror::UpdateUnison(double unison) {
+void Diffuser::UpdateUnison(double unison) {
   int num_voices = 1 + static_cast<int>(unison * (kMaxUnisonVoices - 1));
 
   unison_voices_.clear();
@@ -401,7 +401,7 @@ void Nnirror::UpdateUnison(double unison) {
   }
 }
 
-void Nnirror::SetParameters(const Parameters& params) {
+void Diffuser::SetParameters(const Parameters& params) {
   target_params_ = params;
 
   // Update smooth targets
@@ -425,12 +425,12 @@ void Nnirror::SetParameters(const Parameters& params) {
   UpdateUnison(params.unison);
 }
 
-void Nnirror::UpdateParameters() {
+void Diffuser::UpdateParameters() {
   UpdateSize(params_.size);
   UpdateUnison(params_.unison);
 }
 
-void Nnirror::Reset() {
+void Diffuser::Reset() {
   main_delays_[0]->Clear();
   main_delays_[1]->Clear();
   feedback_delays_[0]->Clear();
@@ -444,20 +444,20 @@ void Nnirror::Reset() {
   lfo_phase_ = 0.0;
 }
 
-int Nnirror::MsToSamples(double ms) const {
+int Diffuser::MsToSamples(double ms) const {
   return static_cast<int>(ms * sample_rate_ / 1000.0);
 }
 
-double Nnirror::SamplesToMs(int samples) const {
+double Diffuser::SamplesToMs(int samples) const {
   return static_cast<double>(samples) * 1000.0 / sample_rate_;
 }
 
-int Nnirror::WrapIndex(int index, int buffer_size) const {
+int Diffuser::WrapIndex(int index, int buffer_size) const {
   while (index < 0) index += buffer_size;
   return index % buffer_size;
 }
 
-void Nnirror::SetParam(std::string name, double val) {
+void Diffuser::SetParam(std::string name, double val) {
   if (name == "wet") {
     val = std::max(0.0, std::min(1.0, val));  // 0-1
     smooth_wet_.SetTarget(val);
@@ -512,4 +512,4 @@ void Nnirror::SetParam(std::string name, double val) {
   }
 }
 
-void Nnirror::EventNotify(broadcast_event event, mixer_timing_info tinfo) {}
+void Diffuser::EventNotify(broadcast_event event, mixer_timing_info tinfo) {}

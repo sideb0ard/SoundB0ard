@@ -132,17 +132,17 @@ void TidalPattern::EventNotify(mixer_timing_info tinfo) {
           for (auto e : events) {
             if (e->value_ == "~") continue;
             std::string midistring = e->value_;
+            // Convert note names (C4, D#3) to MIDI numbers, otherwise use as-is
             if (IsNote(e->value_)) {
-              for (auto t : targets_) {
-                midistring =
-                    std::to_string(get_midi_note_from_string(&e->value_[0]));
+              midistring =
+                  std::to_string(get_midi_note_from_string(&e->value_[0]));
+            }
+            for (auto t : targets_) {
+              std::stringstream ss;
+              ss << "note_on(" << t << "," << midistring << "," << e->velocity_
+                 << "," << e->duration_ << ")";
 
-                std::stringstream ss;
-                ss << "note_on(" << t << "," << midistring << ","
-                   << e->velocity_ << "," << e->duration_ << ")";
-
-                eval_command_queue.push(ss.str());
-              }
+              eval_command_queue.push(ss.str());
             }
           }
         }

@@ -1,0 +1,270 @@
+# J Dilla Style - Drunk Swing Boom Bap
+# Signature loose, drunk timing with heavy swing
+# Layered drums with samples + TR808 synth
+
+# Create drum synth and load DILLA preset (warm, vintage, lo-fi)
+let drums = drum();
+load_preset(drums, "DILLA");
+
+# Load samples for layering
+let vinyl_kick = sample(bd/wuk77.aiff);
+let vinyl_snare = sample(cp/kNackr.aiff);
+let perc_hit = sample(perc/uus.wav);
+let shaker = sample(perc/chezShaker.aiff);
+
+# Volumes
+vol drums 0.8;
+vol vinyl_kick 0.3;
+vol vinyl_snare 0.4;
+vol perc_hit 0.35;
+vol shaker 0.25;
+
+# Pan for width
+pan vinyl_kick 0.05;
+pan vinyl_snare -0.1;
+pan perc_hit 0.3;
+pan shaker -0.4;
+
+# Dilla-style kick pattern - the foundation
+let kick_comp = comp()
+{
+  setup()
+  {
+    # Classic boom bap kick pattern with variations
+    let k1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let k2 = [1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  1, 0, 1, 0];
+    let k3 = [1, 0, 0, 0,  0, 1, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0];
+
+    # Swing amounts - heavier on certain beats
+    let swings = [0, -18, 12, -25, 15, -22, 18, -28, 10, -20, 16, -24, 12, -26, 14, -23];
+
+    # Velocity variations for humanization
+    let vels = [105, 95, 110, 100, 90, 108];
+    let vx = 0;
+
+    # DRUNK WALK timing - this is key to Dilla's feel!
+    let drunk_offset = 0;
+  }
+  run()
+  {
+    let kpat = k1;
+
+    # Pattern changes
+    if (count % 4 == 2) {
+      kpat = k2;
+    }
+    if (count % 8 == 6) {
+      kpat = k3;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      #print("i", i);
+      if (kpat[i] == 1) {
+        # Drunk walk creates that stumbling feel
+        drunk_offset = rincr(drunk_offset, -40, 40);
+
+        # Combine drunk walk + swing pattern
+        let total_offset = drunk_offset + swings[i];
+
+        # Layered kicks - 808 synth + sample
+        note_on_at(drums, 0, i * pp + total_offset, vel = vels[vx]);
+
+        # Add sample layer on strong beats for thickness
+        if (i % 4 == 0 || i == 6 || i == 12) {
+          note_on_at(vinyl_kick, 1, i * pp + total_offset + 5, vel = 80);
+        }
+
+        vx = incr(vx, 0, len(vels));
+      }
+    }
+  }
+}
+
+# Snare on 2 and 4 with Dilla swing
+let snare_comp = comp()
+{
+  setup()
+  {
+    # Classic 2 and 4, with occasional ghost notes
+    let s1 = [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0];
+    let s2 = [0, 0, 0, 0,  1, 0, 0, 1,  0, 0, 0, 0,  1, 0, 0, 0];
+    let ghosts = [0, 0, 1, 0,  0, 0, 0, 0,  0, 1, 0, 0,  0, 0, 0, 0];
+
+    # Drunk timing for snare too
+    let drunk_offset = 0;
+
+    # Heavy swing on snares
+    let swings = [0, -15, 10, -20, 18, -25, 12, -22, 8, -18, 14, -24, 16, -26, 10, -20];
+  }
+  run()
+  {
+    let spat = s1;
+    if (count % 4 == 3) {
+      spat = s2;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (spat[i] == 1) {
+        drunk_offset = rincr(drunk_offset, -35, 35);
+        let total_offset = drunk_offset + swings[i];
+
+        # 808 snare
+        note_on_at(drums, 3, i * pp + total_offset, vel = 95 + rand(20));
+
+        # Layer with vinyl sample for crunch
+        note_on_at(vinyl_snare, 1, i * pp + total_offset + 3, vel = 60 + rand(15));
+      }
+
+      # Ghost notes for texture
+      if (ghosts[i] == 1 && count % 2 == 0) {
+        note_on_at(drums, 1, i * pp + rand(20) - 10, vel = 30 + rand(20));
+      }
+    }
+  }
+}
+#
+# # Hi-hats with swing
+let hats_comp = comp()
+{
+  setup()
+  {
+    let h1 = [1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0];
+    let h2 = [1, 1, 1, 0,  1, 0, 1, 1,  1, 0, 1, 0,  1, 1, 0, 1];
+
+    # Open hats
+    let oh = [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 0, 1, 0];
+
+    # Swing for hats
+    let swings = [0, -12, 8, -15, 10, -18, 12, -20, 6, -14, 10, -16, 8, -17, 10, -19];
+  }
+  run()
+  {
+    let hpat = h1;
+    if (count % 4 == 2) {
+      hpat = h2;
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (hpat[i] == 1) {
+        note_on_at(drums, 2, i * pp + swings[i], vel = 35 + rand(25));
+      }
+
+      if (oh[i] == 1) {
+        note_on_at(drums, 4, i * pp + swings[i], vel = 45 + rand(20));
+      }
+    }
+  }
+}
+#
+# # Percussion layer - Dilla loved little perc hits
+let perc_comp = comp()
+{
+  setup()
+  {
+    let perc1 = [0, 0, 1, 0,  0, 0, 0, 1,  0, 1, 0, 0,  0, 0, 0, 0];
+    let perc2 = [0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1,  0, 0, 1, 0];
+
+    let drunk_offset = 0;
+  }
+  run()
+  {
+    let ppat = perc1;
+    if (count % 3 == 1) {
+      ppat = perc2;
+    }
+
+    if (count % 8 < 6) {
+      for (let i = 0; i < 16; i++) {
+        if (ppat[i] == 1) {
+          drunk_offset = rincr(drunk_offset, -30, 30);
+          note_on_at(perc_hit, 1, i * pp + drunk_offset, vel = 40 + rand(30));
+        }
+      }
+    }
+  }
+}
+
+# Shaker for texture
+let shaker_comp = comp()
+{
+  setup()
+  {
+    let sh = [1, 0, 0, 1,  0, 1, 1, 0,  1, 0, 1, 0,  0, 1, 0, 1];
+  }
+  run()
+  {
+    if (count % 4 >= 2) {
+      for (let i = 0; i < 16; i++) {
+        if (sh[i] == 1) {
+          note_on_at(shaker, 1, i * pp + rand(15) - 7, vel = 25 + rand(20));
+        }
+      }
+    }
+  }
+}
+
+# Master arrangement
+let main_comp = comp()
+{
+  setup()
+  {
+    let c = 0;
+  }
+  run()
+  {
+    if (c == 0) {
+      p31 # kick_comp;
+      p32 # snare_comp;
+    }
+    if (c == 4) {
+      p33 # hats_comp;
+    }
+    if (c == 8) {
+      p34 # perc_comp;
+    }
+    if (c == 12) {
+      p35 # shaker_comp;
+    }
+    if (c == 16) {
+      # Drop some elements
+      p34 # "";
+      p35 # "";
+    }
+    if (c == 20) {
+      # Bring them back
+      p34 # perc_comp;
+    }
+
+    print("Dilla Bar:", c);
+    c++;
+  }
+}
+
+let ralpblah_comp = comp()
+{
+  setup()
+  {
+    let beat = [0, 1, 0, 1,  0, 1, 0, 0,  0, 0, 1, 1,  0, 0, 1, 0];
+    let posz1 = [0, 2, 4, 2, 14, 11];
+    let posz2 = [4, 4, 4, 2, 3, 3];
+    let px = 0;
+  }
+  run()
+  {
+    let p = beat;
+    if (count % 8 == 7)  {
+      p = rand_beat();
+    }
+
+    let posz = posz1;
+    if (count % 4 == 3) {
+      posz = posz2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (p[i] == 1) {
+        note_on_at(ralph, posz[px], i * pp, dur = pp);
+        px = incr(px, 0, len(posz));
+      }
+    }
+  }
+}

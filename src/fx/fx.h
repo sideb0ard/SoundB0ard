@@ -8,24 +8,44 @@
 
 enum class fx_type {
   NONE = -1,
-  BASICFILTER,
-  BITCRUSH,
-  COMPRESSOR,
-  DECIMATE,
+
+  // === SATURATION/DISTORTION ===
+  DISTORTION,  // Enhanced multi-mode distortion (hard, soft, tube, foldback)
+  WAVESHAPER,  // Arctan saturation (kept for compatibility)
+
+  // === DEGRADATION/LOFI ===
+  LOFI_CRUSHER,  // Unified bitcrush/decimate (bit depth + sample rate
+                 // reduction)
+
+  // === TIME-BASED ===
   DELAY,
-  ENVELOPE,
   MODDELAY,
-  MODFILTER,
-  DISTORTION,
-  RESONANTLPF,
   REVERB,
+  TRANSVERB,
+
+  // === CREATIVE/EXPERIMENTAL ===
+  WAVEFORM_SCULPTOR,  // Landmark-based waveform manipulation (was Geometer)
+  DIFFUSER,           // Multi-stage diffusion/blur/reverb (was Nnirror)
+
+  // === DYNAMICS ===
+  COMPRESSOR,
+
+  // === FILTERS ===
+  BASICFILTER,
+  MODFILTER,
+  RESONANTLPF,
+
+  // === OTHER ===
+  ENVELOPE,
   QUADFLANGER,
   ENVELOPEFOLLOWER,
-  WAVESHAPER,
   GRANULATE,
-  TRANSVERB,
-  NNIRROR,
-  GEOMETER,
+
+  // === DEPRECATED (for backward compatibility) ===
+  BITCRUSH = LOFI_CRUSHER,      // Alias to LOFI_CRUSHER
+  DECIMATE = LOFI_CRUSHER,      // Alias to LOFI_CRUSHER
+  NNIRROR = DIFFUSER,           // Alias to DIFFUSER
+  GEOMETER = WAVEFORM_SCULPTOR  // Alias to WAVEFORM_SCULPTOR
 };
 
 class Fx {

@@ -1,19 +1,18 @@
 #include <audioutils.h>
 #include <fx/basicfilterpass.h>
-#include <fx/bitcrush.h>
-#include <fx/decimate.h>
+#include <fx/diffuser.h>
 #include <fx/distortion.h>
 #include <fx/dynamics_processor.h>
 #include <fx/fx.h>
 #include <fx/genz.h>
-#include <fx/geometer.h>
 #include <fx/granulate.h>
+#include <fx/lofi_crusher.h>
 #include <fx/modfilter.h>
 #include <fx/modular_delay.h>
-#include <fx/nnirror.h>
 #include <fx/reverb.h>
 #include <fx/stereodelay.h>
 #include <fx/transverb.h>
+#include <fx/waveform_sculptor.h>
 #include <fx/waveshaper.h>
 #include <mixer.h>
 
@@ -36,8 +35,10 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
     for (size_t i = 1; i < args.size(); i++) {
       str_obj = std::dynamic_pointer_cast<object::String>(args[i]);
       if (str_obj) {
-        if (str_obj->value_ == "bitcrush") {
-          fx.push_back(std::make_unique<BitCrush>());
+        // LoFiCrusher (replaces bitcrush and decimate)
+        if (str_obj->value_ == "lofi" || str_obj->value_ == "lofi_crusher" ||
+            str_obj->value_ == "bitcrush" || str_obj->value_ == "decimate") {
+          fx.push_back(std::make_unique<LoFiCrusher>());
         } else if (str_obj->value_ == "compressor") {
           fx.push_back(std::make_unique<DynamicsProcessor>());
         } else if (str_obj->value_ == "delay") {
@@ -46,8 +47,6 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
         } else if (str_obj->value_ == "distort") {
           std::cout << "BOOYA! Distortion all up in this kittycat!\n";
           fx.push_back(std::make_shared<Distortion>());
-        } else if (str_obj->value_ == "decimate") {
-          fx.push_back(std::make_shared<Decimate>());
         } else if (str_obj->value_ == "filter") {
           fx.push_back(std::make_shared<FilterPass>());
         } else if (str_obj->value_ == "genz") {
@@ -56,8 +55,10 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
           fx.push_back(std::make_shared<Reverb>());
         } else if (str_obj->value_ == "transverb") {
           fx.push_back(std::make_shared<Transverb>());
-        } else if (str_obj->value_ == "nnirror" || str_obj->value_ == "nnrrr") {
-          fx.push_back(std::make_shared<Nnirror>());
+          // Diffuser (replaces nnirror)
+        } else if (str_obj->value_ == "diffuser" ||
+                   str_obj->value_ == "nnirror" || str_obj->value_ == "nnrrr") {
+          fx.push_back(std::make_shared<Diffuser>());
         } else if (str_obj->value_ == "sidechain") {
           if (args.size() > 2) {
             std::cout << "Got a source!\n";
@@ -81,8 +82,11 @@ std::vector<std::shared_ptr<Fx>> ParseFXCmd(
         } else if (str_obj->value_ == "granulate" ||
                    str_obj->value_ == "gran") {
           fx.push_back(std::make_shared<Granulate>());
-        } else if (str_obj->value_ == "geometer" || str_obj->value_ == "geom") {
-          fx.push_back(std::make_shared<Geometer>());
+          // WaveformSculptor (replaces geometer)
+        } else if (str_obj->value_ == "sculptor" ||
+                   str_obj->value_ == "waveform_sculptor" ||
+                   str_obj->value_ == "geometer" || str_obj->value_ == "geom") {
+          fx.push_back(std::make_shared<WaveformSculptor>());
         }
       }
     }
