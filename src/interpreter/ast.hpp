@@ -93,6 +93,14 @@ class BooleanExpression : public Expression {
   bool value_;
 };
 
+class NullLiteral : public Expression {
+ public:
+  explicit NullLiteral(Token token) : Expression{token} {}
+  std::string String() const override {
+    return "NULL";
+  }
+};
+
 class BitOpExpression : public Expression {
  public:
   explicit BitOpExpression(Token toke) : Expression(toke) {}

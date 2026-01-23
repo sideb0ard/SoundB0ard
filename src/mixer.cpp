@@ -1062,9 +1062,16 @@ void Mixer::CheckForAudioActionQueueMessages() {
 }
 
 void Mixer::AddFileToMonitor(std::string filepath) {
+  // Check if already monitoring this file
+  for (const auto &f : file_monitors) {
+    if (f.function_file_filepath == filepath) {
+      return;  // Already monitoring
+    }
+  }
   file_monitors.push_back(
       file_monitor{.function_file_filepath = filepath,
-                   .function_file_filepath_last_write_time = {}});
+                   .function_file_filepath_last_write_time = {},
+                   .initialized = false});
 }
 
 void Mixer::CheckForDelayedEvents() {

@@ -30,6 +30,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"ls", SLANG_LS},
     {"midi_array", SLANG_MIDI_ARRAY},
     {"moog", SLANG_MOOG_SYNTH},
+    {"NULL", SLANG_NULL},
     {"osc", SLANG_OSC},
     {"over", SLANG_OVER},
     {"pattern", SLANG_PATTERN},

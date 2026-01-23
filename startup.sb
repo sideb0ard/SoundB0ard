@@ -1048,7 +1048,7 @@ let print_notes = fn(notes)
 kit();
 drum_kit();
 
-p0 # countr ;
+p0 # countr;
 
 # 3840 midi pulses per loop
 let pplooplen = 3840;

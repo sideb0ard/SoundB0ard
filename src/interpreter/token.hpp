@@ -51,6 +51,7 @@ const TokenType SLANG_PHASOR = "PHASOR";
 const TokenType SLANG_LET = "LET";
 const TokenType SLANG_TRUE = "TRUE";
 const TokenType SLANG_FALSE = "FALSE";
+const TokenType SLANG_NULL = "NULL";
 const TokenType SLANG_IF = "IF";
 const TokenType SLANG_ELSE = "ELSE";
 const TokenType SLANG_RETURN = "RETURN";

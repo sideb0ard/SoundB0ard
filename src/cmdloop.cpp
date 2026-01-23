@@ -31,12 +31,16 @@ extern Tsqueue<std::string> repl_queue;
 char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
 static bool active{true};
 const std::string tick("tick");
+constexpr int kFileCheckInterval = 960;  // Check once per beat (PPQN)
 
 int event_hook() {
+  static int tick_counter = 0;
   while (auto reply = repl_queue.try_pop()) {
     if (reply) {
       // TODO - this is a bit of a fudged way to signal a midi tick
       if (tick.compare(reply->data()) == 0) {
+        if (++tick_counter < kFileCheckInterval) continue;
+        tick_counter = 0;
         for (auto &f : global_mixr->file_monitors) {
           if (!f.function_file_filepath.empty()) {
             //    // std::cout << "GOT A FILE TO MONITOR!\n";
@@ -50,8 +54,16 @@ int event_hook() {
                       ReadFileContents(f.function_file_filepath);
                   eval_command_queue.push(contents);
 
-                  std::cout << "UPdatin' " << f.function_file_filepath
-                            << std::endl;
+                  // Call init() only on first load
+                  if (!f.initialized) {
+                    eval_command_queue.push("init()");
+                    f.initialized = true;
+                    std::cout << "Initializing " << f.function_file_filepath
+                              << std::endl;
+                  } else {
+                    std::cout << "Reloading " << f.function_file_filepath
+                              << std::endl;
+                  }
 
                   f.function_file_filepath_last_write_time = ftime;
                   rl_line_buffer[0] = '\0';

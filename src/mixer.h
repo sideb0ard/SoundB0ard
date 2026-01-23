@@ -47,6 +47,7 @@ struct PreviewBuffer {
 struct file_monitor {
   std::string function_file_filepath;
   std::filesystem::file_time_type function_file_filepath_last_write_time;
+  bool initialized{false};
 };
 
 struct DelayedMidiEvent {

@@ -149,6 +149,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     return NativeBoolToBooleanObject(be->value_);
   }
 
+  std::shared_ptr<ast::NullLiteral> nl =
+      std::dynamic_pointer_cast<ast::NullLiteral>(node);
+  if (nl) {
+    return NULLL;
+  }
+
   std::shared_ptr<ast::PrefixExpression> pe =
       std::dynamic_pointer_cast<ast::PrefixExpression>(node);
   if (pe) {
@@ -218,6 +224,15 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
           if (sample_obj->sample_path_.compare(sample_expression->path_) == 0)
             return NULLL;
       }
+    }
+
+    // If assigning NULL to an existing variable, skip - allows live reload
+    // without overwriting values set by init()
+    auto null_literal =
+        std::dynamic_pointer_cast<ast::NullLiteral>(let_expr->value_);
+    if (null_literal) {
+      auto existing = env->Get(let_expr->name_->value_);
+      if (existing) return NULLL;
     }
 
     auto val = Eval(let_expr->value_, env);
