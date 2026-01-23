@@ -1,5 +1,6 @@
 #include <audio_action_queue.h>
 #include <event_queue.h>
+#include <help.h>
 #include <obliquestrategies.h>
 #include <utils.h>
 
@@ -251,6 +252,13 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     if (lspath) lspath_string = lspath->value_;
     std::string listing = list_sample_dir(lspath_string);
     repl_queue.push(listing);
+  }
+
+  std::shared_ptr<ast::HelpStatement> help_stmt =
+      std::dynamic_pointer_cast<ast::HelpStatement>(node);
+  if (help_stmt) {
+    print_help();
+    return NULLL;
   }
 
   std::shared_ptr<ast::BpmStatement> bpm_stmt =

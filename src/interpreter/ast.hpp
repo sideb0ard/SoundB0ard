@@ -521,6 +521,14 @@ class LsStatement : public Statement {
   std::shared_ptr<Expression> path_;
 };
 
+class HelpStatement : public Statement {
+ public:
+  explicit HelpStatement(Token toke) : Statement(toke) {}
+  std::string String() const override {
+    return "help";
+  }
+};
+
 class StrategyStatement : public Statement {
  public:
   explicit StrategyStatement(Token toke) : Statement(toke) {}

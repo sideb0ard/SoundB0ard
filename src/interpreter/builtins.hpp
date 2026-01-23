@@ -12,6 +12,4 @@ namespace builtin {
 extern std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>>
     built_ins;
 
-std::string GetBuiltInHelp();
-
 }  // namespace builtin

@@ -60,6 +60,8 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement() {
     return ParseReturnStatement();
   else if (cur_token_.type_.compare(token::SLANG_LS) == 0)
     return ParseLsStatement();
+  else if (cur_token_.type_.compare(token::SLANG_HELP) == 0)
+    return ParseHelpStatement();
   else if (cur_token_.type_.compare(token::SLANG_PS) == 0)
     return ParsePsStatement();
   else if (cur_token_.type_.compare(token::SLANG_STRATEGY) == 0)
@@ -149,6 +151,12 @@ std::shared_ptr<ast::LsStatement> Parser::ParseLsStatement() {
 
   if (PeekTokenIs(token::SLANG_SEMICOLON)) NextToken();
 
+  return stmt;
+}
+
+std::shared_ptr<ast::HelpStatement> Parser::ParseHelpStatement() {
+  auto stmt = std::make_shared<ast::HelpStatement>(cur_token_);
+  if (PeekTokenIs(token::SLANG_SEMICOLON)) NextToken();
   return stmt;
 }
 
