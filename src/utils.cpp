@@ -885,8 +885,8 @@ std::vector<std::string> GetSynthPresets(unsigned int synthtype) {
     case (MINISYNTH_TYPE):
       preset_file_name = MOOG_PRESET_FILENAME;
       break;
-    case (DXSYNTH_TYPE):
-      preset_file_name = DX_PRESET_FILENAME;
+    case (FMSYNTH_TYPE):
+      preset_file_name = FM_PRESET_FILENAME;
       break;
     case (DRUMSYNTH_TYPE):
       preset_file_name = DRUM_PRESET_FILENAME;

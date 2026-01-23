@@ -24,7 +24,7 @@ class WebsocketServer;
 
 #include "audio_action_queue.h"
 #include "defjams.h"
-#include "dxsynth.h"
+#include "fmsynth.h"
 #include "fx/fx.h"
 #include "minisynth.h"
 #include "soundgenerator.h"

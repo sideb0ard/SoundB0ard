@@ -1,6 +1,6 @@
 #include <defjams.h>
 #include <drumsampler.h>
-#include <dxsynth.h>
+#include <fmsynth.h>
 #include <math.h>
 #include <midi_freq_table.h>
 #include <midimaaan.h>

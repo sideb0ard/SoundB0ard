@@ -37,7 +37,7 @@ const std::vector<std::string> FILES_TO_IGNORE = {".DS_Store"};
 namespace {
 
 bool HasPresets(int sg_type) {
-  if (sg_type == MINISYNTH_TYPE || sg_type == DXSYNTH_TYPE ||
+  if (sg_type == MINISYNTH_TYPE || sg_type == FMSYNTH_TYPE ||
       sg_type == DRUMSYNTH_TYPE)
     return true;
   return false;

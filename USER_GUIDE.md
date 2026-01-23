@@ -1,40 +1,47 @@
-# SoundB0ard User Guide
+# SBShell User Guide
 
-Welcome to SoundB0ard - a Unix-style shell for making music! This guide will take you from your first sound to complex live-coded performances.
+Yo, Terminal Punk,
+    you are now about to witness the strength of street knowledge.
+
+SoundB0ard - a Unix-style shell for making music! This guide will take you from your first sound to complex live-coded performances.
 
 ---
+
+## 0. Where am i?
+
+You're goto command is `ps`. In Unix this would be 'process status', for SBShell, it's more like 'program status' - it shows you mixer stats like volume and BPM; it shows you environment variables, which can be standard objects like numbers, strings and booleans, and also sound generator objects like FMSynth, MiniSynth, DrumSynth, or Sampler; and it shows the running Processes. More about all of that below..
 
 ## 1. Quick Start / First Sounds
 
 Let's make some noise! Start SoundB0ard and type these commands at the `SB#>` prompt:
 
 ```javascript
-// Create a drum machine
-let drums = drum();
+// whats going on?
+ps
+
+// you'll see various synths already created in the environment.
+// such as dx, dx2 and dx2, sbdrum and more.
 
 // Trigger a kick drum (note 0)
-note_on(drums, 0);
+note_on(sbdrum, 0);
 
-// Try a snare (note 1)
-note_on(drums, 1);
+// Try a clap (note 1)
+note_on(sbdrum, 3);
 
-// Hi-hat (note 2)
-note_on(drums, 2);
+// play a long bass note (midi 20 - G#)
+note_on(dx, 20, dur = 5000);
 ```
 
-**Congratulations!** You just made your first beats. Let's explore what else you can do:
 
 ```javascript
 // Load a classic preset
-load_preset(drums, "TR808");
-note_on(drums, 0);  // Now it sounds like an 808!
+load_preset(sbdrum, "TR808");
+note_on(sbdrum, 0);
 
 // Try different velocities (0-127)
-note_on(drums, 1, vel = 127);  // Loud snare
-note_on(drums, 1, vel = 40);   // Quiet ghost note
+note_on(sbdrum, 1, vel = 127);  // Loud snare
+note_on(sbdrum, 1, vel = 40);   // Quiet ghost note
 
-// Adjust duration in milliseconds
-note_on(drums, 2, dur = 500);  // Long hi-hat
 ```
 
 ---
@@ -62,14 +69,14 @@ load_preset(drums, "DILLA");   // Warm, lo-fi
 // 8 = Laser
 ```
 
-### FM Synth - dxsynth()
+### FM Synth - fmsynth()
 6-operator FM synthesis for bells, bass, keys, and experimental sounds.
 
 ```javascript
-let fm = dxsynth();
-load_preset(fm, "BASS");
-note_on(fm, 36);  // C1 - deep bass note
-note_on(fm, 60);  // C3 - middle C
+let dx1 = fmsynth();
+load_preset(dx1, "BASS");
+note_on(dx1, 36);  // C1 - deep bass note
+note_on(dx1, 60);  // C3 - middle C
 ```
 
 ### Subtractive Synth - minisynth()

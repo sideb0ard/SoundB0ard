@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-static const char DX_PRESET_FILENAME[] = "settings/dxpresets.dat";
+static const char FM_PRESET_FILENAME[] = "settings/fmpresets.dat";
 static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
 static const char DRUM_PRESET_FILENAME[] = "settings/drumpresets.dat";
 
@@ -141,7 +141,7 @@ enum {
 
 typedef enum {
   MINISYNTH_TYPE,
-  DXSYNTH_TYPE,
+  FMSYNTH_TYPE,
   LOOPER_TYPE,
   DRUMSAMPLER_TYPE,
   DRUMSYNTH_TYPE,

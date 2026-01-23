@@ -2,7 +2,7 @@
 #include <defjams.h>
 #include <drum_synth.h>
 #include <drumsampler.h>
-#include <dxsynth.h>
+#include <fmsynth.h>
 #include <granulator.h>
 #include <minisynth.h>
 #include <mixer.h>
@@ -29,8 +29,8 @@ int AddSoundGenerator(unsigned int type, std::string filepath = "",
     case (MINISYNTH_TYPE):
       sg = std::make_unique<SBAudio::MiniSynth>();
       break;
-    case (DXSYNTH_TYPE):
-      sg = std::make_unique<SBAudio::DXSynth>();
+    case (FMSYNTH_TYPE):
+      sg = std::make_unique<SBAudio::FMSynth>();
       break;
     case (DRUMSYNTH_TYPE):
       sg = std::make_unique<SBAudio::DrumSynth>();
@@ -160,8 +160,8 @@ ObjectType StepSequencer::Type() {
 }
 
 FMSynth::FMSynth() {
-  soundgen_id_ = AddSoundGenerator(DXSYNTH_TYPE);
-  soundgenerator_type = DXSYNTH_TYPE;
+  soundgen_id_ = AddSoundGenerator(FMSYNTH_TYPE);
+  soundgenerator_type = FMSYNTH_TYPE;
 }
 std::string FMSynth::Inspect() {
   return "FM synth.";

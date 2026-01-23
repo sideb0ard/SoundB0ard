@@ -6,9 +6,9 @@
 
 enum { DX_LFO_DEST_NONE, DX_LFO_DEST_AMP_MOD, DX_LFO_DEST_VIBRATO };
 
-struct DXSynthVoice : public Voice {
-  DXSynthVoice();
-  ~DXSynthVoice() = default;
+struct FMSynthVoice : public Voice {
+  FMSynthVoice();
+  ~FMSynthVoice() = default;
 
   QBLimitedOscillator m_op1;
   QBLimitedOscillator m_op2;

@@ -22,7 +22,7 @@ void print_help() {
   printf("Sound Generators:\n");
   printf("  drum()       - Drum synthesizer (9 voices)\n");
   printf("  minisynth()  - Subtractive synthesizer\n");
-  printf("  dxsynth()    - FM synthesizer (6 operators)\n");
+  printf("  fmsynth()    - FM synthesizer (6 operators)\n");
   printf("  granular()   - Granular sampler\n");
   printf("  sample(path) - Load audio sample\n\n");
 

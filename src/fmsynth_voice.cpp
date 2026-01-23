@@ -1,4 +1,4 @@
-#include <dxsynth_voice.h>
+#include <fmsynth_voice.h>
 #include <stdlib.h>
 #include <utils.h>
 
@@ -6,7 +6,7 @@
 
 #define IMAX 4.0
 
-DXSynthVoice::DXSynthVoice() {
+FMSynthVoice::FMSynthVoice() {
   // attach oscillators to base class
   m_osc1 = &m_op1;
   m_osc2 = &m_op2;
@@ -19,7 +19,7 @@ DXSynthVoice::DXSynthVoice() {
   m_op4_feedback = 0.0;
 }
 
-void DXSynthVoice::InitGlobalParameters(GlobalSynthParams *sp) {
+void FMSynthVoice::InitGlobalParameters(GlobalSynthParams *sp) {
   Voice::InitGlobalParameters(sp);
   m_global_voice_params->op1_feedback = 1.0;
   m_global_voice_params->op2_feedback = 1.0;
@@ -28,7 +28,7 @@ void DXSynthVoice::InitGlobalParameters(GlobalSynthParams *sp) {
   m_global_voice_params->lfo1_osc_mod_intensity = 1.0;
 }
 
-void DXSynthVoice::InitializeModMatrix(ModulationMatrix *matrix) {
+void FMSynthVoice::InitializeModMatrix(ModulationMatrix *matrix) {
   Voice::InitializeModMatrix(matrix);
 
   std::shared_ptr<ModMatrixRow> row;
@@ -86,7 +86,7 @@ void DXSynthVoice::InitializeModMatrix(ModulationMatrix *matrix) {
   matrix->AddMatrixRow(row);
 }
 
-void DXSynthVoice::SetLFO1Destination(unsigned int op, unsigned int dest) {
+void FMSynthVoice::SetLFO1Destination(unsigned int op, unsigned int dest) {
   switch (op) {
     case (0): {
       if (dest == DX_LFO_DEST_AMP_MOD &&
@@ -161,12 +161,12 @@ void DXSynthVoice::SetLFO1Destination(unsigned int op, unsigned int dest) {
   }
 }
 
-void DXSynthVoice::PrepareForPlay() {
+void FMSynthVoice::PrepareForPlay() {
   Voice::PrepareForPlay();
   Reset();
 }
 
-void DXSynthVoice::Update() {
+void FMSynthVoice::Update() {
   if (!m_global_voice_params) return;
 
   Voice::Update();
@@ -177,12 +177,12 @@ void DXSynthVoice::Update() {
   m_op4_feedback = m_global_voice_params->op4_feedback;
 }
 
-void DXSynthVoice::Reset() {
+void FMSynthVoice::Reset() {
   Voice::Reset();
   m_portamento_inc = 0.0;
 }
 
-bool DXSynthVoice::CanNoteOff() {
+bool FMSynthVoice::CanNoteOff() {
   bool ret = false;
   if (!m_note_on)
     return ret;
@@ -216,7 +216,7 @@ bool DXSynthVoice::CanNoteOff() {
   return ret;
 }
 
-bool DXSynthVoice::IsVoiceDone() {
+bool FMSynthVoice::IsVoiceDone() {
   bool ret = false;
   switch (m_voice_mode) {
     case 0:
@@ -247,7 +247,7 @@ bool DXSynthVoice::IsVoiceDone() {
   return ret;
 }
 
-void DXSynthVoice::SetOutputEGs() {
+void FMSynthVoice::SetOutputEGs() {
   m_eg1.m_output_eg = false;
   m_eg2.m_output_eg = false;
   m_eg3.m_output_eg = false;
@@ -283,7 +283,7 @@ void DXSynthVoice::SetOutputEGs() {
   }
 }
 
-bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
+bool FMSynthVoice::DoVoice(double *left_output, double *right_output) {
   if (!Voice::DoVoice(left_output, right_output)) {
     return false;
   }
@@ -527,7 +527,7 @@ bool DXSynthVoice::DoVoice(double *left_output, double *right_output) {
   return true;
 }
 
-void DXSynthVoice::SetSustainOverride(unsigned int op, bool b) {
+void FMSynthVoice::SetSustainOverride(unsigned int op, bool b) {
   switch (op) {
     case 1:
       m_eg1.SetSustainOverride(b);

@@ -42,7 +42,7 @@ SoundB0ard is an interactive music-making environment with a Unix-style shell in
 
 ### Synthesis Engines
 
-- **DXSynth** (`dxsynth.cpp/h`): FM-style synthesis engine
+- **FMSynth** (`fmsynth.cpp/h`): FM-style synthesis engine
 - **MiniSynth** (`minisynth.cpp/h`): Subtractive synthesis engine
 - **SBSynth** (`sbsynth.cpp/h`): Custom synthesis engine
 - **DrumSynth** (`drum_synth.cpp/h`): Drum synthesis

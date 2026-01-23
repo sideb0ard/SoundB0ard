@@ -2,9 +2,9 @@
 
 #include <dca.h>
 #include <defjams.h>
-#include <dxsynth_voice.h>
 #include <envelope_generator.h>
 #include <filter.h>
+#include <fmsynth_voice.h>
 #include <midimaaan.h>
 #include <modmatrix.h>
 #include <oscillator.h>
@@ -17,7 +17,7 @@ namespace SBAudio {
 
 enum { DX1, DX2, DX3, DX4, DX5, DX6, DX7, DX8, MAXDX };
 
-typedef struct dxsynthsettings {
+typedef struct fmsynthsettings {
   char m_settings_name[256]{};
 
   // LFO1     // lo/hi/def
@@ -85,12 +85,12 @@ typedef struct dxsynthsettings {
   bool m_reset_to_zero{false};
   bool m_legato_mode{false};
 
-} dxsynthsettings;
+} fmsynthsettings;
 
-class DXSynth : public SoundGenerator {
+class FMSynth : public SoundGenerator {
  public:
-  DXSynth();
-  ~DXSynth() override = default;
+  FMSynth();
+  ~FMSynth() override = default;
   StereoVal GenNext(mixer_timing_info tinfo) override;
   std::string Info() override;
   std::string Status() override;
@@ -108,15 +108,15 @@ class DXSynth : public SoundGenerator {
   void Save(std::string preset_name) override;
 
  public:
-  std::array<std::shared_ptr<DXSynthVoice>, MAX_DX_VOICES> voices_;
+  std::array<std::shared_ptr<FMSynthVoice>, MAX_DX_VOICES> voices_;
 
   // global modmatrix, core is shared by all voices
   ModulationMatrix modmatrix;  // routing structure for sound generation
 
   GlobalSynthParams global_synth_params;
 
-  dxsynthsettings m_settings;
-  dxsynthsettings m_settings_backup_while_getting_crazy;
+  fmsynthsettings m_settings;
+  fmsynthsettings m_settings_backup_while_getting_crazy;
 
   int active_midi_osc;  // for midi controller routing
 
@@ -128,8 +128,8 @@ class DXSynth : public SoundGenerator {
   bool PrepareForPlay();
 
   void IncrementVoiceTimestamps();
-  std::shared_ptr<DXSynthVoice> GetOldestVoice();
-  std::shared_ptr<DXSynthVoice> GetOldestVoiceWithNote(int midi_note);
+  std::shared_ptr<FMSynthVoice> GetOldestVoice();
+  std::shared_ptr<FMSynthVoice> GetOldestVoiceWithNote(int midi_note);
 
   void ResetVoices();
 

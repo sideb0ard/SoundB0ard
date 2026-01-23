@@ -63,10 +63,10 @@ class SoundGenerator {
 
   void ParseMidiEvent(midi_event ev, mixer_timing_info tinfo);
 
-  void SetVolume(double val);
+  virtual void SetVolume(double val);
   double GetVolume();
 
-  void SetPan(double val);
+  virtual void SetPan(double val);
   double GetPan();
 
   void SetFxSend(int fx_num, double intensity);

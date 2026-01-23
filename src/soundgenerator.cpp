@@ -128,7 +128,7 @@ StereoVal SoundGenerator::Effector(StereoVal val) {
 }
 
 bool SoundGenerator::IsSynth() {
-  if (type == MINISYNTH_TYPE || type == DXSYNTH_TYPE || type == DRUMSYNTH_TYPE)
+  if (type == MINISYNTH_TYPE || type == FMSYNTH_TYPE || type == DRUMSYNTH_TYPE)
     return true;
 
   return false;

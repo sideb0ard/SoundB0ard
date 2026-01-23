@@ -2,8 +2,8 @@
 #include <defjams.h>
 #include <drum_synth.h>
 #include <drumsampler.h>
-#include <dxsynth.h>
 #include <event_queue.h>
+#include <fmsynth.h>
 #include <fx/distortion.h>
 #include <fx/envelope.h>
 #include <fx/fx.h>

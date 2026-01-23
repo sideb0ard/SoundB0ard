@@ -626,7 +626,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
       GetSynthPresets(MINISYNTH_TYPE);
       std::cout << "NOOP - FIX ME?\n";
     } else if (synth_preset->token_.type_ == token::SLANG_FM_SYNTH) {
-      GetSynthPresets(DXSYNTH_TYPE);
+      GetSynthPresets(FMSYNTH_TYPE);
       std::cout << "NOOP - FIX ME?\n";
     } else
       std::cerr << "NOT A SYNTH TYPE!\n";

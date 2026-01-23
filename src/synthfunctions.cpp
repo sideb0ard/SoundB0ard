@@ -64,8 +64,8 @@ std::map<std::string, double> GetPreset(int id, std::string preset_name) {
     return preset_vals;
   }
 
-  if (id == DXSYNTH_TYPE)
-    preset_file.open(DX_PRESET_FILENAME, std::ifstream::in);
+  if (id == FMSYNTH_TYPE)
+    preset_file.open(FM_PRESET_FILENAME, std::ifstream::in);
   else if (id == MINISYNTH_TYPE)
     preset_file.open(MOOG_PRESET_FILENAME, std::ifstream::in);
   else if (id == DRUMSYNTH_TYPE)

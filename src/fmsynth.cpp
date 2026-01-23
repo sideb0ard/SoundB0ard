@@ -1,4 +1,4 @@
-#include <dxsynth.h>
+#include <fmsynth.h>
 #include <math.h>
 #include <midi_freq_table.h>
 #include <mixer.h>
@@ -32,15 +32,15 @@ float GetRandRatio() {
 }
 }  // namespace
 
-DXSynth::DXSynth() {
-  type = DXSYNTH_TYPE;
+FMSynth::FMSynth() {
+  type = FMSYNTH_TYPE;
   active_midi_osc = 1;
   volume = 0.8;
 
   Reset();
 
   for (int i = 0; i < MAX_DX_VOICES; i++) {
-    voices_[i] = std::make_shared<DXSynthVoice>();
+    voices_[i] = std::make_shared<FMSynthVoice>();
     voices_[i]->InitGlobalParameters(&global_synth_params);
   }
 
@@ -58,29 +58,29 @@ DXSynth::DXSynth() {
   active = true;
 }
 
-void DXSynth::Start() {
+void FMSynth::Start() {
   active = true;
 }
 
-void DXSynth::Stop() {
+void FMSynth::Stop() {
   active = false;
   AllNotesOff();
 }
 
-std::string DXSynth::Status() {
+std::string FMSynth::Status() {
   std::stringstream ss;
   ss << std::setprecision(2) << std::fixed;
   if (!active || volume == 0)
     ss << ANSI_COLOR_RESET;
   else
     ss << COOL_COLOR_ORANGE;
-  ss << "DxSynth(" << m_settings.m_settings_name << ")"
+  ss << "FmSynth(" << m_settings.m_settings_name << ")"
      << " vol:" << volume << " pan:" << pan
      << " algo:" << m_settings.m_voice_mode << ANSI_COLOR_RESET;
   return ss.str();
 }
 
-std::string DXSynth::Info() {
+std::string FMSynth::Info() {
   std::stringstream ss;
   ss << std::setprecision(2) << std::fixed;
   char *INSTRUMENT_COLOR_A = (char *)ANSI_COLOR_RESET;
@@ -189,7 +189,7 @@ std::string DXSynth::Info() {
   return ss.str();
 }
 
-StereoVal DXSynth::GenNext(mixer_timing_info tinfo) {
+StereoVal FMSynth::GenNext(mixer_timing_info tinfo) {
   (void)tinfo;
   if (!active) return (StereoVal){0, 0};
 
@@ -220,7 +220,7 @@ StereoVal DXSynth::GenNext(mixer_timing_info tinfo) {
   return out;
 }
 
-void DXSynth::SetOpFreq(unsigned int op, float val) {
+void FMSynth::SetOpFreq(unsigned int op, float val) {
   for (auto v : voices_) {
     switch (op) {
       case 1:
@@ -240,7 +240,7 @@ void DXSynth::SetOpFreq(unsigned int op, float val) {
   m_last_note_frequency = val;
 }
 
-void DXSynth::NoteOn(midi_event ev) {
+void FMSynth::NoteOn(midi_event ev) {
   bool steal_note = true;
 
   for (auto v : voices_) {
@@ -263,19 +263,19 @@ void DXSynth::NoteOn(midi_event ev) {
   }
 }
 
-void DXSynth::AllNotesOff() {
+void FMSynth::AllNotesOff() {
   for (auto v : voices_) v->NoteOff(-1);
 }
 
-void DXSynth::NoteOff(midi_event ev) {
+void FMSynth::NoteOff(midi_event ev) {
   for (auto v : voices_) v->NoteOff(ev.data1);
 }
 
-void DXSynth::Control(midi_event ev) {
+void FMSynth::Control(midi_event ev) {
   (void)ev;
 }
 
-void DXSynth::PitchBend(midi_event ev) {
+void FMSynth::PitchBend(midi_event ev) {
   unsigned int data1 = ev.data1;
   unsigned int data2 = ev.data2;
   printf("Pitch bend, babee: %u %u\n", data1, data2);
@@ -425,11 +425,11 @@ const std::map<std::string, double> default_preset = {
     {"m_op4_feedback", 0},
 };
 
-void DXSynth::Reset() {
+void FMSynth::Reset() {
   LoadPreset("default", wuurp_preset);
 }
 
-bool DXSynth::PrepareForPlay() {
+bool FMSynth::PrepareForPlay() {
   for (auto v : voices_) v->PrepareForPlay();
 
   Update();
@@ -437,7 +437,7 @@ bool DXSynth::PrepareForPlay() {
   return true;
 }
 
-void DXSynth::Update() {
+void FMSynth::Update() {
   global_synth_params.voice_params.voice_mode = m_settings.m_voice_mode;
   global_synth_params.voice_params.op4_feedback =
       m_settings.m_op4_feedback / 100.0;
@@ -582,19 +582,19 @@ void DXSynth::Update() {
   }
 }
 
-void DXSynth::ResetVoices() {
+void FMSynth::ResetVoices() {
   for (auto v : voices_) v->Reset();
 }
 
-void DXSynth::IncrementVoiceTimestamps() {
+void FMSynth::IncrementVoiceTimestamps() {
   for (auto v : voices_) {
     if (v->m_note_on) v->m_timestamp++;
   }
 }
 
-std::shared_ptr<DXSynthVoice> DXSynth::GetOldestVoice() {
+std::shared_ptr<FMSynthVoice> FMSynth::GetOldestVoice() {
   int timestamp = -1;
-  std::shared_ptr<DXSynthVoice> found_voice = NULL;
+  std::shared_ptr<FMSynthVoice> found_voice = NULL;
   for (auto v : voices_) {
     if (v->m_note_on && (int)v->m_timestamp > timestamp) {
       found_voice = v;
@@ -604,9 +604,9 @@ std::shared_ptr<DXSynthVoice> DXSynth::GetOldestVoice() {
   return found_voice;
 }
 
-std::shared_ptr<DXSynthVoice> DXSynth::GetOldestVoiceWithNote(int midi_note) {
+std::shared_ptr<FMSynthVoice> FMSynth::GetOldestVoiceWithNote(int midi_note) {
   int timestamp = -1;
-  std::shared_ptr<DXSynthVoice> found_voice = NULL;
+  std::shared_ptr<FMSynthVoice> found_voice = NULL;
   for (auto v : voices_) {
     if (v->CanNoteOff() && (int)v->m_timestamp > timestamp &&
         v->m_midi_note_number == midi_note) {
@@ -617,11 +617,7 @@ std::shared_ptr<DXSynthVoice> DXSynth::GetOldestVoiceWithNote(int midi_note) {
   return found_voice;
 }
 
-void DXSynth::Randomize() {
-  // dxsynth_reset(dx);
-  // return;
-  // printf("Randomizing DXSYNTH!\n");
-
+void FMSynth::Randomize() {
   snprintf(m_settings.m_settings_name, sizeof(m_settings.m_settings_name), "%s",
            "-- random UNSAVED--");
 
@@ -679,10 +675,9 @@ void DXSynth::Randomize() {
   m_settings.m_op4_feedback = rand() % 70;
 
   Update();
-  // dxsynth_print_settings(dx);
 }
 
-void DXSynth::Save(std::string preset) {
+void FMSynth::Save(std::string preset) {
   if (preset.empty()) {
     printf(
         "Play tha game, pal, need a name to save yer synth settings "
@@ -691,9 +686,9 @@ void DXSynth::Save(std::string preset) {
   }
   const char *preset_name = preset.c_str();
 
-  printf("Saving '%s' settings for dxsynth to file %s\n", preset_name,
-         DX_PRESET_FILENAME);
-  FILE *presetzzz = fopen(DX_PRESET_FILENAME, "a+");
+  printf("Saving '%s' settings for fmsynth to file %s\n", preset_name,
+         FM_PRESET_FILENAME);
+  FILE *presetzzz = fopen(FM_PRESET_FILENAME, "a+");
   if (presetzzz == NULL) {
     printf("Couldn't save settings!!\n");
     return;
@@ -815,7 +810,7 @@ void DXSynth::Save(std::string preset) {
   printf("Wrote %d settings\n", settings_count++);
 }
 
-void DXSynth::LoadPreset(std::string preset_name,
+void FMSynth::LoadPreset(std::string preset_name,
                          std::map<std::string, double> preset) {
   strncpy(m_settings.m_settings_name, preset_name.c_str(), 256);
   for (const auto &[key, val] : preset) {
@@ -952,28 +947,28 @@ void DXSynth::LoadPreset(std::string preset_name,
   Update();
 }
 
-void DXSynth::SetLFO1Intensity(double val) {
+void FMSynth::SetLFO1Intensity(double val) {
   if (val >= 0.0 && val <= 1.0)
     m_settings.m_lfo1_intensity = val;
   else
     printf("Val has to be between 0.0-1.0\n");
 }
 
-void DXSynth::SetLFO1Rate(double val) {
+void FMSynth::SetLFO1Rate(double val) {
   if (val >= 0.02 && val <= 20.0)
     m_settings.m_lfo1_rate = val;
   else
     printf("Val has to be between 0.02 - 20.0\n");
 }
 
-void DXSynth::SetLFO1Waveform(unsigned int val) {
+void FMSynth::SetLFO1Waveform(unsigned int val) {
   if (val < MAX_LFO_OSC)
     m_settings.m_lfo1_waveform = val;
   else
     printf("Val has to be between [0-%d]\n", MAX_LFO_OSC);
 }
 
-void DXSynth::SetLFO1ModDest(unsigned int mod_dest, unsigned int dest) {
+void FMSynth::SetLFO1ModDest(unsigned int mod_dest, unsigned int dest) {
   if (dest > 2) {
     printf("Dest has to be [0-2]\n");
     return;
@@ -996,7 +991,7 @@ void DXSynth::SetLFO1ModDest(unsigned int mod_dest, unsigned int dest) {
   }
 }
 
-void DXSynth::SetOpWaveform(unsigned int op, unsigned int val) {
+void FMSynth::SetOpWaveform(unsigned int op, unsigned int val) {
   if (val >= MAX_OSC) {
     printf("WAV has to be [0-%d)\n", MAX_OSC);
     return;
@@ -1019,7 +1014,7 @@ void DXSynth::SetOpWaveform(unsigned int op, unsigned int val) {
   }
 }
 
-void DXSynth::SetOpRatio(unsigned int op, double val) {
+void FMSynth::SetOpRatio(unsigned int op, double val) {
   if (val < 0.01 || val > 26) {
     return;
   }
@@ -1041,7 +1036,7 @@ void DXSynth::SetOpRatio(unsigned int op, double val) {
   }
 }
 
-void DXSynth::SetOpSustain(unsigned int op, bool val) {
+void FMSynth::SetOpSustain(unsigned int op, bool val) {
   switch (op) {
     case (1):
       m_settings.m_op1_sustain_override = val;
@@ -1060,7 +1055,7 @@ void DXSynth::SetOpSustain(unsigned int op, bool val) {
   }
 }
 
-void DXSynth::SetOpDetune(unsigned int op, double val) {
+void FMSynth::SetOpDetune(unsigned int op, double val) {
   if (val < -100 || val > 100) {
     return;
   }
@@ -1082,7 +1077,7 @@ void DXSynth::SetOpDetune(unsigned int op, double val) {
   }
 }
 
-void DXSynth::SetEGAttackMs(unsigned int eg, double val) {
+void FMSynth::SetEGAttackMs(unsigned int eg, double val) {
   if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS) {
     return;
   }
@@ -1104,7 +1099,7 @@ void DXSynth::SetEGAttackMs(unsigned int eg, double val) {
   }
 }
 
-void DXSynth::SetEGDecayMs(unsigned int eg, double val) {
+void FMSynth::SetEGDecayMs(unsigned int eg, double val) {
   if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS) {
     return;
   }
@@ -1126,7 +1121,7 @@ void DXSynth::SetEGDecayMs(unsigned int eg, double val) {
   }
 }
 
-void DXSynth::SetEGReleaseMs(unsigned int eg, double val) {
+void FMSynth::SetEGReleaseMs(unsigned int eg, double val) {
   if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS) {
     return;
   }
@@ -1148,7 +1143,7 @@ void DXSynth::SetEGReleaseMs(unsigned int eg, double val) {
   }
 }
 
-void DXSynth::SetEGSustainLevel(unsigned int eg, double val) {
+void FMSynth::SetEGSustainLevel(unsigned int eg, double val) {
   if (val < 0 || val > 1) {
     return;
   }
@@ -1170,7 +1165,7 @@ void DXSynth::SetEGSustainLevel(unsigned int eg, double val) {
   }
 }
 
-void DXSynth::SetOpOutputLevel(unsigned int op, double val) {
+void FMSynth::SetOpOutputLevel(unsigned int op, double val) {
   if (val < 0 || val > 99) {
     return;
   }
@@ -1192,53 +1187,53 @@ void DXSynth::SetOpOutputLevel(unsigned int op, double val) {
   }
 }
 
-void DXSynth::SetPortamentoTimeMs(double val) {
+void FMSynth::SetPortamentoTimeMs(double val) {
   if (val >= 0 && val <= 5000.0)
     m_settings.m_portamento_time_ms = val;
   else
     printf("Val has to be between 0 - 5000.0\n");
 }
 
-void DXSynth::SetVolumeDb(double val) {
+void FMSynth::SetVolumeDb(double val) {
   if (val >= -96 && val <= 20)
     m_settings.m_volume_db = val;
   else
     printf("Val has to be between -96 and 20\n");
 }
 
-void DXSynth::SetPitchbendRange(unsigned int val) {
+void FMSynth::SetPitchbendRange(unsigned int val) {
   if (val <= 12)
     m_settings.m_pitchbend_range = val;
   else
     printf("Val has to be between 0 and 12\n");
 }
-void DXSynth::SetVoiceMode(unsigned int val) {
+void FMSynth::SetVoiceMode(unsigned int val) {
   if (val < MAXDX)
     m_settings.m_voice_mode = val;
   else
     printf("Val has to be [0-%d)\n", MAXDX);
 }
 
-void DXSynth::SetVelocityToAttackScaling(bool b) {
+void FMSynth::SetVelocityToAttackScaling(bool b) {
   m_settings.m_velocity_to_attack_scaling = b;
 }
-void DXSynth::SetNoteNumberToDecayScaling(bool b) {
+void FMSynth::SetNoteNumberToDecayScaling(bool b) {
   m_settings.m_note_number_to_decay_scaling = b;
 }
 
-void DXSynth::SetResetToZero(bool b) {
+void FMSynth::SetResetToZero(bool b) {
   m_settings.m_reset_to_zero = b;
 }
 
-void DXSynth::SetLegatoMode(bool b) {
+void FMSynth::SetLegatoMode(bool b) {
   m_settings.m_legato_mode = b;
 }
 
-void DXSynth::SetOp4Feedback(double val) {
+void FMSynth::SetOp4Feedback(double val) {
   if (val >= 0 && val <= 70) m_settings.m_op4_feedback = val;
 }
 
-void DXSynth::SetPitchbendFromREPL(double val) {
+void FMSynth::SetPitchbendFromREPL(double val) {
   if (val < -12 || val > 12) {
     return;
   }
@@ -1257,10 +1252,10 @@ void DXSynth::SetPitchbendFromREPL(double val) {
   m_settings.m_op4_detune_cents = scaley_val + 2.5;
 }
 
-void DXSynth::SetActiveMidiOsc(int osc_num) {
+void FMSynth::SetActiveMidiOsc(int osc_num) {
   if (osc_num >= 1 && osc_num <= 4) active_midi_osc = osc_num;
 }
-void DXSynth::SetParam(std::string name, double val) {
+void FMSynth::SetParam(std::string name, double val) {
   if (name == "vol")
     SetVolume(val);
   else if (name == "pan")
