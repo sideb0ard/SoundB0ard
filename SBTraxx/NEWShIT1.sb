@@ -2,46 +2,61 @@
 # progression  I-V-vi-IV
 # [I] - [V] - [I] [V] [vi IV] [IV vi] [vi] [I V] [I V vi]
 
-let key = 45;
-let keymod = 1;
-let notez = notes_in_key(key, keymod);
-# print(notez);
-let I = notes_in_chord(notez[0], key, 0, 1);
-let V = notes_in_chord(notez[4], key, 0, 1);
-let vi = notes_in_chord(notez[5], key, 0, 1);
-let IV = notes_in_chord(notez[3], key, 0, 1);
-let chordz = [I, I, I, I, V, I, vi, IV];
-let cx = 0;
+let key = NULL:
+let keymod = NULL;
+let notez = NULL;
+let I = NULL;
+let V = NULL;
+let vi = NULL;
+let IV = NULL;
+let chordz = NULL;
+let cx =NULL;
+let bd = NULL;
+let rap = NULL;
 
-let bd = sample(bd/gaborKick.aiff);
-let rap = sample(voices/RAPMatrix.wav);
 
-# bpm 200;
-# set rap:pitch 0.8;
-# load_preset(dx3, "WNARR"); vol dx3 0.6;
-# load_preset(dx2, "LOWES"); vol dx2 1;
-# load_preset(dx, "LOWES"); vol dx1 ;
-# p9 $ bbblah_gen;
-# p3 $ moddblah_gen;
+let init = fn()
+{
+  key = 45;
+  keymod = 1;
+  notez = notes_in_key(key, keymod);
+  I = notes_in_chord(notez[0], key, 0, 1);
+  V = notes_in_chord(notez[4], key, 0, 1);
+  vi = notes_in_chord(notez[5], key, 0, 1);
+  IV = notes_in_chord(notez[3], key, 0, 1);
+  chordz = [I, I, I, I, V, I, vi, IV];
+  cx = 0;
 
-# p1 $ chordblah_gen;
+  bd = sample(bd/gaborKick.aiff);
+  rap = sample(voices/RAPMatrix.wav);
+  bpm 200;
+  load_preset(dx3, "WNARR"); vol dx3 0.6;
+  load_preset(dx2, "LOWES"); vol dx2 1;
+  load_preset(dx, "LOWES"); vol dx1 ;
+  set rap:pitch 0.8;
+}
 
-# p5 $ basesblah_gen;
-# p6 $ modmodblahblah_gen; p5 $ "";
+# p9 $ bbblah_comp;
+# p3 $ moddblah_comp;
 
-# p3 $ ""; p5 $ basesblah_gen;
+# p1 $ chordblah_comp;
+
+# p5 $ basesblah_comp;
+# p6 $ modmodblahblah_comp; p5 $ "";
+
+# p3 $ ""; p5 $ basesblah_comp;
 
 # p1 $ "";
-# p3 $ moddblah_gen;
-# p8 $ drumblah_gen;  p4 $ rapblah_gen; p5 $ "";
+# p3 $ moddblah_comp;
+# p8 $ drumblah_comp;  p4 $ rapblah_comp; p5 $ "";
 
-# p5 $ basesblah_gen;
+# p5 $ basesblah_comp;
 
-# p2 $ tecblah_gen; p7 $ rockblah_gen;
-# let tec = loop(dloops/scudBeat2.aiff); set tec:pitch 0.8; p2 $ tecblah_gen;
-# let rocka = loop(dloops/rockafellayall2bar.aiff); p7 $ rockblah_gen;
+# p2 $ tecblah_comp; p7 $ rockblah_comp;
+# let tec = loop(dloops/scudBeat2.aiff); set tec:pitch 0.8; p2 $ tecblah_comp;
+# let rocka = loop(dloops/rockafellayall2bar.aiff); p7 $ rockblah_comp;
 
-let chordblah_gen = gen()
+let chordblah_comp = comp()
 {
   setup()
   {
@@ -52,7 +67,7 @@ let chordblah_gen = gen()
   }
 }
 
-let moddblah_gen = gen()
+let moddblah_comp = comp()
 {
   setup()
   {
@@ -80,7 +95,7 @@ let moddblah_gen = gen()
     }
   }
 }
-let modmodblahblah_gen = gen()
+let modmodblahblah_comp = comp()
 {
   setup()
   {
@@ -103,7 +118,7 @@ let modmodblahblah_gen = gen()
 
 
 #  let tec = loop(dloops/tecnAe.aiff);
-let tecblah_gen = gen()
+let tecblah_comp = comp()
 {
   setup()
   {
@@ -126,7 +141,7 @@ let tecblah_gen = gen()
   }
 }
 
-let bbblah_gen = gen()
+let bbblah_comp = comp()
 {
   setup()
   {
@@ -144,7 +159,7 @@ let bbblah_gen = gen()
   }
 }
 
-let rapblah_gen = gen()
+let rapblah_comp = comp()
 {
   setup()
   {
@@ -174,7 +189,7 @@ let rapblah_gen = gen()
   }
 }
 
-let basesblah_gen = gen()
+let basesblah_comp = comp()
 {
   setup()
   {
@@ -216,7 +231,7 @@ let basesblah_gen = gen()
   }
 }
 
-let drumblah_gen = gen()
+let drumblah_comp = comp()
 {
   setup()
   {
@@ -233,7 +248,7 @@ let drumblah_gen = gen()
   }
 }
 
-let rockblah_gen = gen()
+let rockblah_comp = comp()
 {
   setup()
   {

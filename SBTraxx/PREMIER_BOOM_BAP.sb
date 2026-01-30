@@ -147,7 +147,7 @@ let hats_comp = comp()
     for (let i = 0; i < 16; i++) {
       if (hpat[i] == 1) {
         # 909 closed hat
-        note_on_at(drums, 2, i * pp + swings[i], vel = 45 + rand(20));
+        note_on_at(drums, 3, i * pp + swings[i], vel = 45 + rand(20));
 
         # Occasional sample layer
         if (i % 4 == 0 && count % 2 == 0) {

@@ -87,7 +87,7 @@ let padzblah_gen = gen()
         }
 
         if (i % 8 == 4) {
-          note_on_at(sb2, 3, i * pp + offs);
+          note_on_at(sb2, 2, i * pp + offs);
           set sb2:cp_delay_en 0;
           set sb2:cp_eg_attack clpattackz[clpx] at=i*pp;
           clpx = incr(clpx, 0, len(clpattackz));
@@ -99,7 +99,7 @@ let padzblah_gen = gen()
         }
 
         if (i % 4 == 2) {
-          note_on_at(sb2, 2, i * pp + offs, vel = 50 + rand(50));
+          note_on_at(sb2, 3, i * pp + offs, vel = 50 + rand(50));
         }
       }
     } else {

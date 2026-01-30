@@ -100,7 +100,7 @@ let hhablah_comp = comp()
         offz = 0;
       }
       if (hatz[i] == 1) {
-        note_on_at(sbdrum, 2, i * pp  +offz, dur = 10, vel = 30 + rand(50));
+        note_on_at(sbdrum, 3, i * pp  +offz, dur = 10, vel = 30 + rand(50));
       }
       if (hatz[i] == 2) {
         note_on_at(sbdrum, 4, i * pp + offz, dur = 10, vel = 30 + rand(50));

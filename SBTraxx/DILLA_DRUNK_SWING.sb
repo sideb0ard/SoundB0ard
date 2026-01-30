@@ -109,7 +109,7 @@ let snare_comp = comp()
         let total_offset = drunk_offset + swings[i];
 
         # 808 snare
-        note_on_at(drums, 3, i * pp + total_offset, vel = 95 + rand(20));
+        note_on_at(drums, 2, i * pp + total_offset, vel = 95 + rand(20));
 
         # Layer with vinyl sample for crunch
         note_on_at(vinyl_snare, 1, i * pp + total_offset + 3, vel = 60 + rand(15));
@@ -146,7 +146,7 @@ let hats_comp = comp()
 
     for (let i = 0; i < 16; i++) {
       if (hpat[i] == 1) {
-        note_on_at(drums, 2, i * pp + swings[i], vel = 35 + rand(25));
+        note_on_at(drums, 3, i * pp + swings[i], vel = 35 + rand(25));
       }
 
       if (oh[i] == 1) {

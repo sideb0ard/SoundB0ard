@@ -176,7 +176,7 @@ let drumblah_gen = gen()
         offz = 0;
       }
       if (hhz[i] == 1) {
-        note_on_at(sbdrum, 2, i * pp + offz, vel = 30 + rand(30));
+        note_on_at(sbdrum, 3, i * pp + offz, vel = 30 + rand(30));
       }
     }
   }

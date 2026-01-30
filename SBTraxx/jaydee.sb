@@ -26,7 +26,7 @@ let kickblah_comp = comp()
       }
       if (count % 7 < 6) {
         if (i % 8 == 4) {
-          note_on_at(sb2, 3, i * pp + cpdelz[cpx]);
+          note_on_at(sb2, 2, i * pp + cpdelz[cpx]);
           cpx = incr(cpx, 0, len(cpdelz));
         }
       }
@@ -59,7 +59,7 @@ let hhblah_comp = comp()
       let pp = 3840 / lenz[lx];
       for (let i = 0; i < lenz[lx]; i++) {
         # print(i * pp);
-        note_on_at(sb2, 2, i * pp, vel = v);
+        note_on_at(sb2, 3, i * pp, vel = v);
         v = v + 10;
         if (v > 120) {
           v = 10;

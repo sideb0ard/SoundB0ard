@@ -42,7 +42,7 @@ let melblah_gen = gen()
           note_on_at(sbdrum, 0, i);
         }
         if (note_count % 6 == 3) {
-          note_on_at(sbdrum, 3, i);
+          note_on_at(sbdrum, 2, i);
           note_on_at(sbdrum, 1, i);
         }
         note_count++;

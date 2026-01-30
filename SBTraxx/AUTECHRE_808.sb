@@ -1,34 +1,33 @@
-# Autechre-style Beat with TR-808 Drum Synth
-# Complex polyrhythms, glitchy percussion, micro-timing variations
-# Using drum synth notes: 0=kick, 1=snare, 2=ch, 3=clap, 4=oh, 5-7=FM, 8=lazer
+# Using drum synth notes: 0=kick, 1=snare, 2=clap, 3=ch, 4=oh, 5-7=FM, 8=lazer
 
-# Create drum synth and load AUTECHRE preset (glitchy, digital, experimental)
-let drums = drum();
-load_preset(drums, "AUTECHRE");
+let init = fn()
+{
+  load_preset(sbdrum, "glitchhh808");
+  load_preset(dx2, "LOWES");
+  bpm 110;
+}
 
 # MIDI Note mapping:
 # 0 = Bass Drum (bd)
 # 1 = Snare Drum (sd)
-# 2 = Closed Hi-Hat (hh)
-# 3 = Hand Clap (cp)
+# 2 = Hand Clap (cp)
+# 3 = Closed Hi-Hat (hh)
 # 4 = Open Hi-Hat (hh2)
 # 5 = FM Drum 1
 # 6 = FM Drum 2
 # 7 = FM Drum 3
 # 8 = Lazer
 
-# Kick drum component with variations
 let kick_comp = comp()
 {
   setup()
   {
-    # Multiple kick patterns for variation
     let k1 = [1, 0, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0,  0, 1, 0, 0];
     let k2 = [1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 0];
     let k3 = [1, 0, 1, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0];
     let k4 = [0, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0];
 
-    # Timing offsets for micro-timing (Autechre-style)
+    # Timing offsets for micro-timing
     let offsets = [0, 15, -12, 8, -20, 25, -8, 10];
     let ox = 0;
 
@@ -58,7 +57,7 @@ let kick_comp = comp()
         ox = incr(ox, 0, len(offsets));
 
         # Note 0 = Bass Drum
-        note_on_at(drums, 0, i * pp + offset, vel = vels[vx]);
+        note_on_at(sbdrum, 0, i * pp + offset, vel = vels[vx]);
         vx = incr(vx, 0, len(vels));
       }
     }
@@ -92,8 +91,7 @@ let snare_comp = comp()
 
     for (let i = 0; i < 16; i++) {
       if (spat[i] == 1) {
-        # Note 1 = Snare Drum
-        note_on_at(drums, 1, i * pp, vel = 80 + rand(40));
+        note_on_at(sd, 1, i * pp, vel = 80 + rand(40));
       }
     }
 
@@ -102,8 +100,7 @@ let snare_comp = comp()
       let cpat = clap_pats[cx];
       for (let i = 0; i < 16; i++) {
         if (cpat[i] == 1) {
-          # Note 3 = Hand Clap
-          note_on_at(drums, 3, i * pp + 20, vel = 50 + rand(30));
+          note_on_at(cp, 1, i * pp + 20, vel = 50 + rand(30));
         }
       }
       cx = incr(cx, 0, len(clap_pats));
@@ -143,20 +140,19 @@ let hats_comp = comp()
           }
 
           # Note 2 = Closed Hi-Hat
-          note_on_at(drums, 2, i * pp + offset, vel = 30 + rand(40));
+          note_on_at(sbdrum, 3, i * pp + offset, vel = 30 + rand(40));
         }
 
         # Open hats on specific beats
         if (oh1[i] == 1) {
           # Note 4 = Open Hi-Hat
-          note_on_at(drums, 4, i * pp, vel = 50 + rand(30));
+          note_on_at(sbdrum, 4, i * pp, vel = 50 + rand(30));
         }
       }
     }
   }
 }
 
-# Glitchy FM percussion - POLYRHYTHMIC MADNESS!
 let glitch_fm_comp = comp()
 {
   setup()
@@ -166,6 +162,9 @@ let glitch_fm_comp = comp()
     let poly5 = [1, 0, 1, 1, 0];
     let poly13 = [1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0];
     let poly9 = [1, 0, 0, 1, 1, 0, 1, 0, 1];
+
+    let durz = [30, 50, 80, 110, 60, 150];
+    let drx = 0;
   }
   run()
   {
@@ -175,7 +174,8 @@ let glitch_fm_comp = comp()
       if (poly7[idx] == 1) {
         let offset = rand(50) - 25;
         # Note 5 = FM Drum 1
-        note_on_at(drums, 5, i * pp + offset, vel = 40 + rand(60));
+        note_on_at(sbdrum, 5, i * pp + offset, vel = 40 + rand(60), dur = durz[drx]);
+        drx = incr(drx, 0, len(durz));
       }
     }
 
@@ -186,7 +186,8 @@ let glitch_fm_comp = comp()
         if (poly5[idx] == 1) {
           let offset = rand(40) - 20;
           # Note 6 = FM Drum 2
-          note_on_at(drums, 6, i * pp + offset, vel = 50 + rand(50));
+          note_on_at(sbdrum, 6, i * pp + offset, vel = 50 + rand(50), dur = durz[drx]);
+          drx = incr(drx, 0, len(durz));
         }
       }
     }
@@ -198,7 +199,8 @@ let glitch_fm_comp = comp()
         if (poly13[idx] == 1) {
           let offset = rand(60) - 30;
           # Note 7 = FM Drum 3
-          note_on_at(drums, 7, i * pp + offset, vel = 30 + rand(70));
+          note_on_at(sbdrum, 7, i * pp + offset, vel = 30 + rand(70), dur = durz[drx]);
+          drx = incr(drx, 0, len(durz));
         }
       }
     }
@@ -209,12 +211,66 @@ let glitch_fm_comp = comp()
         let idx = i % len(poly9);
         if (poly9[idx] == 1) {
           # Note 8 = Lazer
-          note_on_at(drums, 8, i * pp + rand(30), vel = 20 + rand(80));
+          note_on_at(sbdrum, 8, i * pp + rand(30), vel = 20 + rand(80), dur = durz[drx]);
+          drx = incr(drx, 0, len(durz));
         }
       }
     }
   }
 }
+
+let dxrar = comp()
+{
+  setup()
+  {
+    let mel1 =  [0, 22, 0, 0,  0, 20, 0, 0,  0, 0, 27, 0,  25, 0, 0, 28];
+    let mel2 =  [0, 32, 0, 20,  0, 22, 0, 0,  27, 28, 0, 0,  20, 0, 30, 32];
+  }
+  run()
+  {
+    let mel = mel1;
+    if (count % 4 == 3) {
+      mel = mel2;
+    }
+    for (let i = 0; i < 16; i++) {
+      if (mel[i] > 0) {
+        note_on_at(dx2, mel[i], i * pp, dur = 300);
+      }
+    }
+  }
+}
+
+let DXnar = comp()
+{
+  setup()
+  {
+    let melorig = [49, 49, 0, 47,  51, 51, 0, 47,  54, 52, 0, 51,  56, 54, 51, 0];
+  }
+  run()
+  {
+    if (count % 2 == 1) {
+
+      let mel = rotate(melorig, count % 7);
+      if (count % 16 == 1) {
+        mel = reverse(mel);
+      }
+      if (count % 12 == 1) {
+        mel = shuffle(mel);
+      }
+      for (let i = 0; i < 16; i++) {
+        let off = 40;
+        if (i % 2 == 0) {
+          off = 0;
+        }
+        if (mel[i] > 0) {
+          note_on_at(dx3, mel[i], i * pp, dur = 40);
+        }
+      }
+    }
+  }
+}
+
+
 
 # Master arrangement
 let main_comp = comp()
@@ -265,7 +321,8 @@ let main_comp = comp()
       p34 # hats_comp;
     }
 
-    print("Bar:", c);
+    # uncomment if you want to follow along
+    # print("Bar:", c);
     c++;
   }
 }

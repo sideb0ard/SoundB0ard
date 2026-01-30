@@ -1,9 +1,6 @@
 # SBShell User Guide
 
-Yo, Terminal Punk,
-    you are now about to witness the strength of street knowledge.
-
-SoundB0ard - a Unix-style shell for making music! This guide will take you from your first sound to complex live-coded performances.
+SBShell is a unix shell inspired music making environment - it’s a text based interface, an interactive REPL - Read-Eval-Print Loop, and also supports live-coding in Slang, SBShell’s javascript like language, via file monitoring, to allow for complex evolving music programs.
 
 ---
 
@@ -25,8 +22,8 @@ ps
 // Trigger a kick drum (note 0)
 note_on(sbdrum, 0);
 
-// Try a clap (note 1)
-note_on(sbdrum, 3);
+// Try a clap (note 2)
+note_on(sbdrum, 2);
 
 // play a long bass note (midi 20 - G#)
 note_on(dx, 20, dur = 5000);
@@ -62,8 +59,8 @@ load_preset(drums, "DILLA");   // Warm, lo-fi
 // Drum voices (MIDI note numbers):
 // 0 = Kick
 // 1 = Snare
-// 2 = Closed Hi-Hat
-// 3 = Clap
+// 2 = Clap
+// 3 = Closed Hi-Hat
 // 4 = Open Hi-Hat
 // 5-7 = FM Toms
 // 8 = Laser
@@ -77,6 +74,29 @@ let dx1 = fmsynth();
 load_preset(dx1, "BASS");
 note_on(dx1, 36);  // C1 - deep bass note
 note_on(dx1, 60);  // C3 - middle C
+note_on(dx1, notes_in_chord(40, 36)); // play a E(40) chord in the key of C(36)
+
+midi_ref(); // midi note reference and other info
+Midi Notes:
+- C:0  C#:1  D:2  D#:3  E:4  F:5  F#:6  G:7  G#:8  A:9  A#:10 B:11
+0 C:12 C#:13 D:14 D#:15 E:16 F:17 F#:18 G:19 G#:20 A:21 A#:22 B:23
+1 C:24 C#:25 D:26 D#:27 E:28 F:29 F#:30 G:31 G#:32 A:33 A#:34 B:35
+2 C:36 C#:37 D:38 D#:39 E:40 F:41 F#:42 G:43 G#:44 A:45 A#:46 B:47
+3 C:48 C#:49 D:50 D#:51 E:52 F:53 F#:54 G:55 G#:56 A:57 A#:58 B:59
+4 C:60 C#:61 D:62 D#:63 E:64 F:65 F#:66 G:67 G#:68 A:69 A#:70 B:71
+5 C:72 C#:73 D:74 D#:75 E:76 F:77 F#:78 G:79 G#:80 A:81 A#:82 B:83
+Chord Progressions: I-IV-V, I-V-vi-IV, I-vi-IV-V, vi-ii-V-I vi-IV-I-V
+Chord Mods: None(0), Seventh(1), Seventh Inv(2) Root Inv(3) Power(4)
+Key Mods: None(0), Natural Minor(1), Harmonic Minor Inv(2) Melodic Minor(3) Phrygian(4)
+Filters: LPF1, HPF1, LPF2, HPF2, BPF2, BSF2, LPF4, HPF4, BPF4
+Major Scale: W W H W W W H // Minor Scale: W H W W H W W
+
+SB#> notes_in_key(36)
+SB#> [36, 38, 40, 41,  43, 45, 47, 48]
+print_notes(notes_in_key(36))
+SB#> Notes:[36, 38, 40, 41,  43, 45, 47, 48]
+C D E F G A B
+
 ```
 
 ### Subtractive Synth - minisynth()

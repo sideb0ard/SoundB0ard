@@ -960,7 +960,7 @@ let snare_comp = comp()
       let cpat = clap_pats[cx];
       for (let i = 0; i < 16; i++) {
         if (cpat[i] == 1) {
-          note_on_at(sbdrum, 3, i * pp + 20, vel = 50 + rand(30));
+          note_on_at(sbdrum, 2, i * pp + 20, vel = 50 + rand(30));
         }
       }
       cx = incr(cx, 0, len(clap_pats));

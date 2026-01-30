@@ -440,36 +440,7 @@ std::string DrumSynth::Info() {
      << " sd_delay_sync_len:" << settings_.sd_delay_sync_len << std::endl;
   ss << "     sd_attack:" << settings_.sd_attack
      << " sd_noise_attack:" << settings_.sd_noise_attack << std::endl;
-  ss << COOL_COLOR_YELLOW_MELLOW "     hh(2): hh_vol:" << settings_.bd_vol
-     << " hh_pan:" << settings_.hh_pan << " hh_attack:" << settings_.hh_attack
-     << " hh_decay:" << settings_.hh_decay << std::endl;
-  ss << "     hh_sqamp:" << settings_.hh_sqamp
-     << " hh_midf:" << settings_.hh_midf << " hh_hif:" << settings_.hh_hif
-     << " hh_hif_q:" << settings_.hh_hif_q
-     << " hh_dist:" << settings_.hh_distortion_threshold << std::endl;
-  ss << "     hh_delay_mode:" << settings_.hh_delay_mode
-     << " hh_delay_ms:" << settings_.hh_delay_ms
-     << " hh_delay_feedback_pct:" << settings_.hh_delay_feedback_pct
-     << " hh_delay_ratio:" << settings_.hh_delay_ratio << std::endl;
-  ss << "     hh_delay_wetmix:" << settings_.hh_delay_wetmix
-     << " hh_delay_sync_tempo:" << settings_.hh_delay_sync_tempo
-     << " hh_delay_sync_len:" << settings_.hh_delay_sync_len << std::endl;
-  ss << COOL_COLOR_ORANGE "     hh2(4): hh2_vol:" << settings_.hh2_vol
-     << " hh2_pan:" << settings_.hh2_pan
-     << " hh2_attack:" << settings_.hh2_attack
-     << " hh2_decay:" << settings_.hh2_decay << std::endl;
-  ss << "     hh2_sqamp:" << settings_.hh2_sqamp
-     << " hh2_midf:" << settings_.hh2_midf << " hh2_hif:" << settings_.hh2_hif
-     << " hh2_hif_q:" << settings_.hh2_hif_q
-     << " hh2_dist:" << settings_.hh2_distortion_threshold << std::endl;
-  ss << "     hh2_delay_mode:" << settings_.hh2_delay_mode
-     << " hh2_delay_ms:" << settings_.hh2_delay_ms
-     << " hh2_delay_feedback_pct:" << settings_.hh2_delay_feedback_pct
-     << " hh2_delay_ratio:" << settings_.hh2_delay_ratio << std::endl;
-  ss << "     hh2_delay_wetmix:" << settings_.hh2_delay_wetmix
-     << " hh2_delay_sync_tempo:" << settings_.hh2_delay_sync_tempo
-     << " hh2_delay_sync_len:" << settings_.hh2_delay_sync_len << std::endl;
-  ss << COOL_COLOR_YELLOW_MELLOW "     cp(3): cp_vol:" << settings_.cp_vol
+  ss << COOL_COLOR_YELLOW_MELLOW "     cp(2): cp_vol:" << settings_.cp_vol
      << " cp_pan:" << settings_.cp_pan << " cp_nvol:" << settings_.cp_nvol
      << " cp_nattack:" << settings_.cp_nattack
      << " cp_ndecay:" << settings_.cp_ndecay << " cp_tone:" << settings_.cp_tone
@@ -488,6 +459,35 @@ std::string DrumSynth::Info() {
   ss << "     cp_delay_wetmix:" << settings_.cp_delay_wetmix
      << " cp_delay_sync_tempo:" << settings_.cp_delay_sync_tempo
      << " cp_delay_sync_len:" << settings_.cp_delay_sync_len << std::endl;
+  ss << COOL_COLOR_ORANGE "     hh(3): hh_vol:" << settings_.hh_vol
+     << " hh_pan:" << settings_.hh_pan << " hh_attack:" << settings_.hh_attack
+     << " hh_decay:" << settings_.hh_decay << std::endl;
+  ss << "     hh_sqamp:" << settings_.hh_sqamp
+     << " hh_midf:" << settings_.hh_midf << " hh_hif:" << settings_.hh_hif
+     << " hh_hif_q:" << settings_.hh_hif_q
+     << " hh_dist:" << settings_.hh_distortion_threshold << std::endl;
+  ss << "     hh_delay_mode:" << settings_.hh_delay_mode
+     << " hh_delay_ms:" << settings_.hh_delay_ms
+     << " hh_delay_feedback_pct:" << settings_.hh_delay_feedback_pct
+     << " hh_delay_ratio:" << settings_.hh_delay_ratio << std::endl;
+  ss << "     hh_delay_wetmix:" << settings_.hh_delay_wetmix
+     << " hh_delay_sync_tempo:" << settings_.hh_delay_sync_tempo
+     << " hh_delay_sync_len:" << settings_.hh_delay_sync_len << std::endl;
+  ss << COOL_COLOR_YELLOW_MELLOW "     hh2(4): hh2_vol:" << settings_.hh2_vol
+     << " hh2_pan:" << settings_.hh2_pan
+     << " hh2_attack:" << settings_.hh2_attack
+     << " hh2_decay:" << settings_.hh2_decay << std::endl;
+  ss << "     hh2_sqamp:" << settings_.hh2_sqamp
+     << " hh2_midf:" << settings_.hh2_midf << " hh2_hif:" << settings_.hh2_hif
+     << " hh2_hif_q:" << settings_.hh2_hif_q
+     << " hh2_dist:" << settings_.hh2_distortion_threshold << std::endl;
+  ss << "     hh2_delay_mode:" << settings_.hh2_delay_mode
+     << " hh2_delay_ms:" << settings_.hh2_delay_ms
+     << " hh2_delay_feedback_pct:" << settings_.hh2_delay_feedback_pct
+     << " hh2_delay_ratio:" << settings_.hh2_delay_ratio << std::endl;
+  ss << "     hh2_delay_wetmix:" << settings_.hh2_delay_wetmix
+     << " hh2_delay_sync_tempo:" << settings_.hh2_delay_sync_tempo
+     << " hh2_delay_sync_len:" << settings_.hh2_delay_sync_len << std::endl;
   ss << COOL_COLOR_ORANGE "     fm1(5): fm1_vol:" << settings_.fm1_vol
      << " fm1_pan:" << settings_.fm1_pan
      << " fm1_car_freq:" << settings_.fm1_carrier_freq
@@ -575,12 +575,12 @@ void DrumSynth::NoteOn(midi_event ev) {
       sd_->NoteOn(velocity);
       break;
     case (2):
-      // Hi Hat
-      hh_->NoteOn(velocity);
-      break;
-    case (3):
       // HandClap
       cp_->NoteOn(velocity);
+      break;
+    case (3):
+      // Closed Hi Hat
+      hh_->NoteOn(velocity);
       break;
     case (4):
       // Hi Hat 2 // Open Hat

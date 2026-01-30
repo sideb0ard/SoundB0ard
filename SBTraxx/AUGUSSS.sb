@@ -265,7 +265,7 @@ let hhblah_gen = gen()
         offs = 0;
       }
       if (hatz[i] == 1) {
-        note_on_at(sb2, 2, i * pp + offs, dur = 20, vel = 70 + rand(40));
+        note_on_at(sb2, 3, i * pp + offs, dur = 20, vel = 70 + rand(40));
       }
     }
   }

@@ -31,10 +31,10 @@ let drumblah_gen = gen()
     }
 
     if (count % 2 == 1) {
-      note_on_at(sbdrum, 3, 8 * pp + 170, dur = 100);
+      note_on_at(sbdrum, 2, 8 * pp + 170, dur = 100);
     }
     if (count % 7 == 1) {
-      note_on_at(sbdrum, 3, 15 * pp + 170, dur = 100, vel = 60);
+      note_on_at(sbdrum, 2, 15 * pp + 170, dur = 100, vel = 60);
     }
   }
 }
